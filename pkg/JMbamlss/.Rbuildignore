@@ -1,2 +1,4 @@
 inst
 
+^.*\.Rproj$
+^\.Rproj\.user$
