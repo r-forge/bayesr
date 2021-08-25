@@ -20,6 +20,11 @@ sim_dat <- simJM(nsub = 10, long_setting = "fpc", alpha_setting = "constant",
 # \mu_ij = 1.25
 # \Z_i(t_ij)' = (sin(sim_dat$x2), obstime)
 # \beta = (0.6, -0.01)
+# --------------------- NOTE -------------------
+# The covariate effect of x2 is actually 0.6*sin(x2). This is important as the
+# proposed method of Yao is not able to estimate the nonlinear part, only the
+# coefficient. It assumes that the transformation function of x2 is fully known.
+# ----------------------------------------------
 # K = 3
 # \xi_ik ~ N(0, \lambda_k) with 
 # \lambda_1 = 2*1, \lambda_2 = 2*2/3, \lambda_3 = 2*1/3 ---- function gen_fpc()
