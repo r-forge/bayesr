@@ -2087,7 +2087,8 @@ xbin.fun <- function(ind, weights, e, xweights, xrres, oind, uind = NULL)
 
 xcenter <- function(x)
 {
-  .Call("xcenter", as.numeric(x), PACKAGE = "bamlss")
+  return(x)
+  ##.Call("xcenter", as.numeric(x), PACKAGE = "bamlss")
 }
 
 
@@ -6162,7 +6163,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
             }
 
             if(!slice) {
-              tau2s <- try(tau2.optim(objfun3, tau2[[i]][[j]], maxit = 10), silent = TRUE)
+              tau2s <- try(tau2.optim(objfun3, tau2[[i]][[j]], optim = FALSE, maxit = 50), silent = TRUE)
             } else {
               theta <- c(b0, "tau2" = tau2[[i]][[j]])
               ii <- grep("tau2", names(theta))
@@ -6236,7 +6237,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
                 ll_contrib[[i]][[paste0("s.", j)]] <- ll1 - ll0
                 medf[[i]][[paste0("s.", j, ".edf")]] <- c(medf[[i]][[paste0("s.", j, ".edf")]], tedf)
               }
-            }
+            } else stop(j)
             if(!select & accept) {
               if(inherits(x[[i]]$smooth.construct[[j]], "nnet0.smooth")) {
                 nid <- 1:x[[i]]$smooth.construct[[j]]$nodes
