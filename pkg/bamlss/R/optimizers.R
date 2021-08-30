@@ -2087,8 +2087,7 @@ xbin.fun <- function(ind, weights, e, xweights, xrres, oind, uind = NULL)
 
 xcenter <- function(x)
 {
-  return(x)
-  ##.Call("xcenter", as.numeric(x), PACKAGE = "bamlss")
+  .Call("xcenter", as.numeric(x), PACKAGE = "bamlss")
 }
 
 
@@ -6163,7 +6162,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
             }
 
             if(!slice) {
-              tau2s <- try(tau2.optim(objfun3, tau2[[i]][[j]], optim = FALSE, maxit = 50), silent = TRUE)
+              tau2s <- try(tau2.optim(objfun3, tau2[[i]][[j]], optim = TRUE), silent = TRUE)
             } else {
               theta <- c(b0, "tau2" = tau2[[i]][[j]])
               ii <- grep("tau2", names(theta))
