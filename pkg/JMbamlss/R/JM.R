@@ -4,6 +4,8 @@ source("simMultiJM.R")
 
 if(FALSE) {
   d <- simMultiJM()
+  ## FPCA schätzen!
+  fpca <- 1
 }
 
 jm_bamlss <- function(...)
@@ -36,7 +38,36 @@ sm_time_transform <- function(x, data, grid, yname, timevar, take)
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
   X <- NULL
-print(x$term)
+  for(j in x$term) {
+    if((j != yname) & (j != timevar)) {
+      df <- data.frame(rep(data[[j]], each = length(grid[[1]])))
+      names(df) <- j
+      X <- if(is.null(X)) df else cbind(X, df)
+    }
+  }
+  if(!is.null(X))
+    colnames(X) <- x$term[!(x$term %in% c(yname, timevar))]
+  X <- if(is.null(X)) data.frame(unlist(grid)) else cbind(X, unlist(grid))
+  colnames(X)[ncol(X)] <- yname
+  if(timevar != yname) {
+    X <- cbind(X, unlist(grid))
+    colnames(X)[ncol(X)] <- timevar
+  }
+  if(x$by != "NA" & x$by != yname)
+    X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
+
+  x$Xgrid <- PredictMat(x, X)
+
+  x
+}
+
+## PCRE transformer.
+sm_time_transform_pcre <- function(x, data, grid, yname, timevar, take)
+{
+stop("here!")
+  if(!is.null(take))
+    data <- data[take, , drop = FALSE]
+  X <- NULL
   for(j in x$term) {
     if((j != yname) & (j != timevar)) {
       df <- data.frame(rep(data[[j]], each = length(grid[[1]])))
@@ -76,6 +107,7 @@ JM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
   smj <- object$x$mu$smooth.construct[[j]]
   idvar <- smj$term[1]
 
+
   ## Setup integration.
   grid <- function(time) {
     time / 2 * gq$nodes + time / 2
@@ -95,36 +127,27 @@ JM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
     stop("the time variable is not specified, needed for mu!")
   timevar <- yname
 
-  ## Transform lambda.
-  ## FIXME: remove intercept!
-  ## Compute new design matrices for integration.
-  if(!is.null(object$x$lambda$smooth.construct)) {
-    for(j in names(object$x$lambda$smooth.construct)) {
-      if(j != "model.matrix") {
-        xterm <- object$x$lambda$smooth.construct[[j]]$term
-        by <- if(object$x$lambda$smooth.construct[[j]]$by != "NA") {
-          object$x$lambda$smooth.construct[[j]]$by
-        } else NULL
-        object$x$lambda$smooth.construct[[j]] <- sm_time_transform(object$x$lambda$smooth.construct[[j]],
-          object$model.frame[, unique(c(xterm, yname, by, timevar, idvar)), drop = FALSE],
-          grid, yname, timevar, take)
-      }
-    }
-  }
+  ## FIXME: remove intercepts!
 
-  ## FIXME: gamma + linear.
-
-  ## Setup longitudinal part.
-  if(!is.null(object$x$mu$smooth.construct)) {
-    for(j in names(object$x$mu$smooth.construct)) {
-      if(j != "model.matrix") {
-        xterm <- object$x$mu$smooth.construct[[j]]$term
-        by <- if(object$x$mu$smooth.construct[[j]]$by != "NA") {
-          object$x$mu$smooth.construct[[j]]$by
-        } else NULL
-        object$x$mu$smooth.construct[[j]] <- sm_time_transform(object$x$mu$smooth.construct[[j]],
-          object$model.frame[, unique(c(xterm, yname, by, timevar, idvar)), drop = FALSE],
-          grid, yname, timevar_mu, take_last)
+  ## Compute new design matrices for integration for smooth terms.
+  for(i in c("lambda", "mu", "alpha")) {
+    if(!is.null(object$x[[i]]$smooth.construct)) {
+      for(j in names(object$x[[i]]$smooth.construct)) {
+        if(j != "model.matrix") {
+          xterm <- object$x[[i]]$smooth.construct[[j]]$term
+          by <- if(object$x[[i]]$smooth.construct[[j]]$by != "NA") {
+            object$x[[i]]$smooth.construct[[j]]$by
+          } else NULL
+          if(inherits(object$x[[i]]$smooth.construct[[j]], "pcre.random.effect")) {
+            object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_pcre(object$x[[i]]$smooth.construct[[j]],
+              object$model.frame[, unique(c(xterm, yname, by, timevar, idvar)), drop = FALSE],
+              grid, yname, timevar_mu, take_last)
+          } else {
+            object$x[[i]]$smooth.construct[[j]] <- sm_time_transform(object$x[[i]]$smooth.construct[[j]],
+              object$model.frame[, unique(c(xterm, yname, by, timevar, idvar)), drop = FALSE],
+              grid, yname, if(i == "mu") timevar_mu else timevar, take_last)
+          }
+        }
       }
     }
   }
@@ -140,7 +163,7 @@ f <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
   gamma ~ 1,
   mu ~ -1 + marker + s(obstime, by = marker) +
-    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("fpca" = 1)),
+    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("fpca" = fpca)),
   sigma ~ 1,
   alpha ~ 1
 )
