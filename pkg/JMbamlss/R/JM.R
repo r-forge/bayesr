@@ -17,7 +17,7 @@ if(FALSE) {
     irregFunData(argvals = split(mark$obstime, mark$id), 
                  X = split(mark$res, mark$id))
   })
-  mfpca <- lapply(m_irregFunData, function(mark) {
+  FPCA <- lapply(m_irregFunData, function(mark) {
     PACE(mark)
   })
   mFData <- multiFunData(lapply(FPCA, "[[", "fit"))
