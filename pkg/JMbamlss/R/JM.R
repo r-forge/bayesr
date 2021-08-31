@@ -1,11 +1,31 @@
 library("refund")
+library("mgcv")
+library("MFPCA")
 
 source("simMultiJM.R")
 
 if(FALSE) {
   d <- simMultiJM()
-  ## FPCA schätzen!
-  fpca <- 1
+
+  marker_dat <- split(d, d$marker)
+  marker_dat <- lapply(marker_dat, function (mark) {
+    mark$res <- bam(y ~ s(obstime) + s(x2), data = mark)$residuals
+    mark
+  })
+  m_irregFunData <- lapply(marker_dat, function (mark) {
+    mark <- mark[order(mark$obstime), ]
+    irregFunData(argvals = split(mark$obstime, mark$id), 
+                 X = split(mark$res, mark$id))
+  })
+  mfpca <- lapply(m_irregFunData, function(mark) {
+    PACE(mark)
+  })
+  mFData <- multiFunData(lapply(FPCA, "[[", "fit"))
+  uniExpansions <- lapply(FPCA, function (mark) {
+    list(type = "given", functions = mark$functions)
+  })
+  MFPCA <- MFPCA(mFData = mFData, M = 3, uniExpansions = uniExpansions)
+ 
 }
 
 jm_bamlss <- function(...)
@@ -163,7 +183,7 @@ f <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
   gamma ~ 1,
   mu ~ -1 + marker + s(obstime, by = marker) +
-    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("fpca" = fpca)),
+    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("mfpca" = mfpca)),
   sigma ~ 1,
   alpha ~ 1
 )
