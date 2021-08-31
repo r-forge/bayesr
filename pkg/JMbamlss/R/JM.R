@@ -1,8 +1,9 @@
 library("refund")
-library("mgcv")
+library("bamlss")
 library("MFPCA")
 
 source("simMultiJM.R")
+source("eval_mfun.R")
 
 if(FALSE) {
   d <- simMultiJM()
@@ -84,7 +85,6 @@ sm_time_transform <- function(x, data, grid, yname, timevar, take)
 ## PCRE transformer.
 sm_time_transform_pcre <- function(x, data, grid, yname, timevar, take)
 {
-stop("here!")
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
   X <- NULL
@@ -106,9 +106,23 @@ stop("here!")
   if(x$by != "NA" & x$by != yname)
     X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
 
+  class(x) <- "pcre2.random.effect"
+
+  x$term <- c(x$term, timevar)
+  x$timevar <- timevar
   x$Xgrid <- PredictMat(x, X)
 
   x
+}
+
+Predict.matrix.pcre2.random.effect <- function(object, data)
+{
+  if(is.null(object$xt$mfpc))
+    stop("need mfpa object!")
+print(head(as.data.frame(data)))
+  w <- eval_mfpc(object$xt$mfpc, data[[object$timevar]])
+print(w)
+stop()
 }
 
 ## Compute all necessary matrices.
@@ -127,13 +141,22 @@ JM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
   smj <- object$x$mu$smooth.construct[[j]]
   idvar <- smj$term[1]
 
-
   ## Setup integration.
   grid <- function(time) {
     time / 2 * gq$nodes + time / 2
   }
   y2 <- cbind(object$y[[1]][, "time"], object$model.frame[[idvar]])
   colnames(y2) <- c("time", idvar)
+
+  take_l <- !duplicated(y2[, 1:2])
+  take_last_l <- !duplicated(y2, fromLast = TRUE)
+
+  marker <- FALSE
+  if(!is.null(object$model.frame$marker)) {
+    marker <- TRUE
+    y2 <- cbind(y2, "marker" = as.factor(object$model.frame$marker))
+  }
+
   take <- !duplicated(y2)
   take_last <- !duplicated(y2, fromLast = TRUE)
 
@@ -160,12 +183,12 @@ JM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
           } else NULL
           if(inherits(object$x[[i]]$smooth.construct[[j]], "pcre.random.effect")) {
             object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_pcre(object$x[[i]]$smooth.construct[[j]],
-              object$model.frame[, unique(c(xterm, yname, by, timevar, idvar)), drop = FALSE],
-              grid, yname, timevar_mu, take_last)
+              object$model.frame[, unique(c(xterm, yname, by, timevar_mu, idvar)), drop = FALSE],
+              grid, yname, timevar_mu, if(i == "lambda") take_last_l else take_last)
           } else {
             object$x[[i]]$smooth.construct[[j]] <- sm_time_transform(object$x[[i]]$smooth.construct[[j]],
-              object$model.frame[, unique(c(xterm, yname, by, timevar, idvar)), drop = FALSE],
-              grid, yname, if(i == "mu") timevar_mu else timevar, take_last)
+              object$model.frame[, unique(c(xterm, yname, by, if(i == "mu") timevar_mu else timevar, idvar)), drop = FALSE],
+              grid, yname, if(i == "mu") timevar_mu else timevar, if(i == "lambda") take_last_l else take_last)
           }
         }
       }
@@ -183,9 +206,9 @@ f <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
   gamma ~ 1,
   mu ~ -1 + marker + s(obstime, by = marker) +
-    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("mfpca" = mfpca)),
+    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("mfpc" = MFPCA)),
   sigma ~ 1,
-  alpha ~ 1
+  alpha ~ -1 + marker + s(survtime, by = marker)
 )
 
 b <- bamlss(f, family = jm_bamlss, data = d, timevar = "obstime")

@@ -44,7 +44,7 @@ eval_mfpc <- function (MFPCA, timepoints) {
     zoo::na.approx(t(xpoints), x = xvals, na.rm = FALSE)
   }, xpoints = obs_x, xvals = arg_vals, SIMPLIFY = FALSE)
 
-  # extract 
+  # extract
   mapply(function (dim, tpoint) {
     rownames(dim) <- tpoint
     dim[paste(timepoints), ]
