@@ -78,7 +78,8 @@ sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take)
     X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
 
   x$Xgrid <- PredictMat(x, X)
-
+  print(x$label)
+  print(dim(x$Xgrid))
   x
 }
 
@@ -273,13 +274,47 @@ MJM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
 
 opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...)
 {
+  
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
 
   y <- y[[1]]
 
   eta <- bamlss:::get.eta(x, expand = FALSE)
-
+  
+  # Wofür die Iteration in JM code? Werden die Parameter nicht eh bei 0 
+  # initialisiert?
+  # In pbc Beispiel wird zumindest der Intercept im mu Prädiktor initialisiert.
+  # Aber wird nicht der Intercept noch extra aus dem lambda  rausgenommen?
+  
+  # fit.fun_timegrid() nicht in MJM
+  # Mman braucht das grid ausgewertet mit den jeweiligen aktuellen Parametern.
+  # Im alten Code war das grid in dem $status Element
+  # Bzw. wird die Funktion ff im Environment von sm_time_transform erstellt
+  # und greift dann dort auf das Grid und die Dimensionen des Grids zu.
+  # Hier hat in x$lambda$smooth.construct[[1]] das grid
+  # Aber warum sind das 1000 x 9? Müsste das nicht nsub*subdivisions sein?
+  # Also 50*10
+  eta_timegrid_lambda <- 0
+  print(str(x$lambda$smooth.construct[[1]], max.level = 1))
+  if(length(x$lambda$smooth.construct)) {
+    for(j in names(x$lambda$smooth.construct)) {
+      b <- get.par(x$lambda$smooth.construct[[j]]$state$parameters, "b")
+      print(x$lambda$smooth.construct[[j]]$fit.fun_timegrid)
+      eta_timegrid_lambda <- eta_timegrid_lambda + x$lambda$smooth.construct[[j]]$fit.fun_timegrid(b)
+    }
+  }
+  eta_timegrid <- eta_timegrid_lambda #+ eta_time_grid_alpha*eta_timegrid_mu
+  
+  # Warum werden hier die EDFs auf 0 gesetzt?
+  # for (k in names(x)) {
+  #   if (length(x[[k]]$smooth.construct)) {
+  #     for (j in names(x[[k]]$smooth.construct)) {
+  #       x[[k]]$smooth.construct[[j]]$state$edf <- 0
+  #     }
+  #   }
+  # }
+  
   eps0 <- eps + 1
   eta0 <- do.call("cbind", eta)
   iter <- 0
@@ -287,27 +322,26 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
-      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], nu = nu, ...)
+      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], nu = nu, 
+                                 eta_timegrid = eta_timegrid, ...)
     }
   }
 
   ## return(list("parameters" = par, "fitted.values" = eta))
 }
 
-update_mjm_lambda <- function(x, nu, ...)
+update_mjm_lambda <- function(x, nu, eta_timegrid, ...)
 {
   ## grid matrix -> x$Xgrid
   ## design matrix -> x$X
   ## penalty matrices -> x$S
   ## optimizer.R -> bfit_iwls() updating.
+  
   b <- bamlss::get.state(x, "b")
   tau2 <- bamlss::get.state(x, "tau2")
 
-print(x$state)
-print(x$term)
-print(x$label)
-print(tau2)
-stop("!\n")
+  print(str(eta_timegrid))
+stop("Basst.\n")
 
   ## Newton-Raphson.
   ## b <- b + nu * H %*% grad
