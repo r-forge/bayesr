@@ -271,8 +271,11 @@ MJM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
 }
 
 
-opt_MJM <- function(x, y, eps = 0.0001, maxit = 400, nu = 0.1, ...)
+opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...)
 {
+  if(!is.null(start))
+    x <- bamlss:::set.starting.values(x, start)
+
   y <- y[[1]]
 
   eta <- bamlss:::get.eta(x, expand = FALSE)
@@ -287,6 +290,8 @@ opt_MJM <- function(x, y, eps = 0.0001, maxit = 400, nu = 0.1, ...)
       state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], nu = nu, ...)
     }
   }
+
+  ## return(list("parameters" = par, "fitted.values" = eta))
 }
 
 update_mjm_lambda <- function(x, nu, ...)
@@ -306,6 +311,8 @@ stop("!\n")
 
   ## Newton-Raphson.
   ## b <- b + nu * H %*% grad
+
+  return(x$state)
 }
 
 Surv2 <- bamlss:::Surv2
