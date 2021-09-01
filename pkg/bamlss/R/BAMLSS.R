@@ -98,7 +98,7 @@ bamlss.frame <- function(formula, data = NULL, family = "gaussian",
     if(is.null(overwrite))
       overwrite <- TRUE
     if(file.exists("ff_data_bamlss") & overwrite) {
-      unlink("ff_data_bamlss")
+      unlink("ff_data_bamlss", recursive = TRUE, force = TRUE)
     }
     if(!file.exists("ff_data_bamlss")) {
       cat("  .. creating directory 'ff_data_bamlss' for storing matrices. Note, the directory is not deleted and matrices can be used for another model.\n")
@@ -2015,7 +2015,7 @@ bamlss <- function(formula, family = "gaussian", data = NULL, start = NULL, knot
   ## Remove ff directory?
   if(bf$delete) {
     if(dir.exists("ff_data_bamlss"))
-      unlink("ff_data_bamlss")
+      unlink("ff_data_bamlss", recursive = TRUE, force = TRUE)
   }
 
 
