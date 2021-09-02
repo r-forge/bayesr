@@ -56,6 +56,7 @@ mjm_bamlss <- function(...)
 ## Smooth time transformer function.
 sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take)
 {
+
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
   X <- NULL
@@ -78,8 +79,11 @@ sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take)
     X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
 
   x$Xgrid <- PredictMat(x, X)
-  print(x$label)
-  print(dim(x$Xgrid))
+  
+  # XT necessary for calculation of score and hessian
+  # Matrix of evaluations at the vector of survival times
+  x$XT <- PredictMat(x, data)
+  
   x
 }
 
@@ -159,10 +163,13 @@ param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar, tak
 
 
 ## Compute all necessary matrices.
-MJM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
+MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 {
   stopifnot(requireNamespace("statmod"))
 
+  # gq an object$x anhängen, Attribut von y
+  # attr(object$y, "intweight") <- gq
+  # y schon in object
   gq <- statmod::gauss.quad(subdivisions, ...)
 
   ## Get idvar.
@@ -175,28 +182,36 @@ MJM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
   idvar <- smj$term[1]
 
   ## Setup integration.
-  grid <- function(time) {
+  create_grid <- function(time) {
     time / 2 * gq$nodes + time / 2
   }
-  y2 <- cbind(object$y[[1]][, "time"], object$model.frame[[idvar]])
-  colnames(y2) <- c("time", idvar)
+  y2_l <- cbind(object$y[[1]][, "time"], object$model.frame[[idvar]])
+  colnames(y2_l) <- c("time", idvar)
 
-  take_l <- !duplicated(y2[, 1:2])
-  take_last_l <- !duplicated(y2, fromLast = TRUE)
-  nsubj <- length(unique(y2[, idvar]))
+  take <- !duplicated(y2_l[, 1:2])
+  take_last <- !duplicated(y2_l, fromLast = TRUE)
+  nsubj <- length(unique(y2_l[, idvar]))
+  y2 <- y2_l[take, , drop = FALSE]
+  grid <- lapply(y2[, "time"], create_grid)
+  
 
   marker <- FALSE
   if(!is.null(object$model.frame$marker)) {
     marker <- TRUE
-    y2 <- cbind(y2, "marker" = as.factor(object$model.frame$marker))
+    y2_l <- cbind(y2_l, "marker" = as.factor(object$model.frame$marker))
   }
 
-  take <- !duplicated(y2)
-  take_last <- !duplicated(y2, fromLast = TRUE)
+  take_l <- !duplicated(y2_l)
+  take_last_l <- !duplicated(y2_l, fromLast = TRUE)
 
-  y2 <- y2[take, , drop = FALSE]
-  nobs <- nrow(y2)
-  grid <- lapply(y2[, "time"], grid)
+  y2_l <- y2_l[take_l, , drop = FALSE]
+  grid_l <- lapply(y2_l[, "time"], create_grid)
+  
+  ## Save information for optimizer in attributes of y
+  attr(object$y, "gq_weights") <- gq$weights
+  attr(object$y, "status") <- object$y[[1]][, "status"][take_last]
+  attr(object$y, "status_l") <- object$y[[1]][, "status"][take_last_l]
+  attr(object$y, "take_last") <- take_last
 
   yname <- all.names(object$x$lambda$formula[2])[2]
   timevar_mu <- timevar
@@ -237,12 +252,13 @@ MJM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
           if(inherits(object$x[[i]]$smooth.construct[[j]], "pcre.random.effect")) {
             object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_mjm_pcre(object$x[[i]]$smooth.construct[[j]],
               object$model.frame[, unique(c(xterm, yname, by, timevar_mu, idvar)), drop = FALSE],
-              grid, yname, timevar_mu, if(i == "lambda") take_last_l else take_last,
-              N = nsubj * subdivisions)
+              grid_l, yname, timevar_mu, take_last_l, N = nsubj * subdivisions)
           } else {
             object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_mjm(object$x[[i]]$smooth.construct[[j]],
               object$model.frame[, unique(c(xterm, yname, by, if(i == "mu") timevar_mu else timevar, idvar)), drop = FALSE],
-              grid, yname, if(i == "mu") timevar_mu else timevar, if(i == "lambda") take_last_l else take_last)
+              if(i == "lambda") grid else grid_l, yname, 
+              if(i == "mu") timevar_mu else timevar,
+              if(i == "lambda") take_last else take_last_l)
           }
         }
       }
@@ -253,8 +269,9 @@ MJM_transform <- function(object, subdivisions = 10, timevar = NULL, ...)
   for(i in c("lambda", "mu", "alpha")) {
     if(!is.null(object$x[[i]]$smooth.construct$model.matrix)) {
       object$x[[i]]$smooth.construct$model.matrix <- param_time_transform_mjm(object$x[[i]]$smooth.construct$model.matrix,
-        bamlss:::drop.terms.bamlss(object$x[[i]]$terms, sterms = FALSE, keep.response = FALSE), object$model.frame, grid, yname, 
-        if(i != "mu") timevar else timevar_mu, if(i == "lambda") take_last_l else take_last)
+        bamlss:::drop.terms.bamlss(object$x[[i]]$terms, sterms = FALSE, keep.response = FALSE), object$model.frame,
+        if(i == "lambda") grid else grid_l, yname, 
+        if(i != "mu") timevar else timevar_mu, if(i == "lambda") take_last else take_last_l)
     }
   }
 
@@ -278,34 +295,38 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
 
-  y <- y[[1]]
 
+# braucht man also auch noch take als attribut von y, damit man aus eta die
+# richtigen Zeilen rauslesen kann
+  # Wofür braucht man überhaupt das gesamte Grid der Beobachtungszeitpunkte?
   eta <- bamlss:::get.eta(x, expand = FALSE)
   
   # Wofür die Iteration in JM code? Werden die Parameter nicht eh bei 0 
   # initialisiert?
   # In pbc Beispiel wird zumindest der Intercept im mu Prädiktor initialisiert.
   # Aber wird nicht der Intercept noch extra aus dem lambda  rausgenommen?
-  
+  # Und was ist überhaupt mit den Parametern?
+  #-----
   # fit.fun_timegrid() nicht in MJM
-  # Mman braucht das grid ausgewertet mit den jeweiligen aktuellen Parametern.
+  # Man braucht das grid ausgewertet mit den jeweiligen aktuellen Parametern.
   # Im alten Code war das grid in dem $status Element
   # Bzw. wird die Funktion ff im Environment von sm_time_transform erstellt
   # und greift dann dort auf das Grid und die Dimensionen des Grids zu.
-  # Hier hat in x$lambda$smooth.construct[[1]] das grid
-  # Aber warum sind das 1000 x 9? Müsste das nicht nsub*subdivisions sein?
-  # Also 50*10
   eta_timegrid_lambda <- 0
-  print(str(x$lambda$smooth.construct[[1]], max.level = 1))
+
+  # Kann man rausnehmen
+  # Mu Intercept initialisieren (mean(y), sd(y) -> sigma)
+  # Startwert 0 alle anderen
+  # bei optim undsample nur noch smooth.construct
   if(length(x$lambda$smooth.construct)) {
     for(j in names(x$lambda$smooth.construct)) {
       b <- get.par(x$lambda$smooth.construct[[j]]$state$parameters, "b")
-      print(x$lambda$smooth.construct[[j]]$fit.fun_timegrid)
-      eta_timegrid_lambda <- eta_timegrid_lambda + x$lambda$smooth.construct[[j]]$fit.fun_timegrid(b)
+      new_eta <- x$lambda$smooth.construct[[j]]$Xgrid %*% b
+      eta_timegrid_lambda <- eta_timegrid_lambda + new_eta
     }
   }
   eta_timegrid <- eta_timegrid_lambda #+ eta_time_grid_alpha*eta_timegrid_mu
-  
+
   # Warum werden hier die EDFs auf 0 gesetzt?
   # for (k in names(x)) {
   #   if (length(x[[k]]$smooth.construct)) {
@@ -322,15 +343,15 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
-      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], nu = nu, 
-                                 eta_timegrid = eta_timegrid, ...)
+      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu, 
+                                 eta = eta, eta_timegrid = eta_timegrid, ...)
     }
   }
 
   ## return(list("parameters" = par, "fitted.values" = eta))
 }
 
-update_mjm_lambda <- function(x, nu, eta_timegrid, ...)
+update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
 {
   ## grid matrix -> x$Xgrid
   ## design matrix -> x$X
@@ -339,14 +360,37 @@ update_mjm_lambda <- function(x, nu, eta_timegrid, ...)
   
   b <- bamlss::get.state(x, "b")
   tau2 <- bamlss::get.state(x, "tau2")
-
-  print(str(eta_timegrid))
+  
+  # Alle Terme der Ableitung haben dasselbe Schema:
+  # Faktor*Vektor INT(Faktor * Vektor)
+  # Daraus wird dann in der 2. Ableitung
+  # Faktor*Vektor*t(Vektor) INT(Faktor*Vektor*t(Vektor))
+  exp_eta_gamma <- exp(eta$gamma[attr(y, "take_last")])
+  
+  int_i <- survint_gq(pre_fac = exp_eta_gamma, int_fac = exp(eta_timegrid),
+                      int_vec = x$Xgrid, weights = attr(y, "gq_weights"))
+  
 stop("Basst.\n")
 
+  # Wo finden wir den Status?
+  # Wo finden wir das XT (Datenmatrix am letzten Beobachtungszeitpunkt)?
+  # aus opt -> aus Surv Objekt
+  x_score <- drop(t(x$status$state) %*% x$XT) - sum(int_i)
   ## Newton-Raphson.
   ## b <- b + nu * H %*% grad
 
   return(x$state)
+}
+
+survint_gq <- function(pre_fac, pre_vec = NULL, int_fac, int_vec = NULL,
+                       weights) {
+  #browser()
+  n_gq <- length(weights)
+  # n_gq sollte 350/n_gq sollte gerade zahl ergeben
+  # dann pre_fac: vector * prevec
+  # prevec muss zu Objekt umgeändert werden, wenn es NULL ist
+  # int_fac: jede n_gq-te Zeile muss summiert werden
+  cat("Tut was.\n")
 }
 
 Surv2 <- bamlss:::Surv2
@@ -359,6 +403,9 @@ f <- list(
   sigma ~ 1,
   alpha ~ -1 + marker + s(survtime, by = marker)
 )
+
+
+# Externe zeitvariierende Kovariablen nicht möglich.
 
 b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime")
 
