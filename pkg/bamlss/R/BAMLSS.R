@@ -2205,8 +2205,12 @@ samplestats <- function(samples, x = NULL, y = NULL, family = NULL, logLik = FAL
         tpar <- mpar
         dev <- ll <- rep(NA, ncol(par[[1]]))
         for(j in 1:ncol(par[[1]])) {
-          for(i in nx)
-            tpar[[i]] <- par[[i]][, j]
+          for(i in nx) {
+            if(!is.null(ncol(par[[i]])))
+              tpar[[i]] <- par[[i]][, j]
+            else
+              tpar[[i]] <- par[[i]]
+          }
           llt <- try(family$loglik(y, tpar), silent = TRUE)
           if(!inherits(llt, "try-error")) {
             ll[j] <- llt
