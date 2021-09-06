@@ -167,9 +167,6 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 {
   stopifnot(requireNamespace("statmod"))
 
-  # gq an object$x anhängen, Attribut von y
-  # attr(object$y, "intweight") <- gq
-  # y schon in object
   gq <- statmod::gauss.quad(subdivisions, ...)
 
   ## Get idvar.
@@ -295,46 +292,21 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
 
-
-# braucht man also auch noch take als attribut von y, damit man aus eta die
-# richtigen Zeilen rauslesen kann
   # Wofür braucht man überhaupt das gesamte Grid der Beobachtungszeitpunkte?
+  # Braucht man  auch noch take als attribut von y, damit man aus eta die
+  # richtigen Zeilen rauslesen kann?
+  # Hier die Initialisierung von mu und sigma?
   eta <- bamlss:::get.eta(x, expand = FALSE)
+  eta$mu <- mean(y[[1]][, 3])
+  eta$sigma <- log(sd(y[[1]][, 3]))
   
-  # Wofür die Iteration in JM code? Werden die Parameter nicht eh bei 0 
-  # initialisiert?
-  # In pbc Beispiel wird zumindest der Intercept im mu Prädiktor initialisiert.
-  # Aber wird nicht der Intercept noch extra aus dem lambda  rausgenommen?
-  # Und was ist überhaupt mit den Parametern?
-  #-----
-  # fit.fun_timegrid() nicht in MJM
-  # Man braucht das grid ausgewertet mit den jeweiligen aktuellen Parametern.
-  # Im alten Code war das grid in dem $status Element
-  # Bzw. wird die Funktion ff im Environment von sm_time_transform erstellt
-  # und greift dann dort auf das Grid und die Dimensionen des Grids zu.
   eta_timegrid_lambda <- 0
-
-  # Kann man rausnehmen
-  # Mu Intercept initialisieren (mean(y), sd(y) -> sigma)
-  # Startwert 0 alle anderen
-  # bei optim undsample nur noch smooth.construct
-  if(length(x$lambda$smooth.construct)) {
-    for(j in names(x$lambda$smooth.construct)) {
-      b <- get.par(x$lambda$smooth.construct[[j]]$state$parameters, "b")
-      new_eta <- x$lambda$smooth.construct[[j]]$Xgrid %*% b
-      eta_timegrid_lambda <- eta_timegrid_lambda + new_eta
-    }
+  eta_timegrid_alpha <- 0
+  eta_timegrid_mu <- 0
+  if(length(x$mu$smooth.construct)) {
+    eta_timegrid_mu <- mean(y[[1]][, 3])
   }
-  eta_timegrid <- eta_timegrid_lambda #+ eta_time_grid_alpha*eta_timegrid_mu
-
-  # Warum werden hier die EDFs auf 0 gesetzt?
-  # for (k in names(x)) {
-  #   if (length(x[[k]]$smooth.construct)) {
-  #     for (j in names(x[[k]]$smooth.construct)) {
-  #       x[[k]]$smooth.construct[[j]]$state$edf <- 0
-  #     }
-  #   }
-  # }
+  eta_timegrid <- eta_timegrid_lambda + eta_timegrid_alpha*eta_timegrid_mu
   
   eps0 <- eps + 1
   eta0 <- do.call("cbind", eta)
@@ -361,15 +333,27 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
   b <- bamlss::get.state(x, "b")
   tau2 <- bamlss::get.state(x, "tau2")
   
-  # Alle Terme der Ableitung haben dasselbe Schema:
-  # Faktor*Vektor INT(Faktor * Vektor)
-  # Daraus wird dann in der 2. Ableitung
-  # Faktor*Vektor*t(Vektor) INT(Faktor*Vektor*t(Vektor))
   exp_eta_gamma <- exp(eta$gamma[attr(y, "take_last")])
   
-  int_i <- survint_gq(pre_fac = exp_eta_gamma, int_fac = exp(eta_timegrid),
+  int_i <- survint_gq(pre_fac = exp_eta_gamma, omega = exp(eta_timegrid),
                       int_vec = x$Xgrid, weights = attr(y, "gq_weights"))
-  
+  # For other predictors
+  # * to be created
+  # -----
+  # mu:
+  # int_i <- survint_gq(pre_fac = exp_eta_gamma, omega = exp(eta_timegrid),
+  #                     int_fac = eta_alpha*, int_vec = x$Xgrid,
+  #                     weights = attr(y, "gq_weights"))
+  # -----
+  # gamma:
+  # int_i <- survint_gq(pre_fac = exp_eta_gamma, pre_vec = x_gamma*,
+  #                     omega = exp(eta_timegrid),
+  #                     weights = attr(y, "gq_weights"))
+  # -----
+  # alpha:
+  # int_i <- survint_gq(pre_fac = exp_eta_gamma, omega = exp(eta_timegrid),
+  #                     int_fac = eta_mu*, int_vec = x$Xgrid, 
+  #                     weights = attr(y, "gq_weights"))
 stop("Basst.\n")
 
   # Wo finden wir den Status?
@@ -382,15 +366,34 @@ stop("Basst.\n")
   return(x$state)
 }
 
-survint_gq <- function(pre_fac, pre_vec = NULL, int_fac, int_vec = NULL,
-                       weights) {
-  #browser()
-  n_gq <- length(weights)
-  # n_gq sollte 350/n_gq sollte gerade zahl ergeben
-  # dann pre_fac: vector * prevec
-  # prevec muss zu Objekt umgeändert werden, wenn es NULL ist
-  # int_fac: jede n_gq-te Zeile muss summiert werden
-  cat("Tut was.\n")
+survint_gq <- function(pre_fac, pre_vec = NULL, omega, int_fac = NULL,
+                       int_vec = NULL, weights) {
+  
+  if (sum(c(is.null(pre_vec), is.null(int_vec))) != 1) {
+    stop("Either pre_vec or int_vec must be specified.")
+  }
+  
+  # Integration as weighted sum of evaluated points
+  n <- length(pre_fac)
+  gq_mat <- diag(n)%x%t(weights)
+  
+  if (is.null(pre_vec)) {
+    # Not a gamma predictor
+    if (is.null(int_fac)) {
+      int_fac <- rep(1, n*length(weights))
+    }
+    score_int <- pre_fac*gq_mat %*% (omega*int_fac*int_vec)
+    hess_int <- pre_fac*gq_mat %*% (omega*int_fac^2*int_vec %*% t(int_vec))
+  } else {
+    # Gamma predictor
+    if (!is.null(int_fac)) {
+      error("Argument int_fac is not used for predictor gamma.")
+    }
+    pre_fac <- c(pre_fac*gq_mat %*% omega)
+    score_int <- pre_fac*pre_vec
+    hess_int <- pre_fac*pre_vec %*% t(pre_vec)
+  }
+  list(score_int = score_int, hess_int = hess_int)
 }
 
 Surv2 <- bamlss:::Surv2
@@ -429,4 +432,25 @@ if(FALSE) {
   }
 
   3/2 * sum(foo(3/2 * gq$nodes + 3/2) * gq$weights)
+}
+
+if(FALSE) {
+  pref <- c(1, 1, 1)
+  prev <- matrix(1:4, byrow = TRUE, ncol = 4, nrow = 3)
+  om <- c(1:21)
+  intf <- rep(1, 21)
+  intv <- matrix(rep(1:7, times = 3), ncol = 4, nrow = 21)
+  we <- statmod::gauss.quad(7)$weights
+  
+  # lambda case
+  lc <- survint_gq(pre_fac = pref, pre_vec = NULL, omega = om,
+                   int_fac = NULL, int_vec = intv, weights = we)
+  
+  # alpha case
+  ac <- survint_gq(pre_fac = pref, pre_vec = NULL, omega = om,
+                   int_fac = intf, int_vec = intv, weights = we)
+  
+  # gamma case
+  gc <- survint_gq(pre_fac = pref, pre_vec = prev[,1], omega = om,
+                   int_fac = intf, int_vec = NULL, weights = we)
 }
