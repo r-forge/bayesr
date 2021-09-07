@@ -207,7 +207,6 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   ## Save information for optimizer in attributes of y
   attr(object$y, "gq_weights") <- gq$weights
   attr(object$y, "status") <- object$y[[1]][, "status"][take_last]
-  attr(object$y, "status_l") <- object$y[[1]][, "status"][take_last_l]
   attr(object$y, "take_last") <- take_last
 
   yname <- all.names(object$x$lambda$formula[2])[2]
@@ -316,9 +315,21 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
-      x$lambda$smooth.construct[[j]]$state <- 
-        update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu, 
-                          eta = eta, eta_timegrid = eta_timegrid, ...)
+      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu, 
+                                 eta = eta, eta_timegrid = eta_timegrid, ...)
+      # Update die etas? Fitted_timegrid?
+      eta_timegrid_lambda <- eta_timegrid_lambda -
+        x$lambda$smooth.construct[[j]]$state$fitted_timegrid + 
+        state$fitted_timegrid
+      browser()
+      if (is.null(x$lambda$smooth.construct[[j]]$state$fitted_timegrid)) {
+        stop("Fitted_timegrid muss noch erstellt werden.")
+      }
+      eta_timegrid <- eta_timegrid_lambda + 
+        eta_timegrid_alpha * eta_timegrid_mu
+      eta$lambda <- eta$lambda - fitted(x$lambda$smooth.construct[[j]]$state) +
+        fitted(state)
+      x$lambda$smooth.construct[[j]]$state <- state
       stop("Basst.")
     }
   }
@@ -365,7 +376,14 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
   ## Newton-Raphson.
-  x$state$parameters[seq_len(b_p)] <- b + nu * solve(x_H) %*% x_score
+  # Minus? z.B. in zeile 1211 g + nu * HS
+  # bamlss::JM verwendet matrix_inv() Funktion definiert in BAMLSS.R
+  # Ausgleich über nu?
+  b <- b - nu * solve(x_H) %*% x_score
+  
+  x$state$parameters[seq_len(b_p)] <- b
+  x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
+  x$state$fitted.values <- drop(x$X %*% b)
   return(x$state)
   
 }
