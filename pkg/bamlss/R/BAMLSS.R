@@ -10589,9 +10589,9 @@ plot.bamlss.residuals <- function(x, which = c("hist-resid", "qq-resid", "wp"), 
           d$xup <- d2$x
         }
         level <- 0.95
-        xlim <- max(abs(d$x))
+        xlim <- max(abs(d$x), na.rm = TRUE)
         xlim <- c(-xlim, xlim)
-        ylim <- max(abs(c(as.numeric(d$y), as.numeric(d$ylo), as.numeric(d$yup))))
+        ylim <- max(abs(c(as.numeric(d$y), as.numeric(d$ylo), as.numeric(d$yup))), na.rm = TRUE)
         ylim <- c(-ylim, ylim)
         if(!is.null(args$ylim2))
           ylim <- args$ylim2
