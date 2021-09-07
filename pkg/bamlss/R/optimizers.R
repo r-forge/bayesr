@@ -6236,7 +6236,9 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
                 ll_contrib[[i]][[paste0("s.", j)]] <- ll1 - ll0
                 medf[[i]][[paste0("s.", j, ".edf")]] <- c(medf[[i]][[paste0("s.", j, ".edf")]], tedf)
               }
-            } else stop(j)
+            } else {
+              warning(paste0("check distribution of term ", j, "!"))
+            }
             if(!select & accept) {
               if(inherits(x[[i]]$smooth.construct[[j]], "nnet0.smooth")) {
                 nid <- 1:x[[i]]$smooth.construct[[j]]$nodes
