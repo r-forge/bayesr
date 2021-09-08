@@ -194,8 +194,8 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 
   marker <- FALSE
   if(!is.null(object$model.frame$marker)) {
-    marker <- TRUE
     y2_l <- cbind(y2_l, "marker" = as.factor(object$model.frame$marker))
+    marker <- length(levels(as.factor(object$model.frame$marker)))
   }
 
   take_l <- !duplicated(y2_l)
@@ -203,11 +203,15 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 
   y2_l <- y2_l[take_l, , drop = FALSE]
   grid_l <- lapply(y2_l[, "time"], create_grid)
-  
+
   ## Save information for optimizer in attributes of y
   attr(object$y, "gq_weights") <- gq$weights
   attr(object$y, "status") <- object$y[[1]][, "status"][take_last]
   attr(object$y, "take_last") <- take_last
+  attr(object$y, "take_last_l") <- take_last_l
+  attr(object$y, "nsubj") <- nsubj
+  attr(object$y, "marker") <- marker
+  
 
   yname <- all.names(object$x$lambda$formula[2])[2]
   timevar_mu <- timevar
@@ -285,56 +289,143 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 }
 
 
-opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...)
+opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1, ...)
 {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
-
-  # Wofür braucht man überhaupt das gesamte Grid der Beobachtungszeitpunkte?
-  # Braucht man  auch noch take als attribut von y, damit man aus eta die
-  # richtigen Zeilen rauslesen kann?
-  # Hier die Initialisierung von mu und sigma - Warum initialisiert get.eta in
-  # bamlss::JM bereits alpha, sigma und mu, aber hier nicht?
-  eta <- bamlss:::get.eta(x, expand = FALSE)
-  eta$mu <- mean(y[[1]][, 3])
-  eta$sigma <- log(sd(y[[1]][, 3]))
   
-  eta_timegrid_lambda <- 0
+  # ----------------------------------------------------------------------------------------
+  ## Set alpha/mu/sigma intercept starting value.
+  # Noch mal mit Niki absprechen
+  # Warum initialisiert man alpha mit machine.eps? Man muss dann bei MJM 
+  # wahrscheinlich auch markerm2 initialisieren?
   eta_timegrid_alpha <- 0
+  if(length(x$alpha$smooth.construct)) {
+    for(j in names(x$alpha$smooth.construct)) {
+      if (j == "model.matrix" & is.null(start)) {
+        x$alpha$smooth.construct[[j]]$state$parameters[1] <- .Machine$double.eps
+        x$alpha$smooth.construct[[j]]$state$fitted.values <- 
+          x$alpha$smooth.construct[[j]]$X %*% 
+          x$alpha$smooth.construct[[j]]$state$parameters
+      } 
+      b <- get.par(x$alpha$smooth.construct[[j]]$state$parameters, "b")
+      eta_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
+      x$alpha$smooth.construct[[j]]$state$fitted_timegrid <- eta_sj
+      eta_timegrid_alpha <- eta_timegrid_alpha + eta_sj
+    }
+  } 
+  
+  # Man braucht hier noch die Info über die Marker. Dann kann man jeden Marker 
+  # Intercept mit seinem eigenen Mittelwert initialisieren
+  # Hier muss man sich noch überlegen, was man dann mit dem pcre-Term machen 
+  # möchte: Wie wird der dann upgedated? Das Xgrid besteht aus col = (id, wfpc1,
+  # wfpc2) und nrow = 700, und b = 2*50 - 2 Parameter
   eta_timegrid_mu <- 0
   if(length(x$mu$smooth.construct)) {
-    eta_timegrid_mu <- mean(y[[1]][, 3])
+    for(j in names(x$mu$smooth.construct)) {
+      if (j == "model.matrix" & is.null(start)) {
+        x$mu$smooth.construct[[j]]$state$parameters[1] <- 
+          mean(y[[1]][, "obs"], na.rm = TRUE)
+        x$mu$smooth.construct[[j]]$state$fitted.values <- 
+          x$mu$smooth.construct[[j]]$X %*% 
+          x$mu$smooth.construct[[j]]$state$parameters
+      }
+      b <- get.par(x$mu$smooth.construct[[j]]$state$parameters, "b")
+      if(inherits(x$mu$smooth.construct[[j]], "pcre2.random.effect")){
+        eta_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$Xgrid))
+      } else {
+        eta_sj <- drop(x$mu$smooth.construct[[j]]$Xgrid %*% b)
+      }
+      x$mu$smooth.construct[[j]]$state$fitted_timegrid <- eta_sj
+      eta_timegrid_mu <- eta_timegrid_mu + eta_sj
+    }
   }
-  eta_timegrid <- eta_timegrid_lambda + eta_timegrid_alpha*eta_timegrid_mu
   
+  eta_timegrid_lambda <- 0
+  if(length(x$lambda$smooth.construct)) {
+    for(j in names(x$lambda$smooth.construct)) {
+      b <- get.par(x$lambda$smooth.construct[[j]]$state$parameters, "b")
+      eta_sj <- drop(x$lambda$smooth.construct[[j]]$Xgrid %*% b)
+      x$lambda$smooth.construct[[j]]$state$fitted_timegrid <- eta_sj
+      eta_timegrid_lambda <- eta_timegrid_lambda + eta_sj
+    }
+  }
+
+  # Auch hier sollte man für jeden Marker einen eigenen Startwert wählen
+  if(!is.null(x$sigma$smooth.construct$model.matrix)) {
+    x$sigma$smooth.construct$model.matrix$state$parameters[1] <- 
+      log(sd(y[[1]][, "obs"], na.rm = TRUE))
+    x$sigma$smooth.construct$model.matrix$state$fitted.values <-
+      x$sigma$smooth.construct$model.matrix$X %*% 
+      x$sigma$smooth.construct$model.matrix$state$parameters
+  }
+
+  
+  # Das eta sollte doch eigentlich unterschiedliche Anzahl an Werten haben?
+  # Also für die survival-Parts nur die Anzahl der Beobachtungen und für den 
+  # longitudinalen Teil die Gesamtzahl?
+  eta <- bamlss:::get.eta(x, expand = FALSE)
+
+  marker <- attr(y, "marker")
+  eta_timegrid_long <- eta_timegrid_alpha*eta_timegrid_mu
+  if (marker) {
+    eta_timegrid_long <- drop(
+      t(rep(1, marker)) %x% diag(length(eta_timegrid_lambda)) %*%
+      eta_timegrid_long)
+  }
+  eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
+  
+  # Wie funktioniert eps? Erst mal nur iter umsetzen
   eps0 <- eps + 1
   eta0 <- do.call("cbind", eta)
   iter <- 0
-
+  
+  # Für logLik
+  nsubj <- attr(y, "nsubj")
+  gq_weights <- attr(y, "gq_weights")
+  take_last <- attr(y, "take_last")
+  take_last_l <- attr(y, "take_last_l")
+  status <- attr(y, "status")
+  
+  
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
       state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu, 
                                  eta = eta, eta_timegrid = eta_timegrid, ...)
-      # Update die etas? Fitted_timegrid?
       eta_timegrid_lambda <- eta_timegrid_lambda -
         x$lambda$smooth.construct[[j]]$state$fitted_timegrid + 
         state$fitted_timegrid
-      browser()
-      if (is.null(x$lambda$smooth.construct[[j]]$state$fitted_timegrid)) {
-        stop("Fitted_timegrid muss noch erstellt werden.")
-      }
       eta_timegrid <- eta_timegrid_lambda + 
-        eta_timegrid_alpha * eta_timegrid_mu
+        eta_timegrid_long
       eta$lambda <- eta$lambda - fitted(x$lambda$smooth.construct[[j]]$state) +
         fitted(state)
       x$lambda$smooth.construct[[j]]$state <- state
-      stop("Basst.")
     }
+    # browser()
+    eta_T_long <- eta$alpha[take_last_l] * eta$mu[take_last_l]
+    if (marker) {
+      eta_T_long <- drop(
+        t(rep(1, marker)) %x% diag(nsubj) %*% eta_T_long)
+    }
+    eta_T <- eta$gamma[take_last] + eta$gamma[take_last] + eta_T_long
+    sum_Lambda <- exp(eta$gamma[take_last])%*%(diag(nsubj)%x%t(gq_weights))%*%
+      exp(eta_timegrid)
+    logLik <- status %*% eta_T - sum_Lambda # + longitudinal part
+    # logLik <- sum((eta_timegrid[,ncol(eta_timegrid)] + eta$gamma) * status, na.rm = TRUE) -
+    #   exp(eta$gamma) %*% int0 + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
+    
+    iter <- iter + 1
+    cat("Iteration ", iter,", LogLik ", logLik, "\n")
   }
 
+  # Log-Posterior ausrechnen und ausgeben
+  # get_logPost Funktion aus JM als Vorlage
+  # log Likelihood reicht aus über eta
+  # in bamlss:::simsurv kann man sich Cox-Modell auch simulieren lassen
   ## return(list("parameters" = par, "fitted.values" = eta))
+  stop("Basst.")
 }
 
 update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
@@ -379,7 +470,14 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
   # Minus? z.B. in zeile 1211 g + nu * HS
   # bamlss::JM verwendet matrix_inv() Funktion definiert in BAMLSS.R
   # Ausgleich über nu?
-  b <- b - nu * solve(x_H) %*% x_score
+  # -
+  # Prior aus xhess verwenden
+  # Dann doch wieder mit plus
+  x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
+  x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  
+  delta <- solve(x_H, x_score)
+  b <- b + nu * delta
   
   x$state$parameters[seq_len(b_p)] <- b
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
