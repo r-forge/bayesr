@@ -185,6 +185,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   y2_l <- cbind(object$y[[1]][, "time"], object$model.frame[[idvar]])
   colnames(y2_l) <- c("time", idvar)
 
+  
   take <- !duplicated(y2_l[, 1:2])
   take_last <- !duplicated(y2_l, fromLast = TRUE)
   nsubj <- length(unique(y2_l[, idvar]))
@@ -403,13 +404,13 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1, ...
         fitted(state)
       x$lambda$smooth.construct[[j]]$state <- state
     }
-    # browser()
+    
     eta_T_long <- eta$alpha[take_last_l] * eta$mu[take_last_l]
     if (marker) {
       eta_T_long <- drop(
         t(rep(1, marker)) %x% diag(nsubj) %*% eta_T_long)
     }
-    eta_T <- eta$gamma[take_last] + eta$gamma[take_last] + eta_T_long
+    eta_T <- eta$lambda[take_last] + eta$gamma[take_last] + eta_T_long
     sum_Lambda <- exp(eta$gamma[take_last])%*%(diag(nsubj)%x%t(gq_weights))%*%
       exp(eta_timegrid)
     logLik <- status %*% eta_T - sum_Lambda # + longitudinal part
@@ -417,7 +418,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1, ...
     #   exp(eta$gamma) %*% int0 + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
     
     iter <- iter + 1
-    cat("Iteration ", iter,", LogLik ", logLik, "\n")
+    cat("It ", iter,", LogLik ", logLik, "\n")
   }
 
   # Log-Posterior ausrechnen und ausgeben
@@ -575,4 +576,14 @@ if(FALSE) {
   # gamma case
   gc <- survint_gq(pre_fac = pref, pre_vec = prev, omega = om,
                    int_fac = NULL, int_vec = NULL, weights = we)
+}
+
+if(FALSE) {
+  set.seed(123)
+  simpledata <- simSurv()
+  simplef <- list(
+    Surv2(time, event) ~ -1 + s(time),
+    gamma ~ 1
+  )
+  b <- bamlss(simplef, family = mjm_bamlss, data = simpledata)
 }
