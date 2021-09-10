@@ -385,7 +385,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
   
   eps0 <- eps + 1
-  eta0 <- do.call("cbind", eta)
+  eta0 <- do.call("cbind", eta[c("lambda", "gamma")])
   iter <- 0
   
   # Für logLik
@@ -437,9 +437,10 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
     #   exp(eta$gamma) %*% int0 + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
     
     iter <- iter + 1
-    eta1 <- do.call("cbind", eta)
+    eta1 <- do.call("cbind", eta[c("lambda", "gamma")])
     eps0 <- mean(abs((eta1 - eta0) / eta1), na.rm = TRUE)
     cat("It ", iter,", LogLik ", logLik, "\n")
+    if (iter != 88)
     eta0 <- eta1
   }
 
@@ -448,6 +449,14 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   # log Likelihood reicht aus über eta
   # in bamlss:::simsurv kann man sich Cox-Modell auch simulieren lassen
   ## return(list("parameters" = par, "fitted.values" = eta))
+  
+  max_y <- max(y[[1]][, 1])
+  pred_data <- data.frame(seq(0, max_y, length.out = 100))
+  colnames(pred_data) <- x$lambda$smooth.construct[[1]]$term
+  b_it <- x$lambda$smooth.construct[[1]]$state$parameters[-10]
+  pred_mat <- PredictMat(x$lambda$smooth.construct[[1]], pred_data)
+  plot(pred_data[, 1], pred_mat%*%b_it)
+  
   
   stop("Basst.")
 }
@@ -582,7 +591,9 @@ f <- list(
 
 
 # Externe zeitvariierende Kovariablen nicht möglich.
-
+# in example:
+# eta_lambda = 1.4*log((t + 10)/1000)
+curve(1.4*log((x + 10)/1000), from = 0, to = 120)
 b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime")
 
 
@@ -629,14 +640,33 @@ if(FALSE) {
 }
 
 if(FALSE) {
+  simSurv2 <- function (n = 300) 
+  {
+    X <- matrix(NA, nrow = n, ncol = 3)
+    X[, 1] <- runif(n, -1, 1)
+    X[, 2] <- runif(n, -3, 3)
+    X[, 3] <- runif(n, -1, 1)
+    cens_fct <- function(time, mean_cens) {
+      censor_time <- rexp(n = length(time), rate = 1/mean_cens)
+      event <- (time <= censor_time)
+      t_obs <- apply(cbind(time, censor_time), 1, min)
+      return(cbind(t_obs, event))
+    }
+    lambda <- function(time, x) {
+      exp(log(time) + sin(time * 2))
+    }
+    d <- rSurvTime2(lambda, X, cens_fct, mean_cens = 5)
+    return(d)
+  }
   set.seed(123)
-  simpledata <- simSurv()
-  simpledata$id <- factor(1:300)
+  n <- 600
+  simpledata <- simSurv2(n)
+  simpledata$id <- factor(seq_len(n))
   simplef <- list(
     Surv2(time, event, obs = x1) ~ -1 + s(time),
     gamma ~ 1,
     mu ~ s(id, x2, x3, bs = "pcre", xt = list("mfpc" = MFPCA))
   )
-  # Kann man dann außerhalb der Schleife machen
   b <- bamlss(simplef, family = mjm_bamlss, data = simpledata, timevar = "time")
+  curve(log(x) + sin(x * 2), from = 0, to = max(simpledata$time))
 }
