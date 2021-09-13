@@ -68,7 +68,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.5</span>
       </span>
     </div>
 
@@ -119,6 +119,9 @@
     </li>
     <li>
       <a href="../articles/fatalities.html">Fatalities Model for Austria</a>
+    </li>
+    <li>
+      <a href="../articles/mvnorm.html">Multivariate Normal Model</a>
     </li>
     <li>
       <a href="../articles/misc.html">Miscellaneous Topics</a>
@@ -178,7 +181,9 @@
   the <span class="pkg">scoringRules</span> package.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>CRPS</span>(<span class='no'>object</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>Inf</span>, <span class='fl'>Inf</span>), <span class='kw'>FUN</span> <span class='kw'>=</span> <span class='no'>mean</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>CRPS</span>(<span class='no'>object</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>Inf</span>, <span class='fl'>Inf</span>), <span class='kw'>FUN</span> <span class='kw'>=</span> <span class='no'>mean</span>,
+  <span class='kw'>term</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,6 +203,11 @@
     <tr>
       <th>FUN</th>
       <td><p>Function to be applied on the CRPS scores.</p></td>
+    </tr>
+    <tr>
+      <th>term</th>
+      <td><p>If required, specify the model terms that should be used within the
+    <code><a href='predict.bamlss.html'>predict.bamlss</a></code> function.</p></td>
     </tr>
     <tr>
       <th>&#8230;</th>

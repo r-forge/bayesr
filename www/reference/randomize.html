@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.5</span>
       </span>
     </div>
 
@@ -120,6 +120,9 @@
     </li>
     <li>
       <a href="../articles/fatalities.html">Fatalities Model for Austria</a>
+    </li>
+    <li>
+      <a href="../articles/mvnorm.html">Multivariate Normal Model</a>
     </li>
     <li>
       <a href="../articles/misc.html">Miscellaneous Topics</a>
@@ -180,7 +183,8 @@
   is based on function <code><a href='https://www.rdocumentation.org/packages/mgcv/topics/smooth2random'>smooth2random</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>randomize</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>trans_random</span>(<span class='no'>x</span>)
+<span class='fu'>randomize</span>(<span class='no'>x</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -249,19 +253,19 @@
 #&gt;  $ S.scale       : num 22.3
 #&gt;  $ X.dim         : int 9
 #&gt;  $ fit.fun       :function (X, b, expand = TRUE, no.sparse.setup = FALSE)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1100 9 1123 3 9 3 1100 1123
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1194 9 1217 3 9 3 1194 1217
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;   ..- attr(*, ".internal")= logi TRUE
 #&gt;  $ prior         :function (parameters)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1195 19 1245 5 19 5 1195 1245
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1289 19 1339 5 19 5 1289 1339
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;   ..- attr(*, "var_prior")= chr "ig"
 #&gt;  $ grad          :function (score = NULL, parameters, full = TRUE)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1249 18 1273 5 18 5 1249 1273
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1343 18 1367 5 18 5 1343 1367
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;  $ hess          :function (score = NULL, parameters, full = FALSE)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1275 18 1287 5 18 5 1275 1287
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1369 18 1381 5 18 5 1369 1381
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;  - attr(*, "class")= chr [1:2] "tprs.smooth" "mgcv.smooth"
 #&gt;  - attr(*, "qrc")=List of 4
 #&gt;   ..$ qr   : num [1:10, 1] 1.96 0.135 -0.376 0.162 0.389 ...
@@ -303,19 +307,19 @@
 #&gt;  $ S.scale       : num 22.3
 #&gt;  $ X.dim         : int 9
 #&gt;  $ fit.fun       :function (X, b, expand = TRUE, no.sparse.setup = FALSE)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1100 9 1123 3 9 3 1100 1123
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1194 9 1217 3 9 3 1194 1217
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;   ..- attr(*, ".internal")= logi TRUE
 #&gt;  $ prior         :function (parameters)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1195 19 1245 5 19 5 1195 1245
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1289 19 1339 5 19 5 1289 1339
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;   ..- attr(*, "var_prior")= chr "ig"
 #&gt;  $ grad          :function (score = NULL, parameters, full = TRUE)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1249 18 1273 5 18 5 1249 1273
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1343 18 1367 5 18 5 1343 1367
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;  $ hess          :function (score = NULL, parameters, full = FALSE)  
-#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1275 18 1287 5 18 5 1275 1287
-#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5559de8c2c60&gt; 
+#&gt;   ..- attr(*, "srcref")= 'srcref' int [1:8] 1369 18 1381 5 18 5 1369 1381
+#&gt;   .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' &lt;environment: 0x5567f9adedf8&gt; 
 #&gt;  $ Xf            : num [1:500, 1] -0.6793 -1.2461 -0.0775 -1.7152 -0.0343 ...
 #&gt;  $ rand          :List of 1
 #&gt;   ..$ Xr: num [1:500, 1:8] -0.03749 -0.05814 -0.00187 -0.08334 -0.003 ...

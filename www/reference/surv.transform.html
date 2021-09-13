@@ -73,7 +73,7 @@ See the example section on how to extract the time grid design matrices." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.5</span>
       </span>
     </div>
 
@@ -124,6 +124,9 @@ See the example section on how to extract the time grid design matrices." />
     </li>
     <li>
       <a href="../articles/fatalities.html">Fatalities Model for Austria</a>
+    </li>
+    <li>
+      <a href="../articles/mvnorm.html">Multivariate Normal Model</a>
     </li>
     <li>
       <a href="../articles/misc.html">Miscellaneous Topics</a>
@@ -298,7 +301,8 @@ See the example section on how to extract the time grid design matrices." />
 #&gt;   .. .. ..$ model.matrix 
 #&gt;   .. .. ..$ smooth.construct 
 #&gt;   ..$ y 
-#&gt;   .. ..$ Surv(time, event) </div><div class='input'>
+#&gt;   .. ..$ Surv(time, event) 
+#&gt;   ..$ delete </div><div class='input'>
 <span class='co'>## Apply the transformer.</span>
 <span class='no'>bf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/with'>with</a></span>(<span class='no'>bf</span>, <span class='fu'>surv_transform</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>model.frame</span>,
   <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>family</span>, <span class='kw'>is.cox</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>subdivisions</span> <span class='kw'>=</span> <span class='fl'>25</span>))
@@ -310,10 +314,8 @@ See the example section on how to extract the time grid design matrices." />
 <span class='no'>grid</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/attr'>attr</a></span>(<span class='no'>bf</span>$<span class='no'>y</span><span class='kw'>[[</span><span class='fl'>1</span>]], <span class='st'>"grid"</span>)
 <span class='no'>gdim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>grid</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>grid</span><span class='kw'>[[</span><span class='fl'>1</span>]]))
 <span class='no'>b</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>ncol</a></span>(<span class='no'>X</span>))
-<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='no'>X</span></div># NOT RUN {
-<!-- %*% b -->
-# }
-<div class='input'><span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/matrix'>matrix</a></span>(<span class='no'>fit</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='no'>gdim</span>[<span class='fl'>1</span>], <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='no'>gdim</span>[<span class='fl'>2</span>], <span class='kw'>byrow</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='no'>X</span> <span class='kw'>%*%</span> <span class='no'>b</span>
+<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/matrix'>matrix</a></span>(<span class='no'>fit</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='no'>gdim</span>[<span class='fl'>1</span>], <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='no'>gdim</span>[<span class='fl'>2</span>], <span class='kw'>byrow</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/plot'>plot</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/vector'>as.vector</a></span>(<span class='no'>fit</span>) ~ <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unlist'>unlist</a></span>(<span class='no'>grid</span>), <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"n"</span>,
   <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='st'>"Survival time"</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>"Effect"</span>)</div><div class='input'><span class='kw'>for</span>(<span class='no'>j</span> <span class='kw'>in</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq_along</a></span>(<span class='no'>grid</span>)) {

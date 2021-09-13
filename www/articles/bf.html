@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.5</span>
       </span>
     </div>
 
@@ -81,6 +81,9 @@
     </li>
     <li>
       <a href="../articles/fatalities.html">Fatalities Model for Austria</a>
+    </li>
+    <li>
+      <a href="../articles/mvnorm.html">Multivariate Normal Model</a>
     </li>
     <li>
       <a href="../articles/misc.html">Miscellaneous Topics</a>
@@ -187,7 +190,8 @@
 ##   .. .. ..$ model.matrix 
 ##   .. .. ..$ smooth.construct 
 ##   ..$ y 
-##   .. ..$ num</code></pre>
+##   .. ..$ num 
+##   ..$ delete</code></pre>
 <p>For writing a new estimation engine, the user can directly work with the <code>model.matrix</code> elements, for linear effects, and the <code>smooth.construct</code> list, for smooth effects respectively. The <code>smooth.construct</code> is a named list which is compiled using the <code>smoothCon()</code> function of the <em>mgcv</em> package using the generic <code><a href="../reference/smooth.construct.html">smooth.construct()</a></code> method for setting up smooth terms.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(bf<span class="op">$</span>x<span class="op">$</span>mu<span class="op">$</span>smooth.construct))</a></code></pre></div>
 <pre><code>## [1] "s(x2)"       "s(x3)"       "te(lon,lat)"</code></pre>

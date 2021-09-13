@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.5</span>
       </span>
     </div>
 
@@ -120,6 +120,9 @@
     </li>
     <li>
       <a href="../articles/fatalities.html">Fatalities Model for Austria</a>
+    </li>
+    <li>
+      <a href="../articles/mvnorm.html">Multivariate Normal Model</a>
     </li>
     <li>
       <a href="../articles/misc.html">Miscellaneous Topics</a>
@@ -347,7 +350,8 @@
 #&gt;   .. .. ..$ model.matrix 
 #&gt;   .. .. ..$ smooth.construct 
 #&gt;   ..$ y 
-#&gt;   .. ..$ num </div><div class='input'>
+#&gt;   .. ..$ num 
+#&gt;   ..$ delete </div><div class='input'>
 <span class='co'>## Categorical responses.</span>
 <span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(
   <span class='no'>cat</span> ~ <span class='no'>fac</span> + <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>)
@@ -380,7 +384,8 @@
 #&gt;   .. .. ..$ model.matrix 
 #&gt;   .. .. ..$ smooth.construct 
 #&gt;   ..$ y 
-#&gt;   .. ..$ cat </div><div class='input'>
+#&gt;   .. ..$ cat 
+#&gt;   ..$ delete </div><div class='input'>
 <span class='co'>## The response is a matrix per default.</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/head'>head</a></span>(<span class='no'>bf</span>$<span class='no'>y</span>)</div><div class='output co'>#&gt;   cat.none cat.medium cat.high cat.low
 #&gt; 1        0          0        0       1
@@ -413,7 +418,8 @@
 #&gt;   .. .. ..$ model.matrix 
 #&gt;   .. .. ..$ smooth.construct 
 #&gt;   ..$ y 
-#&gt;   .. ..$ catnone </div><div class='input'>
+#&gt;   .. ..$ catnone 
+#&gt;   ..$ delete </div><div class='input'>
 <span class='co'>## Hierarchical structures.</span>
 <span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(
   <span class='no'>num</span> ~ <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='no'>id</span>,
@@ -451,7 +457,8 @@
 #&gt;   .. .. ..$ model.matrix 
 #&gt;   .. .. ..$ smooth.construct 
 #&gt;   ..$ y 
-#&gt;   .. ..$ num </div><div class='input'>
+#&gt;   .. ..$ num 
+#&gt;   ..$ delete </div><div class='input'>
 <span class='co'>## Special model term constructors,</span>
 <span class='co'>## set up "new" constructor function and eval</span>
 <span class='co'>## with bamlss.frame().</span>
@@ -495,7 +502,8 @@
 #&gt;   .. .. ..$ model.matrix 
 #&gt;   .. .. ..$ smooth.construct 
 #&gt;   ..$ y 
-#&gt;   .. ..$ num </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='no'>bf</span>$<span class='no'>x</span>$<span class='no'>mu</span>$<span class='no'>smooth.construct</span>)</div><div class='output co'>#&gt; NULL</div></pre>
+#&gt;   .. ..$ num 
+#&gt;   ..$ delete </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='no'>bf</span>$<span class='no'>x</span>$<span class='no'>mu</span>$<span class='no'>smooth.construct</span>)</div><div class='output co'>#&gt; NULL</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

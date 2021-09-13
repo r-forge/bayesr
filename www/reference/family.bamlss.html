@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.5</span>
       </span>
     </div>
 
@@ -123,6 +123,9 @@
     </li>
     <li>
       <a href="../articles/fatalities.html">Fatalities Model for Austria</a>
+    </li>
+    <li>
+      <a href="../articles/mvnorm.html">Multivariate Normal Model</a>
     </li>
     <li>
       <a href="../articles/misc.html">Miscellaneous Topics</a>
@@ -213,6 +216,8 @@
 <span class='fu'>weibull_bamlss</span>(<span class='no'>...</span>)
 <span class='fu'>Sichel_bamlss</span>(<span class='no'>...</span>)
 <span class='fu'>GEV_bamlss</span>(<span class='no'>...</span>)
+<span class='fu'>gumbel_bamlss</span>(<span class='no'>...</span>)
+<span class='fu'>mix_bamlss</span>(<span class='no'>f1</span>, <span class='no'>f2</span>, <span class='no'>...</span>)
 
 <span class='co'>## Extractor functions:</span>
 <span class='co'># S3 method for bamlss</span>
@@ -251,6 +256,10 @@
     <tr>
       <th>eps</th>
       <td><p>Constant to be used for the approximation of the absolute function.</p></td>
+    </tr>
+    <tr>
+      <th>f1, f2</th>
+      <td><p>A family of class <code>"gamlss.family"</code>, see package <span class="pkg">gamlss.dist</span>.</p></td>
     </tr>
     <tr>
       <th>&#8230;</th>

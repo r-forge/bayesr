@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.5</span>
       </span>
     </div>
 
@@ -120,6 +120,9 @@
     </li>
     <li>
       <a href="../articles/fatalities.html">Fatalities Model for Austria</a>
+    </li>
+    <li>
+      <a href="../articles/mvnorm.html">Multivariate Normal Model</a>
     </li>
     <li>
       <a href="../articles/misc.html">Miscellaneous Topics</a>
@@ -181,15 +184,17 @@
     </div>
 
     <pre class="usage"><span class='co'>## Deep learning bamlss.</span>
-<span class='fu'>dl.bamlss</span>(<span class='no'>object</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>eps</span> <span class='kw'>=</span> <span class='no'>.Machine</span>$<span class='no'>double.eps</span>^<span class='fl'>0.25</span>, <span class='kw'>maxit</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>force.stop</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>epochs</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>optimizer</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>batch_size</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>keras.model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='no'>...</span>)
+<span class='fu'>dl.bamlss</span>(<span class='no'>object</span>, <span class='kw'>optimizer</span> <span class='kw'>=</span> <span class='st'>"adam"</span>,
+  <span class='kw'>epochs</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>batch_size</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>nlayers</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>units</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>activation</span> <span class='kw'>=</span> <span class='st'>"sigmoid"</span>,
+  <span class='kw'>l1</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>l2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='co'>## Predict method.</span>
 <span class='co'># S3 method for dl.bamlss</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>drop</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>object</span>, <span class='no'>newdata</span>,
+  <span class='kw'>model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"link"</span>, <span class='st'>"parameter"</span>),
+  <span class='kw'>drop</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -199,26 +204,11 @@
       <td><p>An object of class <code>"bamlss"</code> or a <code><a href='bamlss.formula.html'>bamlss.formula</a></code>.</p></td>
     </tr>
     <tr>
-      <th>offset</th>
-      <td><p>A <code><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></code> or <code><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></code>. Can be used to supply
-    model offsets for use in fitting, e.g., fitted values from an initial model fit.</p></td>
-    </tr>
-    <tr>
-      <th>weights</th>
-      <td><p>Prior weights on the data.</p></td>
-    </tr>
-    <tr>
-      <th>eps</th>
-      <td><p>The relative convergence tolerance of the algorithm.</p></td>
-    </tr>
-    <tr>
-      <th>maxit</th>
-      <td><p>Integer, maximum number of iterations of the algorithm.</p></td>
-    </tr>
-    <tr>
-      <th>force.stop</th>
-      <td><p>Logical. should the algorithm stop if relative change is smaller than
-    <code>eps</code>.</p></td>
+      <th>optimizer</th>
+      <td><p>Character or call to optimizer functions to be used within <code><a href='https://www.rdocumentation.org/packages/keras/topics/reexports'>fit</a></code>.
+    For character, options are: <code>"adam"</code> <code>"sgd"</code>, <code>"rmsprop"</code>, <code>"adagrad"</code>,
+    <code>"adadelta"</code>, <code>"adamax"</code>, <code>"adam"</code>. The default is
+    <code><a href='https://www.rdocumentation.org/packages/keras/topics/optimizer_rmsprop'>optimizer_rmsprop</a></code> with learning rate set to <code>1e-04</code>.</p></td>
     </tr>
     <tr>
       <th>epochs</th>
@@ -226,29 +216,32 @@
     <code><a href='https://www.rdocumentation.org/packages/keras/topics/reexports'>fit</a></code>.</p></td>
     </tr>
     <tr>
-      <th>optimizer</th>
-      <td><p>Character or call to optimizer functions to be used within <code><a href='https://www.rdocumentation.org/packages/keras/topics/reexports'>fit</a></code>.
-    For character, options are: <code>"adam"</code> <code>"sgd"</code>, <code>"rmsprop"</code>, <code>"adagrad"</code>,
-    <code>"adadelta"</code>, <code>"adamax"</code>, <code>"nadam"</code>. The default is
-    <code><a href='https://www.rdocumentation.org/packages/keras/topics/optimizer_rmsprop'>optimizer_rmsprop</a></code> with learning rate set to <code>1e-04</code>.</p></td>
-    </tr>
-    <tr>
       <th>batch_size</th>
       <td><p>Number of samples per gradient update, see <code><a href='https://www.rdocumentation.org/packages/keras/topics/reexports'>fit</a></code>.</p></td>
     </tr>
     <tr>
-      <th>keras.model</th>
-      <td><p>A compiled model using <span class="pkg">keras</span>, e.g., using
-    <code><a href='https://www.rdocumentation.org/packages/keras/topics/keras_model_sequential'>keras_model_sequential</a></code> and <code><a href='https://www.rdocumentation.org/packages/keras/topics/reexports'>compile</a></code>. Note
-    that the last layer only has one unit with linear activation function.</p></td>
+      <th>nlayers</th>
+      <td><p>Number of hidden layers.</p></td>
+    </tr>
+    <tr>
+      <th>units</th>
+      <td><p>Number of nodes per hidden layer, can be a vector.</p></td>
+    </tr>
+    <tr>
+      <th>activation</th>
+      <td><p>Activation functions used for the hidden layers, can be a vector.</p></td>
+    </tr>
+    <tr>
+      <th>l1</th>
+      <td><p>Shrinkage parameter for L1 penalty.</p></td>
+    </tr>
+    <tr>
+      <th>l2</th>
+      <td><p>Shrinkage parameter for L2 penalty.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
       <td><p>Print information during runtime of the algorithm.</p></td>
-    </tr>
-    <tr>
-      <th>digits</th>
-      <td><p>Set the digits for printing when <code>verbose = TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>newdata</th>
@@ -259,6 +252,12 @@
       <th>model</th>
       <td><p>Character or integer specifying for which distributional parameter predictions should
     be computed.</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>If <code>type = "link"</code> the predictor of the corresponding <code>model</code>
+    is returned. If <code>type = "parameter"</code> predictions on the distributional parameter scale
+    are returned.</p></td>
     </tr>
     <tr>
       <th>drop</th>
@@ -304,7 +303,7 @@
 
 <span class='co'>## Fit neural network.</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='st'>"keras"</span>)
-<span class='no'>b</span> <span class='kw'>&lt;-</span> <span class='fu'>dl.bamlss</span>(<span class='no'>f</span>)
+<span class='no'>b</span> <span class='kw'>&lt;-</span> <span class='fu'>dl.bamlss</span>(<span class='no'>f</span>, <span class='kw'>epochs</span> <span class='kw'>=</span> <span class='fl'>2000</span>)
 
 <span class='co'>## Plot estimated functions.</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/par'>par</a></span>(<span class='kw'>mfrow</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>))
@@ -314,15 +313,20 @@
   <span class='kw'>ylim</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/range'>range</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/fitted.values'>fitted</a></span>(<span class='no'>b</span>)$<span class='no'>sigma</span>, <span class='no'>fsigma</span>)))
 <span class='fu'><a href='plot2d.html'>plot2d</a></span>(<span class='no'>fsigma</span> ~ <span class='no'>x</span>, <span class='kw'>add</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>col.lines</span> <span class='kw'>=</span> <span class='st'>"red"</span>)
 
-<span class='co'>## Another example identifying structures that are</span>
-<span class='co'>## not captured by the initial model.</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='GAMart.html'>GAMart</a></span>()
-<span class='no'>b1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='bamlss.html'>bamlss</a></span>(<span class='no'>num</span> ~ <span class='fu'>s</span>(<span class='no'>x1</span>) + <span class='fu'>s</span>(<span class='no'>x2</span>) + <span class='fu'>s</span>(<span class='no'>x3</span>), <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>sampler</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='no'>b2</span> <span class='kw'>&lt;-</span> <span class='fu'>dl.bamlss</span>(<span class='no'>num</span> ~ <span class='no'>lon</span> + <span class='no'>lat</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/fitted.values'>fitted</a></span>(<span class='no'>b1</span>))
-<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>b2</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"mu"</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/par'>par</a></span>(<span class='kw'>mfrow</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>))
-<span class='fu'><a href='plot3d.html'>plot3d</a></span>(<span class='no'>p</span> ~ <span class='no'>lon</span> + <span class='no'>lat</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>d</span>, <span class='kw'>symmetric</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='co'>## Predict with newdata.</span>
+<span class='no'>nd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(-<span class='fl'>6</span>, <span class='fl'>6</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>100</span>))
+<span class='no'>nd</span>$<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>b</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='no'>nd</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"link"</span>)
+
+<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/par'>par</a></span>(<span class='kw'>mfrow</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>))
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>xlim</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>6</span>, <span class='fl'>6</span>), <span class='kw'>ylim</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/range'>range</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>nd</span>$<span class='no'>p</span>$<span class='no'>mu</span>, <span class='no'>y</span>)))
+<span class='fu'><a href='plot2d.html'>plot2d</a></span>(<span class='no'>p</span>$<span class='no'>mu</span> ~ <span class='no'>x</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>nd</span>, <span class='kw'>add</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'><a href='plot2d.html'>plot2d</a></span>(<span class='no'>p</span>$<span class='no'>sigma</span> ~ <span class='no'>x</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>nd</span>,
+  <span class='kw'>ylim</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/range'>range</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>nd</span>$<span class='no'>p</span>$<span class='no'>sigma</span>, <span class='no'>fsigma</span>)))
+<span class='fu'><a href='plot2d.html'>plot2d</a></span>(<span class='no'>fsigma</span> ~ <span class='no'>x</span>, <span class='kw'>add</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>col.lines</span> <span class='kw'>=</span> <span class='st'>"red"</span>)
+
+<span class='co'>## Plot quantile residuals.</span>
+<span class='no'>e</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/residuals'>residuals</a></span>(<span class='no'>b</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/plot'>plot</a></span>(<span class='no'>e</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
