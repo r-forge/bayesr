@@ -35,6 +35,7 @@ vignettes/distregvis.Rmd
 vignettes/lasso.Rmd
 vignettes/zn.Rmd
 vignettes/fatalities.Rmd
+vignettes/mvnorm.Rmd
 
 vignettes/DebTrivedi.rda.zip
 vignettes/DebTrivedi.rda

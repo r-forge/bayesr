@@ -20,6 +20,7 @@ articles:
     - jm
     - cox
     - fatalities
+    - mvnorm
 
 navbar:
   left:
@@ -49,6 +50,8 @@ navbar:
         href: articles/zn.html
       - text: Fatalities Model for Austria
         href: articles/fatalities.html
+      - text: Multivariate Normal Model
+        href: articles/mvnorm.html
       - text: Miscellaneous Topics
         href: articles/misc.html
     - text: Publications

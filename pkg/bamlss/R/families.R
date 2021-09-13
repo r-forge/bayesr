@@ -3170,12 +3170,12 @@ mvnorm_bamlss <- function(k = 2, ...)
 
 
 log_dmvnorm <- function(y, par) {
+  npar <- names(par)
   par <- do.call("cbind", par)
   y <- as.matrix(y)
-  cn <- colnames(par)
-  sj <- grep("sigma", cn)
-  mj <- grep("mu", cn)
-  rj <- as.integer(min(grep("rho", cn)))
+  sj <- grep("sigma", npar)
+  mj <- grep("mu", npar)
+  rj <- as.integer(min(grep("rho", npar)))
   return(.Call("log_dmvnorm", y, par, nrow(y), ncol(y), mj, sj, rj, PACKAGE = "bamlss"))
 }
 

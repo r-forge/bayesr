@@ -4232,11 +4232,15 @@ predict.bamlss <- function(object, newdata, model = NULL, term = NULL, match.nam
               any(sapply(x[[jj]]$margin, function(z) { inherits(z, "random.effect") }))
             } else inherits(x[[jj]], "random.effect")
           }
-          if(random) {
-            if(ncol(X) == ncol(samps[, sn, drop = FALSE]))
+          if(any(sn %in% colnames(samps))) {
+            if(random) {
+              if(ncol(X) == ncol(samps[, sn, drop = FALSE]))
+                eta <- eta + fitted_matrix(X, samps[, sn, drop = FALSE])
+            } else {
               eta <- eta + fitted_matrix(X, samps[, sn, drop = FALSE])
+            }
           } else {
-            eta <- eta + fitted_matrix(X, samps[, sn, drop = FALSE])
+            warning(paste("model term", j, "not in samples, prediction is set to 0!"))
           }
         } else {
           if(is.null(x[[jj]]$PredictMat)) {
