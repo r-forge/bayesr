@@ -5843,6 +5843,8 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
           } else {
             start2 <- start[paste0(i, ".s.", j, ".b", 1:ncX)]
           }
+          if(any(is.na(start2)))
+            stop("dimensions do not match, check starting values!")
           beta[[i]][[paste0("s.", j)]] <- if(all(is.na(start2))) rep(0, ncX) else start2
           if(inherits(x[[i]]$smooth.construct[[j]], "nnet0.smooth")) {
             npar <- x[[i]]$smooth.construct[[j]]$state$parameters
@@ -6204,7 +6206,6 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
 #              } else {
 #                accept <- TRUE
 #              }
-
               if((((ll1 > ll0) & (epsll > eps_loglik)) | always) & accept) {
                 tau2[[i]][[j]] <- tau2s
                 S <- 0

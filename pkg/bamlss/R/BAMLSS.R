@@ -828,7 +828,7 @@ smooth.construct_ff.default <- function(object, data, knots, ...)
     }
   }
   nd <- as.data.frame(nd)
-  object <- smoothCon(object, data = nd, knots = knots)[[1L]]
+  object <- smoothCon(object, data = nd, knots = knots, absorb.cons = TRUE)[[1L]]
   rm(nd)
   nobs <- nrow(data)
   if(file.exists(paste0(xfile, ".rds"))) {
