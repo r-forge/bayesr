@@ -6212,7 +6212,7 @@ nnet0_update <- function(x, family, y, eta, id, weights, criterion, ...)
 
   ic1 <- objfun2(tau2)
 
-  if(ic1 < ic0)
+  if(ic1 <= ic0)
     tau2 <- tau22
 
   P <- matrix_inv(ZWZ + 1/tau2 * x$S[[1]])
