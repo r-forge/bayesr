@@ -221,6 +221,15 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
     stop("the time variable is not specified, needed for mu!")
   timevar <- yname
 
+  # design.construct als Funktion eingebaut, damit sich die eta-Vektoren
+  # der Survival-Prädiktoren in der Länge ändern
+  ## Recompute design matrixes for lambda, gamma, alpha.
+  for(j in c("lambda", "gamma", "alpha")) {
+    object$x[[j]] <- bamlss:::design.construct(object$terms, 
+      data = object$model.frame[take, , drop = FALSE], model.matrix = TRUE, 
+      smooth.construct = TRUE, model = j, scale.x = FALSE)[[j]]
+  }
+  
   ## The basic setup.
   if(is.null(attr(object$x, "bamlss.engine.setup")))
     object$x <- bamlss.engine.setup(object$x, ...)
@@ -366,7 +375,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
       x$sigma$smooth.construct$model.matrix$X %*% 
       x$sigma$smooth.construct$model.matrix$state$parameters
   }
-
   
   # Das eta sollte doch eigentlich unterschiedliche Anzahl an Werten haben?
   # Also für die survival-Parts nur die Anzahl der Beobachtungen und für den 
@@ -395,7 +403,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   take_last_l <- attr(y, "take_last_l")
   status <- attr(y, "status")
   
-  
+  # browser()
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
@@ -424,6 +432,9 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
     
     
     # Likelihood calculation
+    # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
+    # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
+    # Vektor.
     eta_T_long <- eta$alpha[take_last_l] * eta$mu[take_last_l]
     if (marker) {
       eta_T_long <- drop(
@@ -453,7 +464,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   max_y <- max(y[[1]][, 1])
   pred_data <- data.frame(seq(0, max_y, length.out = 100))
   colnames(pred_data) <- x$lambda$smooth.construct[[1]]$term
-  b_it <- x$lambda$smooth.construct[[1]]$state$parameters[-10]
+  k <- x$lambda$smooth.construct[[1]]$bs.dim
+  b_it <- x$lambda$smooth.construct[[1]]$state$parameters[-k]
   pred_mat <- PredictMat(x$lambda$smooth.construct[[1]], pred_data)
   plot(pred_data[, 1], pred_mat%*%b_it)
   
@@ -467,14 +479,12 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
   ## design matrix -> x$X
   ## penalty matrices -> x$S
   ## optimizer.R -> bfit_iwls() updating.
-  
+ 
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
-  tau2 <- bamlss::get.state(x, "tau2")
+  #tau2 <- bamlss::get.state(x, "tau2")
   
-  exp_eta_gamma <- exp(eta$gamma[attr(y, "take_last")])
-  
-  int_i <- survint_gq(pre_fac = exp_eta_gamma, omega = exp(eta_timegrid),
+  int_i <- survint_gq(pre_fac = exp(eta$gamma), omega = exp(eta_timegrid),
                       int_vec = x$Xgrid, weights = attr(y, "gq_weights"))
   # For other predictors
   # * to be created
@@ -519,13 +529,12 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, ...) {
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
   take_last <- attr(y, "take_last")
-  exp_eta_gamma <- exp(eta$gamma[take_last])
-  x_gamma <- x$X[take_last, , drop = FALSE]
+  exp_eta_gamma <- exp(eta$gamma)
   
-  int_i <- survint_gq(pre_fac = exp_eta_gamma, pre_vec = x_gamma,
+  int_i <- survint_gq(pre_fac = exp_eta_gamma, pre_vec = x$X,
                       omega = exp(eta_timegrid),
                       weights = attr(y, "gq_weights"))
-  x_score <- drop(attr(y, "status") %*% x_gamma) - colSums(int_i$score_int)
+  x_score <- drop(attr(y, "status") %*% x$X) - colSums(int_i$score_int)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
@@ -659,11 +668,11 @@ if(FALSE) {
     return(d)
   }
   set.seed(123)
-  n <- 600
+  n <- 300
   simpledata <- simSurv2(n)
   simpledata$id <- factor(seq_len(n))
   simplef <- list(
-    Surv2(time, event, obs = x1) ~ -1 + s(time),
+    Surv2(time, event, obs = x1) ~ -1 + s(time, k = 10),
     gamma ~ 1,
     mu ~ s(id, x2, x3, bs = "pcre", xt = list("mfpc" = MFPCA))
   )
