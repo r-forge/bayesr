@@ -55,22 +55,28 @@ mjm_bamlss <- function(...)
 }
 
 ## Smooth time transformer function.
-sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take)
+sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take, survtime)
 {
 
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
   X <- NULL
+  XT <- NULL
   for(j in x$term) {
     if((j != yname) & (j != timevar)) {
       df <- data.frame(rep(data[[j]], each = length(grid[[1]])))
       names(df) <- j
       X <- if(is.null(X)) df else cbind(X, df)
+      XT <- if(is.null(XT)) df else cbind(XT, df)
     }
   }
-  if(!is.null(X))
+  if(!is.null(X)) {
     colnames(X) <- x$term[!(x$term %in% c(yname, timevar))]
+    colnames(XT) <- x$term[!(x$term %in% c(yname, timevar))]
+  }
+    
   X <- if(is.null(X)) data.frame(unlist(grid)) else cbind(X, unlist(grid))
+  XT <- if(is.null(XT)) data.frame(unlist(grid)) else cbind(X, unlist(grid))
   colnames(X)[ncol(X)] <- yname
   if(timevar != yname) {
     X <- cbind(X, unlist(grid))
@@ -118,7 +124,8 @@ sm_time_transform_mjm_pcre <- function(x, data, grid, yname, timevar, take, N)
   x$term <- c(x$term, timevar)
   x$timevar <- timevar
   x$Xgrid <- PredictMat(x, X)
-
+  x$XT <- PredictMat(x, data)
+  
   x
 }
 
@@ -135,30 +142,80 @@ Predict.matrix.pcre2.random.effect <- function(object, data)
 }
 
 ## Linear design transformer.
-param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar, take)
+param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar, 
+                                     take, idvar)
 {
+ 
+  X <- Xn <- tvar <- NULL
+  # For time-varying covariates in lambda predictor (idvar is not NULL)
+  if (!is.null(idvar)) {
+    id <- data[[idvar]]
+    for (j in names(data)) {
+      if ((!grepl("Surv(", j, fixed = TRUE) & 
+           !grepl("Surv2(", j, fixed = TRUE)) & (j != yname) & (j != timevar)) {
+        
+        # split data per subject
+        idata <- split(data[[j]], id)
+        # check if timevarying variable
+        temp <- lapply(1:length(idata), function(i){
+          length(unique(idata[[i]])) > 1
+          })
+        if(any(unlist(temp))){
+          tvar <- c(tvar, j)
+          # extract unique time-varying values
+          values <- lapply(1:length(idata), function(i){unique(idata[[i]])})
+          # extract break points
+          breaks <- lapply(1:length(idata), function(i){
+            split(data[[timevar2]], id)[[i]][c(TRUE, diff(idata[[i]]) != 0)]})
+          # transfer break points to evaluation grid
+          igrid <- lapply(1:length(idata), function(i){
+            if(length(breaks[[i]]) > 1){
+              g <- cut(grid[[i]], breaks[[i]], labels=FALSE,
+                       include.lowest = TRUE)
+              g[is.na(g)] <- max(g, na.rm=TRUE) + 1
+              g
+            } else {
+              rep(1, length(grid[[i]]))
+            }})
+          # evaluate variable on that grid
+          evalgrid <- lapply(1:length(idata), function(i){
+            values[[i]][igrid[[i]]]})
+          df <- data.frame(unlist(evalgrid))
+          names(df) <- j
+          X <- if (is.null(X)) 
+            df
+          else cbind(X, df)
+          Xn <- c(Xn, j)
+        }
+      }
+    }
+  }
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
-  X <- Xn <- NULL
+  
   for(j in names(data)) {
-    if((!grepl("Surv(", j, fixed = TRUE) & !grepl("Surv2(", j, fixed = TRUE)) & (j != yname) & (j != timevar)) {
+    if((!grepl("Surv(", j, fixed = TRUE) & !grepl("Surv2(", j, fixed = TRUE)) &
+       (j != yname) & (j != timevar) & !(j %in% tvar)) {
       df <- data.frame(rep(data[[j]], each = length(grid[[1]])))
       names(df) <- j
       X <- if(is.null(X)) df else cbind(X, df)
       Xn <- c(Xn, j)
     }
   }
-  if(!is.null(X))
+  if(!is.null(X)) {
     colnames(X) <- Xn
+  }
   X <- if(is.null(X)) data.frame(unlist(grid)) else cbind(X, unlist(grid))
   colnames(X)[ncol(X)] <- yname
   if(timevar != yname) {
     X <- cbind(X, unlist(grid))
     colnames(X)[ncol(X)] <- timevar
   }
-
+  
   x$Xgrid <- model.matrix(formula, data = X)
-
+  # Hier muss man noch ein x$XT erzeugen
+  #x$XT <- PredictMat(x, data)
+  
   x
 }
 
@@ -194,10 +251,12 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   grid <- lapply(y2[, "time"], create_grid)
   
 
-  marker <- FALSE
+  nmarker <- FALSE
+  marker <- rep(1, nrow(y2_l))
   if(!is.null(object$model.frame$marker)) {
     y2_l <- cbind(y2_l, "marker" = as.factor(object$model.frame$marker))
-    marker <- length(levels(as.factor(object$model.frame$marker)))
+    nmarker <- length(levels(as.factor(object$model.frame$marker)))
+    marker <- object$model.frame$marker
   }
 
   take_l <- !duplicated(y2_l)
@@ -212,6 +271,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   attr(object$y, "take_last") <- take_last
   attr(object$y, "take_last_l") <- take_last_l
   attr(object$y, "nsubj") <- nsubj
+  attr(object$y, "nmarker") <- nmarker
   attr(object$y, "marker") <- marker
   
 
@@ -226,8 +286,9 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   ## Recompute design matrixes for lambda, gamma, alpha.
   for(j in c("lambda", "gamma", "alpha")) {
     object$x[[j]] <- bamlss:::design.construct(object$terms, 
-      data = object$model.frame[take, , drop = FALSE], model.matrix = TRUE, 
-      smooth.construct = TRUE, model = j, scale.x = FALSE)[[j]]
+      data = object$model.frame[if (j == "alpha") take_l else take, , 
+      drop = FALSE], model.matrix = TRUE, smooth.construct = TRUE, model = j, 
+      scale.x = FALSE)[[j]]
   }
   
   ## The basic setup.
@@ -282,7 +343,9 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
       object$x[[i]]$smooth.construct$model.matrix <- param_time_transform_mjm(object$x[[i]]$smooth.construct$model.matrix,
         bamlss:::drop.terms.bamlss(object$x[[i]]$terms, sterms = FALSE, keep.response = FALSE), object$model.frame,
         if(i == "lambda") grid else grid_l, yname, 
-        if(i != "mu") timevar else timevar_mu, if(i == "lambda") take_last else take_last_l)
+        if(i != "mu") timevar else timevar_mu,
+        if(i == "lambda") take_last else take_last_l,
+        idvar = if (i == "lambda") idvar else NULL)
     }
   }
 
@@ -306,6 +369,9 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
   
+  nmarker <- attr(y, "nmarker")
+  marker <- attr(y, "marker")
+  
   # ----------------------------------------------------------------------------------------
   ## Set alpha/mu/sigma intercept starting value.
   # Noch mal mit Niki absprechen
@@ -313,34 +379,37 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   # wahrscheinlich auch markerm2 initialisieren?
   # Computational besser für Ableitungen, so lassen
   eta_timegrid_alpha <- 0
+  eta_T_alpha <- 0
   if(length(x$alpha$smooth.construct)) {
     for(j in names(x$alpha$smooth.construct)) {
       if (j == "model.matrix" & is.null(start)) {
-        x$alpha$smooth.construct[[j]]$state$parameters[1] <- .Machine$double.eps
+        x$alpha$smooth.construct[[j]]$state$parameters[seq_len(nmarker)] <- 
+          .Machine$double.eps
         x$alpha$smooth.construct[[j]]$state$fitted.values <- 
           x$alpha$smooth.construct[[j]]$X %*% 
           x$alpha$smooth.construct[[j]]$state$parameters
+        
       } 
       b <- get.par(x$alpha$smooth.construct[[j]]$state$parameters, "b")
-      eta_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
-      x$alpha$smooth.construct[[j]]$state$fitted_timegrid <- eta_sj
-      eta_timegrid_alpha <- eta_timegrid_alpha + eta_sj
+      eta_grid_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
+      eta_T_sj <- drop(x$alpha$smooth.construct[[j]]$XT %*% b)
+      x$alpha$smooth.construct[[j]]$state$fitted_timegrid <- eta_grid_sj
+      x$alpha$smooth.construct[[j]]$state$fitted_T <- eta_T_sj
+      eta_timegrid_alpha <- eta_timegrid_alpha + eta_grid_sj
+      eta_T_alpha <- eta_T_alpha + eta_T_sj
     }
   } 
-  
-  # Man braucht hier noch die Info über die Marker. Dann kann man jeden Marker 
-  # Intercept mit seinem eigenen Mittelwert initialisieren
-  #Initialisiserung kann man auch weglassen - Input sollte standardisiert sein
   
   # Hier muss man sich noch überlegen, was man dann mit dem pcre-Term machen 
   # möchte: Wie wird der dann upgedated? Das Xgrid besteht aus col = (id, wfpc1,
   # wfpc2) und nrow = 700, und b = 2*50 - 2 Parameter
   eta_timegrid_mu <- 0
+  eta_T_mu <- 0
   if(length(x$mu$smooth.construct)) {
     for(j in names(x$mu$smooth.construct)) {
       if (j == "model.matrix" & is.null(start)) {
-        x$mu$smooth.construct[[j]]$state$parameters[1] <- 
-          mean(y[[1]][, "obs"], na.rm = TRUE)
+        x$mu$smooth.construct[[j]]$state$parameters[seq_len(nmarker)] <- 
+          tapply(y[[1]][, "obs"], marker, mean, na.rm = TRUE)
         x$mu$smooth.construct[[j]]$state$fitted.values <- 
           x$mu$smooth.construct[[j]]$X %*% 
           x$mu$smooth.construct[[j]]$state$parameters
@@ -348,12 +417,15 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
       b <- get.par(x$mu$smooth.construct[[j]]$state$parameters, "b")
       if(inherits(x$mu$smooth.construct[[j]], "pcre2.random.effect")){
         # Unterschied smooth.construct, smoothCon Funktion mit Constraint
-        eta_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$Xgrid))
+        eta_grid_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$Xgrid))
       } else {
-        eta_sj <- drop(x$mu$smooth.construct[[j]]$Xgrid %*% b)
+        eta_grid_sj <- drop(x$mu$smooth.construct[[j]]$Xgrid %*% b)
+        eta_T_sj <- drop(x$mu$smooth.construct[[j]]$XT %*% b)
       }
-      x$mu$smooth.construct[[j]]$state$fitted_timegrid <- eta_sj
-      eta_timegrid_mu <- eta_timegrid_mu + eta_sj
+      x$mu$smooth.construct[[j]]$state$fitted_timegrid <- eta_grid_sj
+      x$mu$smooth.construct[[j]]$state$fitted_T <- eta_T_sj
+      eta_timegrid_mu <- eta_timegrid_mu + eta_grid_sj
+      eta_T_mu <- eta_T_mu + eta_T_sj
     }
   }
   
@@ -367,27 +439,20 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
     }
   }
 
-  # Auch hier sollte man für jeden Marker einen eigenen Startwert wählen
   if(!is.null(x$sigma$smooth.construct$model.matrix)) {
-    x$sigma$smooth.construct$model.matrix$state$parameters[1] <- 
-      log(sd(y[[1]][, "obs"], na.rm = TRUE))
+    x$sigma$smooth.construct$model.matrix$state$parameters[seq_len(nmarker)] <- 
+      tapply(y[[1]][, "obs"], marker, function(x) log(sd(x, na.rm = TRUE)))
     x$sigma$smooth.construct$model.matrix$state$fitted.values <-
       x$sigma$smooth.construct$model.matrix$X %*% 
       x$sigma$smooth.construct$model.matrix$state$parameters
   }
   
-  # Das eta sollte doch eigentlich unterschiedliche Anzahl an Werten haben?
-  # Also für die survival-Parts nur die Anzahl der Beobachtungen und für den 
-  # longitudinalen Teil die Gesamtzahl?
-  # mjm_transform Zeile 200
-  # Vor dem Entfernen des Intercepts -> Überprüfen. Sollte passen
   eta <- bamlss:::get.eta(x, expand = FALSE)
 
-  marker <- attr(y, "marker")
   eta_timegrid_long <- eta_timegrid_alpha*eta_timegrid_mu
-  if (marker) {
+  if (nmarker) {
     eta_timegrid_long <- drop(
-      t(rep(1, marker)) %x% diag(length(eta_timegrid_lambda)) %*%
+      t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
       eta_timegrid_long)
   }
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
@@ -403,7 +468,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   take_last_l <- attr(y, "take_last_l")
   status <- attr(y, "status")
   
-  # browser()
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
@@ -430,15 +494,31 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
       }
     }
     
+    ## (3) update alpha.
+    if(length(x$alpha$smooth.construct)) {
+      for(j in seq_along(x$alpha$smooth.construct)) {
+        state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, nu = nu,
+                                  eta = eta, eta_timegrid = eta_timegrid, 
+                                  eta_timegrid_mu = eta_timegrid_mu, ...)
+        eta$alpha <- eta$alpha - fitted(x$alpha$smooth.construct[[j]]$state) +
+          fitted(state)
+        eta_timegrid_alpha <- eta_timegrid_alpha - 
+          x$alpha$smooth.construct[[j]]$state$fitted_timegrid + 
+          state$fitted_timegrid
+        x$alpha$smooth.construct[[j]]$state <- state
+      }
+    }
     
     # Likelihood calculation
     # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
     # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
     # Vektor.
+    # ---- LIKELIHOOD für longitudinal-Teil ist noch falsch berechnet!
+    # Man verwendet hier eigentlich das eta_timegrid
     eta_T_long <- eta$alpha[take_last_l] * eta$mu[take_last_l]
-    if (marker) {
+    if (nmarker) {
       eta_T_long <- drop(
-        t(rep(1, marker)) %x% diag(nsubj) %*% eta_T_long)
+        t(rep(1, nmarker)) %x% diag(nsubj) %*% eta_T_long)
     }
     eta_T <- eta$lambda[take_last] + eta$gamma[take_last] + eta_T_long
     sum_Lambda <- exp(eta$gamma[take_last])%*%(diag(nsubj)%x%t(gq_weights))%*%
@@ -549,6 +629,40 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, ...) {
   
 }
 
+update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, ...) {
+  
+  
+  b <- bamlss::get.state(x, "b")
+  b_p <- length(b)
+  nmarker <- attr(y, "nmarker")
+  
+  int_i <- survint_gq(pre_fac = rep(exp(eta$gamma), nmarker), 
+                      omega = rep(exp(eta_timegrid), nmarker),
+                      int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
+                      weights = attr(y, "gq_weights"))
+                      
+
+  # Für die Score-Funktion braucht man noch die Auswertungen zum Event-Zeitpunkt
+  # für die Prädiktoren alpha und mu
+  # Aber mit der Gauss-Quadratur kann man das timegrid nicht verwenden, weil der
+  # letzte Zeitpunkt ja nicht automatisch die Survival-Zeit ist wie bei der
+  # Dreiecksregel. Also muss man noch mal ein neues eta erstellen und 
+  # mitschleppen?
+  x_score <- drop(attr(y, "status") %*% x$X) - colSums(int_i$score_int)
+  x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
+  
+  x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
+  x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  
+  delta <- solve(x_H, x_score)
+  b <- b + nu * delta
+  
+  x$state$parameters[seq_len(b_p)] <- b
+  x$state$fitted.values <- drop(x$X %*% b)
+  return(x$state)
+  
+}
+
 survint_gq <- function(pre_fac, pre_vec = NULL, omega, int_fac = NULL,
                        int_vec = NULL, weights) {
   
@@ -594,7 +708,7 @@ f <- list(
   gamma ~ 1,
   mu ~ -1 + marker + s(obstime, by = marker) +
     s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("mfpc" = MFPCA)),
-  sigma ~ 1,
+  sigma ~ -1 + marker,
   alpha ~ -1 + marker + s(survtime, by = marker)
 )
 
