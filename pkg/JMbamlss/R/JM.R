@@ -55,13 +55,12 @@ mjm_bamlss <- function(...)
 }
 
 ## Smooth time transformer function.
-sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take, survtime)
+sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take, y)
 {
 
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
-  X <- NULL
-  XT <- NULL
+  X <- XT <- NULL
   for(j in x$term) {
     if((j != yname) & (j != timevar)) {
       df <- data.frame(rep(data[[j]], each = length(grid[[1]])))
@@ -71,25 +70,30 @@ sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take, survtime)
     }
   }
   if(!is.null(X)) {
-    colnames(X) <- x$term[!(x$term %in% c(yname, timevar))]
-    colnames(XT) <- x$term[!(x$term %in% c(yname, timevar))]
+    colnames(X) <- colnames(XT) <- x$term[!(x$term %in% c(yname, timevar))]
   }
     
   X <- if(is.null(X)) data.frame(unlist(grid)) else cbind(X, unlist(grid))
-  XT <- if(is.null(XT)) data.frame(unlist(grid)) else cbind(X, unlist(grid))
-  colnames(X)[ncol(X)] <- yname
+  XT <- if(is.null(XT)) data.frame(y[, 1]) else cbind(X, y[, 1])
+  colnames(X)[ncol(X)] <- colnames(XT)[ncol(XT)] <- yname
   if(timevar != yname) {
     X <- cbind(X, unlist(grid))
-    colnames(X)[ncol(X)] <- timevar
+    XT <- cbind(XT, y[, 1])
+    colnames(X)[ncol(X)] <- colnames(XT)[ncol(XT)] <- timevar
   }
-  if(x$by != "NA" & x$by != yname)
+  if(x$by != "NA" & x$by != yname) {
     X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
-
+    XT[[x$by]] <- data[[x$by]]
+    if (nrow(XT) != nrow(data)) {
+      stop("XT dimensions do not coincide with 'by' dimensions for ", x$label)
+    }
+  }
+    
   x$Xgrid <- PredictMat(x, X)
   
   # XT necessary for calculation of score and hessian
   # Matrix of evaluations at the vector of survival times
-  x$XT <- PredictMat(x, data)
+  x$XT <- PredictMat(x, XT)
   
   x
 }
@@ -299,14 +303,19 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   if(!is.null(object$x$lambda$smooth.construct$model.matrix)) {
     cn <- colnames(object$x$lambda$smooth.construct$model.matrix$X)
     if("(Intercept)" %in% cn)
-      object$x$lambda$smooth.construct$model.matrix$X <- object$x$lambda$smooth.construct$model.matrix$X[, cn != "(Intercept)", drop = FALSE]
+      object$x$lambda$smooth.construct$model.matrix$X <- 
+        object$x$lambda$smooth.construct$model.matrix$X[, cn != "(Intercept)",
+                                                        drop = FALSE]
     if(ncol(x$lambda$smooth.construct$model.matrix$X) < 1) {
       object$x$lambda$smooth.construct$model.matrix <- NULL
-      object$x$lambda$terms <- drop.terms.bamlss(x$lambda$terms, pterms = FALSE, keep.intercept = FALSE)
+      object$x$lambda$terms <- drop.terms.bamlss(x$lambda$terms, pterms = FALSE,
+                                                 keep.intercept = FALSE)
     } else {
-      object$x$lambda$smooth.construct$model.matrix$term <- gsub("(Intercept)+", "",
+      object$x$lambda$smooth.construct$model.matrix$term <- 
+        gsub("(Intercept)+", "",
         object$x$lambda$smooth.construct$model.matrix$term, fixed = TRUE)
-      object$x$lambda$smooth.construct$model.matrix$state$parameters <- object$x$lambda$smooth.construct$model.matrix$state$parameters[-1]
+      object$x$lambda$smooth.construct$model.matrix$state$parameters <- 
+        object$x$lambda$smooth.construct$model.matrix$state$parameters[-1]
       object$x$lambda$terms <- drop.terms.bamlss(x$lambda$terms,
         pterms = TRUE, sterms = TRUE, keep.intercept = FALSE)
     }
@@ -321,16 +330,25 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
           by <- if(object$x[[i]]$smooth.construct[[j]]$by != "NA") {
             object$x[[i]]$smooth.construct[[j]]$by
           } else NULL
-          if(inherits(object$x[[i]]$smooth.construct[[j]], "pcre.random.effect")) {
-            object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_mjm_pcre(object$x[[i]]$smooth.construct[[j]],
-              object$model.frame[, unique(c(xterm, yname, by, timevar_mu, idvar)), drop = FALSE],
-              grid_l, yname, timevar_mu, take_last_l, N = nsubj * subdivisions)
+          if(inherits(object$x[[i]]$smooth.construct[[j]], 
+                      "pcre.random.effect")) {
+            object$x[[i]]$smooth.construct[[j]] <- 
+              sm_time_transform_mjm_pcre(object$x[[i]]$smooth.construct[[j]],
+                object$model.frame[, unique(c(xterm, yname, by, timevar_mu,
+                  idvar)), drop = FALSE], 
+                grid_l, yname, timevar_mu, take_last_l, 
+                N = nsubj * subdivisions)
           } else {
-            object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_mjm(object$x[[i]]$smooth.construct[[j]],
-              object$model.frame[, unique(c(xterm, yname, by, if(i == "mu") timevar_mu else timevar, idvar)), drop = FALSE],
-              if(i == "lambda") grid else grid_l, yname, 
-              if(i == "mu") timevar_mu else timevar,
-              if(i == "lambda") take_last else take_last_l)
+            object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_mjm(
+              #x, data, grid, yname, timevar, take, survtime
+              x = object$x[[i]]$smooth.construct[[j]],
+              data = object$model.frame[, unique(c(xterm, yname, by,
+                if(i == "mu") timevar_mu else timevar, idvar)), drop = FALSE],
+              grid = if(i == "lambda") grid else grid_l,
+              yname = yname, 
+              timevar = if(i == "mu") timevar_mu else timevar,
+              take = if(i == "lambda") take_last else take_last_l,
+              y = if (i == "lambda") y2 else y2_l)
           }
         }
       }
@@ -340,8 +358,10 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   ## Now linear part.
   for(i in c("lambda", "mu", "alpha")) {
     if(!is.null(object$x[[i]]$smooth.construct$model.matrix)) {
-      object$x[[i]]$smooth.construct$model.matrix <- param_time_transform_mjm(object$x[[i]]$smooth.construct$model.matrix,
-        bamlss:::drop.terms.bamlss(object$x[[i]]$terms, sterms = FALSE, keep.response = FALSE), object$model.frame,
+      object$x[[i]]$smooth.construct$model.matrix <- param_time_transform_mjm(
+        object$x[[i]]$smooth.construct$model.matrix,
+        bamlss:::drop.terms.bamlss(object$x[[i]]$terms, sterms = FALSE,
+          keep.response = FALSE), object$model.frame,
         if(i == "lambda") grid else grid_l, yname, 
         if(i != "mu") timevar else timevar_mu,
         if(i == "lambda") take_last else take_last_l,
@@ -680,7 +700,8 @@ survint_gq <- function(pre_fac, pre_vec = NULL, omega, int_fac = NULL,
       int_fac <- rep(1, n*length(weights))
     }
     score_int <- pre_fac*gq_mat %*% (omega*int_fac*int_vec)
-    hess_int <- pre_fac*gq_mat %*% (omega*int_fac^2*t(apply(int_vec, 1, tcrossprod)))
+    hess_int <- pre_fac*gq_mat %*% (omega*int_fac^2*t(apply(int_vec, 1,
+                                                            tcrossprod)))
   } else {
     # Gamma predictor
     if (!is.null(int_fac)) {
@@ -733,7 +754,8 @@ if(FALSE) {
   b <- bamlss(y ~ s(x))
 
   foo <- function(x) {
-    X <- cbind(PredictMat(b$x$mu$smooth.construct[["s(x)"]], data.frame("x" = x)), 1)
+    X <- cbind(PredictMat(b$x$mu$smooth.construct[["s(x)"]],
+                          data.frame("x" = x)), 1)
     beta <- coef(b, FUN = mean, hyper = FALSE, model = "mu")
     return(drop(X %*% beta))
   }
