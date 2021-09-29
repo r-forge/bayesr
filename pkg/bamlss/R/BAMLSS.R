@@ -95,14 +95,17 @@ bamlss.frame <- function(formula, data = NULL, family = "gaussian",
     }
   } else {
     overwrite <- list(...)$overwrite
+    ff_name <- list(...)$ff_name
+    if(is.null(ff_name))
+      ff_name <- "ff_data_bamlss"
     if(is.null(overwrite))
       overwrite <- TRUE
-    if(file.exists("ff_data_bamlss") & overwrite) {
-      unlink("ff_data_bamlss", recursive = TRUE, force = TRUE)
+    if(file.exists(ff_name) & overwrite) {
+      unlink(ff_name, recursive = TRUE, force = TRUE)
     }
-    if(!file.exists("ff_data_bamlss")) {
-      cat("  .. creating directory 'ff_data_bamlss' for storing matrices. Note, the directory is not deleted and matrices can be used for another model.\n")
-      dir.create("ff_data_bamlss")
+    if(!file.exists(ff_name)) {
+      cat(paste0("  .. creating directory '", ff_name, "' for storing matrices. Note, the directory is may not deleted and matrices can be used for another model. Use delete = TRUE in the bamlss call. Before starting a new model you can set overwrite = TRUE to overwrite existing data.\n"))
+      dir.create(ff_name)
     }
     rn <- response.name(formula, hierarchical = FALSE, keep.functions = FALSE)
     if(!any(rn %in% names(bf$model.frame))) {
@@ -111,6 +114,7 @@ bamlss.frame <- function(formula, data = NULL, family = "gaussian",
       rn <- rn[rn %in% names(bf$model.frame)]
     }
     bf$y <- bf$model.frame[rn]
+    bf$ff_name <- ff_name
   }
 
   bf$formula <- formula
@@ -266,6 +270,10 @@ design.construct <- function(formula, data = NULL, knots = NULL,
     stopifnot(requireNamespace("ff"))
     stopifnot(requireNamespace("ffbase"))
   }
+
+  ff_name <- list(...)$ff_name
+  if(is.null(ff_name))
+    ff_name <- "ff_data_bamlss"
 
   if(!is.character(data) & no_ff) {
     if(!inherits(data, "data.frame"))
@@ -440,7 +448,8 @@ design.construct <- function(formula, data = NULL, knots = NULL,
             } else {
               if(inherits(data, "ffdf")) {
                 smt <- smooth.construct_ff(tsm, data,
-                  knots, absorb.cons = if(is.null(absorb.cons)) acons else absorb.cons)
+                  knots, absorb.cons = if(is.null(absorb.cons)) acons else absorb.cons,
+                  ff_name = ff_name)
                 smt <- list(smt)
               } else {
                 smt <- smoothCon(tsm, data, knots,
@@ -773,7 +782,7 @@ ff_ncol <- function(x, value)
 #  result
 #}
 
-smooth.construct_ff.default <- function(object, data, knots, ...)
+smooth.construct_ff.default <- function(object, data, knots, ff_name, ...)
 {
   object$xt$center <- TRUE
   object$xt$nocenter <- FALSE
@@ -789,7 +798,7 @@ smooth.construct_ff.default <- function(object, data, knots, ...)
   nd <- list()
   cat("  .. ff processing term", object$label, "\n")
   xfile <- rmf(object$label)
-  xfile <- file.path("ff_data_bamlss", xfile)
+  xfile <- file.path(ff_name, xfile)
   is_f <- sapply(data, is.factor)
   if((length(terms) > 1) & !any(is_f)) {
     ud <- nrow(unique(data[, terms]))
@@ -6150,7 +6159,7 @@ nnet0_update <- function(x, family, y, eta, id, weights, criterion, ...)
     fit <- fit - Z[, j] * par[j]
 
     opt <- try(optim(c(par[j], par[i]), fn = objfun, gr = gradfun,
-      method = "L-BFGS-B", i = i, j = j, fit = fit), silent = TRUE)
+      method = "BFGS", i = i, j = j, fit = fit), silent = TRUE)
 
 #    H <- matrix_inv(hessfun(c(par[j], par[i]), i = i, j = j, fit = fit))
 #    S <- gradfun(c(par[j], par[i]), i = i, j = j, fit = fit)
