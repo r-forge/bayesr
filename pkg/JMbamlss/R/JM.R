@@ -383,7 +383,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 
 opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...)
 {
-  
+  #browser()
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
   
@@ -516,7 +516,11 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
       for(j in seq_along(x$alpha$smooth.construct)) {
         state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, nu = nu,
                                   eta = eta, eta_timegrid = eta_timegrid, 
-                                  eta_timegrid_mu = eta_timegrid_mu, ...)
+                                  eta_timegrid_mu = eta_timegrid_mu, 
+                                  eta_T_mu = eta_T_mu, ...)
+        # Hier der updating Schritt muss noch angepasst werden. eta_T_alpha ins-
+        # besondere sollte hier irgendwo upgedated werden? Oder reicht halt doch
+        # einfach eta$alpha?
         eta$alpha <- eta$alpha - fitted(x$alpha$smooth.construct[[j]]$state) +
           fitted(state)
         eta_timegrid_alpha <- eta_timegrid_alpha - 
@@ -646,9 +650,10 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, ...) {
   
 }
 
-update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, ...) {
+update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, 
+                             eta_T_mu, ...) {
   
-  
+  #browser()
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
   nmarker <- attr(y, "nmarker")
@@ -665,7 +670,8 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, ...) 
   # letzte Zeitpunkt ja nicht automatisch die Survival-Zeit ist wie bei der
   # Dreiecksregel. Also muss man noch mal ein neues eta erstellen und 
   # mitschleppen?
-  x_score <- drop(attr(y, "status") %*% x$X) - colSums(int_i$score_int)
+  delta <- rep(attr(y, "status"), nmarker)
+  x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
@@ -675,7 +681,13 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, ...) 
   b <- b + nu * delta
   
   x$state$parameters[seq_len(b_p)] <- b
+  x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
   x$state$fitted.values <- drop(x$X %*% b)
+  # Braucht man das fitted_T überhaupt? Sind nicht die fitted.values eh schon
+  # die fitted_T - Werte, weil nämlich x$XT überhaupt nicht nötig war zu
+  # erstellen, weil das eh schon in x$X enthalten war?
+  x$state$fitted_T <- drop(x$XT %*% b)
+
   return(x$state)
   
 }
