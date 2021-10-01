@@ -147,9 +147,9 @@ Predict.matrix.pcre2.random.effect <- function(object, data)
 
 ## Linear design transformer.
 param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar, 
-                                     take, idvar)
+                                     take, idvar, y)
 {
- 
+
   X <- Xn <- tvar <- NULL
   # For time-varying covariates in lambda predictor (idvar is not NULL)
   if (!is.null(idvar)) {
@@ -217,9 +217,8 @@ param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar,
   }
   
   x$Xgrid <- model.matrix(formula, data = X)
-  # Hier muss man noch ein x$XT erzeugen
-  #x$XT <- PredictMat(x, data)
-  
+  x$XT <- model.matrix(formula, data = data)
+
   x
 }
 
@@ -340,7 +339,6 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
                 N = nsubj * subdivisions)
           } else {
             object$x[[i]]$smooth.construct[[j]] <- sm_time_transform_mjm(
-              #x, data, grid, yname, timevar, take, survtime
               x = object$x[[i]]$smooth.construct[[j]],
               data = object$model.frame[, unique(c(xterm, yname, by,
                 if(i == "mu") timevar_mu else timevar, idvar)), drop = FALSE],
@@ -408,7 +406,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
         x$alpha$smooth.construct[[j]]$state$fitted.values <- 
           x$alpha$smooth.construct[[j]]$X %*% 
           x$alpha$smooth.construct[[j]]$state$parameters
-        
       } 
       b <- get.par(x$alpha$smooth.construct[[j]]$state$parameters, "b")
       eta_grid_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
@@ -814,4 +811,9 @@ if(FALSE) {
   )
   b <- bamlss(simplef, family = mjm_bamlss, data = simpledata, timevar = "time")
   curve(log(x) + sin(x * 2), from = 0, to = max(simpledata$time))
+  simplef_cox <- list(
+    Surv2(time, event, obs = x1) ~ -1 + s(time, k = 10),
+    gamma ~ 1)
+  b_c <- bamlss(simplef_cox, family = cox_bamlss, data = simpledata)
+  plot(b_c, ask = FALSE)
 }
