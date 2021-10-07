@@ -383,7 +383,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 
 opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...)
 {
-  #browser()
+
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
   
@@ -397,7 +397,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   # wahrscheinlich auch markerm2 initialisieren?
   # Computational besser für Ableitungen, so lassen
   eta_timegrid_alpha <- 0
-  eta_T_alpha <- 0
+  #eta_T_alpha <- 0
   if(length(x$alpha$smooth.construct)) {
     for(j in names(x$alpha$smooth.construct)) {
       if (j == "model.matrix" & is.null(start)) {
@@ -409,11 +409,11 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
       } 
       b <- get.par(x$alpha$smooth.construct[[j]]$state$parameters, "b")
       eta_grid_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
-      eta_T_sj <- drop(x$alpha$smooth.construct[[j]]$XT %*% b)
+      #eta_T_sj <- drop(x$alpha$smooth.construct[[j]]$XT %*% b)
       x$alpha$smooth.construct[[j]]$state$fitted_timegrid <- eta_grid_sj
-      x$alpha$smooth.construct[[j]]$state$fitted_T <- eta_T_sj
+      #x$alpha$smooth.construct[[j]]$state$fitted_T <- eta_T_sj
       eta_timegrid_alpha <- eta_timegrid_alpha + eta_grid_sj
-      eta_T_alpha <- eta_T_alpha + eta_T_sj
+      #eta_T_alpha <- eta_T_alpha + eta_T_sj
     }
   } 
   
@@ -465,13 +465,9 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
   }
   
   eta <- bamlss:::get.eta(x, expand = FALSE)
-
-  eta_timegrid_long <- eta_timegrid_alpha*eta_timegrid_mu
-  if (nmarker) {
-    eta_timegrid_long <- drop(
-      t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-      eta_timegrid_long)
-  }
+  eta_timegrid_long <- drop(
+    t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
+    (eta_timegrid_alpha*eta_timegrid_mu))
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
   
   eps0 <- eps + 1
@@ -526,6 +522,10 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
         eta_timegrid_alpha <- eta_timegrid_alpha - 
           x$alpha$smooth.construct[[j]]$state$fitted_timegrid + 
           state$fitted_timegrid
+        eta_timegrid_long <- drop(
+          t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
+            (eta_timegrid_alpha * eta_timegrid_mu))
+        eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
         x$alpha$smooth.construct[[j]]$state <- state
       }
     }
@@ -653,7 +653,6 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, ...) {
 update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, 
                              eta_T_mu, ...) {
   
-  #browser()
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
   nmarker <- attr(y, "nmarker")
@@ -664,13 +663,8 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
                       weights = attr(y, "gq_weights"))
                       
 
-  # Für die Score-Funktion braucht man noch die Auswertungen zum Event-Zeitpunkt
-  # für die Prädiktoren alpha und mu
-  # Aber mit der Gauss-Quadratur kann man das timegrid nicht verwenden, weil der
-  # letzte Zeitpunkt ja nicht automatisch die Survival-Zeit ist wie bei der
-  # Dreiecksregel. Also muss man noch mal ein neues eta erstellen und 
-  # mitschleppen?
   delta <- rep(attr(y, "status"), nmarker)
+  # Verwende hier x$X und nicht x$XT?
   x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
@@ -682,11 +676,12 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
   
   x$state$parameters[seq_len(b_p)] <- b
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
+  # Hier wird in jm_bamlss auch x$ und nicht x$XT verwendet
   x$state$fitted.values <- drop(x$X %*% b)
   # Braucht man das fitted_T überhaupt? Sind nicht die fitted.values eh schon
   # die fitted_T - Werte, weil nämlich x$XT überhaupt nicht nötig war zu
   # erstellen, weil das eh schon in x$X enthalten war?
-  x$state$fitted_T <- drop(x$XT %*% b)
+  # x$state$fitted_T <- drop(x$XT %*% b)
 
   return(x$state)
   
