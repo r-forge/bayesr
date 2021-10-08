@@ -6101,6 +6101,7 @@ nnet0_update <- function(x, family, y, eta, id, weights, criterion, ...)
     Xw <- drop(x$X %*% w[-1L])
     Z[, j] <- x$activ_fun(Xw)
     fit <- fit + Z[, j] * w[1L]
+    fit <- fit - mean(fit)
     eta[[id]] <- eta[[id]] + fit
     score <- family$score[[id]](y, family$map2par(eta))
     gr <- score * cbind(Z[, j], w[1L] * x$activ_grad(Xw) * x$X)
@@ -6133,6 +6134,7 @@ nnet0_update <- function(x, family, y, eta, id, weights, criterion, ...)
   objfun <- function(w, i, j, fit) {
     Z[, j] <- x$activ_fun(drop(x$X %*% w[-1L]))
     fit <- fit + Z[, j] * w[1L]
+    fit <- fit - mean(fit)
     eta[[id]] <- eta[[id]] + fit
     ll <- family$loglik(y, family$map2par(eta)) - t(w) %*% I %*% w
 
@@ -6148,6 +6150,7 @@ nnet0_update <- function(x, family, y, eta, id, weights, criterion, ...)
 #  par[1:x$nodes] <- drop(P %*% crossprod(Z * hess, e))
 
   fit <- drop(Z %*% par[1:x$nodes])
+  fit <- fit - mean(fit)
 
   eta2 <- eta
 
@@ -6196,6 +6199,7 @@ nnet0_update <- function(x, family, y, eta, id, weights, criterion, ...)
     }
 
     fit <- fit + Z[, j] * par[j]
+    fit <- fit - mean(fit)
   }
 
   if(!is.null(attr(x$X, "oc")))
