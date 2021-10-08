@@ -381,7 +381,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 }
 
 
-opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...)
+opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...)
 {
 
   if(!is.null(start))
@@ -470,16 +470,18 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
     (eta_timegrid_alpha*eta_timegrid_mu))
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
   
-  eps0 <- eps + 1
-  eta0 <- do.call("cbind", eta[c("lambda", "gamma")])
-  iter <- 0
-  
   # Für logLik
   nsubj <- attr(y, "nsubj")
   gq_weights <- attr(y, "gq_weights")
   take_last <- attr(y, "take_last")
   take_last_l <- attr(y, "take_last_l")
   status <- attr(y, "status")
+  
+  eps0 <- eps + 1
+  eta0_surv <- do.call("cbind", eta[c("lambda", "gamma")])
+  eta0_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
+  eta0 <- cbind(eta0_surv, eta0_alpha)
+  iter <- 0
   
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
@@ -517,7 +519,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
         # Hier der updating Schritt muss noch angepasst werden. eta_T_alpha ins-
         # besondere sollte hier irgendwo upgedated werden? Oder reicht halt doch
         # einfach eta$alpha?
-        eta$alpha <- eta$alpha - fitted(x$alpha$smooth.construct[[j]]$state) +
+        eta$alpha <- eta$alpha - 
+          drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
           fitted(state)
         eta_timegrid_alpha <- eta_timegrid_alpha - 
           x$alpha$smooth.construct[[j]]$state$fitted_timegrid + 
@@ -536,24 +539,26 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 400, nu = 0.1, ...
     # Vektor.
     # ---- LIKELIHOOD für longitudinal-Teil ist noch falsch berechnet!
     # Man verwendet hier eigentlich das eta_timegrid
-    eta_T_long <- eta$alpha[take_last_l] * eta$mu[take_last_l]
-    if (nmarker) {
-      eta_T_long <- drop(
-        t(rep(1, nmarker)) %x% diag(nsubj) %*% eta_T_long)
-    }
-    eta_T <- eta$lambda[take_last] + eta$gamma[take_last] + eta_T_long
-    sum_Lambda <- exp(eta$gamma[take_last])%*%(diag(nsubj)%x%t(gq_weights))%*%
+    eta_T_long <- drop(
+      t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+    eta_T <- eta$lambda + eta$gamma + eta_T_long
+    sum_Lambda <- exp(eta$gamma)%*%(diag(nsubj)%x%t(gq_weights))%*%
       exp(eta_timegrid)
-    logLik <- status %*% eta_T - sum_Lambda # + longitudinal part
+    logLik <- drop(status %*% eta_T - sum_Lambda) # + longitudinal part
     # logLik <- sum((eta_timegrid[,ncol(eta_timegrid)] + eta$gamma) * status, na.rm = TRUE) -
     #   exp(eta$gamma) %*% int0 + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
     
     iter <- iter + 1
-    eta1 <- do.call("cbind", eta[c("lambda", "gamma")])
+    eta1_surv <- do.call("cbind", eta[c("lambda", "gamma")])
+    eta1_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
+    eta1 <- cbind(eta1_surv, eta0_alpha)
     eps0 <- mean(abs((eta1 - eta0) / eta1), na.rm = TRUE)
-    cat("It ", iter,", LogLik ", logLik, "\n")
-    if (iter != 88)
+    if (iter %% 5 == 0) {
+      cat("It ", iter,", LogLik ", logLik, "\n")
+    }
     eta0 <- eta1
+    eta0_surv <- eta1_surv
+    eta0_alpha <- eta1_alpha
   }
 
   # Log-Posterior ausrechnen und ausgeben
@@ -593,11 +598,6 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
   # mu:
   # int_i <- survint_gq(pre_fac = exp_eta_gamma, omega = exp(eta_timegrid),
   #                     int_fac = eta_alpha*, int_vec = x$Xgrid,
-  #                     weights = attr(y, "gq_weights"))
-  # -----
-  # alpha:
-  # int_i <- survint_gq(pre_fac = exp_eta_gamma, omega = exp(eta_timegrid),
-  #                     int_fac = eta_mu*, int_vec = x$Xgrid, 
   #                     weights = attr(y, "gq_weights"))
 
   # Status from MJM_transform
