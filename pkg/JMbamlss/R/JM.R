@@ -483,6 +483,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
   take_last <- attr(y, "take_last")
   take_last_l <- attr(y, "take_last_l")
   status <- attr(y, "status")
+  survtime <- y[[1]][, "time"][take_last]
   
   eps0 <- eps + 1
   eta0_surv <- do.call("cbind", eta[c("lambda", "gamma")])
@@ -494,7 +495,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
       state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu, 
-                                 eta = eta, eta_timegrid = eta_timegrid, ...)
+                                 eta = eta, eta_timegrid = eta_timegrid, 
+                                 survtime = survtime, ...)
       eta_timegrid_lambda <- eta_timegrid_lambda -
         x$lambda$smooth.construct[[j]]$state$fitted_timegrid + 
         state$fitted_timegrid
@@ -509,7 +511,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
     if(length(x$gamma$smooth.construct)) {
       for(j in seq_along(x$gamma$smooth.construct)) {
         state <- update_mjm_gamma(x$gamma$smooth.construct[[j]], y = y, nu = nu,
-                                 eta = eta, eta_timegrid = eta_timegrid, ...)
+                                 eta = eta, eta_timegrid = eta_timegrid, 
+                                 survtime = survtime, ...)
         eta$gamma <- eta$gamma - fitted(x$gamma$smooth.construct[[j]]$state) +
           fitted(state)
         x$gamma$smooth.construct[[j]]$state <- state
@@ -522,7 +525,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
         state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, nu = nu,
                                   eta = eta, eta_timegrid = eta_timegrid, 
                                   eta_timegrid_mu = eta_timegrid_mu, 
-                                  eta_T_mu = eta_T_mu, ...)
+                                  eta_T_mu = eta_T_mu, survtime = survtime, ...)
         eta$alpha <- eta$alpha - 
           drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
           fitted(state)
@@ -542,7 +545,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
       for(j in seq_along(x$mu$smooth.construct)) {
         state <- update_mjm_mu(x$mu$smooth.construct[[j]], y = y, nu = nu,
                                eta = eta, eta_timegrid = eta_timegrid,
-                               eta_timegrid_alpha = eta_timegrid_alpha, ...)
+                               eta_timegrid_alpha = eta_timegrid_alpha, 
+                               survtime = survtime, ...)
         eta$mu <- eta$mu - 
           drop(fitted(x$mu$smooth.construct[[j]]$state)) +
           fitted(state)
@@ -571,7 +575,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
     eta_T <- eta$lambda + eta$gamma + eta_T_long
     # sum_Lambda muss doch auch noch für die jeweilige Intervall-Länge gewichtet
     # werden, oder?
-    sum_Lambda <- exp(eta$gamma)%*%(diag(nsubj)%x%t(gq_weights))%*%
+    sum_Lambda <- (survtime/2 * exp(eta$gamma)) %*%
+      (diag(nsubj)%x%t(gq_weights))%*%
       exp(eta_timegrid)
     logLik <- drop(status %*% eta_T - sum_Lambda) +
       sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
@@ -614,7 +619,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
   stop("Basst.")
 }
 
-update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
+update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, survtime, ...)
 {
   ## grid matrix -> x$Xgrid
   ## design matrix -> x$X
@@ -626,7 +631,8 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
   #tau2 <- bamlss::get.state(x, "tau2")
 
   int_i <- survint_gq(pre_fac = exp(eta$gamma), omega = exp(eta_timegrid),
-                      int_vec = x$Xgrid, weights = attr(y, "gq_weights"))
+                      int_vec = x$Xgrid, weights = attr(y, "gq_weights"),
+                      survtime = survtime)
 # browser()
   
 
@@ -655,7 +661,7 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, ...)
   
 }
 
-update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, ...) {
+update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, survtime, ...) {
 #  browser()
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
@@ -664,7 +670,8 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, ...) {
   
   int_i <- survint_gq(pre_fac = exp_eta_gamma, pre_vec = x$X,
                       omega = exp(eta_timegrid),
-                      weights = attr(y, "gq_weights"))
+                      weights = attr(y, "gq_weights"),
+                      survtime = survtime)
   x_score <- drop(attr(y, "status") %*% x$X) - colSums(int_i$score_int)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
@@ -681,7 +688,7 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, ...) {
 }
 
 update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, 
-                             eta_T_mu, ...) {
+                             eta_T_mu, survtime, ...) {
 #  browser()
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
@@ -690,7 +697,8 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
   int_i <- survint_gq(pre_fac = rep(exp(eta$gamma), nmarker), 
                       omega = rep(exp(eta_timegrid), nmarker),
                       int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
-                      weights = attr(y, "gq_weights"))
+                      weights = attr(y, "gq_weights"),
+                      survtime = survtime)
                       
 
   delta <- rep(attr(y, "status"), nmarker)
@@ -718,7 +726,7 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
 }
 
 update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha, 
-                          ...) {
+                          survtime, ...) {
 # browser()
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
@@ -727,7 +735,8 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
   int_i <- survint_gq(pre_fac = rep(exp(eta$gamma), nmarker),
                       omega = rep(exp(eta_timegrid), nmarker),
                       int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
-                      weights = attr(y, "gq_weights"))
+                      weights = attr(y, "gq_weights"),
+                      survtime = survtime)
 
   delta <- rep(attr(y, "status"), nmarker)
   x_score <- drop(
@@ -755,7 +764,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
 # sondern bis T_i integriert? Hier noch ein Argument einfügen, dass als Faktor
 # noch T_i/2 auf jedes Element hinzumultipliziert?
 survint_gq <- function(pre_fac, pre_vec = NULL, omega, int_fac = NULL,
-                       int_vec = NULL, weights) {
+                       int_vec = NULL, weights, survtime) {
   
   if (sum(c(is.null(pre_vec), is.null(int_vec))) != 1) {
     stop("Either pre_vec or int_vec must be specified.")
@@ -788,7 +797,7 @@ survint_gq <- function(pre_fac, pre_vec = NULL, omega, int_fac = NULL,
       stop("Problem with dimensions in gauss quadrature.")
     }
   }
-  list(score_int = score_int, hess_int = hess_int)
+  list(score_int = survtime/2 * score_int, hess_int = survtime/2 * hess_int)
   # hess_int: each row corresponds to one individual 
   # each row has ncol(vec)^2 elements -> is a matrix of derivatives
 }
