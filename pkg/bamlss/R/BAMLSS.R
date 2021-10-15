@@ -808,7 +808,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
   if(is.null(nthres))
     nthres <- 1
   if(nrow(data) > nthres) {
-    if((length(terms) > 1) & !any(is_f)) {
+    if((length(terms) > 1) & !any(is_f) & FALSE) {
       ud <- nrow(unique(data[, terms]))
       km <- kmeans(data[, terms], min(c(1000, floor(0.9 * ud))))
       uc <- unique(km$cluster)
