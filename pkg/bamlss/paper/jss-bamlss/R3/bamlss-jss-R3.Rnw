@@ -1720,6 +1720,8 @@ for objects of class \code{bamlss.residuals} and can be selected via the \code{w
 argument of the plot method for these objects:
 %
 <<eval=FALSE>>=
+set.seed(321)
+
 resids <- c(
   "ztnbinom" = residuals(flash_model_ztnbinom),
   "ztSICHEL" = residuals(flash_model_ztSICHEL)
@@ -1730,6 +1732,8 @@ plot(resids, which = "wp", main = "Worm plot")
 \begin{figure}[t!]
 \centering
 <<fig=TRUE, height=4.5, width=6, echo=FALSE, pdf=FALSE, png=TRUE>>=
+set.seed(321)
+
 resids <- c(
 	"ztnbinom" = residuals(flash_model_ztnbinom, newdata = FlashAustriaTrain),
 	"ztSICHEL" = residuals(flash_model_ztSICHEL, newdata = FlashAustriaTrain)

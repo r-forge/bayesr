@@ -10424,7 +10424,6 @@ residuals.bamlss <- function(object, type = c("quantile", "response"), nsamps = 
           u <- ifelse(u > 0.999999, u - 1e-16, u)
           u <- ifelse(u < 1e-06, u + 1e-16, u)
           res <- qnorm(u)
-
 #	  a <- family$p(y - 1, par)
 #	  b <- family$p(y, par)
 #	  u <- runif(n = length(y), min = a, max = b)

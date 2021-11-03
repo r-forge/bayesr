@@ -764,7 +764,7 @@ step or for getting the next step in an MCMC simulation, a.o.
 
 Using a basis function approach, the updating functions $U_{jk}( \cdot )$ for posterior mode
 (frequentist penalized likelihood) estimation or MCMC for $\boldsymbol{\beta}_{jk}$ share an iteratively
-weighted least squares updating step (IWLS,~\citealp{bamlss:Gamerman:1997})
+weighted least squares updating step  
 \begin{equation} \label{eqn:blockbackfit}
   \boldsymbol{\beta}_{jk}^{(t+1)}
   = U_{jk}(\boldsymbol{\beta}_{jk}^{(t)}; \, \cdot \,) =
