@@ -403,7 +403,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
   # wahrscheinlich auch markerm2 initialisieren?
   # Computational besser für Ableitungen, so lassen
   eta_timegrid_alpha <- 0
-  #eta_T_alpha <- 0
   if(length(x$alpha$smooth.construct)) {
     for(j in names(x$alpha$smooth.construct)) {
       if (j == "model.matrix" & is.null(start)) {
@@ -415,17 +414,11 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
       } 
       b <- get.par(x$alpha$smooth.construct[[j]]$state$parameters, "b")
       eta_grid_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
-      #eta_T_sj <- drop(x$alpha$smooth.construct[[j]]$XT %*% b)
       x$alpha$smooth.construct[[j]]$state$fitted_timegrid <- eta_grid_sj
-      #x$alpha$smooth.construct[[j]]$state$fitted_T <- eta_T_sj
       eta_timegrid_alpha <- eta_timegrid_alpha + eta_grid_sj
-      #eta_T_alpha <- eta_T_alpha + eta_T_sj
     }
   } 
   
-  # Hier muss man sich noch überlegen, was man dann mit dem pcre-Term machen 
-  # möchte: Wie wird der dann upgedated? Das Xgrid besteht aus col = (id, wfpc1,
-  # wfpc2) und nrow = 700, und b = 2*50 - 2 Parameter
   eta_timegrid_mu <- 0
   eta_T_mu <- 0
   if(length(x$mu$smooth.construct)) {
@@ -488,6 +481,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
   eta0_surv <- do.call("cbind", eta[c("lambda", "gamma")])
   eta0_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
   eta0 <- cbind(eta0_surv, eta0_alpha)
+  eta0_long <- do.call("cbind", eta[c("mu", "sigma")])
   iter <- 0
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
@@ -566,13 +560,10 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
     # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
     # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
     # Vektor.
-    # ---- LIKELIHOOD für longitudinal-Teil ist noch falsch berechnet!
-    # Man verwendet hier eigentlich das eta_timegrid
     eta_T_long <- drop(
       t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
     eta_T <- eta$lambda + eta$gamma + eta_T_long
-    # sum_Lambda muss doch auch noch für die jeweilige Intervall-Länge gewichtet
-    # werden, oder?
+    
     sum_Lambda <- (survtime/2 * exp(eta$gamma)) %*%
       (diag(nsubj)%x%t(gq_weights))%*%
       exp(eta_timegrid)
@@ -582,26 +573,26 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
     # Eigentlich sollte hier doch auch über die Log-Posterior das Max gebildet
     # werden? Die Score und Hesse-Funktionen beziehen nämlich schon die Prioris
     # mit ein
-    
 
-    # eta1_long fehlt und muss vielleicht noch überarbeitet werden? JM.R(915)?
+    # Stopping criterion
     iter <- iter + 1
     eta1_surv <- do.call("cbind", eta[c("lambda", "gamma")])
     eta1_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
     eta1 <- cbind(eta1_surv, eta0_alpha)
-    eps0 <- mean(abs((eta1 - eta0) / eta1), na.rm = TRUE)
+    eps0_surv <- mean(abs((eta1 - eta0) / eta1), na.rm = TRUE)
+    eta1_long <- do.call("cbind", eta[c("mu", "sigma")])
+    eps0_long <- mean(abs((eta1_long - eta0_long) / eta1_long), na.rm = TRUE)
+    eps0 <- mean(c(eps0_surv, eps0_long))
+
     #if (iter %% 5 == 0) {
       cat("It ", iter,", LogLik ", logLik, "\n")
     #}
     eta0 <- eta1
-    eta0_surv <- eta1_surv
-    eta0_alpha <- eta1_alpha
+    eta0_long <- eta1_long
   }
 
   # Log-Posterior ausrechnen und ausgeben
   # get_logPost Funktion aus JM als Vorlage
-  # log Likelihood reicht aus über eta
-  # in bamlss:::simsurv kann man sich Cox-Modell auch simulieren lassen
   ## return(list("parameters" = par, "fitted.values" = eta))
   
   max_y <- max(y[[1]][, 1])
@@ -691,11 +682,6 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
   b_p <- length(b)
   nmarker <- attr(y, "nmarker")
   
-  # int_i <- survint_gq(pred = "long", pre_fac = rep(exp(eta$gamma), nmarker), 
-  #                     omega = rep(exp(eta_timegrid), nmarker),
-  #                     int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
-  #                     weights = attr(y, "gq_weights"),
-  #                     survtime = survtime)
   int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
                       omega = exp(eta_timegrid),
                       int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
@@ -704,7 +690,6 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
                       
 
   delta <- rep(attr(y, "status"), nmarker)
-  # Verwende hier x$X und nicht x$XT?
   
   x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
@@ -717,7 +702,6 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
   
   x$state$parameters[seq_len(b_p)] <- b
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
-  # Hier wird in jm_bamlss auch x$ und nicht x$XT verwendet
   x$state$fitted.values <- drop(x$X %*% b)
   # Braucht man das fitted_T überhaupt? Sind nicht die fitted.values eh schon
   # die fitted_T - Werte, weil nämlich x$XT überhaupt nicht nötig war zu
@@ -763,9 +747,6 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
   
 }
 
-# Muss man hier nicht noch die Summe dafür anpassen, dass man nicht bis -1,
-# sondern bis T_i integriert? Hier noch ein Argument einfügen, dass als Faktor
-# noch T_i/2 auf jedes Element hinzumultipliziert?
 survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
                        pre_vec = NULL, omega, int_fac = NULL,
                        int_vec = NULL, weights, survtime) {
@@ -818,6 +799,7 @@ survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
       stop("Problem with dimensions in gauss quadrature.")
     }
   }
+  # Multiply with borders of integration for Legendre
   list(score_int = survtime/2 * score_int, hess_int = survtime/2 * hess_int)
   # hess_int: each row corresponds to one individual 
   # each row has ncol(vec)^2 elements -> is a matrix of derivatives
