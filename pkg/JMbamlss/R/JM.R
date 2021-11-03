@@ -125,7 +125,6 @@ sm_time_transform_mjm_pcre <- function(x, data, grid, yname, timevar, take,
     X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
 
   class(x) <- "pcre2.random.effect"
-
   x$term <- c(x$term, timevar)
   x$timevar <- timevar
   x$Xgrid <- PredictMat(x, X, n = nmarker*nrow(X))
@@ -490,7 +489,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
   eta0_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
   eta0 <- cbind(eta0_surv, eta0_alpha)
   iter <- 0
-#  browser()
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
@@ -540,7 +538,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
       }
     }
     
-    ## (4) update mu
+    ## (4) update mu.
     if(length(x$mu$smooth.construct)) {
       for(j in seq_along(x$mu$smooth.construct)) {
         state <- update_mjm_mu(x$mu$smooth.construct[[j]], y = y, nu = nu,
@@ -581,7 +579,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
     logLik <- drop(status %*% eta_T - sum_Lambda) +
       sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
                 log = TRUE))
-# browser()
     # Eigentlich sollte hier doch auch über die Log-Posterior das Max gebildet
     # werden? Die Score und Hesse-Funktionen beziehen nämlich schon die Prioris
     # mit ein
@@ -625,15 +622,15 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, survtime, ...)
   ## design matrix -> x$X
   ## penalty matrices -> x$S
   ## optimizer.R -> bfit_iwls() updating.
-# browser()
+  
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
   #tau2 <- bamlss::get.state(x, "tau2")
 
-  int_i <- survint_gq(pre_fac = exp(eta$gamma), omega = exp(eta_timegrid),
+  int_i <- survint_gq(pred = "lambda", pre_fac = exp(eta$gamma),
+                      omega = exp(eta_timegrid),
                       int_vec = x$Xgrid, weights = attr(y, "gq_weights"),
                       survtime = survtime)
-# browser()
   
 
   # Status from MJM_transform
@@ -662,13 +659,13 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, survtime, ...)
 }
 
 update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, survtime, ...) {
-#  browser()
+  
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
   take_last <- attr(y, "take_last")
   exp_eta_gamma <- exp(eta$gamma)
   
-  int_i <- survint_gq(pre_fac = exp_eta_gamma, pre_vec = x$X,
+  int_i <- survint_gq(pred = "gamma", pre_fac = exp_eta_gamma, pre_vec = x$X,
                       omega = exp(eta_timegrid),
                       weights = attr(y, "gq_weights"),
                       survtime = survtime)
@@ -689,13 +686,18 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, survtime, ...) {
 
 update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu, 
                              eta_T_mu, survtime, ...) {
-#  browser()
+  
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
   nmarker <- attr(y, "nmarker")
   
-  int_i <- survint_gq(pre_fac = rep(exp(eta$gamma), nmarker), 
-                      omega = rep(exp(eta_timegrid), nmarker),
+  # int_i <- survint_gq(pred = "long", pre_fac = rep(exp(eta$gamma), nmarker), 
+  #                     omega = rep(exp(eta_timegrid), nmarker),
+  #                     int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
+  #                     weights = attr(y, "gq_weights"),
+  #                     survtime = survtime)
+  int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
+                      omega = exp(eta_timegrid),
                       int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
                       weights = attr(y, "gq_weights"),
                       survtime = survtime)
@@ -703,6 +705,7 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
 
   delta <- rep(attr(y, "status"), nmarker)
   # Verwende hier x$X und nicht x$XT?
+  
   x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
@@ -727,13 +730,13 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
 
 update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha, 
                           survtime, ...) {
-# browser()
+
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
   nmarker <- attr(y, "nmarker")
   
-  int_i <- survint_gq(pre_fac = rep(exp(eta$gamma), nmarker),
-                      omega = rep(exp(eta_timegrid), nmarker),
+  int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
+                      omega = exp(eta_timegrid),
                       int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
                       weights = attr(y, "gq_weights"),
                       survtime = survtime)
@@ -742,7 +745,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
   x_score <- drop(
     crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
       t(delta * x$XT) %*% eta$alpha) - colSums(int_i$score_int)
-  x_H <- - crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
+  x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
     matrix(colSums(int_i$hess_int), ncol = b_p)
 
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
@@ -763,34 +766,52 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
 # Muss man hier nicht noch die Summe dafür anpassen, dass man nicht bis -1,
 # sondern bis T_i integriert? Hier noch ein Argument einfügen, dass als Faktor
 # noch T_i/2 auf jedes Element hinzumultipliziert?
-survint_gq <- function(pre_fac, pre_vec = NULL, omega, int_fac = NULL,
+survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
+                       pre_vec = NULL, omega, int_fac = NULL,
                        int_vec = NULL, weights, survtime) {
-  
+   
   if (sum(c(is.null(pre_vec), is.null(int_vec))) != 1) {
     stop("Either pre_vec or int_vec must be specified.")
   }
-  
+  if (pred != "long" & !is.null(int_fac)) {
+    stop("Argument int_fac is only used for longitudinal predictors.")
+  }
+  # int_vec <- (t(rep(1, nmarker)) %x% diag(length(eta_timegrid))) %*%
+  #   (eta_timegrid_alpha * x$Xgrid)
   # Integration as weighted sum of evaluated points
-  n <- length(pre_fac)
+  n <- length(survtime)
   gq_mat <- diag(n)%x%t(weights)
   
-  if (is.null(pre_vec)) {
-    # Not a gamma predictor
-    if (is.null(int_fac)) {
-      int_fac <- rep(1, n*length(weights))
+  if (pred == "long") {
+    nmarker <- nrow(int_vec)/(n*length(weights))
+    if (nmarker %% 1 != 0) {
+      stop("Dimensions of longitudinal design matrix do not match.")
     }
-    score_int <- pre_fac*gq_mat %*% (omega*int_fac*int_vec)
-    hess_int <- pre_fac*gq_mat %*% (omega*int_fac^2*t(apply(int_vec, 1,
-                                                            tcrossprod)))
-  } else {
-    # Gamma predictor
-    if (!is.null(int_fac)) {
-      stop("Argument int_fac is not used for predictor gamma.")
-    }
-    pre_fac <- c(pre_fac*gq_mat %*% omega)
-    score_int <- pre_fac*pre_vec
-    hess_int <- pre_fac*t(apply(pre_vec, 1, tcrossprod))
+    pre_fac <- rep(pre_fac, nmarker)
+    omega <- rep(omega, nmarker)
+    gq_mat <- diag(n*nmarker)%x%t(weights)
+    
+    # Alternativ mit Matrixmultiplikation statt verlängertem Vektor
+    # dim_mat <- t(rep(1, nmarker)) %x% diag(n*length(weights))
+    # score_int <- pre_fac*gq_mat %*% (omega*dim_mat %*% (int_fac*int_vec))
+    # hess_int <- pre_fac*gq_mat %*% 
+    #   (omega*dim_mat %*% t(apply(int_fac*int_vec, 1, tcrossprod)))
   }
+  switch(pred, 
+    "lambda" =, "long" = {
+      if (is.null(int_fac)) {
+        int_fac <- rep(1, n*length(weights))
+      }
+      score_int <- pre_fac*gq_mat %*% (omega*int_fac*int_vec)
+      hess_int <- pre_fac*gq_mat %*% (omega*int_fac^2*t(apply(int_vec, 1,
+                                                              tcrossprod)))
+    },
+    "gamma" = {
+      pre_fac <- c(pre_fac*gq_mat %*% omega)
+      score_int <- pre_fac*pre_vec
+      hess_int <- pre_fac*t(apply(pre_vec, 1, tcrossprod))
+    })
+  
   if (dim(score_int)[1] != dim(hess_int)[1]) {
     hess_int <- t(hess_int)
     if (dim(score_int)[1] != dim(hess_int)[1]) {
@@ -850,18 +871,19 @@ if(FALSE) {
   intf <- rep(1, 21)
   intv <- matrix(rep(1:4, each = 21), ncol = 4, nrow = 21)
   we <- rep(1, 7)#statmod::gauss.quad(7)$weights
+  sur <- c(1, 1, 1)
   
   # lambda case
-  lc <- survint_gq(pre_fac = pref, pre_vec = NULL, omega = om,
-                   int_fac = NULL, int_vec = intv, weights = we)
+  lc <- survint_gq(pred = "lambda", pre_fac = pref, pre_vec = NULL, omega = om,
+                   int_fac = NULL, int_vec = intv, weights = we, survtime = sur)
   
   # alpha case
-  ac <- survint_gq(pre_fac = pref, pre_vec = NULL, omega = om,
-                   int_fac = intf, int_vec = intv, weights = we)
+  ac <- survint_gq(pred = "long", pre_fac = pref, pre_vec = NULL, omega = om,
+                   int_fac = intf, int_vec = intv, weights = we, survtime = sur)
   
   # gamma case
-  gc <- survint_gq(pre_fac = pref, pre_vec = prev, omega = om,
-                   int_fac = NULL, int_vec = NULL, weights = we)
+  gc <- survint_gq(pred = "gamma", pre_fac = pref, pre_vec = prev, omega = om,
+                   int_fac = NULL, int_vec = NULL, weights = we, survtime = sur)
 }
 
 if(FALSE) {
