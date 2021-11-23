@@ -5,7 +5,7 @@ library(bamlss)
 library(refund)
 library(funData)
 library(tidyverse)
-source("../R/simJM.R")
+source("R/simJM.R")
 sim_dat <- simJM(nsub = 100, long_setting = "fpc", alpha_setting = "constant",
                  long_df = 3, sigma = 0.05, seed = 120, eval_scale = 2)
 
@@ -72,6 +72,18 @@ nrow(coef(m1))
 # 837 parameters
 
 
+# Time difference is the other way round when using mgcv
+system.time(
+  m_gcv <- bam(y ~  obstime + s(x2, bs = "ps") + 
+                 s(id, wfpc.1, wfpc.2, wfpc.3, bs = "pcre"),
+               data = sim_dat)
+)
+system.time(
+  m1_gcv <- bam(y ~ obstime + s(x2, bs = "ps") + ti(id, bs = "re") +
+                  ti(id, obstime, bs = c("re", "cr"), 
+                     k = c(nlevels(sim_dat$id), 8)),
+                data = sim_dat)
+)
 
 # Compare model fits ------------------------------------------------------
 
@@ -79,12 +91,17 @@ nrow(coef(m1))
 newdat <- sim_dat[rep(1, 5), ]
 newdat$obstime <- 0:4
 m1_int <- predict(m1, newdat, term = "1")$mu
-m1_obs <- predict(m1, newdat, term = "obstime")$mu # Why not 0 for obstime=0?
-m1_x2 <- predict(m1, newdat, term = "s(x2)")$mu
-m1_id <- predict(m1, newdat, term = "ti(id)")$mu
-m1_fre <- predict(m1, newdat, term = "ti(id,obstime)")$mu
+m1_obs <- predict(m1, newdat, term = "obstime", intercept = FALSE)$mu
+# Why not 0 for obstime=0?
+# Answer: obstime is contained in two model terms so it automatically returns
+#         the sum of all the model terms containing obstime
+m1_x2 <- predict(m1, newdat, term = "s(x2)", intercept = FALSE)$mu
+m1_id <- predict(m1, newdat, term = "ti(id)", intercept = FALSE)$mu
+m1_fre <- predict(m1, newdat, term = "ti(id,obstime)", intercept = FALSE)$mu
 m1_mu <- predict(m1, newdat)$mu
 
-# Doesn't add up
-m1_mu
-m1_int+m1_obs+m1_x2+m1_id+m1_fre
+# Only adds up if you leave out functional random effects prediction
+all.equal(m1_mu, m1_int+m1_obs+m1_x2+m1_id)#+m1_fre
+
+library(mgcv)
+
