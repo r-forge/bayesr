@@ -200,7 +200,7 @@ bamlss(formula, family = "gaussian", data = NULL,
   \doi{10.1080/10618600.2017.1407325}
 
   Umlauf N, Klein N, Simon T, Zeileis A (2021).
-  bamlss: A Lego Toolbox for Flexible Bayesian Regression (and Beyond).}
+  bamlss: A Lego Toolbox for Flexible Bayesian Regression (and Beyond).
   \emph{Journal of Statistical Software},
   \bold{100}(4), 1--53. \doi{10.18637/jss.v100.i04}
 }
