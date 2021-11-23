@@ -7,7 +7,11 @@ if(!exists("d")) {
   source("simMultiJM.R")
   source("eval_mfun.R")
   
-  d <- simMultiJM(nsub = 50)
+  set.seed(1808)
+  d <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121), 
+                  lambda = function(t, x) {
+                    1.4*log((120*t + 10)/1000)
+                  })
 
   marker_dat <- split(d, d$marker)
   marker_dat <- lapply(marker_dat, function (mark) {
@@ -57,15 +61,16 @@ mjm_bamlss <- function(...)
 ## Smooth time transformer function.
 sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take, y)
 {
-
+  
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
   X <- XT <- NULL
   for(j in x$term) {
     if((j != yname) & (j != timevar)) {
-      df <- data.frame(rep(data[[j]], each = length(grid[[1]])))
-      names(df) <- j
-      X <- if(is.null(X)) df else cbind(X, df)
+      df_grid <- data.frame(rep(data[[j]], each = length(grid[[1]])))
+      df <- data.frame(data[[j]])
+      names(df_grid) <- names(df) <- j
+      X <- if(is.null(X)) df_grid else cbind(X, df_grid)
       XT <- if(is.null(XT)) df else cbind(XT, df)
     }
   }
@@ -74,7 +79,7 @@ sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take, y)
   }
     
   X <- if(is.null(X)) data.frame(unlist(grid)) else cbind(X, unlist(grid))
-  XT <- if(is.null(XT)) data.frame(y[, 1]) else cbind(X, y[, 1])
+  XT <- if(is.null(XT)) data.frame(y[, 1]) else cbind(XT, y[, 1])
   colnames(X)[ncol(X)] <- colnames(XT)[ncol(XT)] <- yname
   if(timevar != yname) {
     X <- cbind(X, unlist(grid))
@@ -237,11 +242,14 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
   gq <- statmod::gauss.quad(subdivisions, ...)
 
   ## Get idvar.
-  class_mu <- sapply(object$x$mu$smooth.construct, class)
+  class_mu <- lapply(object$x$mu$smooth.construct, class)
   class_mu <- sapply(class_mu, function(x) x[1])
-  if(!any(class_mu == "pcre.random.effect"))
-    stop("need pcre smooth!")
-  j <- which(class_mu == "pcre.random.effect")
+  if(!any(class_mu == "pcre.random.effect")){
+    #stop("need pcre smooth!")
+    j <- length(class_mu)
+  } else {
+    j <- which(class_mu == "pcre.random.effect")
+  }
   smj <- object$x$mu$smooth.construct[[j]]
   idvar <- smj$term[1]
 
@@ -387,9 +395,9 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...)
 }
 
 
-opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...)
+opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 200, nu = 0.1, ...)
 {
-
+  
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
   
@@ -418,7 +426,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
       eta_timegrid_alpha <- eta_timegrid_alpha + eta_grid_sj
     }
   } 
-  
   eta_timegrid_mu <- 0
   eta_T_mu <- 0
   if(length(x$mu$smooth.construct)) {
@@ -486,43 +493,43 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
-      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu, 
-                                 eta = eta, eta_timegrid = eta_timegrid, 
+      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu,
+                                 eta = eta, eta_timegrid = eta_timegrid,
                                  survtime = survtime, ...)
       eta_timegrid_lambda <- eta_timegrid_lambda -
-        x$lambda$smooth.construct[[j]]$state$fitted_timegrid + 
+        x$lambda$smooth.construct[[j]]$state$fitted_timegrid +
         state$fitted_timegrid
-      eta_timegrid <- eta_timegrid_lambda + 
+      eta_timegrid <- eta_timegrid_lambda +
         eta_timegrid_long
       eta$lambda <- eta$lambda - fitted(x$lambda$smooth.construct[[j]]$state) +
         fitted(state)
       x$lambda$smooth.construct[[j]]$state <- state
     }
-    
+
     ## (2) update gamma.
     if(length(x$gamma$smooth.construct)) {
       for(j in seq_along(x$gamma$smooth.construct)) {
         state <- update_mjm_gamma(x$gamma$smooth.construct[[j]], y = y, nu = nu,
-                                 eta = eta, eta_timegrid = eta_timegrid, 
+                                 eta = eta, eta_timegrid = eta_timegrid,
                                  survtime = survtime, ...)
         eta$gamma <- eta$gamma - fitted(x$gamma$smooth.construct[[j]]$state) +
           fitted(state)
         x$gamma$smooth.construct[[j]]$state <- state
       }
     }
-    
+
     ## (3) update alpha.
     if(length(x$alpha$smooth.construct)) {
       for(j in seq_along(x$alpha$smooth.construct)) {
         state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, nu = nu,
-                                  eta = eta, eta_timegrid = eta_timegrid, 
-                                  eta_timegrid_mu = eta_timegrid_mu, 
+                                  eta = eta, eta_timegrid = eta_timegrid,
+                                  eta_timegrid_mu = eta_timegrid_mu,
                                   eta_T_mu = eta_T_mu, survtime = survtime, ...)
-        eta$alpha <- eta$alpha - 
+        eta$alpha <- eta$alpha -
           drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
           fitted(state)
-        eta_timegrid_alpha <- eta_timegrid_alpha - 
-          x$alpha$smooth.construct[[j]]$state$fitted_timegrid + 
+        eta_timegrid_alpha <- eta_timegrid_alpha -
+          x$alpha$smooth.construct[[j]]$state$fitted_timegrid +
           state$fitted_timegrid
         eta_timegrid_long <- drop(
           t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
@@ -531,19 +538,19 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
         x$alpha$smooth.construct[[j]]$state <- state
       }
     }
-    
+
     ## (4) update mu.
     if(length(x$mu$smooth.construct)) {
       for(j in seq_along(x$mu$smooth.construct)) {
         state <- update_mjm_mu(x$mu$smooth.construct[[j]], y = y, nu = nu,
                                eta = eta, eta_timegrid = eta_timegrid,
-                               eta_timegrid_alpha = eta_timegrid_alpha, 
+                               eta_timegrid_alpha = eta_timegrid_alpha,
                                survtime = survtime, ...)
-        eta$mu <- eta$mu - 
+        eta$mu <- eta$mu -
           drop(fitted(x$mu$smooth.construct[[j]]$state)) +
           fitted(state)
-        eta_timegrid_mu <- eta_timegrid_mu - 
-          x$mu$smooth.construct[[j]]$state$fitted_timegrid + 
+        eta_timegrid_mu <- eta_timegrid_mu -
+          x$mu$smooth.construct[[j]]$state$fitted_timegrid +
           state$fitted_timegrid
         eta_timegrid_long <- drop(
           t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
@@ -555,7 +562,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 600, nu = 0.1, ...
         x$mu$smooth.construct[[j]]$state <- state
       }
     }
-    
+
     # Likelihood calculation
     # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
     # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
@@ -731,7 +738,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
       t(delta * x$XT) %*% eta$alpha) - colSums(int_i$score_int)
   x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
     matrix(colSums(int_i$hess_int), ncol = b_p)
-
+  
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
   
@@ -750,7 +757,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
 survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
                        pre_vec = NULL, omega, int_fac = NULL,
                        int_vec = NULL, weights, survtime) {
-   
+  
   if (sum(c(is.null(pre_vec), is.null(int_vec))) != 1) {
     stop("Either pre_vec or int_vec must be specified.")
   }
@@ -763,35 +770,33 @@ survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
   n <- length(survtime)
   gq_mat <- diag(n)%x%t(weights)
   
-  if (pred == "long") {
-    nmarker <- nrow(int_vec)/(n*length(weights))
-    if (nmarker %% 1 != 0) {
-      stop("Dimensions of longitudinal design matrix do not match.")
-    }
-    pre_fac <- rep(pre_fac, nmarker)
-    omega <- rep(omega, nmarker)
-    gq_mat <- diag(n*nmarker)%x%t(weights)
-    
-    # Alternativ mit Matrixmultiplikation statt verlängertem Vektor
-    # dim_mat <- t(rep(1, nmarker)) %x% diag(n*length(weights))
-    # score_int <- pre_fac*gq_mat %*% (omega*dim_mat %*% (int_fac*int_vec))
-    # hess_int <- pre_fac*gq_mat %*% 
-    #   (omega*dim_mat %*% t(apply(int_fac*int_vec, 1, tcrossprod)))
-  }
   switch(pred, 
-    "lambda" =, "long" = {
-      if (is.null(int_fac)) {
-        int_fac <- rep(1, n*length(weights))
-      }
-      score_int <- pre_fac*gq_mat %*% (omega*int_fac*int_vec)
-      hess_int <- pre_fac*gq_mat %*% (omega*int_fac^2*t(apply(int_vec, 1,
-                                                              tcrossprod)))
-    },
-    "gamma" = {
-      pre_fac <- c(pre_fac*gq_mat %*% omega)
-      score_int <- pre_fac*pre_vec
-      hess_int <- pre_fac*t(apply(pre_vec, 1, tcrossprod))
-    })
+         "lambda" = {
+           score_int <- pre_fac*gq_mat %*% (omega*int_vec)
+           hess_int <- pre_fac*gq_mat %*% (omega*t(apply(int_vec, 1, 
+                                                         tcrossprod)))
+         },
+         "gamma" = {
+           pre_fac <- c(pre_fac*gq_mat %*% omega)
+           score_int <- pre_fac*pre_vec
+           hess_int <- pre_fac*t(apply(pre_vec, 1, tcrossprod))
+         },
+         "long" = {
+           nmarker <- nrow(int_vec)/(n*length(weights))
+           if (nmarker %% 1 != 0) {
+             stop("Dimensions of longitudinal design matrix do not match.")
+           }
+           
+           # Alternativ mit Matrixmultiplikation statt verlängertem Vektor
+           # dim_mat <- t(rep(1, nmarker)) %x% diag(n*length(weights))
+           # score_int <- pre_fac*gq_mat %*% (omega*dim_mat %*% (int_fac*int_vec))
+           # hess_int <- pre_fac*gq_mat %*% 
+           #   (omega*dim_mat %*% t(apply(int_fac*int_vec, 1, tcrossprod)))
+           sum_mat <- matrix(rep(diag(omega), nmarker), nrow = length(omega))
+           score_int <- pre_fac*gq_mat %*% sum_mat %*% (int_fac*int_vec)
+           hess_int <- pre_fac*gq_mat %*% sum_mat %*% 
+             (int_fac^2*t(apply(int_vec, 1, tcrossprod)))
+         })
   
   if (dim(score_int)[1] != dim(hess_int)[1]) {
     hess_int <- t(hess_int)
@@ -805,7 +810,18 @@ survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
   # each row has ncol(vec)^2 elements -> is a matrix of derivatives
 }
 
+
 Surv2 <- bamlss:::Surv2
+
+f_re <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
+  gamma ~ 1, 
+  mu ~ -1 + marker + ti(obstime, by = marker) +
+    ti(id, bs = "re") +
+    ti(id, obstime, bs = c("re", "cr"), k = c(50, 5)),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker + s(survtime, by = marker)
+)
 
 f <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
@@ -820,7 +836,8 @@ f <- list(
 # Externe zeitvariierende Kovariablen nicht möglich.
 # in example:
 # eta_lambda = 1.4*log((t + 10)/1000)
-curve(1.4*log((x + 10)/1000), from = 0, to = 120)
+curve(1.4*log((120*x + 10)/1000), from = 0, to = 1)
+#b <- bamlss(f_re, family = mjm_bamlss, data = d, timevar = "obstime")
 b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime")
 
 
