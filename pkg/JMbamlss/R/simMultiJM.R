@@ -27,10 +27,10 @@
 simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                        nmark = 2, M = 6, ncovar = 2,
                        lambda = function(t, x) {
-                         1.4*log((t + 10)/1000) - 1.5
+                         1.4*log((t + 10)/1000)
                        },
                        gamma = function(x) {
-                         0.3*x[, 1]
+                         - 1.5 + 0.3*x[, 1]
                        },
                        alpha = rep(list(function(t, x) {
                          0.3 + 0*t
@@ -214,7 +214,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   
   
-  ## full hazard (including nonlinear effect)
+  ## full hazard
   hazard <-  function(time, x, r, ...){
     # mu_fun könnte auch hier als Objekt erstellt und unten ersetzt werden
     # ich brauche also nur eine Funktion, die mit gegeben time, x und r mu auf
