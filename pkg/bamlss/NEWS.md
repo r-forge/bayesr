@@ -1,3 +1,7 @@
+# bamlss 1.1-6
+
+* JSS paper published <doi:10.18637/jss.v100.i04>.
+
 # bamlss 1.1-5
 
 * Bug fixing.
