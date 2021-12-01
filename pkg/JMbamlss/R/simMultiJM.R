@@ -8,6 +8,7 @@
 #' @param nsub Number of subjects.
 #' @param times Vector of time points.
 #' @param probmiss Probability of missingness.
+#' @param maxfac Factor changing the uniform censoring interval.
 #' @param nmark Number of markers.
 #' @param M Number of principal components.
 #' @param ncovar Number of covariates.
@@ -25,7 +26,7 @@
 #'   scaling the eigenvalues.
 #' @param full Create a wide-format data.frame and 
 simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
-                       nmark = 2, M = 6, ncovar = 2,
+                       maxfac = 1.5, nmark = 2, M = 6, ncovar = 2,
                        lambda = function(t, x) {
                          1.4*log((t + 10)/1000)
                        },
@@ -61,9 +62,9 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   ## specify censoring function (aus CoxFlexBoost) changed into uniformly (as 
   ## too much censoring)
   ## added censoring at tmax
-  censoring <- function(time, tmax){
+  censoring <- function(time, tmax, maxfac){
     ## censoring times are independent uniformly distributed
-    censor_time <- runif(n = length(time), min=0, max=1.5*tmax)
+    censor_time <- runif(n = length(time), min = 0, max = maxfac*tmax)
     censor_time <- ifelse(censor_time > tmax, tmax, censor_time)
     event <- (time <= censor_time)
     survtime <- apply(cbind(time, censor_time), 1, min)
@@ -79,7 +80,9 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     n <- length(select)
     n_miss <- round(prop*n, 0)
     miss <- sample(select, n_miss)
-    data <- data[-miss,]
+    if (length(miss) > 0) {
+      data <- data[-miss,]
+    }
     return(data)
   }
   
@@ -105,15 +108,18 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     splitVals <- rep(NA, length(argvals) + 1)
     x[[1]] <- unlist(argvals[[1]])
     splitVals[1:2] <- c(0, length(x[[1]]))
-    for (i in 2:p) {
-      x[[i]] <- unlist(argvals[[i]])
-      x[[i]] <- argvals[[i]] - min(argvals[[i]]) + max(x[[i - 1]])
-      splitVals[i + 1] <- splitVals[i] + length(x[[i]])
+    if (p > 1) {
+      for (i in 2:p) {
+        x[[i]] <- unlist(argvals[[i]])
+        x[[i]] <- argvals[[i]] - min(argvals[[i]]) + max(x[[i - 1]])
+        splitVals[i + 1] <- splitVals[i] + length(x[[i]])
+      }
     }
     f <- funData::eFun(unlist(x), M, ignoreDeg = ignoreDeg, type = eFunType)
     trueFuns <- vector("list", p)
-    for (j in seq_len(p)) trueFuns[[j]] <- funData::funData(argvals[[j]], 
-            s[j] * f@X[, (1 + splitVals[j]):splitVals[j + 1]])
+    for (j in seq_len(p)) trueFuns[[j]] <- funData::funData(
+      argvals[[j]], s[j] * f@X[, (1 + splitVals[j]):splitVals[j + 1], 
+                               drop = FALSE])
     return(funData::multiFunData(trueFuns))
   }
   
@@ -212,8 +218,6 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     }, mu_k = mu, pc_k = pc_bases, SIMPLIFY = FALSE)
   }
   
-  
-  
   ## full hazard
   hazard <-  function(time, x, r, ...){
     # mu_fun könnte auch hier als Objekt erstellt und unten ersetzt werden
@@ -224,6 +228,52 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
             alpha_k(time, x)*mu_k
           }, alpha_k = alpha, mu_k = mu_fun(time, x, r, mu, b_set),
           SIMPLIFY = FALSE)))
+  }
+  
+  
+  ## Code from bamlss package, slightly adapted
+  rJM <- function (hazard, censoring, x, r, subdivisions = 1000, tmin = 0, 
+            tmax, maxfac, file = NULL, ...) 
+  {
+    nsub <- nrow(x)
+    time <- rep(NA, nsub)
+    Hazard <- function(hazard, time, x, r) {
+      integrate(hazard, 0, time, x = x, r = r, 
+                subdivisions = subdivisions)$value
+    }
+    InvHazard <- function(Hazard, hazard, x, r, tmin, tmax) {
+      negLogU <- -log(runif(1, 0, 1))
+      rootfct <- function(time) {
+        negLogU - Hazard(hazard, time, x, r)
+      }
+      if (rootfct(tmin) < 0) {
+        return(0)
+      }
+      else {
+        root <- try(uniroot(rootfct, interval = c(0, tmax))$root, 
+                    silent = TRUE)
+        root <- if (inherits(root, "try-error")) {
+          tmax + 0.01
+        }
+        else {
+          root
+        }
+      }
+      return(root)
+    }
+    cumhaz <- rep(NA, nsub)
+    survprob <- rep(NA, nsub)
+    for (i in 1:nsub) {
+      time[i] <- InvHazard(Hazard, hazard, x[i, ], r[i, ], 
+                           tmin, tmax)
+      cumhaz[i] <- Hazard(hazard, time[i], x[i, ], r[i, ])
+      survprob[i] <- exp((-1) * cumhaz[i])
+    }
+    time_event <- censoring(time, tmax, maxfac)
+    data_short <- data.frame(survtime = time_event[, 1], 
+                             event = time_event[, 2], x, r, cumhaz = cumhaz)
+    names(data_short) <- gsub(".", "", names(data_short), fixed = TRUE)
+    return(data_short)
   }
   
   
@@ -240,7 +290,8 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   r <- temp[[1]]
   b_set <- temp[[2]]
   
-  data_short <- bamlss::rJM(hazard, censoring, x, r, tmin = times[1], tmax = tmax) 
+  data_short <- rJM(hazard, censoring, x, r, tmin = times[1], tmax = tmax, 
+                    maxfac = maxfac) 
   
   
   ## Create the full simulated data
@@ -250,20 +301,20 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   # gamma and lambda have only joint intercept which is estimated in
   # predictor gamma
-  #????
-  data_grid <- data.frame(survtime = times,
-                          mu = seq(-0.5, 2.5, length.out = length(times)))
+  # What was data_grid for?
+  # data_grid <- data.frame(survtime = times,
+  #                         mu = seq(-0.5, 2.5, length.out = length(times)))
   f_lambda <- lambda(data_short$survtime)  
-  f_gamma <- gamma(data_short[,grep("x[0-9]+", colnames(data_short))])
+  #f_gamma <- gamma(data_short[,grep("x[0-9]+", colnames(data_short))])
   data_base$lambda <- lambda(data_base$obstime) - mean(f_lambda)
-  data_grid$lambda <- lambda(data_grid$survtime) - mean(f_lambda)
+  #data_grid$lambda <- lambda(data_grid$survtime) - mean(f_lambda)
   data_base$gamma <- gamma(x[id, ]) + mean(f_lambda)
-  data_grid$alpha <- cbind(data_grid,
-                           alpha = do.call(cbind, 
-                                           lapply(alpha, function(alpha_k) {
-                                             alpha_k(data_grid$survtime, 0)
-                                           })))
-  #????
+  # data_grid$alpha <- cbind(data_grid,
+  #                          alpha = do.call(cbind, 
+  #                                          lapply(alpha, function(alpha_k) {
+  #                                            alpha_k(data_grid$survtime, 0)
+  #                                          })))
+  #
   data_long <- do.call(rbind, rep(list(data_base), nmark))
   data_long$marker <- factor(rep(paste0("m", seq_len(nmark)),
                                  each = length(id)))
@@ -282,6 +333,9 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                      fpc = fpcs,
                      wfpc = t(t(fpcs)*b_set$evals))
   
+  # Hypothetical longitudinal data
+  data_hypo <- data_long
+  
   # censoring                   
   data_long <- data_long[data_long$obstime <= data_long$survtime,]
   
@@ -296,7 +350,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   
   if(full){
-    d <- list(data=data_long, data_grid = data_grid, data_full = data_full)
+    d <- list(data=data_long, data_full = data_full, data_hypo = data_hypo)
   } else {
     d <- data_long
   }
