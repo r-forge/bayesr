@@ -98,69 +98,6 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   } 
   
   
-  ## Code from Clara Happ-Kurz' package funData and slightly adapted
-  simMultiSplit <- function (argvals, M, eFunType, ignoreDeg = NULL, eValType, 
-                             s) {
-    if (any(c(length(M), length(eFunType), length(eValType)) != 1)) 
-      stop("argvals, M, eFunType, eValType must all be of length 1!")
-    p <- length(argvals)
-    x <- vector("list", length = length(argvals))
-    splitVals <- rep(NA, length(argvals) + 1)
-    x[[1]] <- unlist(argvals[[1]])
-    splitVals[1:2] <- c(0, length(x[[1]]))
-    if (p > 1) {
-      for (i in 2:p) {
-        x[[i]] <- unlist(argvals[[i]])
-        x[[i]] <- argvals[[i]] - min(argvals[[i]]) + max(x[[i - 1]])
-        splitVals[i + 1] <- splitVals[i] + length(x[[i]])
-      }
-    }
-    f <- funData::eFun(unlist(x), M, ignoreDeg = ignoreDeg, type = eFunType)
-    trueFuns <- vector("list", p)
-    for (j in seq_len(p)) trueFuns[[j]] <- funData::funData(
-      argvals[[j]], s[j] * f@X[, (1 + splitVals[j]):splitVals[j + 1], 
-                               drop = FALSE])
-    return(funData::multiFunData(trueFuns))
-  }
-  
-  ## Code from Clara Happ-Kurz' package funData and slightly adapted
-  simMultiWeight <- function (argvals, M, eFunType, ignoreDeg = NULL, eValType,
-                              alpha) {
-    p <- length(argvals)
-    dimsSupp <- foreach::foreach(j = seq_len(p), .combine = "c") %do% {
-      length(argvals[[j]])
-    }
-    if (any(dimsSupp > 2)) {
-      stop(paste0("Function simMultiWeight: method is not implemented for ",
-                  "objects of dimension > 2!"))
-    }
-    if (p > 1) {
-      if (isTRUE(do.call(all.equal, lapply(M, prod)))) {
-        Mtotal <- prod(M[[1]])
-      }
-      else stop("Function simMultiWeight: basis dimensions must be equal!")
-    }
-    else {
-      Mtotal <- prod(M[[1]])
-    }
-
-    weight <- sqrt(alpha/sum(alpha))
-    basis <- vector("list", p)
-    for (j in seq_len(p)) {
-      if (dimsSupp[j] == 1) 
-        basis[[j]] <- weight[j] * funData::eFun(argvals[[j]][[1]], M = M[[j]], 
-             ignoreDeg = ignoreDeg[[j]], type = eFunType[[j]])
-      else basis[[j]] <- weight[j] * tensorProduct(
-        funData::eFun(argvals[[j]][[1]], M = M[[j]][1], 
-             ignoreDeg = ignoreDeg[[j]][[1]], type = eFunType[[j]][1]), 
-              funData::eFun(argvals[[j]][[2]], M = M[[j]][2], 
-                            ignoreDeg = ignoreDeg[[j]][[2]], 
-                            type = eFunType[[j]][2]))
-    }
-    return(funData::multiFunData(basis))
-  }
-  
-  
   ## generate the multivariate functional principal component basis
   mfpc <- function(argvals, mfpc_args, M) {
     switch(mfpc_args$type,
@@ -183,8 +120,9 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     if(!is.null(seed)) set.seed(seed)
     
     evals <- funData::eVal(M = M, type = mfpc_args$eValType)
+    evals <- mfpc_args$eValScale * evals
     
-    scores <- mvtnorm::rmvnorm(nsub, sigma = diag(mfpc_args$eValScale * evals),
+    scores <- mvtnorm::rmvnorm(nsub, sigma = diag(evals),
                                method="chol")
     colnames(scores) <- paste0("s", 1:M)
     
@@ -361,3 +299,75 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     return(d) 
   } 
 }
+
+
+
+# Function to create a MFPCA basis using splits ---------------------------
+
+
+## Code from Clara Happ-Kurz' package funData and slightly adapted
+simMultiSplit <- function (argvals, M, eFunType, ignoreDeg = NULL, eValType, 
+                           s) {
+  if (any(c(length(M), length(eFunType), length(eValType)) != 1)) 
+    stop("argvals, M, eFunType, eValType must all be of length 1!")
+  p <- length(argvals)
+  x <- vector("list", length = length(argvals))
+  splitVals <- rep(NA, length(argvals) + 1)
+  x[[1]] <- unlist(argvals[[1]])
+  splitVals[1:2] <- c(0, length(x[[1]]))
+  if (p > 1) {
+    for (i in 2:p) {
+      x[[i]] <- unlist(argvals[[i]])
+      x[[i]] <- argvals[[i]] - min(argvals[[i]]) + max(x[[i - 1]])
+      splitVals[i + 1] <- splitVals[i] + length(x[[i]])
+    }
+  }
+  f <- funData::eFun(unlist(x), M, ignoreDeg = ignoreDeg, type = eFunType)
+  trueFuns <- vector("list", p)
+  for (j in seq_len(p)) trueFuns[[j]] <- funData::funData(
+    argvals[[j]], s[j] * f@X[, (1 + splitVals[j]):splitVals[j + 1], 
+                             drop = FALSE])
+  return(funData::multiFunData(trueFuns))
+}
+
+
+# Function to crate a MFPCA basis using weighting -------------------------
+
+
+## Code from Clara Happ-Kurz' package funData and slightly adapted
+simMultiWeight <- function (argvals, M, eFunType, ignoreDeg = NULL, eValType,
+                            alpha) {
+  p <- length(argvals)
+  dimsSupp <- foreach::foreach(j = seq_len(p), .combine = "c") %do% {
+    length(argvals[[j]])
+  }
+  if (any(dimsSupp > 2)) {
+    stop(paste0("Function simMultiWeight: method is not implemented for ",
+                "objects of dimension > 2!"))
+  }
+  if (p > 1) {
+    if (isTRUE(do.call(all.equal, lapply(M, prod)))) {
+      Mtotal <- prod(M[[1]])
+    }
+    else stop("Function simMultiWeight: basis dimensions must be equal!")
+  }
+  else {
+    Mtotal <- prod(M[[1]])
+  }
+  
+  weight <- sqrt(alpha/sum(alpha))
+  basis <- vector("list", p)
+  for (j in seq_len(p)) {
+    if (dimsSupp[j] == 1) 
+      basis[[j]] <- weight[j] * funData::eFun(argvals[[j]][[1]], M = M[[j]], 
+                                              ignoreDeg = ignoreDeg[[j]], type = eFunType[[j]])
+    else basis[[j]] <- weight[j] * tensorProduct(
+      funData::eFun(argvals[[j]][[1]], M = M[[j]][1], 
+                    ignoreDeg = ignoreDeg[[j]][[1]], type = eFunType[[j]][1]), 
+      funData::eFun(argvals[[j]][[2]], M = M[[j]][2], 
+                    ignoreDeg = ignoreDeg[[j]][[2]], 
+                    type = eFunType[[j]][2]))
+  }
+  return(funData::multiFunData(basis))
+}
+

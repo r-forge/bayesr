@@ -15,7 +15,7 @@ source("R/opt_MJM.R")
 source("R/opt_updating.R")
 
 library(tidyverse)
-debugonce(simMultiJM)
+#debugonce(simMultiJM)
 
 
 
@@ -33,8 +33,24 @@ dat1 <- simMultiJM(nmark = 1, M = 1,
 table(dat1$data$event) # no censoring
 ggplot(dat1$data, aes(x = obstime, y = mu, group = id)) + 
   geom_point() # all die at 0
-sd(dat1$data_full$mu)
-sd(dat1$data_full$s1) # variation in longitudinal trajectores comes from PCRE
+var(dat1$data_full$mu)
+var(dat1$data_full$s1) # variation in longitudinal trajectores comes from PCRE
+ggplot(dat1$data_hypo, aes(x = obstime, y = mu, group = id)) + 
+  geom_line() # constant trajectories
+
+# Constant high hazard -> everyone dies in the beginning
+dat1_1 <- simMultiJM(nmark = 1, M = 5,
+                   lambda = function(t, x) 300,
+                   gamma = function(x) 0,
+                   alpha = list(function(t, x) 0*t),
+                   mu = list(function(t, x) 1.25),
+                   sigma = function(t, x) 0.001 + 0*t,
+                   full = TRUE)
+ggplot(dat1_1$data, aes(x = obstime, y = mu, group = id)) + 
+  geom_point() # all die at 0
+var(dat1_1$data_full$mu)
+var(dat1_1$data_full$s1) # no longer the same
+var(dat1_1$data_full$s5) # eigenvalues are seq(1, 0.2, by = 0.2)
 ggplot(dat1$data_hypo, aes(x = obstime, y = mu, group = id)) + 
   geom_line() # constant trajectories
 
@@ -71,8 +87,8 @@ ggplot(dat2_1$data, aes(x = obstime, y = mu, group = id)) +
   geom_point() # missingness shares of longitudinal trajectories
 summary(as.integer(table(dat2_1$data$id))) # 0.25*121 = 30.25
 
-
-
+# debug(preproc_MFPCA)
+mfpca1 <- preproc_MFPCA(dat2_1$data)
 
 
 
@@ -88,10 +104,10 @@ dat2 <- simMultiJM(nmark = 2, M = 3,
                    sigma = function(t, x) 0.001 + 0*t,
                    full = TRUE)
 
-dat3 <- simMultiJM(nmark = 2, M = 1,
+dat3 <- simMultiJM(nmark = 3, M = 1,
                    lambda = function(t, x) 300,
                    gamma = function(x) 0,
-                   alpha = rep(list(function(t, x) 0*t), 2),
-                   mu = rep(list(function(t, x) 1.25), 2),
+                   alpha = rep(list(function(t, x) 0*t), 3),
+                   mu = rep(list(function(t, x) 1.25), 3),
                    sigma = function(t, x) 0.001 + 0*t,
                    full = TRUE)
