@@ -26,14 +26,24 @@ par(mfrow = c(1,2))
 set.seed(1808)
 
 
+d_new <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121), 
+                    lambda = function(t, x) {
+                      1.4*log((120*t + 10)/1000)
+                    })
+d_new120 <- d_new
+d_new120$survtime <- d_new120$survtime*120
+d_new120$obstime <- d_new120$obstime*120
+
+d_old <- simMultiJM(nsub = 50)
+d_old1 <- d_old
+d_old1$survtime <- d_old1$survtime/120
+d_old1$obstime <- d_old1$obstime/120
+
+
+
 
 # PCRE Model for new example ----------------------------------------------
 
-
-d_new <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121), 
-                lambda = function(t, x) {
-                  1.4*log((120*t + 10)/1000)
-                })
 
 marker_dat <- split(d_new, d_new$marker)
 marker_dat <- lapply(marker_dat, function (mark) {
@@ -81,9 +91,6 @@ plot(pred_data[, 1], pred_mat%*%b_new$parameters$lambda$s$`s(survtime)`[1:9])
 
 # Change the time-scale ---------------------------------------------------
 
-d_new120 <- d_new
-d_new120$survtime <- d_new120$survtime*120
-d_new120$obstime <- d_new120$obstime*120
 
 marker_dat120 <- split(d_new120, d_new120$marker)
 marker_dat120 <- lapply(marker_dat120, function (mark) {
@@ -131,8 +138,6 @@ plot(pred_data120[, 1],
 
 # Old example -------------------------------------------------------------
 
-
-d_old <- simMultiJM(nsub = 50)
 
 marker_dat_old <- split(d_old, d_old$marker)
 marker_dat_old <- lapply(marker_dat_old, function (mark) {
@@ -208,10 +213,6 @@ plot(pred_data_re[, 1],
 
 # Old data set with first reducing time scale -----------------------------
 
-
-d_old1 <- d_old
-d_old1$survtime <- d_old1$survtime/120
-d_old1$obstime <- d_old1$obstime/120
 marker_dat1 <- split(d_old1, d_old1$marker)
 marker_dat1 <- lapply(marker_dat1, function (mark) {
   mark$res <- bam(y ~ s(obstime) + s(x2), data = mark)$residuals
@@ -242,8 +243,8 @@ f_old1 <- list(
 )
 
 # Model fit with pcre and plot
-b_old1 <- bamlss(f_old1, family = mjm_bamlss, data = d_old1, timevar = "obstime",
-                sampler = FALSE)
+b_old1 <- bamlss(f_old1, family = mjm_bamlss, data = d_old1, 
+                 timevar = "obstime", sampler = FALSE)
 
 curve(1.4*log((x*120 + 10)/1000), from = 0, to = 1)
 
@@ -273,4 +274,5 @@ k1re <- b_re1$x$lambda$smooth.construct[[1]]$bs.dim
 b_it1re <- b_re1$x$lambda$smooth.construct[[1]]$state$parameters[-k1re]
 pred_mat1re <- PredictMat(b_re1$x$lambda$smooth.construct[[1]], pred_data1re)
 
-plot(pred_data1re[, 1], pred_mat1re%*%b_re1$parameters$lambda$s$`s(survtime)`[1:9])
+plot(pred_data1re[, 1],
+     pred_mat1re%*%b_re1$parameters$lambda$s$`s(survtime)`[1:9])

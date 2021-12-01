@@ -57,14 +57,14 @@ eta_timegrid_long <- drop(
 eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
 x_Xgrid <- cbind(1, int_times)
 
-int_new <- survint_gq(pred = "long",
-                      pre_fac = exp(eta_gamma),
-                      omega = exp(eta_timegrid),
-                      int_fac = eta_timegrid_alpha,
-                      int_vec = x_Xgrid,
-                      weights = gq$weights,
-                      survtime = s_times)
-int_new
+survint_gq(pred = "long",
+           pre_fac = exp(eta_gamma),
+           omega = exp(eta_timegrid),
+           int_fac = eta_timegrid_alpha,
+           int_vec = x_Xgrid,
+           weights = gq$weights,
+           survtime = s_times)
+
 # Compare to correct integrals
 int_func_one(s_times[1])
 
@@ -177,6 +177,7 @@ all.equal(survint_gq(pred = "long",
           int_func_one_dec(s_times_120[1])$hess_int)
 
 
+
 # Integration using bamlss Implementation ---------------------------------
 
 # FOR SOME REASON THIS DOES NOT WORK - R CRASHES
@@ -213,6 +214,7 @@ all.equal(survint_gq(pred = "long",
 
 # Integration for multiple markers ----------------------------------------
 
+
 nmarker <- 2
 
 # Have the same function for the second longitudinal marker and the association
@@ -241,14 +243,13 @@ eta_timegrid_long <- drop(
 eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
 x_Xgrid <- rbind(cbind(1, int_times), cbind(0, rep(0, length(int_times))))
 
-int_new <- survint_gq(pred = "long",
-                      pre_fac = exp(eta_gamma),
-                      omega = exp(eta_timegrid),
-                      int_fac = eta_timegrid_alpha,
-                      int_vec = x_Xgrid,
-                      weights = gq$weights,
-                      survtime = s_times)
-int_new
+survint_gq(pred = "long",
+           pre_fac = exp(eta_gamma),
+           omega = exp(eta_timegrid),
+           int_fac = eta_timegrid_alpha,
+           int_vec = x_Xgrid,
+           weights = gq$weights,
+           survtime = s_times)
 int_func(s_times[1])
 
 
@@ -269,17 +270,56 @@ int_func <- function (t) {
 # Set up arguments for survint
 x_Xgrid_re <- cbind(1, rep(int_times, nmarker))
 
-int_new_re <- survint_gq(pred = "long",
-                         pre_fac = exp(eta_gamma),
-                         omega = exp(eta_timegrid),
-                         int_fac = eta_timegrid_alpha,
-                         int_vec = x_Xgrid_re,
-                         weights = gq$weights,
-                         survtime = s_times)
-int_new_re
+survint_gq(pred = "long",
+           pre_fac = exp(eta_gamma),
+           omega = exp(eta_timegrid),
+           int_fac = eta_timegrid_alpha,
+           int_vec = x_Xgrid_re,
+           weights = gq$weights,
+           survtime = s_times)
 int_func(s_times[1])
 
 
 
+# Integration multiple markers, decreasing hazard, non-unit -----------------
 
+
+# Have the same function for the second longitudinal marker and the association
+# This gives the function to integrate for marker-SPECIFIC effects:
+# Intercept: \int exp(-4-0.02x) dx -> -50*exp(-4-0.02x)
+# Time: \int x*exp(-4-0.02x) dx -> 50*exp(-0.02x-4)*(x+50)
+# => Hess: 0.5*exp(4+2x), 0.25*exp(2x+4)*(2x-1), 0.25*exp(2x+4)*(2x-1),
+#          0.25*exp(2x+4)*(2x^2-2x+1)
+
+# Correct integrals would be
+int_func <- function (t) {
+  list(score_int = c(-50*exp(-4-0.02*t)+50*exp(-4),
+                     -50*exp(-0.02*t-4)*(t+50) + 2500*exp(-4)),
+       hess_int = c(-50*exp(-4-0.02*t)+50*exp(-4),
+                    -50*exp(-0.02*t-4)*(t+50) + 2500*exp(-4),
+                    -50*exp(-0.02*t-4)*(t+50) + 2500*exp(-4),
+                    -50*exp(-0.02*t-4)*(t^2+100*t+5000) + 250000*exp(-4)))
+}
+
+
+# Set up arguments for survint
+eta_timegrid_lambda_dec <- lambda_dec(int_times)
+eta_gamma_dec <- gamma_dec(rep(1, n))
+eta_timegrid_alpha_dec <- alpha_dec(rep(rep(1, n*n_gq), nmarker))
+eta_timegrid_mu_dec <- mu_dec(rep(int_times_120, nmarker))
+eta_timegrid_long_dec <- drop(
+  t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
+    (eta_timegrid_alpha_dec*eta_timegrid_mu_dec))
+eta_timegrid_dec <- eta_timegrid_lambda_dec + eta_timegrid_long_dec
+x_Xgrid_120 <- rbind(cbind(1, int_times_120), 
+                     cbind(0, rep(0, length(int_times))))
+
+survint_gq(pred = "long",
+           pre_fac = exp(eta_gamma_dec),
+           omega = exp(eta_timegrid_dec),
+           int_fac = eta_timegrid_alpha_dec,
+           int_vec = x_Xgrid_120,
+           weights = gq$weights,
+           survtime = s_times_120)
+int_func(s_times_120[1])
 
