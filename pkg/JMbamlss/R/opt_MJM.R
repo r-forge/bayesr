@@ -2,7 +2,7 @@
 
 # Optimizer for MJM -------------------------------------------------------
 
-opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1, 
+opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 50, nu = 0.1, 
                     ...) {
   
   if(!is.null(start))
