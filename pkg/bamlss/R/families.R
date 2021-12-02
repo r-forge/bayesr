@@ -5313,89 +5313,26 @@ ELF_bamlss <- function(..., tau = 0.5)
   if(tau < 0.001 | tau > (1 - 0.001))
     stop("tau must be between 0 and 1!")
 
+  lambda <- 0.05
+
   rval <- list(
     "family" = "Elf density",
-    "names" = c("mu", "sigma", "lambda"),
-    "links" = c(mu = "identity", sigma = "log", lambda = "log"),
+    "names" = c("mu", "sigma"),
+    "links" = c(mu = "identity", sigma = "log"),
     "d" = function(y, par, log = FALSE) {
       r <- y - par$mu
-#      d <- (1 - tau) * r/par$sigma - par$lambda * log(1 + exp(r/(par$lambda * par$sigma))) -
-#        log(par$lambda * par$sigma * beta(par$lambda *(1 - tau), par$lambda*tau))
 
-## library("Deriv")
-## e <- expression((1 - tau) * (y-mu)/s - lam * log(1 + exp((y-mu)/(lam*s))) - log(lam * s * beta(lam*(1 - tau), lam*tau)))
-## Deriv(e, cache.exp = FALSE, "mu")
-
-      d <- (1 - tau) * r/par$sigma - par$lambda * log1pexp(r/(par$lambda * par$sigma)) -
-        log(par$lambda * par$sigma * beta(par$lambda *(1 - tau), par$lambda*tau))
+      d <- (1 - tau) * r/par$sigma - lambda * log1pexp(r/(lambda * par$sigma)) -
+        log(lambda * par$sigma * beta(lambda *(1 - tau), lambda*tau))
 
       if(!log)
         d <- exp(d)
 
       return(d)
     },
-    "score" = list(
-      "mu" = function(y, par, ...) {
-        .e2 <- exp((y - par$mu)/(par$lambda * par$sigma))
-        score <- (.e2/(1 + .e2) + tau - 1)/par$sigma
-        return(score)
-      },
-      "sigma" = function(y, par, ...) {
-        .e1 <- par$lambda * par$sigma
-        .e2 <- y - par$mu
-        .e4 <- exp(.e2/.e1)
-        score <- (par$lambda^2 * .e4/((1 + .e4) * .e1^2) - (1 - tau)/par$sigma^2) * .e2 - 1/par$sigma
-        return(score)
-      },
-      "lambda" = function(y, par, ...) {
-        .e1 <- par$lambda * par$sigma
-        .e2 <- y - par$mu
-        .e4 <- exp(.e2/.e1)
-        .e5 <- 1 - tau
-        .e6 <- digamma(par$lambda)
-        score <- -((1 + par$lambda * (.e5 * (digamma(par$lambda * .e5) - .e6) + tau * (digamma(par$lambda * tau) - .e6)))/par$lambda + log1p(.e4) - .e1 * .e4 * .e2/((1 + .e4) * .e1^2))
-        return(score)
-      }
-    ),
-    "hess" = list(
-      "mu" = function(y, par, ...) {
-        .e2 <- exp((y - par$mu)/(par$lambda * par$sigma))
-        .e3 <- 1 + .e2
-        hess <- .e2 * (.e2/.e3 - 1)/(par$lambda * par$sigma^2 * .e3)
-        return(-hess)
-      },
-      "sigma" = function(y, par, ...) {
-        .e1 <- par$lambda * par$sigma
-        .e2 <- y - par$mu
-        .e4 <- exp(.e2/.e1)
-        .e5 <- 1 + .e4
-        hess <- (2 * ((1 - tau)/par$sigma^3) - par$lambda^3 * ((2 * (.e1 * .e5) - .e4 * .e2)/(.e5 * .e1^2)^2 + .e2/(.e5 * .e1^4)) * .e4) * .e2 + 1/par$sigma^2
-        return(-hess)
-      },
-      "lambda" = function(y, par, ...) {
-        .e1 <- par$lambda * par$sigma
-        .e2 <- y - par$mu
-        .e3 <- 1 - tau
-        .e5 <- exp(.e2/.e1)
-        .e6 <- digamma(par$lambda)
-        .e7 <- .e1^2
-        .e8 <- 1 + .e5
-        .e9 <- par$lambda * .e3
-        .e10 <- par$lambda * tau
-        .e11 <- .e3 * (digamma(.e9) - .e6)
-        .e12 <- .e8 * .e7
-        .e15 <- tau * (digamma(.e10) - .e6)
-        .e16 <- trigamma(par$lambda)
-        hess <- -((.e11 + par$lambda * ((.e3 * trigamma(.e9) - .e16) * .e3 + tau * 
-          (tau * trigamma(.e10) - .e16)) + .e15 - (1 + par$lambda * (.e11 + .e15))/par$lambda)/par$lambda -
-          par$sigma * ((2 - .e1 * .e2/.e7)/.e12 - .e1 * (2 * (.e1 * .e8) - .e5 * .e2)/.e12^2) * .e5 * .e2)
-        return(-hess)
-      }
-    ),
     "initialize" = list(
       "mu"    = function(y, ...) { (y + quantile(y, prob = tau)) / 2 },
-      "sigma"    = function(y, ...) { sd((y - quantile(y, prob = tau)) / 2) },
-      "lambda"    = function(y, ...) { rep(4, length(y)) }
+      "sigma"    = function(y, ...) { sd((y - quantile(y, prob = tau)) / 2) }
     )
   )
 
