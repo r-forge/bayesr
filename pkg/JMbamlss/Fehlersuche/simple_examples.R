@@ -15,8 +15,12 @@ source("R/MJM_transform.R")
 source("R/opt_MJM.R")
 source("R/opt_updating.R")
 
+# Alternative bamlss Code (more options)
+source("Fehlersuche/JM.R")
+
 library(tidyverse)
 library(refund)
+library(bamlss)
 #debugonce(simMultiJM)
 
 
@@ -176,10 +180,10 @@ b_nolong <- bamlss(f_pcre, family = mjm_bamlss, data = dat3$data,
 matrix(c(b_pcre$parameters$lambda$s[[1]], b_nolong$parameters$lambda$s[[1]]),
        nrow = 2, byrow = TRUE)
 
-debugonce(opt_JM)
-# fix.alpha <- fix.mu <- fix.dalpha <- TRUE
-b_old_fix <- bamlss(f_old, data = dat3$data, family = "jm", timevar = "obstime",
-                idvar = "id", sampler = FALSE, maxit = 200)
+b_old_fix <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
+                    timevar = "obstime",
+                idvar = "id", sampler = FALSE, maxit = 200, fix.alpha = TRUE,
+                fix.mu = TRUE, fix.dalpha = TRUE, fix.sigma = TRUE)
 
 matrix(c(b_old$parameters$lambda$s[[1]], b_old_fix$parameters$lambda$s[[1]]),
        nrow = 2, byrow = TRUE)
@@ -188,6 +192,22 @@ plot(b_old_fix, model = "lambda")
 
 
 
+#######
+# Fix the longitudinal part and reduce subdivisions
+b_old_fix_bad <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
+                        timevar = "obstime", idvar = "id", sampler = FALSE,
+                        maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
+                        fix.dalpha = TRUE, fix.sigma = TRUE, subdivisions = 7)
+b_old_fix_bad$parameters$lambda$s[[1]]
+
+
+#######
+# Fix the longitudinal part and fix the smoothing parameter
+b_old_fix_smo <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
+                        timevar = "obstime", idvar = "id", sampler = FALSE,
+                        maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
+                        fix.dalpha = TRUE, fix.sigma = TRUE, do.optim2 = FALSE)
+b_old_fix_smo$parameters$lambda
 
 
 # Multivariate JMs --------------------------------------------------------
