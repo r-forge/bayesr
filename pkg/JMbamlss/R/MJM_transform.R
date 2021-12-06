@@ -6,7 +6,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...) {
   
   # Gaussian Quadrature
   stopifnot(requireNamespace("statmod"))
-  gq <- statmod::gauss.quad(subdivisions, ...)
+  gq <- statmod::gauss.quad(subdivisions)
   
   
   # Get idvar
@@ -46,7 +46,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...) {
   
   
   # Longitudinal variables
-  nmarker <- FALSE
+  nmarker <- 1
   marker <- rep(1, nrow(y2_l))
   if(!is.null(object$model.frame$marker)) {
     y2_l <- cbind(y2_l, "marker" = as.factor(object$model.frame$marker))

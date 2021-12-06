@@ -199,8 +199,15 @@ survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
            #   (omega*dim_mat %*% t(apply(int_fac*int_vec, 1, tcrossprod)))
            sum_mat <- matrix(rep(diag(omega), nmarker), nrow = length(omega))
            score_int <- pre_fac*gq_mat %*% sum_mat %*% (int_fac*int_vec)
-           hess_int <- pre_fac*gq_mat %*% sum_mat %*% 
-             (int_fac^2*t(apply(int_vec, 1, tcrossprod)))
+           hess_int <- if (dim(int_vec)[2] == 1) {
+             pre_fac*gq_mat %*% sum_mat %*% 
+               (int_fac^2*do.call(rbind, apply(int_vec, 1, tcrossprod,
+                                              simplify = FALSE)))
+           } else {
+             pre_fac*gq_mat %*% sum_mat %*% 
+               (int_fac^2*t(apply(int_vec, 1, tcrossprod)))
+           }
+
          })
   
   if (dim(score_int)[1] != dim(hess_int)[1]) {

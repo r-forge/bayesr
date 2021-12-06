@@ -114,7 +114,8 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
       stop(paste("Choose either 'split' or 'weighted' for the simulation",
                  "of multivariate functional data.")))
     if (M == 1) {
-      bases <- multiFunData(lapply(bases, "/", sqrt(norm(bases))))
+      bases <- funData::multiFunData(lapply(bases, "/", 
+                                            sqrt(funData::norm(bases))))
     }
     bases
   }

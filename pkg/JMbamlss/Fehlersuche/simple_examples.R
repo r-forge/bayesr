@@ -16,12 +16,13 @@ source("R/opt_MJM.R")
 source("R/opt_updating.R")
 
 library(tidyverse)
+library(refund)
 #debugonce(simMultiJM)
 
-set.seed(1808)
 
 # Univariate JMs ----------------------------------------------------------
 
+set.seed(1808)
 
 # Constant high hazard -> everyone dies in the beginning
 dat1 <- simMultiJM(nmark = 1, M = 1,
@@ -106,10 +107,64 @@ ggplot(dat2_1$data, aes(x = obstime, y = mu, group = id)) +
   geom_point() # missingness shares of longitudinal trajectories
 summary(as.integer(table(dat2_1$data$id))) # 0.25*121 = 30.25
 
+
+
+# Fit for simple model ----------------------------------------------------
+
+set.seed(1808)
+
+# Constant hazard
+dat3 <- simMultiJM(nsub = 30, nmark = 1, M = 1,
+                   lambda = function(t, x) -5,
+                   gamma = function(x) 0,
+                   alpha = list(function(t, x) 0*t),
+                   mu = list(function(t, x) 1.25),
+                   sigma = function(t, x) 0.001 + 0*t,
+                   full = TRUE)
+ggplot(dat3$data, aes(x = obstime, y = mu, group = id)) + 
+  geom_line() +
+  geom_point(aes(x = survtime, shape = factor(event)))
+
 # debug(preproc_MFPCA)
 # MFPCA on the data
-mfpca1 <- preproc_MFPCA(dat2_1$data)
-mfpcaT <- create_true_MFPCA(M = 5, nmarker = 1)
+mfpca1 <- preproc_MFPCA(dat3$data)
+mfpcaT <- create_true_MFPCA(M = 1, nmarker = 1)
+
+f_pcre <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
+  gamma ~ 1,
+  mu ~ 1 + obstime +
+    s(id, wfpc, bs = "pcre", xt = list("mfpc" = mfpcaT)),
+  sigma ~ 1,
+  alpha ~ 1
+)
+b_pcre <- bamlss(f_pcre, family = mjm_bamlss, data = dat3$data, 
+                 timevar = "obstime", sampler = FALSE, maxit = 200)
+
+f_re <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
+  gamma ~ 1,
+  mu ~ 1 + obstime + s(id, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1
+)
+b_re <- bamlss(f_re, family = mjm_bamlss, data = dat3$data, timevar = "obstime",
+               sampler = FALSE, maxit = 200)
+
+f_old <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
+  gamma ~ 1,
+  mu ~ 1 + obstime + s(id, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1,
+  dalpha ~ -1
+)
+b_old <- bamlss(f_old, data = dat3$data, family = "jm", timevar = "obstime",
+                idvar = "id", sampler = FALSE, maxit = 600)
+
+matrix(c(b_pcre$parameters$lambda$s[[1]], b_re$parameters$lambda$s[[1]],
+         b_old$parameters$lambda$s[[1]]), nrow = 3, byrow = TRUE)
+
 
 
 # Multivariate JMs --------------------------------------------------------

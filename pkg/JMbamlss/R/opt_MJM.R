@@ -2,7 +2,7 @@
 
 # Optimizer for MJM -------------------------------------------------------
 
-opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 50, nu = 0.1, 
+opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1, 
                     ...) {
   
   if(!is.null(start))
@@ -43,6 +43,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 50, nu = 0.1,
       b <- get.par(x$mu$smooth.construct[[j]]$state$parameters, "b")
       if(inherits(x$mu$smooth.construct[[j]], "pcre2.random.effect")){
         eta_grid_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$Xgrid))
+        eta_T_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$XT))
       } else {
         eta_grid_sj <- drop(x$mu$smooth.construct[[j]]$Xgrid %*% b)
         eta_T_sj <- drop(x$mu$smooth.construct[[j]]$XT %*% b)
