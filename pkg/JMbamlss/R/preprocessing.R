@@ -47,9 +47,6 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
 
 # Create true MFPC basis --------------------------------------------------
 
-mfpc_args = list(type = "split", eFunType = "Poly",
-                 ignoreDeg = NULL, eValType = "linear",
-                 eValScale = 1)
 
 create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1), 
                                type = "split", eFunType = "Poly",
@@ -62,6 +59,11 @@ create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1),
   mfpc_seed <- switch(type, 
                       "split" = sample(c(-1, 1), nmarker, 0.5),
                       "weight" = stats::runif(nmark, 0.2, 0.8))
+  
+  mean <- multiFunData(
+    rep(list(funData(argvals, matrix(0, nrow = M, ncol = length(argvals)))),
+             nmarker))
+  argvals <- rep(list(argvals), nmarker)
   
   bases <- switch(type,
                   split = simMultiSplit(argvals = argvals, M = M,
@@ -77,4 +79,12 @@ create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1),
                   stop(paste0("Choose either 'split' or 'weighted' for the sim",
                               "ulation of multivariate functional data.")))
   
+  if (M == 1) {
+    bases <- multiFunData(lapply(bases, "/", sqrt(norm(bases))))
+  }
+  
+  mfpca <- list(values = evals,
+                functions = bases,
+                meanFunction = mean)
+  return(mfpca)
 }

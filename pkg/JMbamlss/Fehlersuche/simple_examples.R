@@ -1,8 +1,9 @@
 
 # Different Simple Data Examples ------------------------------------------
 
-# Data Generation
+# Data Generation and Preprocessing
 source("R/simMultiJM.R")
+source("R/preprocessing.R")
 
 # Helperfunction PCRE
 source("R/eval_mfun.R")
@@ -17,7 +18,7 @@ source("R/opt_updating.R")
 library(tidyverse)
 #debugonce(simMultiJM)
 
-
+set.seed(1808)
 
 # Univariate JMs ----------------------------------------------------------
 
@@ -33,10 +34,11 @@ dat1 <- simMultiJM(nmark = 1, M = 1,
 table(dat1$data$event) # no censoring
 ggplot(dat1$data, aes(x = obstime, y = mu, group = id)) + 
   geom_point() # all die at 0
-var(dat1$data_full$mu)
-var(dat1$data_full$s1) # variation in longitudinal trajectores comes from PCRE
+var(dat1$data_full$mu) # variation in longitudinal trajectories 
+var(dat1$data_full$s1)/120 # comes from PCRE
 ggplot(dat1$data_hypo, aes(x = obstime, y = mu, group = id)) + 
   geom_line() # constant trajectories
+
 
 # Constant high hazard -> everyone dies in the beginning
 dat1_1 <- simMultiJM(nmark = 1, M = 5,
@@ -53,6 +55,23 @@ var(dat1_1$data_full$s1) # no longer the same
 var(dat1_1$data_full$s5) # eigenvalues are seq(1, 0.2, by = 0.2)
 ggplot(dat1$data_hypo, aes(x = obstime, y = mu, group = id)) + 
   geom_line() # constant trajectories
+
+
+# Constant high hazard -> everyone dies in the beginning but different time 
+# scale
+dat1_2 <- simMultiJM(nmark = 1, M = 1,
+                     times = seq(0, 1, length.out = 121),
+                     lambda = function(t, x) 300,
+                     gamma = function(x) 0,
+                     alpha = list(function(t, x) 0*t),
+                     mu = list(function(t, x) 1.25),
+                     sigma = function(t, x) 0.001 + 0*t,
+                     full = TRUE)
+table(dat1_2$data$event) # no censoring
+ggplot(dat1_2$data, aes(x = obstime, y = mu, group = id)) + 
+  geom_point() # all die at 0
+var(dat1_2$data_full$mu)
+var(dat1_2$data_full$s1) # variation comes from PCRE
 
 
 # Constant low hazard -> everyone survives
@@ -79,7 +98,7 @@ dat2_1 <- simMultiJM(nmark = 1, M = 1, maxfac = 500,
                      sigma = function(t, x) 0.001 + 0*t,
                      full = TRUE)
 table(dat2_1$data$event) # no one dies
-table(dat2_1$data$survtime < 120) # no one is censored
+table(dat2_1$data$survtime < 120) # (almost) no one is censored
 ggplot(dat2_1$data, aes(x = obstime, y = mu, group = id)) + 
   geom_line() +
   geom_point(aes(x = survtime, shape = factor(event)))
@@ -88,8 +107,9 @@ ggplot(dat2_1$data, aes(x = obstime, y = mu, group = id)) +
 summary(as.integer(table(dat2_1$data$id))) # 0.25*121 = 30.25
 
 # debug(preproc_MFPCA)
+# MFPCA on the data
 mfpca1 <- preproc_MFPCA(dat2_1$data)
-
+mfpcaT <- create_true_MFPCA(M = 5, nmarker = 1)
 
 
 # Multivariate JMs --------------------------------------------------------

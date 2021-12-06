@@ -100,19 +100,23 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   ## generate the multivariate functional principal component basis
   mfpc <- function(argvals, mfpc_args, M) {
-    switch(mfpc_args$type,
-           split = simMultiSplit(argvals = argvals, M = M,
-                                 eFunType = mfpc_args$eFunType,
-                                 ignoreDeg = mfpc_args$ignoreDeg,
-                                 eValType = mfpc_args$eValType,
-                                 s = mfpc_args$mfpc_seed),
-           weighted = simMultiWeight(argvals = argvals, M = M,
-                                     eFunType = mfpc_args$eFunType,
-                                     ignoreDeg = mfpc_args$ignoreDeg,
-                                     eValType = mfpc_args$eValType,
-                                     alpha = mfpc_args$mfpc_seed),
-           stop(paste("Choose either 'split' or 'weighted' for the simulation",
-                      "of multivariate functional data.")))
+    bases <- switch(mfpc_args$type,
+      split = simMultiSplit(argvals = argvals, M = M,
+                            eFunType = mfpc_args$eFunType,
+                            ignoreDeg = mfpc_args$ignoreDeg,
+                            eValType = mfpc_args$eValType,
+                            s = mfpc_args$mfpc_seed),
+      weighted = simMultiWeight(argvals = argvals, M = M,
+                                eFunType = mfpc_args$eFunType,
+                                ignoreDeg = mfpc_args$ignoreDeg,
+                                eValType = mfpc_args$eValType,
+                                alpha = mfpc_args$mfpc_seed),
+      stop(paste("Choose either 'split' or 'weighted' for the simulation",
+                 "of multivariate functional data.")))
+    if (M == 1) {
+      bases <- multiFunData(lapply(bases, "/", sqrt(norm(bases))))
+    }
+    bases
   }
   
   ## generate functional principal component based random effects
@@ -239,20 +243,10 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   # gamma and lambda have only joint intercept which is estimated in
   # predictor gamma
-  # What was data_grid for?
-  # data_grid <- data.frame(survtime = times,
-  #                         mu = seq(-0.5, 2.5, length.out = length(times)))
-  f_lambda <- lambda(data_short$survtime)  
-  #f_gamma <- gamma(data_short[,grep("x[0-9]+", colnames(data_short))])
+  f_lambda <- lambda(data_short$survtime)
   data_base$lambda <- lambda(data_base$obstime) - mean(f_lambda)
-  #data_grid$lambda <- lambda(data_grid$survtime) - mean(f_lambda)
   data_base$gamma <- gamma(x[id, ]) + mean(f_lambda)
-  # data_grid$alpha <- cbind(data_grid,
-  #                          alpha = do.call(cbind, 
-  #                                          lapply(alpha, function(alpha_k) {
-  #                                            alpha_k(data_grid$survtime, 0)
-  #                                          })))
-  #
+
   data_long <- do.call(rbind, rep(list(data_base), nmark))
   data_long$marker <- factor(rep(paste0("m", seq_len(nmark)),
                                  each = length(id)))
@@ -288,7 +282,13 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   
   if(full){
-    d <- list(data=data_long, data_full = data_full, data_hypo = data_hypo)
+    
+    # FPC basis functions
+    fpc_base <- mfpc(argvals = rep(list(times), nmark), mfpc_args = b_set,
+                     M = M)
+    
+    d <- list(data = data_long, data_full = data_full, data_hypo = data_hypo,
+              fpc_base = fpc_base)
   } else {
     d <- data_long
   }
