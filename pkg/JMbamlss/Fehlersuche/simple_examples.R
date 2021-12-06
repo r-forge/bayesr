@@ -160,10 +160,33 @@ f_old <- list(
   dalpha ~ -1
 )
 b_old <- bamlss(f_old, data = dat3$data, family = "jm", timevar = "obstime",
-                idvar = "id", sampler = FALSE, maxit = 600)
+                idvar = "id", sampler = FALSE, maxit = 200)
 
+# Obvious differences
 matrix(c(b_pcre$parameters$lambda$s[[1]], b_re$parameters$lambda$s[[1]],
          b_old$parameters$lambda$s[[1]]), nrow = 3, byrow = TRUE)
+
+
+
+#######
+# Fix the longitudinal part
+b_nolong <- bamlss(f_pcre, family = mjm_bamlss, data = dat3$data, 
+                   timevar = "obstime", sampler = FALSE, maxit = 200, 
+                   opt_long = FALSE)
+matrix(c(b_pcre$parameters$lambda$s[[1]], b_nolong$parameters$lambda$s[[1]]),
+       nrow = 2, byrow = TRUE)
+
+debugonce(opt_JM)
+# fix.alpha <- fix.mu <- fix.dalpha <- TRUE
+b_old_fix <- bamlss(f_old, data = dat3$data, family = "jm", timevar = "obstime",
+                idvar = "id", sampler = FALSE, maxit = 200)
+
+matrix(c(b_old$parameters$lambda$s[[1]], b_old_fix$parameters$lambda$s[[1]]),
+       nrow = 2, byrow = TRUE)
+plot(b_old, model = "lambda")
+plot(b_old_fix, model = "lambda")
+
+
 
 
 
