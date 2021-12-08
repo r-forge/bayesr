@@ -1,7 +1,8 @@
 
 # MJM_transform -----------------------------------------------------------
 
-MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...) {
+MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
+                          ...) {
   
   
   # Gaussian Quadrature
@@ -168,6 +169,15 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...) {
   ## Update prior/grad/hess functions
   for(j in names(object$x)) {
     for(sj in names(object$x[[j]]$smooth.construct)) {
+      if (!is.null(tau[[j]][[sj]])) {
+        tau_pos <- grepl(
+          "tau", names(object$x[[j]]$smooth.construct[[sj]]$state$parameters))
+        if (sum(tau_pos) != length(tau[[j]][[sj]])) {
+          warning(cat("Smooth", sj, "in", j, "does not have correct length.\n"))
+        }
+        object$x[[j]]$smooth.construct[[sj]]$state$parameters[tau_pos] <- 
+          tau[[j]][[sj]]
+      }
       priors <- bamlss:::make.prior(object$x[[j]]$smooth.construct[[sj]])
       object$x[[j]]$smooth.construct[[sj]]$prior <- priors$prior
       object$x[[j]]$smooth.construct[[sj]]$grad <- priors$grad
