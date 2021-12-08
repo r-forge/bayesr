@@ -20,6 +20,7 @@ source("Fehlersuche/JM.R")
 
 library(tidyverse)
 library(refund)
+library(survival)
 library(bamlss)
 #debugonce(simMultiJM)
 
@@ -172,13 +173,17 @@ matrix(c(b_pcre$parameters$lambda$s[[1]], b_re$parameters$lambda$s[[1]],
 
 
 
-#######
+##  Only survival part
 # Fix the longitudinal part
 b_nolong <- bamlss(f_pcre, family = mjm_bamlss, data = dat3$data, 
                    timevar = "obstime", sampler = FALSE, maxit = 200, 
                    opt_long = FALSE)
 matrix(c(b_pcre$parameters$lambda$s[[1]], b_nolong$parameters$lambda$s[[1]]),
        nrow = 2, byrow = TRUE)
+
+b_re_nolong <- bamlss(f_re, family = mjm_bamlss, data = dat3$data, 
+                      timevar = "obstime", sampler = FALSE, maxit = 200,
+                      opt_long = FALSE)
 
 b_old_fix <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
                     timevar = "obstime",
@@ -192,7 +197,7 @@ plot(b_old_fix, model = "lambda")
 
 
 
-#######
+## Only survival part with bad integral
 # Fix the longitudinal part and reduce subdivisions
 b_old_fix_bad <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
                         timevar = "obstime", idvar = "id", sampler = FALSE,
@@ -201,13 +206,141 @@ b_old_fix_bad <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
 b_old_fix_bad$parameters$lambda$s[[1]]
 
 
-#######
+## Only survival part with fixed smoothing parameter in bamlss
 # Fix the longitudinal part and fix the smoothing parameter
 b_old_fix_smo <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
                         timevar = "obstime", idvar = "id", sampler = FALSE,
                         maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
                         fix.dalpha = TRUE, fix.sigma = TRUE, do.optim2 = FALSE)
 b_old_fix_smo$parameters$lambda
+
+
+
+# Change the intercept in the formulas ------------------------------------
+
+f_new_wint <- list(
+  Surv2(survtime, event, obs = y) ~ s(survtime),
+  gamma ~ 1,
+  mu ~ 1 + obstime + s(id, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1
+)
+b_new_wint <- bamlss(f_new_wint, family = mjm_bamlss, data = dat3$data,
+                     timevar = "obstime", sampler = FALSE, maxit = 200, 
+                     opt_long = FALSE)
+matrix(c(b_new_wint$parameters$lambda$s[[1]], 
+         b_re_nolong$parameters$lambda$s[[1]]), nrow = 2, byrow = TRUE)
+
+f_old_wint <- list(
+  Surv2(survtime, event, obs = y) ~ s(survtime),
+  gamma ~ 1,
+  mu ~ 1 + obstime + s(id, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1,
+  dalpha ~ -1
+)
+b_old_wint <-  bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
+                      timevar = "obstime", idvar = "id", sampler = FALSE, 
+                      maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
+                      fix.dalpha = TRUE, fix.sigma = TRUE)
+matrix(c(b_old_wint$parameters$lambda$s[[1]], 
+         b_old_fix$parameters$lambda$s[[1]]), nrow = 2, byrow = TRUE)
+
+b_old_wint_nosmoo <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
+                            timevar = "obstime", idvar = "id", sampler = FALSE,
+                            maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
+                            fix.dalpha = TRUE, fix.sigma = TRUE,
+                            do.optim2 = FALSE)
+matrix(c(b_old_wint_nosmoo$parameters$lambda$s[[1]], 
+         b_old_fix_smo$parameters$lambda$s[[1]]), nrow = 2, byrow = TRUE)
+
+
+# Fit for example with linear baseline ------------------------------------
+
+set.seed(1808)
+
+# Constant hazard
+dat4 <- simMultiJM(nsub = 30, nmark = 1, M = 1,
+                   lambda = function(t, x) -5 + 0.02*t,
+                   gamma = function(x) 0,
+                   alpha = list(function(t, x) 0*t),
+                   mu = list(function(t, x) 1.25),
+                   sigma = function(t, x) 0.001 + 0*t,
+                   full = TRUE)
+ggplot(dat4$data, aes(x = obstime, y = mu, group = id)) + 
+  geom_line() +
+  geom_point(aes(x = survtime, shape = factor(event)))
+
+## Linear specification of baseline hazard doesn't work in bamlss implementation
+# flin_re <- list(
+#   Surv2(survtime, event, obs = y) ~ survtime,
+#   gamma ~ 1,
+#   mu ~ 1 + obstime + s(id, bs = "re"),
+#   sigma ~ 1,
+#   alpha ~ 1
+# )
+# blin_re <- bamlss(flin_re, family = mjm_bamlss, data = dat4$data,
+#                   timevar = "obstime", sampler = FALSE, maxit = 200, 
+#                   opt_long = FALSE)
+# 
+# flin_old <- list(
+#   Surv2(survtime, event, obs = y) ~ -1 + survtime,
+#   gamma ~ 1,
+#   mu ~ 1 + obstime + s(id, bs = "re"),
+#   sigma ~ 1,
+#   alpha ~ 1,
+#   dalpha ~ -1
+# )
+# blin_old <-  bamlss(flin_old, data = dat3$data, family = "jmFEHLERSUCHE",
+#                       timevar = "obstime", idvar = "id", sampler = FALSE, 
+#                       maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
+#                       fix.dalpha = TRUE, fix.sigma = TRUE)
+
+b_lin_re <- bamlss(f_re, family = mjm_bamlss, data = dat4$data,
+                   timevar = "obstime", sampler = FALSE, maxit = 200,
+                   opt_long = FALSE)
+b_lin_old <- bamlss(f_old, data = dat4$data, family = "jmFEHLERSUCHE",
+                    timevar = "obstime", idvar = "id", sampler = FALSE,
+                    maxit = 200, fix.alpha = TRUE, fix.mu = TRUE,
+                    fix.dalpha = TRUE, fix.sigma = TRUE)
+b_lin_old_fixsm <- bamlss(f_old, data = dat4$data, family = "jmFEHLERSUCHE",
+                          timevar = "obstime", idvar = "id", sampler = FALSE,
+                          maxit = 200, fix.alpha = TRUE, fix.mu = TRUE,
+                          fix.dalpha = TRUE, fix.sigma = TRUE,
+                          do.optim2 = FALSE)
+
+
+
+# Try Cox Model in bamlss -------------------------------------------------
+
+
+set.seed(1808)
+
+# Constant hazard
+dat5 <- simMultiJM(nsub = 3000, nmark = 1, M = 1,
+                   lambda = function(t, x) -5 + 0.02*t,
+                   gamma = function(x) 0,
+                   alpha = list(function(t, x) 0*t),
+                   mu = list(function(t, x) 1.25),
+                   sigma = function(t, x) 0.001 + 0*t,
+                   full = TRUE)
+ggplot(dat5$data, aes(x = obstime, y = mu, group = id)) + 
+  geom_line() +
+  geom_point(aes(x = survtime, shape = factor(event)))
+
+f_cox <- list(
+  Surv(survtime, event) ~ s(survtime),
+  gamma ~ 1
+)
+dat_cox <- dat5$data %>%
+  distinct(id, event, survtime)
+b_cox <- bamlss(f_cox, data = dat_cox, family = "cox", maxit = 100,
+                sampler = FALSE)
+plot(b_cox)
+# Plot shows that there is a linear baseline hazard with rough slope of 
+# 2.2/120 = 0.0183
+b_cox$parameters$gamma
+
 
 
 # Multivariate JMs --------------------------------------------------------
