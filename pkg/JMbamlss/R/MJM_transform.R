@@ -93,23 +93,24 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...) {
   ## Remove intercept from lambda.
   if(!is.null(object$x$lambda$smooth.construct$model.matrix)) {
     cn <- colnames(object$x$lambda$smooth.construct$model.matrix$X)
-    if("(Intercept)" %in% cn)
+    if("(Intercept)" %in% cn) {
       object$x$lambda$smooth.construct$model.matrix$X <- 
         object$x$lambda$smooth.construct$model.matrix$X[, cn != "(Intercept)",
                                                         drop = FALSE]
-    if(ncol(x$lambda$smooth.construct$model.matrix$X) < 1) {
+    }
+    if(ncol(object$x$lambda$smooth.construct$model.matrix$X) < 1) {
       object$x$lambda$smooth.construct$model.matrix <- NULL
-      object$x$lambda$terms <- drop.terms.bamlss(x$lambda$terms, pterms = FALSE,
-                                                 keep.intercept = FALSE)
+      object$x$lambda$terms <- bamlss:::drop.terms.bamlss(
+        object$x$lambda$terms, pterms = FALSE, keep.intercept = FALSE)
     } else {
       object$x$lambda$smooth.construct$model.matrix$term <- 
         gsub("(Intercept)+", "",
              object$x$lambda$smooth.construct$model.matrix$term, fixed = TRUE)
       object$x$lambda$smooth.construct$model.matrix$state$parameters <- 
         object$x$lambda$smooth.construct$model.matrix$state$parameters[-1]
-      object$x$lambda$terms <- drop.terms.bamlss(x$lambda$terms,
-                                                 pterms = TRUE, sterms = TRUE, 
-                                                 keep.intercept = FALSE)
+      object$x$lambda$terms <- bamlss:::drop.terms.bamlss(
+        object$x$lambda$terms, pterms = TRUE, sterms = TRUE,
+        keep.intercept = FALSE)
     }
   }
   
@@ -159,7 +160,8 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, ...) {
         if(i == "lambda") grid else grid_l, yname, 
         if(i != "mu") timevar else timevar_mu,
         if(i == "lambda") take_last else take_last_l,
-        idvar = if (i == "lambda") idvar else NULL)
+        idvar = if (i == "lambda") idvar else NULL,
+        timevar2 = if (i == "lambda") timevar_mu else NULL)
     }
   }
   
@@ -265,7 +267,7 @@ sm_time_transform_mjm_pcre <- function(x, data, grid, yname, timevar, take,
 # Linear Design Transformer -----------------------------------------------
 
 param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar, 
-                                     take, idvar, y) {
+                                     take, idvar, y, timevar2 = NULL) {
   
   X <- Xn <- tvar <- NULL
   
