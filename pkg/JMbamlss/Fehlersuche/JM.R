@@ -1266,7 +1266,7 @@ update_jm_mu <- function(x, y, eta, eta_timegrid,
     xgrad <- drop(xgrad + t(dx$XT) %*% drop(eta$dalpha * status))
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
-  } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
+  } else bamlss:::do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
   xhess0 <- -1 * XWX - int$hess
   
   env <- new.env()
@@ -2524,7 +2524,7 @@ propose_jm_mu_simple <- function(x, y,
   xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
-  } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
+  } else bamlss:::do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
   xhess <- -1 * XWX - int$hess
   xhess <- xhess - x$hess(score = NULL, x$state$parameters, full = FALSE)
   
@@ -2577,7 +2577,7 @@ propose_jm_mu_simple <- function(x, y,
   xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
-  } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
+  } else bamlss:::do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
   xhess <- -1 * XWX - int$hess
   xhess <- xhess - x$hess(score = NULL, x$state$parameters, full = FALSE)
   Sigma2 <- bamlss:::matrix_inv(-1 * xhess, index = NULL)
@@ -4677,7 +4677,7 @@ update_jm_mu_nonlin <- function(x, y, eta, eta_timegrid,
   #   xgrad <- drop(xgrad + t(dx$XT) %*% drop(eta$dalpha * status))
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
-  } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
+  } else bamlss:::do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
   XAX <- crossprod(x$XT * drop(eta_alpha2 * status), x$XT)
   xhess0 <- -1 * XWX + XAX - int$hess
 
@@ -5156,7 +5156,7 @@ propose_jm_mu_nonlin <- function(x, y,
   
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
-  } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
+  } else bamlss:::do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
   XAX <- crossprod(x$XT * drop(eta_alpha2 * status), x$XT)
   xhess <- -1 * XWX + XAX - int$hess 
   xhess <- xhess - x$hess(score = NULL, x$state$parameters, full = FALSE) 
@@ -5261,7 +5261,7 @@ propose_jm_mu_nonlin <- function(x, y,
   
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
-  } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
+  } else bamlss:::do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
   XAX <- crossprod(x$XT *  drop(eta_alpha2 * status), x$XT)
   xhess0 <- -1 * XWX + XAX - int$hess
   xhess <- xhess0 - x$hess(score = NULL, x$state$parameters, full = FALSE) 
