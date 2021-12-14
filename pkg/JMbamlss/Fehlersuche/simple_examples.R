@@ -192,8 +192,9 @@ b_old_fix <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
 
 matrix(c(b_old$parameters$lambda$s[[1]], b_old_fix$parameters$lambda$s[[1]]),
        nrow = 2, byrow = TRUE)
-plot(b_old, model = "lambda")
-plot(b_old_fix, model = "lambda")
+plot(b_re_nolong, model = "lambda", ask = FALSE)
+plot(b_old, model = "lambda", ask = FALSE)
+plot(b_old_fix, model = "lambda", ask = FALSE)
 
 
 
@@ -213,6 +214,7 @@ b_old_fix_smo <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
                         maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
                         fix.dalpha = TRUE, fix.sigma = TRUE, do.optim2 = FALSE)
 b_old_fix_smo$parameters$lambda
+plot(b_old_fix_smo, model = "lambda", ask = FALSE)
 
 
 
@@ -239,14 +241,14 @@ f_old_wint <- list(
   alpha ~ 1,
   dalpha ~ -1
 )
-b_old_wint <-  bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
+b_old_wint <-  bamlss(f_old_wint, data = dat3$data, family = "jmFEHLERSUCHE",
                       timevar = "obstime", idvar = "id", sampler = FALSE, 
                       maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
                       fix.dalpha = TRUE, fix.sigma = TRUE)
 matrix(c(b_old_wint$parameters$lambda$s[[1]], 
          b_old_fix$parameters$lambda$s[[1]]), nrow = 2, byrow = TRUE)
 
-b_old_wint_nosmoo <- bamlss(f_old, data = dat3$data, family = "jmFEHLERSUCHE",
+b_old_wint_nosmoo <- bamlss(f_old_wint, data = dat3$data, family = "jmFEHLERSUCHE",
                             timevar = "obstime", idvar = "id", sampler = FALSE,
                             maxit = 200, fix.alpha = TRUE, fix.mu = TRUE, 
                             fix.dalpha = TRUE, fix.sigma = TRUE,

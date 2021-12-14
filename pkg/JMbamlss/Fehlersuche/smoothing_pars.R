@@ -1,6 +1,6 @@
 
 # Analyze influence of smoothing parameters -------------------------------
-
+# UNIVARIATE
 
 # Data Generation and Preprocessing
 source("R/simMultiJM.R")
@@ -44,6 +44,10 @@ ggplot(dat_sigmas$data, aes(x = obstime, y = y, group = id)) +
   geom_line() +
   geom_point(aes(x = survtime, shape = factor(event)))
 
+# Create data for prediction
+pred_dat <- dat_sigmas$data[c(1, 1), c("id", "survtime", "obstime")]
+pred_dat$survtime <- pred_dat$obstime <- c(0, 120)
+
 f_re <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
   gamma ~ 1,
@@ -80,6 +84,12 @@ plot(b_nolong_spu, ask = FALSE, model = "lambda")
 c(b_nolong$parameters$gamma[[1]], b_nolong_spl$parameters$gamma[[1]],
   b_nolong_spu$parameters$gamma[[1]])
 
+# True hazard: [-5, -2.6]
+# b_nolong_spl very close (but arbitrary smoothing parameter!)
+predict(b_nolong, pred_dat)$lambda + predict(b_nolong, pred_dat)$gamma
+predict(b_nolong_spl, pred_dat)$lambda + predict(b_nolong_spl, pred_dat)$gamma
+predict(b_nolong_spu, pred_dat)$lambda + predict(b_nolong_spu, pred_dat)$gamma
+
 
 
 
@@ -109,6 +119,12 @@ plot(b_nolong_bamls, ask = FALSE, model = "lambda")
 # bamlss_nolong: (-0.15, 0.25) -- 0.4/120 = 0.003
 # b_nolong_bamls: (-0.01, 0.02) -- 0.03/120 = 0.00025
 bamlss_nolong$parameters$gamma$p
+
+# True hazard: [-5, -2.6]
+predict(bamlss_nolong, pred_dat)$lambda + 
+  predict(bamlss_nolong, pred_dat)$gamma
+predict(b_nolong_bamls, pred_dat)$lambda + 
+  predict(b_nolong_bamls, pred_dat)$gamma
 
 
 
@@ -140,6 +156,18 @@ c(b_long$parameters$alpha[[1]], b_long_spl$parameters$alpha[[1]],
 b_long$parameters$gamma[[1]] + 
   b_long$parameters$alpha[[1]]*b_long$parameters$mu$p[[1]]
 
+# True hazard: [-5, -2.6]
+predict(b_long, pred_dat)$lambda + 
+  predict(b_long, pred_dat)$gamma +
+  predict(b_long, pred_dat)$alpha * predict(b_long, pred_dat)$mu
+predict(b_long_spl, pred_dat)$lambda + 
+  predict(b_long_spl, pred_dat)$gamma +
+  predict(b_long_spl, pred_dat)$alpha * predict(b_long_spl, pred_dat)$mu
+predict(b_long_spu, pred_dat)$lambda + 
+  predict(b_long_spu, pred_dat)$gamma +
+  predict(b_long_spu, pred_dat)$alpha * predict(b_long_spu, pred_dat)$mu
+
+
 
 # Center Longitudinal Data ------------------------------------------------
 
@@ -147,12 +175,26 @@ dat_cen <- dat_sigmas
 dat_cen$data$y <- dat_cen$data$y - mean(dat_cen$data$y)
 
 b_long_cen <- bamlss(f_re, family = mjm_bamlss, data = dat_cen$data, 
-                     timevar = "obstime", sampler = FALSE, maxit = 200,)
+                     timevar = "obstime", sampler = FALSE, maxit = 200)
+
+# Estimated BH changes considerably
+# (-8, 8) -- 16/120 = 0.13
+plot(b_long_cen, ask = FALSE, model = "lambda")
+
+# Alpha part is highly biased in own implementation
+# But overall the hazard is close to the true hazard
 b_long_cen$parameters$gamma$p
 b_long_cen$parameters$alpha$p
 b_long_cen$parameters$mu$p
 b_long_cen$parameters$gamma[[1]] + 
   b_long_cen$parameters$alpha[[1]]*b_long_cen$parameters$mu$p[[1]]
+
+# True hazard: [-5, -2.6]
+predict(b_long_cen, pred_dat)$lambda + 
+  predict(b_long_cen, pred_dat)$gamma +
+  predict(b_long_cen, pred_dat)$alpha * predict(b_long_cen, pred_dat)$mu
+
+
 
 
 # Comparison to bamlss ----------------------------------------------------
@@ -170,6 +212,29 @@ b_long_bamls <- bamlss(f_re, family = mjm_bamlss, data = dat_sigmas$data,
 plot(bamlss_long, ask = FALSE, model = "lambda")
 plot(b_long_bamls, ask = FALSE, model = "lambda")
 # Again too smooth
+bamlss_long$parameters$alpha
+b_long_bamls$parameters$alpha
+
+# True hazard: [-5, -2.6]
+predict(bamlss_long, pred_dat)$lambda + 
+  predict(bamlss_long, pred_dat)$gamma +
+  predict(bamlss_long, pred_dat)$alpha * predict(bamlss_long, pred_dat)$mu
+
+
+# Recompute on the centered data
+bamlss_long_cen <- bamlss(f_rebamlss, family = "jmFEHLERSUCHE", 
+                          data = dat_cen$data, timevar = "obstime",
+                          idvar = "id", sampler = FALSE, maxit = 200)
+bamlss_long_cen$parameters$gamma$p
+bamlss_long_cen$parameters$alpha$p
+bamlss_long_cen$parameters$mu$p
+
+# True hazard: [-5, -2.6]
+# Centering does not change the model prediction
+predict(bamlss_long_cen, pred_dat)$lambda + 
+  predict(bamlss_long_cen, pred_dat)$gamma +
+  predict(bamlss_long_cen, pred_dat)$alpha * predict(bamlss_long_cen, 
+                                                     pred_dat)$mu
 
 
 
@@ -216,6 +281,17 @@ c(b_long$parameters$gamma[[1]] +
   b_longls$parameters$gamma[[1]] + 
     b_longls$parameters$alpha[[1]]*b_longls$parameters$mu$p[[1]])
 
+# True hazard: [-5, -2.6]
+predict(b_longls, pred_dat)$lambda + 
+  predict(b_longls, pred_dat)$gamma +
+  predict(b_longls, pred_dat)$alpha * predict(b_longls, pred_dat)$mu
+predict(b_longls_spl, pred_dat)$lambda + 
+  predict(b_longls_spl, pred_dat)$gamma +
+  predict(b_longls_spl, pred_dat)$alpha * predict(b_longls_spl, pred_dat)$mu
+predict(b_longls_spu, pred_dat)$lambda + 
+  predict(b_longls_spu, pred_dat)$gamma +
+  predict(b_longls_spu, pred_dat)$alpha * predict(b_longls_spu, pred_dat)$mu
+
 
 
 # Constant BH, Small Sigma ------------------------------------------------
@@ -255,39 +331,190 @@ plot(cbh_long, ask = FALSE, model = "lambda")
 plot(cbh_long_spl, ask = FALSE, model = "lambda")
 plot(cbh_long_spu, ask = FALSE, model = "lambda")
 
+c(cbh_nolong$parameters$gamma[[1]], cbh_long$parameters$gamma[[1]])
+predict(cbh_nolong, pred_dat)$lambda + 
+  predict(cbh_nolong, pred_dat)$gamma
+predict(cbh_long, pred_dat)$lambda + 
+  predict(cbh_long, pred_dat)$gamma +
+  predict(cbh_long, pred_dat)$alpha * predict(cbh_long, pred_dat)$mu
 
 
-# Multivariate Example ----------------------------------------------------
+
+# Linear BH, Small Sigma, Association -------------------------------------
+
 
 set.seed(1808)
-d <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121), 
-                lambda = function(t, x) {
-                  1.4*log((120*t + 10)/1000)
-                })
 
-f_re_mul <- list(
+# Linear hazard, constant association, constant marker values
+dat_assocs <- simMultiJM(nsub = 30, nmark = 1, M = 1,
+                         lambda = function(t, x) - 6.25 + 0.02*t,
+                         gamma = function(x) 0,
+                         alpha = list(function(t, x) 1 + 0*t),
+                         mu = list(function(t, x) 1.25),
+                         sigma = function(t, x) -50 + 0*t,
+                         full = TRUE)
+ggplot(dat_assocs$data, aes(x = obstime, y = y, group = id)) + 
+  geom_line() +
+  geom_point(aes(x = survtime, shape = factor(event)))
+
+
+# Different model specifications
+a_nolong <- bamlss(f_re, family = mjm_bamlss, data = dat_assocs$data, 
+                   timevar = "obstime", sampler = FALSE, maxit = 200, 
+                   opt_long = FALSE)
+a_long <- bamlss(f_re, family = mjm_bamlss, data = dat_assocs$data, 
+                 timevar = "obstime", sampler = FALSE, maxit = 200)
+a_long_sml <- bamlss(f_re, family = mjm_bamlss, data = dat_assocs$data, 
+                     timevar = "obstime", sampler = FALSE, maxit = 200,
+                     tau = list("lambda" = list("s(survtime)" = 0.005)))
+a_long_smu <- bamlss(f_re, family = mjm_bamlss, data = dat_assocs$data, 
+                     timevar = "obstime", sampler = FALSE, maxit = 200,
+                     tau = list("lambda" = list("s(survtime)" = 5000)))
+a_bamlss <- bamlss(f_rebamlss, family = "jm", data = dat_assocs$data, 
+                   timevar = "obstime", idvar = "id", sampler = FALSE, 
+                   maxit = 200)
+
+# BH plots, best approximation to truth with sml
+plot(a_nolong, model = "lambda", ask = FALSE)
+plot(a_long, model = "lambda", ask = FALSE)
+plot(a_long_sml, model = "lambda", ask = FALSE)
+plot(a_long_smu, model = "lambda", ask = FALSE)
+plot(a_bamlss, model = "lambda", ask = FALSE)
+
+# True hazard: [-5, -2.6]
+predict(a_nolong, pred_dat)$lambda + 
+  predict(a_nolong, pred_dat)$gamma
+predict(a_long, pred_dat)$lambda + 
+  predict(a_long, pred_dat)$gamma +
+  predict(a_long, pred_dat)$alpha * predict(a_long, pred_dat)$mu
+predict(a_long_sml, pred_dat)$lambda + 
+  predict(a_long_sml, pred_dat)$gamma +
+  predict(a_long_sml, pred_dat)$alpha * predict(a_long_sml, pred_dat)$mu
+predict(a_long_smu, pred_dat)$lambda + 
+  predict(a_long_smu, pred_dat)$gamma +
+  predict(a_long_smu, pred_dat)$alpha * predict(a_long_smu, pred_dat)$mu
+predict(a_bamlss, pred_dat)$lambda + 
+  predict(a_bamlss, pred_dat)$gamma +
+  predict(a_bamlss, pred_dat)$alpha * predict(a_bamlss, pred_dat)$mu
+
+model_list <- c("a_nolong", "a_long", "a_long_sml", "a_long_smu", "a_bamlss")
+sapply(model_list, function(x) get(x)$parameters$gamma[[1]])
+sapply(model_list, function(x) get(x)$parameters$alpha[[1]])
+
+
+
+
+# Constant Association with Centered Data ---------------------------------
+
+
+dat_assocc <- dat_assocs
+dat_assocc$data$y <- dat_assocc$data$y - mean(dat_assocc$data$y)
+
+a_cen <- bamlss(f_re, family = mjm_bamlss, data = dat_assocc$data, 
+                timevar = "obstime", sampler = FALSE, maxit = 200)
+a_cen_bamlss <- bamlss(f_rebamlss, family = "jm", data = dat_assocc$data, 
+                       timevar = "obstime", idvar = "id", sampler = FALSE, 
+                       maxit = 200)
+
+# BH is deeply affected
+plot(a_cen, model = "lambda", ask = FALSE)
+plot(a_bamlss, model = "lambda", ask = FALSE)
+
+sapply(c("a_cen", "a_cen_bamlss"), function(x) get(x)$parameters$gamma[[1]])
+sapply(c("a_cen", "a_cen_bamlss"), function(x) get(x)$parameters$alpha[[1]])
+
+
+
+# Constant Association with Linear Mu -------------------------------------
+
+
+set.seed(1808)
+
+# Linear hazard, constant association, constant marker values
+dat_lin <- simMultiJM(nsub = 30, nmark = 1, M = 1,
+                      lambda = function(t, x) - 6.25 + 0.015*t,
+                      gamma = function(x) 0,
+                      alpha = list(function(t, x) 1 + 0*t),
+                      mu = list(function(t, x) 1.25 + 0.005*t),
+                      sigma = function(t, x) -50 + 0*t,
+                      full = TRUE)
+ggplot(dat_lin$data, aes(x = obstime, y = y, group = id)) + 
+  geom_line() +
+  geom_segment(dat_lin$data %>% group_by(id) %>% 
+                 filter(obstime == max(obstime)),
+               mapping = aes(x = obstime, y = y, xend = survtime, yend = y),
+               linetype = "dotted") +
+  geom_point(dat_lin$data %>% group_by(id) %>% 
+               filter(obstime == max(obstime)),
+             mapping = aes(x = survtime, shape = factor(event)))
+
+
+# Different model specs
+a_lin <- bamlss(f_re, family = mjm_bamlss, data = dat_lin$data,
+                timevar = "obstime", sampler = FALSE, maxit = 200)
+a_lin_sml <- bamlss(f_re, family = mjm_bamlss, data = dat_lin$data, 
+                    timevar = "obstime", sampler = FALSE, maxit = 200,
+                    tau = list("lambda" = list("s(survtime)" = 0.005)))
+a_lin_smu <- bamlss(f_re, family = mjm_bamlss, data = dat_lin$data, 
+                    timevar = "obstime", sampler = FALSE, maxit = 200,
+                    tau = list("lambda" = list("s(survtime)" = 5000)))
+a_lin_bamlss <- bamlss(f_rebamlss, family = "jm", data = dat_lin$data, 
+                   timevar = "obstime", idvar = "id", sampler = FALSE, 
+                   maxit = 200)
+
+plot(a_lin, model = "lambda", ask = FALSE)
+plot(a_lin_sml, model = "lambda", ask = FALSE)
+plot(a_lin_smu, model = "lambda", ask = FALSE)
+plot(a_lin_bamlss, model = "lambda", ask = FALSE)
+
+# Bamlss estimates alpha parameter to 0
+model_list <- c("a_lin", "a_lin_sml", "a_lin_smu", "a_lin_bamlss")
+sapply(model_list, function(x) get(x)$parameters$gamma[[1]])
+sapply(model_list, function(x) get(x)$parameters$alpha[[1]])
+sapply(model_list, function(x) get(x)$parameters$mu[[2]][[1]])
+sapply(model_list, function(x) get(x)$parameters$mu[[2]][[2]])
+
+
+# True hazard: (-5, -2.6)
+predict(a_lin, pred_dat)$lambda + 
+  predict(a_lin, pred_dat)$gamma +
+  predict(a_lin, pred_dat)$alpha * predict(a_lin, pred_dat)$mu
+predict(a_lin_sml, pred_dat)$lambda + 
+  predict(a_lin_sml, pred_dat)$gamma +
+  predict(a_lin_sml, pred_dat)$alpha * predict(a_lin_sml, pred_dat)$mu
+predict(a_lin_smu, pred_dat)$lambda + 
+  predict(a_lin_smu, pred_dat)$gamma +
+  predict(a_lin_smu, pred_dat)$alpha * predict(a_lin_smu, pred_dat)$mu
+predict(a_lin_bamlss, pred_dat)$lambda + 
+  predict(a_lin_bamlss, pred_dat)$gamma +
+  predict(a_lin_bamlss, pred_dat)$alpha * predict(a_lin_bamlss, pred_dat)$mu
+# bamlss has the smallest spread
+
+
+
+# Use PCRE Model Terms ----------------------------------------------------
+
+mfpcaT <- create_true_MFPCA(M = 1, nmarker = 1)
+f_pcre <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
   gamma ~ 1,
-  mu ~ -1 + marker + ti(obstime, by = marker) +
-    ti(id, bs = "re") +
-    ti(id, obstime, bs = c("re", "cr"), k = c(50, 5)),
-  sigma ~ -1 + marker,
-  alpha ~ -1 + marker + s(survtime, by = marker)
+  mu ~ 1 + obstime + s(id, wfpc, bs = "pcre", xt = list("mfpc" = mfpcaT)),
+  sigma ~ 1,
+  alpha ~ 1
 )
-b <- bamlss(f_re_mul, family = mjm_bamlss, data = d, timevar = "obstime",
-            sampler = FALSE, maxit = 50)
 
+# Different model specs
+pcre_a_lin <- bamlss(f_pcre, family = mjm_bamlss, data = dat_lin$data,
+                     timevar = "obstime", sampler = FALSE, maxit = 200)
+pcre_a_lin_sml <- bamlss(f_pcre, family = mjm_bamlss, data = dat_lin$data,
+                         timevar = "obstime", sampler = FALSE, maxit = 200,
+                         tau = list("lambda" = list("s(survtime)" = 0.005)))
+pcre_a_lin_smu <- bamlss(f_pcre, family = mjm_bamlss, data = dat_lin$data, 
+                         timevar = "obstime", sampler = FALSE, maxit = 200,
+                         tau = list("lambda" = list("s(survtime)" = 5000)))
 
-f <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
-  gamma ~ 1,
-  mu ~ -1 + marker + s(obstime, by = marker) +
-    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("mfpc" = MFPCA)),
-  sigma ~ -1 + marker,
-  alpha ~ -1 + marker + s(survtime, by = marker)
-)
-b_f <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-              sampler = FALSE)
+# Only small differences to the a_lin models based on RE
+plot(pcre_a_lin, model = "lambda", ask = FALSE)
+plot(pcre_a_lin_sml, model = "lambda", ask = FALSE)
+plot(pcre_a_lin_smu, model = "lambda", ask = FALSE)
 
-MFPCA <- create_true_MFPCA(M = 2, nmarker = 2)
-plot(b_f, model = "lambda", ask = FALSE)

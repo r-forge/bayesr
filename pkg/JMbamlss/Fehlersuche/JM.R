@@ -3805,14 +3805,14 @@ jm_predict <- function(object, newdata, type = c("link", "parameter", "probabili
     surv_timevar <- attr(object$y[[1]], "timevar")["lambda"]
     tempdata <- newdata
     tempdata[, long_timevar] <- tempdata[, surv_timevar]
-    mu <- predict.bamlss(object, model = "mu", newdata = tempdata, type = type,
+    mu <- bamlss:::predict.bamlss(object, model = "mu", newdata = tempdata, type = type,
                          cores = cores, chunks = chunks, verbose = verbose)
     newdata$mu <- mu
   }
   
   if(!(type %in% c("probabilities", "cumhaz"))) {
     object$family$predict <- NULL
-    return(predict.bamlss(object, newdata = newdata, type = type,
+    return(bamlss:::predict.bamlss(object, newdata = newdata, type = type,
                           FUN = FUN, cores = cores, chunks = chunks, verbose = verbose, ...))
   }
   
@@ -3861,7 +3861,7 @@ jm_predict <- function(object, newdata, type = c("link", "parameter", "probabili
     for(i in 1:nobs)
       width[i] <- timegrid[[i]][2] - timegrid[[i]][1]
     
-    pred.setup <- predict.bamlss(object, data, type = "link",
+    pred.setup <- bamlss:::predict.bamlss(object, data, type = "link",
                                  get.bamlss.predict.setup = TRUE, ...)
 
     enames <- pred.setup$enames
@@ -3913,9 +3913,9 @@ jm_predict <- function(object, newdata, type = c("link", "parameter", "probabili
     }
 
     if(loglik) {
-      eta_gamma <- predict.bamlss(object, data[take, , drop = FALSE], model = "gamma")
-      eta_mu <- predict.bamlss(object, data, model = "mu")
-      eta_sigma <- predict.bamlss(object, data, model = "sigma")
+      eta_gamma <- bamlss:::predict.bamlss(object, data[take, , drop = FALSE], model = "gamma")
+      eta_mu <- bamlss:::predict.bamlss(object, data, model = "mu")
+      eta_sigma <- bamlss:::predict.bamlss(object, data, model = "sigma")
       mf <- model.frame(object, data = data)
       y <- mf[, grep("Surv", names(mf), fixed = TRUE)]
       eta_timegrid <- matrix(eta_timegrid, nrow = gdim[1], ncol = gdim[2], byrow = TRUE)
