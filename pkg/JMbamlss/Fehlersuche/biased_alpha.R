@@ -71,7 +71,7 @@ f_mjm <- list(
   sigma ~ 1,
   alpha ~ 1
 )
-m_mjm <- bamlss(f_bamlss, family = "mjm", data = dat_unc$data, 
+m_mjm <- bamlss(f_mjm, family = "mjm", data = dat_unc$data, 
                    timevar = "obstime", sampler = FALSE)
 m_mjm$parameters$alpha
 
