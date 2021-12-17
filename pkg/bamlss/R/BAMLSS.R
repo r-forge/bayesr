@@ -591,12 +591,15 @@ design.construct <- function(formula, data = NULL, knots = NULL,
         if(!is.null(obj$smooth.construct[[j]]$by)) {
           if(obj$smooth.construct[[j]]$by != "NA") {
             if(grepl(pat <- paste("):", obj$smooth.construct[[j]]$by, sep = ""), slj, fixed = TRUE)) {
-              slj <- gsub(pat, paste(",by=", obj$smooth.construct[[j]]$by, "):", sep = ""), slj, fixed = TRUE)
-              slj <- strsplit(slj, "", fixed = TRUE)[[1]]
-              if(slj[length(slj)] == ":")
-                slj <- slj[-length(slj)]
-              slj <- paste(slj, collapse = "")
-              obj$smooth.construct[[j]]$label <- slj
+              if(!grepl(paste0("by=", obj$smooth.construct[[j]]$by),
+                obj$smooth.construct[[j]]$label, fixed = TRUE)) {
+                slj <- gsub(pat, paste(",by=", obj$smooth.construct[[j]]$by, "):", sep = ""), slj, fixed = TRUE)
+                slj <- strsplit(slj, "", fixed = TRUE)[[1]]
+                if(slj[length(slj)] == ":")
+                  slj <- slj[-length(slj)]
+                slj <- paste(slj, collapse = "")
+                obj$smooth.construct[[j]]$label <- slj
+              }
             }
           }
         } else obj$smooth.construct[[j]]$by <- "NA"
@@ -793,12 +796,12 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
   object$xt$nocenter <- FALSE
   terms <- object$term
   if(object$by != "NA") {
-    object$label <- strsplit(object$label, "")[[1]]
-    object$label <- paste0(object$label[-length(object$label)], collapse = "")
-    object$label <- paste0(object$label, ",by=", object$by, ")")
-    object$xt$center <- FALSE
-    object$xt$nocenter <- TRUE
-    terms <- c(terms, object$by)
+    if(!grepl(paste0("by=", object$by), object$label, fixed = TRUE)) {
+      object$label <- strsplit(object$label, "")[[1]]
+      object$label <- paste0(object$label[-length(object$label)], collapse = "")
+      object$label <- paste0(object$label, ",by=", object$by, ")")
+    }
+    terms <- unique(c(terms, object$by))
   }
   nd <- list()
   cat("  .. ff processing term", object$label, "\n")
