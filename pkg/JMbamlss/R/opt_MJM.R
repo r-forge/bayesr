@@ -3,7 +3,7 @@
 # Optimizer for MJM -------------------------------------------------------
 
 opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
-                    opt_long = TRUE, ...) {
+                    opt_long = TRUE, alpha.eps = 0.001, ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -87,19 +87,20 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   status <- attr(y, "status")
   survtime <- y[[1]][, "time"][take_last]
   
-  eps0 <- eps + 1
+  eps0 <- eps0_surv <- eps0_long <- eps + 1
   eta0_surv <- do.call("cbind", eta[c("lambda", "gamma")])
   eta0_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
   eta0 <- cbind(eta0_surv, eta0_alpha)
   eta0_long <- do.call("cbind", eta[c("mu", "sigma")])
   iter <- 0
+  alpha_update <- FALSE
   
   # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
   it_param <- list()
   
   # Updating the predictors
   while((eps0 > eps) & (iter < maxit)) {
-    
+   
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
       state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu,
@@ -128,25 +129,32 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     }
     
     # NUR VORÜBERGEHEND ZUM CHECK
+    if (max(c(eps0_surv, eps0_long)) < alpha.eps) {
+      alpha_update <- TRUE
+    }
     if (opt_long) {
       ## (3) update alpha.
-      if(length(x$alpha$smooth.construct)) {
-        for(j in seq_along(x$alpha$smooth.construct)) {
-          state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, nu = nu,
-                                    eta = eta, eta_timegrid = eta_timegrid,
-                                    eta_timegrid_mu = eta_timegrid_mu,
-                                    eta_T_mu = eta_T_mu, survtime = survtime, ...)
-          eta$alpha <- eta$alpha -
-            drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
-            fitted(state)
-          eta_timegrid_alpha <- eta_timegrid_alpha -
-            x$alpha$smooth.construct[[j]]$state$fitted_timegrid +
-            state$fitted_timegrid
-          eta_timegrid_long <- drop(
-            t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-              (eta_timegrid_alpha * eta_timegrid_mu))
-          eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
-          x$alpha$smooth.construct[[j]]$state <- state
+      if(alpha_update) {
+        if(length(x$alpha$smooth.construct)) {
+          for(j in seq_along(x$alpha$smooth.construct)) {
+            state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, 
+                                      nu = nu,
+                                      eta = eta, eta_timegrid = eta_timegrid,
+                                      eta_timegrid_mu = eta_timegrid_mu,
+                                      eta_T_mu = eta_T_mu, survtime = survtime, 
+                                      ...)
+            eta$alpha <- eta$alpha -
+              drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
+              fitted(state)
+            eta_timegrid_alpha <- eta_timegrid_alpha -
+              x$alpha$smooth.construct[[j]]$state$fitted_timegrid +
+              state$fitted_timegrid
+            eta_timegrid_long <- drop(
+              t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
+                (eta_timegrid_alpha * eta_timegrid_mu))
+            eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
+            x$alpha$smooth.construct[[j]]$state <- state
+          }
         }
       }
       
@@ -198,16 +206,22 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     iter <- iter + 1
     eta1_surv <- do.call("cbind", eta[c("lambda", "gamma")])
     eta1_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
-    eta1 <- cbind(eta1_surv, eta0_alpha)
-    eps0_surv <- mean(abs((eta1 - eta0) / eta1), na.rm = TRUE)
     eta1_long <- do.call("cbind", eta[c("mu", "sigma")])
+    #eta1 <- cbind(eta1_surv, eta0_alpha)
+    eps0_surv <- mean(abs((eta1_surv - eta0_surv) / eta1_surv), na.rm = TRUE)
+    eps0_alpha <- if (alpha_update) {
+      mean(abs((eta1_alpha - eta0_alpha) / eta1_alpha), na.rm = TRUE)
+    } else {
+      eps + 1
+    }
     eps0_long <- mean(abs((eta1_long - eta0_long) / eta1_long), na.rm = TRUE)
-    eps0 <- mean(c(eps0_surv, eps0_long))
+    eps0 <- mean(c(eps0_surv, eps0_alpha, eps0_long))
     
     #if (iter %% 5 == 0) {
     cat("It ", iter,", LogLik ", logLik, "\n")
     #}
-    eta0 <- eta1
+    eta0_surv <- eta1_surv
+    eta0_alpha <- eta1_alpha
     eta0_long <- eta1_long
     
     # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
