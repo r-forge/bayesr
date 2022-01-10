@@ -128,7 +128,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       }
     }
     
-    # NUR VORÜBERGEHEND ZUM CHECK
     if (max(c(eps0_surv, eps0_long)) < alpha.eps) {
       alpha_update <- TRUE
     }
@@ -207,7 +206,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     eta1_surv <- do.call("cbind", eta[c("lambda", "gamma")])
     eta1_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
     eta1_long <- do.call("cbind", eta[c("mu", "sigma")])
-    #eta1 <- cbind(eta1_surv, eta0_alpha)
     eps0_surv <- mean(abs((eta1_surv - eta0_surv) / eta1_surv), na.rm = TRUE)
     eps0_alpha <- if (alpha_update) {
       mean(abs((eta1_alpha - eta0_alpha) / eta1_alpha), na.rm = TRUE)

@@ -269,6 +269,21 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   # Hypothetical longitudinal data
   data_hypo <- data_long
   
+  # Data at survival time
+  data_short$lambda <- lambda(data_short$survtime) - mean(f_lambda)
+  data_short$gamma <- gamma(x) + mean(f_lambda)
+  shortmu <- do.call(c, mu_fun(data_short$survtime, x, r, mu, b_set))
+  shortalpha <- do.call(c, lapply(alpha, function(alpha_k) {
+    alpha_k(data_short$survtime, x)
+  }))
+  data_short <- do.call(rbind, rep(list(data_short), nmark))
+  data_short$marker <- factor(rep(paste0("m", seq_len(nmark)),
+                                  each = nrow(x)))
+  data_short$alpha <- shortalpha
+  data_short$mu <- shortmu
+  data_short$sigma <- sigma(t = data_short$survtime, x = data_short)
+  attr(data_short, "f_lambda") <- f_lambda
+  
   # censoring                   
   data_long <- data_long[data_long$obstime <= data_long$survtime,]
   
@@ -289,7 +304,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                      M = M)
     
     d <- list(data = data_long, data_full = data_full, data_hypo = data_hypo,
-              fpc_base = fpc_base)
+              fpc_base = fpc_base, data_short = data_short)
   } else {
     d <- data_long
   }
