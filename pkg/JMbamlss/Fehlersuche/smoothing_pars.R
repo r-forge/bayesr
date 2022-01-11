@@ -148,11 +148,15 @@ plot(b_long, ask = FALSE, model = "lambda")
 plot(b_long_spl, ask = FALSE, model = "lambda")
 plot(b_long_spu, ask = FALSE, model = "lambda")
 
-# Identifiability problems with constant marker values and gamma intercept
+# Only small identifiability problems with constant marker values, gamma
+# intercept and zero association
 c(b_long$parameters$gamma[[1]], b_long_spl$parameters$gamma[[1]],
   b_long_spu$parameters$gamma[[1]])
 c(b_long$parameters$alpha[[1]], b_long_spl$parameters$alpha[[1]],
   b_long_spu$parameters$alpha[[1]])
+c(b_long$parameters$alpha[[1]]*b_long$parameters$mu$p[[1]], 
+  b_long_spl$parameters$alpha[[1]]*b_long_spl$parameters$mu$p[[1]],
+  b_long_spu$parameters$alpha[[1]]*b_long_spu$parameters$mu$p[[1]])
 b_long$parameters$gamma[[1]] + 
   b_long$parameters$alpha[[1]]*b_long$parameters$mu$p[[1]]
 
@@ -177,9 +181,9 @@ dat_cen$data$y <- dat_cen$data$y - mean(dat_cen$data$y)
 b_long_cen <- bamlss(f_re, family = mjm_bamlss, data = dat_cen$data, 
                      timevar = "obstime", sampler = FALSE, maxit = 200)
 
-# Estimated BH changes considerably
-# (-8, 8) -- 16/120 = 0.13
+# Estimated BH does not really change
 plot(b_long_cen, ask = FALSE, model = "lambda")
+plot(b_long, ask = FALSE, model = "lambda")
 
 # Alpha part is highly biased in own implementation
 # But overall the hazard is close to the true hazard
@@ -189,7 +193,16 @@ b_long_cen$parameters$mu$p
 b_long_cen$parameters$gamma[[1]] + 
   b_long_cen$parameters$alpha[[1]]*b_long_cen$parameters$mu$p[[1]]
 
+# Apparently, the association parameter is more biased when centering the
+# longitudinal marker but the influence of the longitudinal submodel on the 
+# hazard is smaller for centering (= closer to the truth)
+c(b_long$parameters$gamma$p, b_long_cen$parameters$gamma$p)
+c(b_long$parameters$alpha$p, b_long_cen$parameters$alpha$p)
+c(b_long$parameters$alpha[[1]]*b_long$parameters$mu$p[[1]],
+  b_long_cen$parameters$alpha[[1]]*b_long_cen$parameters$mu$p[[1]])
+
 # True hazard: [-5, -2.6]
+# Not centering is closer to the true hazard
 predict(b_long_cen, pred_dat)$lambda + 
   predict(b_long_cen, pred_dat)$gamma +
   predict(b_long_cen, pred_dat)$alpha * predict(b_long_cen, pred_dat)$mu
@@ -214,11 +227,15 @@ plot(b_long_bamls, ask = FALSE, model = "lambda")
 # Again too smooth
 bamlss_long$parameters$alpha
 b_long_bamls$parameters$alpha
+# Own implementation is biased
 
 # True hazard: [-5, -2.6]
 predict(bamlss_long, pred_dat)$lambda + 
   predict(bamlss_long, pred_dat)$gamma +
   predict(bamlss_long, pred_dat)$alpha * predict(bamlss_long, pred_dat)$mu
+predict(b_long_bamls, pred_dat)$lambda + 
+  predict(b_long_bamls, pred_dat)$gamma +
+  predict(b_long_bamls, pred_dat)$alpha * predict(b_long_bamls, pred_dat)$mu
 
 
 # Recompute on the centered data
@@ -267,15 +284,15 @@ b_longls_spu <- bamlss(f_re, family = mjm_bamlss, data = dat_sigmal$data,
                        timevar = "obstime", sampler = FALSE, maxit = 200,
                        tau = list("lambda" = list("s(survtime)" = 5000)))
 
-# Baseline estimates worsen
-# b_longls:  (-2.5, 2) -- 4.5/120 = 0.038
-# b_longls_spl: (-1.5, 2.5) -- 4/120 = 0.033
-# b_longls_spu: (-4, 4) -- 8/120 = 0.07
+# Baseline estimates are similar
+# b_longls:  (-2.5, 1) -- 3.5/120 = 0.029
+# b_longls_spl: (-1, 1.5) -- 2.5/120 = 0.021
+# b_longls_spu: (-3, 3) -- 6/120 = 0.05
 plot(b_longls, ask = FALSE, model = "lambda")
 plot(b_longls_spl, ask = FALSE, model = "lambda")
 plot(b_longls_spu, ask = FALSE, model = "lambda")
 
-# Parameter estimates also worsen
+# Parameter estimates also similar
 c(b_long$parameters$gamma[[1]] + 
     b_long$parameters$alpha[[1]]*b_long$parameters$mu$p[[1]],
   b_longls$parameters$gamma[[1]] + 
@@ -325,19 +342,38 @@ cbh_long_spl <- bamlss(f_re, family = mjm_bamlss, data = dat_cbh$data,
 cbh_long_spu <- bamlss(f_re, family = mjm_bamlss, data = dat_cbh$data,
                        timevar = "obstime", sampler = FALSE, maxit = 200,
                        tau = list("lambda" = list("s(survtime)" = 5000)))
+bamlss_cbh <- bamlss(f_rebamlss, family = "jmFEHLERSUCHE", 
+                     data = dat_cbh$data, timevar = "obstime", 
+                     idvar = "id", sampler = FALSE, maxit = 200, 
+                     fix.alpha = TRUE, fix.mu = TRUE, fix.sigma = TRUE)
+(sp_bamlss_cbh <- bamlss_cbh$parameters$lambda$s$`s(survtime)`[10])
+cbh_bamls <- bamlss(f_re, family = mjm_bamlss, data = dat_sigmas$data, 
+                    timevar = "obstime", sampler = FALSE, maxit = 200,
+                    opt_long = FALSE, 
+                    tau = list("lambda" = list("s(survtime)" = sp_bamlss_cbh)))
 
+
+# BH is constant so a fit close to horizontal is best
+# Hard to identify for all models
+# Best for own implementation with bamlss smoothing parameter
 plot(cbh_nolong, ask = FALSE, model = "lambda")
 plot(cbh_long, ask = FALSE, model = "lambda")
 plot(cbh_long_spl, ask = FALSE, model = "lambda")
 plot(cbh_long_spu, ask = FALSE, model = "lambda")
+plot(bamlss_cbh, ask = FALSE, model = "lambda")
+plot(cbh_bamls, ask = FALSE, model = "lambda")
 
 c(cbh_nolong$parameters$gamma[[1]], cbh_long$parameters$gamma[[1]])
+
+# True hazard is [-5, -5]
 predict(cbh_nolong, pred_dat)$lambda + 
   predict(cbh_nolong, pred_dat)$gamma
 predict(cbh_long, pred_dat)$lambda + 
   predict(cbh_long, pred_dat)$gamma +
   predict(cbh_long, pred_dat)$alpha * predict(cbh_long, pred_dat)$mu
-
+predict(cbh_bamls, pred_dat)$lambda + 
+  predict(cbh_bamls, pred_dat)$gamma +
+  predict(cbh_bamls, pred_dat)$alpha * predict(cbh_bamls, pred_dat)$mu
 
 
 # Linear BH, Small Sigma, Association -------------------------------------
@@ -374,12 +410,22 @@ a_bamlss <- bamlss(f_rebamlss, family = "jm", data = dat_assocs$data,
                    timevar = "obstime", idvar = "id", sampler = FALSE, 
                    maxit = 200)
 
-# BH plots, best approximation to truth with sml
+# BH plots, best approximation to truth with own implementation
+# a_nolong: (-2, 1) -- 3/120 = 0.025
+# a_long: (-2, 1) -- 3/120 = 0.025
+# a_long_sml: (-1, 1.5) -- 2.5/120 = 0.021
+# a_long_smu: (-2.5, 2) -- 4.5/120 = 0.038
+# a_bamlss: (-0.1, 0.3) -- 0.4/120 = 0.003
 plot(a_nolong, model = "lambda", ask = FALSE)
 plot(a_long, model = "lambda", ask = FALSE)
 plot(a_long_sml, model = "lambda", ask = FALSE)
 plot(a_long_smu, model = "lambda", ask = FALSE)
 plot(a_bamlss, model = "lambda", ask = FALSE)
+
+# Alpha parameter is set to zero (avoiding identifiability problems)
+model_list <- c("a_nolong", "a_long", "a_long_sml", "a_long_smu", "a_bamlss")
+sapply(model_list, function(x) get(x)$parameters$gamma[[1]])
+sapply(model_list, function(x) get(x)$parameters$alpha[[1]])
 
 # True hazard: [-5, -2.6]
 predict(a_nolong, pred_dat)$lambda + 
@@ -397,10 +443,6 @@ predict(a_bamlss, pred_dat)$lambda +
   predict(a_bamlss, pred_dat)$gamma +
   predict(a_bamlss, pred_dat)$alpha * predict(a_bamlss, pred_dat)$mu
 
-model_list <- c("a_nolong", "a_long", "a_long_sml", "a_long_smu", "a_bamlss")
-sapply(model_list, function(x) get(x)$parameters$gamma[[1]])
-sapply(model_list, function(x) get(x)$parameters$alpha[[1]])
-
 
 
 
@@ -416,12 +458,27 @@ a_cen_bamlss <- bamlss(f_rebamlss, family = "jm", data = dat_assocc$data,
                        timevar = "obstime", idvar = "id", sampler = FALSE, 
                        maxit = 200)
 
-# BH is deeply affected
+# BH is not affected
+# a_cen: (-2, 0.5) -- 2.5/120 = 0.021
+# a_bamlss: (-0.1, 0.25) -- 0.35/120 = 0.003
 plot(a_cen, model = "lambda", ask = FALSE)
 plot(a_bamlss, model = "lambda", ask = FALSE)
 
-sapply(c("a_cen", "a_cen_bamlss"), function(x) get(x)$parameters$gamma[[1]])
-sapply(c("a_cen", "a_cen_bamlss"), function(x) get(x)$parameters$alpha[[1]])
+# Centering opens up to bias of alpha parameter
+sapply(c("a_cen", "a_cen_bamlss", "a_long"), 
+       function(x) get(x)$parameters$gamma[[1]])
+sapply(c("a_cen", "a_cen_bamlss", "a_long"), 
+       function(x) get(x)$parameters$alpha[[1]])
+
+# Predictions are hardly affected
+predict(a_long, pred_dat)$lambda + 
+  predict(a_long, pred_dat)$gamma +
+  predict(a_long, pred_dat)$alpha * predict(a_long, pred_dat)$mu
+predict(a_cen, pred_dat)$lambda + 
+  predict(a_cen, pred_dat)$gamma +
+  predict(a_cen, pred_dat)$alpha * predict(a_cen, pred_dat)$mu
+
+
 
 
 
@@ -462,17 +519,22 @@ a_lin_bamlss <- bamlss(f_rebamlss, family = "jm", data = dat_lin$data,
                    timevar = "obstime", idvar = "id", sampler = FALSE, 
                    maxit = 200)
 
+# a_lin: (-2, 0.5) -- 2.5/120 = 0.02
+# a_lin_sml: (-1, 1.5) -- 2.5/120 = 0.02
+# a_lin_smu: (-2, 2) -- 4/120 = 0.03
+# a_lin_bamlss: (-0.1, 0.2) -- 0.3/120 = 0.0025
 plot(a_lin, model = "lambda", ask = FALSE)
 plot(a_lin_sml, model = "lambda", ask = FALSE)
 plot(a_lin_smu, model = "lambda", ask = FALSE)
 plot(a_lin_bamlss, model = "lambda", ask = FALSE)
 
-# Bamlss estimates alpha parameter to 0
+# Bamlss estimates alpha parameter to 0, other models estimate it small
 model_list <- c("a_lin", "a_lin_sml", "a_lin_smu", "a_lin_bamlss")
 sapply(model_list, function(x) get(x)$parameters$gamma[[1]])
 sapply(model_list, function(x) get(x)$parameters$alpha[[1]])
 sapply(model_list, function(x) get(x)$parameters$mu[[2]][[1]])
 sapply(model_list, function(x) get(x)$parameters$mu[[2]][[2]])
+# mu estimates are good for all models
 
 
 # True hazard: (-5, -2.6)

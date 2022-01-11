@@ -65,6 +65,6 @@ plot_fun("sigma", "p")
 plot_fun("alpha", "s", 1)
 plot_fun("alpha", "p")
 
-plot(1:200, sapply(it_param, function (x) {
+plot(1:100, sapply(it_param, function (x) {
   x$lambda$s[[1]][1]
 }))

@@ -170,7 +170,8 @@ b_old <- bamlss(f_old, data = dat3$data, family = "jm", timevar = "obstime",
 # Obvious differences
 matrix(c(b_pcre$parameters$lambda$s[[1]], b_re$parameters$lambda$s[[1]],
          b_old$parameters$lambda$s[[1]]), nrow = 3, byrow = TRUE)
-
+plot(b_re, model = "lambda", ask = FALSE)
+plot(b_old, model = "lambda", ask = FALSE)
 
 
 ##  Only survival part
