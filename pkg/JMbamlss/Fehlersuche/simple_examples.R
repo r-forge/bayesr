@@ -346,6 +346,50 @@ b_cox$parameters$gamma
 
 
 
+# Estimation of Sigma -----------------------------------------------------
+
+set.seed(1808)
+
+# Linear hazard
+dat_sigma <- simMultiJM(nsub = 100, nmark = 1, M = 1,
+                        lambda = function(t, x) -5 + 0.02*t,
+                        gamma = function(x) 0,
+                        alpha = list(function(t, x) 0*t),
+                        mu = list(function(t, x) 0.01*(t-60)^2),
+                        sigma = function(t, x) 0.001 + 0*t,
+                        full = TRUE)
+ggplot(dat_sigma$data, aes(x = obstime, y = y, group = id)) + 
+  geom_line() +
+  geom_segment(dat_sigma$data %>% group_by(id) %>% 
+                 filter(obstime == max(obstime)),
+               mapping = aes(x = obstime, y = y, xend = survtime, yend = y),
+               linetype = "dotted") +
+  geom_point(dat_sigma$data %>% group_by(id) %>% 
+               filter(obstime == max(obstime)),
+             mapping = aes(x = survtime, shape = factor(event)))
+
+f_sigma <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
+  gamma ~ 1,
+  mu ~ 1 + obstime + I(obstime^2) + s(id, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1
+)
+
+b_sigma <- bamlss(f_sigma, family = mjm_bamlss, data = dat_sigma$data, 
+                  timevar = "obstime", sampler = FALSE, maxit = 200)
+
+# lambda: (-1, 2) -- 3/120 = 0.025
+plot(b_sigma, model = "lambda")
+b_sigma$parameters$gamma # 5
+b_sigma$parameters$sigma # 0.001
+# starting value is
+log(sd(dat_sigma$data$mu))
+b_sigma$parameters$mu$p # 36, 1.2, 0.0001
+
+
+
+
 # Multivariate JMs --------------------------------------------------------
 
 

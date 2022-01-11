@@ -181,6 +181,19 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
         }
       }
       
+      ## (5) update sigma.
+      if(length(x$sigma$smooth.construct)) {
+        for(j in seq_along(x$sigma$smooth.construct)) {
+          state <- update_mjm_sigma(x$sigma$smooth.construct[[j]], y = y, 
+                                    nu = nu, eta = eta, 
+                                    eta_timegrid = eta_timegrid,
+                                    survtime = survtime, ...)
+          eta$sigma <- eta$sigma -
+            drop(fitted(x$sigma$smooth.construct[[j]]$state)) +
+            fitted(state)
+          x$sigma$smooth.construct[[j]]$state <- state
+        }
+      }
     }
 
     # Likelihood calculation

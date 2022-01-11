@@ -157,6 +157,34 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
 }
 
 
+
+# Updating sigma predictor ------------------------------------------------
+
+
+update_mjm_sigma <- function(x, y, nu, eta, eta_timegrid, survtime, ...) {
+  
+  b <- bamlss::get.state(x, "b")
+  b_p <- length(b)
+  
+  x_score <- crossprod(x$X, -1 + (y[[1]][, "obs"] - eta$mu)^2 / 
+                         exp(eta$sigma)^2)
+  x_H <- 2 * crossprod(x$X * drop((y[[1]][, "obs"] - eta$mu)/ exp(eta$sigma)^2),
+                       x$X * drop(y[[1]][, "obs"] - eta$mu))
+
+  x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
+  x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  
+  delta <- solve(x_H, x_score)
+  b <- b + nu * delta
+  
+  x$state$parameters[seq_len(b_p)] <- b
+  x$state$fitted.values <- drop(x$X %*% b)
+
+  return(x$state)
+  
+}
+
+
 # Survival integral for GQ ------------------------------------------------
 
 survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,

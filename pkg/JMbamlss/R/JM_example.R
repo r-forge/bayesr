@@ -20,10 +20,10 @@ source("R/opt_updating.R")
 if(!exists("d")) {
   
   library("refund")
+  library("survival")
   library("bamlss")
   library("MFPCA")
   
-  Surv2 <- bamlss:::Surv2
   
   set.seed(1808)
   d <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121), 
