@@ -320,6 +320,8 @@ bamlss.engine.setup.smooth.default <- function(x, Matrix = FALSE, ...)
             }, length.out = ntau2)
           }
         } else rep(x$sp, length.out = ntau2)
+        if(all(is.logical(tau2)))
+          tau2 <- rep(0.0001, length(tau2))
         names(tau2) <- paste("tau2", 1:ntau2, sep = "")
         state$parameters <- c(state$parameters, tau2)
       }
@@ -1580,7 +1582,8 @@ bfit_iwls <- function(x, family, y, eta, id, weights, criterion, ...)
       edf <- sum_diag(XWX %*% P)
       eta2[[id]] <- eta2[[id]] + fit
       ic <- get.ic(family, y, family$map2par(eta2), edf0 + edf, length(z), criterion, ...)
-      if(!is.null(env$ic_val)) {
+
+      if(!is.null(env$ic_val) & FALSE) {
         if((ic < env$ic_val) & (ic < env$ic00_val)) {
           par <- c(g, tau2)
           names(par) <- names(x$state$parameters)
