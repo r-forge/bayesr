@@ -1466,6 +1466,9 @@ bfit_iwls <- function(x, family, y, eta, id, weights, criterion, ...)
 
   no_ff <- !inherits(y, "ff")
   peta <- family$map2par(eta)
+  enet <- x$xt$enet
+  if(is.null(enet))
+    enet <- FALSE
 
   nobs <- length(eta[[1L]])
   
@@ -1527,6 +1530,8 @@ bfit_iwls <- function(x, family, y, eta, id, weights, criterion, ...)
       tau2 <- get.state(x, "tau2")
       for(j in seq_along(x$S))
         S <- S + 1 / tau2[j] * if(is.function(x$S[[j]])) x$S[[j]](c(g0, x$fixed.hyper)) else x$S[[j]]
+      if(enet)
+        S <- S + diag(1, ncol(S)) * (1 - 1 / tau2[1L]) / 2
       P <- matrix_inv(XWX + S + if(!is.null(x$xt[["pS"]])) x$xt[["pS"]] else 0, index = x$sparse.setup)
     }
     if(is.null(x$xt[["pm"]])) {
@@ -1552,6 +1557,8 @@ bfit_iwls <- function(x, family, y, eta, id, weights, criterion, ...)
       S <- 0
       for(j in seq_along(x$S))
         S <- S + 1 / tau2[j] * if(is.function(x$S[[j]])) x$S[[j]](c(g0, x$fixed.hyper)) else x$S[[j]]
+      if(enet)
+        S <- S + diag(1, ncol(S)) * (1 - 1 / tau2[1L]) / 2
       P <- matrix_inv(XWX + S + if(!is.null(x$xt[["pS"]])) x$xt[["pS"]] else 0, index = x$sparse.setup)
       if(inherits(P, "try-error")) return(NA)
       if(is.null(x$xt[["pm"]])) {
