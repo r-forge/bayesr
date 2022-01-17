@@ -3,6 +3,7 @@
 
 # Data Generation
 source("R/simMultiJM.R")
+source("R/preprocessing.R")
 
 # Helperfunction PCRE
 source("R/eval_mfun.R")
@@ -29,27 +30,14 @@ if(!exists("d")) {
   d <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121), 
                   lambda = function(t, x) {
                     1.4*log((120*t + 10)/1000)
-                  })
-  
-  marker_dat <- split(d, d$marker)
-  marker_dat <- lapply(marker_dat, function (mark) {
-    mark$res <- bam(y ~ s(obstime) + s(x2), data = mark)$residuals
-    mark
-  })
-  m_irregFunData <- lapply(marker_dat, function (mark) {
-    mark <- mark[order(mark$obstime), ]
-    irregFunData(argvals = split(mark$obstime, mark$id), 
-                 X = split(mark$res, mark$id))
-  })
-  FPCA <- lapply(m_irregFunData, function(mark) {
-    PACE(mark)
-  })
-  mFData <- multiFunData(lapply(FPCA, "[[", "fit"))
-  uniExpansions <- lapply(FPCA, function (mark) {
-    list(type = "given", functions = mark$functions)
-  })
-  MFPCA <- MFPCA(mFData = mFData, M = 2, uniExpansions = uniExpansions)
-  
+                  },
+                  alpha = rep(list(function(t, x) {
+                    0.3 + 0*t
+                  }), 2),
+                  mu = rep(list(function(t, x){
+                    1.25 + 0.6*sin(x[, 2]) + (-0.01)*t
+                  }), 2))
+  mfpca <- preproc_MFPCA(data = d, uni_mean = "y ~ s(obstime) + s(x2)", M = 2)
 }
 
 
@@ -61,12 +49,13 @@ f <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
   gamma ~ 1,
   mu ~ -1 + marker + s(obstime, by = marker) +
-    s(id, wfpc.1, wfpc.2, bs = "pcre", xt = list("mfpc" = MFPCA)),
+    s(id, wfpc.1, wfpc.2, bs = "unc_pcre", xt = list("mfpc" = mfpca)),
   sigma ~ -1 + marker,
   alpha ~ -1 + marker + s(survtime, by = marker)
 )
+
 b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-            sampler = FALSE)
+            sampler = FALSE, maxit = 400)
 
 
 

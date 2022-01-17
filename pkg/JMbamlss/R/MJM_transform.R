@@ -264,7 +264,9 @@ sm_time_transform_mjm_pcre <- function(x, data, grid, yname, timevar, take,
   if(x$by != "NA" & x$by != yname)
     X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
   
-  class(x) <- "pcre2.random.effect"
+  if(!"unc_pcre.random.effect" %in% class(x)) {
+    class(x) <- "pcre2.random.effect"
+  }
   x$term <- c(x$term, timevar)
   x$timevar <- timevar
   x$Xgrid <- PredictMat(x, X, n = nmarker*nrow(X))
