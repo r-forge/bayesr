@@ -41,6 +41,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
           x$mu$smooth.construct[[j]]$state$parameters
       }
       b <- get.par(x$mu$smooth.construct[[j]]$state$parameters, "b")
+      ### PASST DAS HIER NOCH MIT DEM PCRE2 ?
       if(inherits(x$mu$smooth.construct[[j]], "pcre2.random.effect")){
         eta_grid_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$Xgrid))
         eta_T_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$XT))
@@ -96,7 +97,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   alpha_update <- FALSE
   
   # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
-  it_param <- list()
+  # it_param <- list()
   
   # Updating the predictors
   while((eps0 > eps) & (iter < maxit)) {
@@ -236,7 +237,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     eta0_long <- eta1_long
     
     # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
-    it_param[[iter]] <- bamlss:::get.all.par(x)
+    # it_param[[iter]] <- bamlss:::get.all.par(x)
   }
   
   # Log-Posterior ausrechnen und ausgeben
