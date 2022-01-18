@@ -14,7 +14,7 @@ mjm_bamlss <- function(...)
     "links" = links,
     "transform" = MJM_transform,
     "optimizer" = opt_MJM,
-    "sampler" = NULL,
+    "sampler" = MJM_mcmc,
     "predict" = NULL
   )
   

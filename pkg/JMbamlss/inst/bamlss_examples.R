@@ -3,7 +3,7 @@ data("pbc2", package = "JMbayes")
 
 ## Set up the model formula including
 ## functional random intercepts using ti().
-f <- list(
+f_bamlss <- list(
   Surv2(years, status2, obs = log(serBilir)) ~ s(years,k=20),
   gamma ~ s(age,k=20) + drug + sex,
   mu ~ ti(id,bs="re") + 
@@ -18,8 +18,9 @@ set.seed(123)
 
 debug(bamlss:::sam_JM)
 ## Estimate model.
-b <- bamlss(f, data = pbc2, family = "jm",
-            timevar = "year", idvar = "id")
+pbc2 <- pbc2[1:300, ]
+b <- bamlss(f_bamlss, data = pbc2, family = "jm",
+            timevar = "year", idvar = "id", optimizer = FALSE)
 
 
 # --- Code from JM.R

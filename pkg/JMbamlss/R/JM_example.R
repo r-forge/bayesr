@@ -14,13 +14,14 @@ source("R/mjm_bamlss.R")
 source("R/MJM_transform.R")
 source("R/opt_MJM.R")
 source("R/opt_updating.R")
+source("R/MJM_mcmc.R")
+source("R/mcmc_proposing.R")
 
 
 # Data Generation ---------------------------------------------------------
 
 if(!exists("d")) {
   
-  library("refund")
   library("survival")
   library("bamlss")
   library("MFPCA")
@@ -54,8 +55,11 @@ f <- list(
   alpha ~ -1 + marker + s(survtime, by = marker)
 )
 
-b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-            sampler = FALSE, maxit = 400)
+# b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
+#             sampler = FALSE, maxit = 400)
+
+b_sample <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
+                   optimizer = FALSE)
 
 
 
