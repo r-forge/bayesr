@@ -11,7 +11,6 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, survtime, ...)
   
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
-  #tau2 <- bamlss::get.state(x, "tau2")
   
   int_i <- survint_gq(pred = "lambda", pre_fac = exp(eta$gamma),
                       omega = exp(eta_timegrid),
@@ -25,12 +24,6 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, survtime, ...)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
   ## Newton-Raphson.
-  # Minus? z.B. in zeile 1211 g + nu * HS
-  # bamlss::JM verwendet matrix_inv() Funktion definiert in BAMLSS.R
-  # Ausgleich über nu?
-  # -
-  # Prior aus xhess verwenden
-  # Dann doch wieder mit plus
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
   
@@ -107,10 +100,6 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
   x$state$parameters[seq_len(b_p)] <- b
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
   x$state$fitted.values <- drop(x$X %*% b)
-  # Braucht man das fitted_T überhaupt? Sind nicht die fitted.values eh schon
-  # die fitted_T - Werte, weil nämlich x$XT überhaupt nicht nötig war zu
-  # erstellen, weil das eh schon in x$X enthalten war?
-  # x$state$fitted_T <- drop(x$XT %*% b)
   
   return(x$state)
   
@@ -220,11 +209,11 @@ survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
              stop("Dimensions of longitudinal design matrix do not match.")
            }
            
-           # Alternativ mit Matrixmultiplikation statt verlängertem Vektor
-           # dim_mat <- t(rep(1, nmarker)) %x% diag(n*length(weights))
-           # score_int <- pre_fac*gq_mat %*% (omega*dim_mat %*% (int_fac*int_vec))
-           # hess_int <- pre_fac*gq_mat %*% 
-           #   (omega*dim_mat %*% t(apply(int_fac*int_vec, 1, tcrossprod)))
+         # Alternativ mit Matrixmultiplikation statt verlängertem Vektor
+         # dim_mat <- t(rep(1, nmarker)) %x% diag(n*length(weights))
+         # score_int <- pre_fac*gq_mat %*% (omega*dim_mat %*% (int_fac*int_vec))
+         # hess_int <- pre_fac*gq_mat %*% 
+         #   (omega*dim_mat %*% t(apply(int_fac*int_vec, 1, tcrossprod)))
            sum_mat <- matrix(rep(diag(omega), nmarker), nrow = length(omega))
            score_int <- pre_fac*gq_mat %*% sum_mat %*% (int_fac*int_vec)
            hess_int <- if (dim(int_vec)[2] == 1) {
