@@ -167,7 +167,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                eta = eta, eta_timegrid = eta_timegrid,
                                eta_T = eta_T, eta_T_mu = eta_T_mu,
                                eta_timegrid_alpha = eta_timegrid_alpha,
-                               eta_timegid_mu = eta_timegid_mu, 
+                               eta_timegrid_mu = eta_timegrid_mu, 
                                eta_timegrid_long = eta_timegrid_long,
                                eta_timegrid_lambda = eta_timegrid_lambda,
                                survtime = survtime, logLik_old = logLik_old, 
@@ -221,7 +221,8 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     
     if(save) {
       logLik.samps[js] <- logLik_old
-      logPost.samps[js] <- as.numeric(logLik.samps[js] + get.log.prior(x))
+      logPost.samps[js] <- as.numeric(logLik.samps[js] + 
+                                        bamlss:::get.log.prior(x))
     }
   }
   
@@ -245,7 +246,6 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   dev <- -2 * logLik.samps
   mpar <- apply(samps, 2, mean, na.rm = TRUE)
   names(mpar) <- colnames(samps)
-  browser()
   ll <- family$p2logLik(mpar)
   mdev <- -2 * ll
   pd <- mean(dev) - mdev

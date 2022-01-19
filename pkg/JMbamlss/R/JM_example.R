@@ -59,7 +59,7 @@ f <- list(
 #             sampler = FALSE, maxit = 400)
 
 b_sample <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-                   optimizer = FALSE)
+                   optimizer = FALSE, n.iter = 4, burnin = 1, step = 1)
 
 
 

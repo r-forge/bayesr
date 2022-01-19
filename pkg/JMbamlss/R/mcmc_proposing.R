@@ -2,7 +2,7 @@
 # Proposals for all predictors --------------------------------------------
 
 propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
-                        eta_timegrid_alpha, eta_timegid_mu, eta_timegrid_long,
+                        eta_timegrid_alpha, eta_timegrid_mu, eta_timegrid_long,
                         eta_timegrid_lambda, survtime, logLik_old, nsubj, 
                         gq_weights, status, nmarker, nu) {
   
@@ -25,7 +25,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "gamma" = {
-      int_i <- survint_gq(pred = "gamma", pre_fac = exp_eta_gamma, 
+      int_i <- survint_gq(pred = "gamma", pre_fac = exp(eta$gamma), 
                           pre_vec = x$X, omega = exp(eta_timegrid),
                           weights = gq_weights, survtime = survtime)
       x_score <- drop(status %*% x$X) - colSums(int_i$score_int)
@@ -106,7 +106,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
     "gamma" = {
       
       # fitted values and state
-      fit_prop <- drop(x$X %*% b)
+      fit_prop <- drop(x$X %*% b_prop)
       eta$gamma <- eta$gamma - fitted(x$state) + fit_prop
       x$state$fitted.values <- fit_prop
       
@@ -150,7 +150,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       eta$mu <- eta$mu - fitted(x$state) + fit_prop
       
       # fitted survival values
-      fit_T_prop <- drop(x$XT %*% b)
+      fit_T_prop <- drop(x$XT %*% b_prop)
       eta_T_mu <- eta_T_mu - x$state$fitted_T + fit_T_prop
       eta_T_long <- drop(
         t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
@@ -165,7 +165,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
     "sigma" = {
       
       # fitted values and state
-      fit_prop <- drop(x$X %*% b)
+      fit_prop <- drop(x$X %*% b_prop)
       eta$sigma <- eta$sigma - fitted(x$state) + fit_prop
       x$state$fitted.values <- fit_prop
       
@@ -190,7 +190,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "gamma" = {
-      int_i <- survint_gq(pred = "gamma", pre_fac = exp_eta_gamma, 
+      int_i <- survint_gq(pred = "gamma", pre_fac = exp(eta$gamma), 
                           pre_vec = x$X, omega = exp(eta_timegrid),
                           weights = gq_weights, survtime = survtime)
       x_score <- drop(status %*% x$X) - colSums(int_i$score_int)
@@ -222,6 +222,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                              drop((y[[1]][, "obs"] - eta$mu) / 
                                     exp(eta$sigma)^2),
                            x$X * drop(y[[1]][, "obs"] - eta$mu))
+      x_H0 <- x_H
     })
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
@@ -242,8 +243,13 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   
   # WIE KOMMTS?
   ## Save edf.
-  x$state$edf <- bamlss:::sum_diag(
-    matrix(colSums(int_i$hess_int), ncol = length(b_prop)) %*% Sigma)
+  x$state$edf <- if (predictor == "sigma") {
+    bamlss:::sum_diag(x_H0 %*% Sigma)
+  } else {
+    bamlss:::sum_diag(matrix(colSums(int_i$hess_int), ncol = length(b_prop)) %*%
+                        Sigma)
+  }
+    
   
   
   ## Sample variance parameter.

@@ -185,6 +185,73 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
     }
   }
   
+  
+  ### JM_TRANSFORM() enthält auch Code, der die Diagonale der Penalty-Matrizen
+  ### um eine kleine Konstante erhöht... Zur Stabilisierung? Wäre das noch
+  ### hilfreich?
+  
+  
+  # Include a function to compute the logLikelihood for a set of parameters
+  object$family$p2logLik <- function (par, logPost = FALSE, ...) {
+    eta <- eta_timegrid <- list()
+    lprior <- 0
+    nx <- c("lambda", "mu", "gamma", "sigma", "alpha")
+    for(j in nx) {
+      eta[[j]] <- 0
+      if(!(j %in% c("gamma", "sigma"))) {
+        eta_timegrid[[j]] <- 0
+        if (j == "mu") {
+          eta_T_mu <- 0
+        }
+      }
+        
+      for(sj in names(object$x[[j]]$smooth.construct)) {
+        pn <- paste(j, if(sj != "model.matrix") "s" else "p", sep = ".")
+        cn <- colnames(object$x[[j]]$smooth.construct[[sj]]$X)
+        if(is.null(cn))
+          cn <- paste("b", 1:ncol(object$x[[j]]$smooth.construct[[sj]]$X), sep = "")
+        pn0 <- paste(pn, sj, sep = ".")
+        pn <- paste(pn0, cn, sep = ".")
+        if(all(is.na(par[pn]))) {
+          if(sj == "model.matrix")
+            pn <- gsub(".p.model.matrix.", ".p.", pn, fixed = TRUE)
+        }
+        eta[[j]] <- eta[[j]] + object$x[[j]]$smooth.construct[[sj]]$X %*% par[pn]
+        if(!(j %in% c("gamma", "sigma"))) {
+          eta_timegrid[[j]] <- eta_timegrid[[j]] + 
+            object$x[[j]]$smooth.construct[[sj]]$Xgrid %*% par[pn]
+          if (j == "mu") {
+            eta_T_mu + object$x[[j]]$smooth.construct[[sj]]$XT %*% par[pn]
+          }
+        }
+          
+        if(logPost) {
+          pn2 <- paste(pn0, "tau2", sep = ".")
+          tpar <- par[grep2(c(pn, pn2), names(par), fixed = TRUE)]
+          lprior <- lprior + object$x[[j]]$smooth.construct[[sj]]$prior(tpar)
+        }
+      }
+    }
+    eta_timegrid_long <- drop(
+      t(rep(1, nmarker)) %x% diag(length(eta_timegrid$lambda)) %*%
+        (drop(eta_timegrid$alpha) * drop(eta_timegrid$mu)))
+    eta_timegrid <- eta_timegrid$lambda + eta_timegrid_long
+    
+    eta_T_long <- drop(
+      t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+    eta_T <- eta$lambda + eta$gamma + eta_T_long
+      
+    sum_Lambda <- drop(y2[, 1]/2 * exp(eta$gamma)) %*%
+      (diag(nsubj)%x%t(gq$weights))%*%
+      exp(eta_timegrid)
+    logLik <- drop(object$y[[1]][, "status"][take_last] %*% eta_T - sum_Lambda) +
+      sum(dnorm(object$y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
+                log = TRUE))
+    if(logPost)
+      logLik <- logLik + lprior
+    return(drop(logLik))
+  }
+  
   return(object)
 }
 

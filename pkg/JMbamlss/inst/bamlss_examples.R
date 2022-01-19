@@ -20,7 +20,8 @@ debug(bamlss:::sam_JM)
 ## Estimate model.
 pbc2 <- pbc2[1:300, ]
 b <- bamlss(f_bamlss, data = pbc2, family = "jm",
-            timevar = "year", idvar = "id", optimizer = FALSE)
+            timevar = "year", idvar = "id", optimizer = FALSE,
+            n.iter = 4, burnin = 1, step = 1)
 
 
 # --- Code from JM.R
