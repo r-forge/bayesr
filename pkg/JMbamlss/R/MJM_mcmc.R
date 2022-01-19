@@ -16,12 +16,14 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     x <- bamlss:::set.starting.values(x, start)
   }
   
-  ## Names of parameters/predictors.
+  # Names of parameters/predictors and other attributes
   nx <- names(x)
   nmarker <- attr(y, "nmarker")
   take_last <- attr(y, "take_last")
   survtime <- y[[1]][, "time"][take_last]
   nsubj <- length(survtime)
+  gq_weights <- attr(y, "gq_weights")
+  status <- attr(y, "status")
   
   ## Number of observations.
   #nobs <- attr(y, "nobs")
@@ -93,11 +95,34 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     }
   }
   
+  # Eta predictors
   eta_timegrid_long <- drop(
     t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
       (eta_timegrid_alpha*eta_timegrid_mu))
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
+  eta_T_long <- drop(
+    t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+  eta_T <- eta$lambda + eta$gamma + eta_T_long
   
+  # Old logLikelihood and prior.
+  sum_Lambda <- (survtime/2 * exp(eta$gamma)) %*%
+    (diag(nsubj)%x%t(gq_weights))%*% 
+    exp(eta_timegrid)
+  logLik_old <- drop(status %*% eta_T - sum_Lambda) +
+    sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
+              log = TRUE))
+  
+  # Fct for saving acceptance probability on the right scale
+  transform_acceptprop <- function(x) {
+    if(is.null(x)) return(0)
+    if(is.na(x)) return(0)
+    x <- exp(x)
+    if(x < 0)
+      x <- 0
+    if(x > 1)
+      x <- 1
+    x
+  }
   
   
   ## Process iterations
@@ -123,179 +148,82 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     }
   }
   logLik.samps <- logPost.samps <- rep(NA, length = length(iterthin))
-  
-  
-  # UMBENENNEN: Warum wird das hier gebraucht? Woher kommt die exp()Fkt?
-  foo <- function(x) {
-    if(is.null(x)) return(0)
-    if(is.na(x)) return(0)
-    x <- exp(x)
-    if(x < 0)
-      x <- 0
-    if(x > 1)
-      x <- 1
-    x
-  }
-  
-  ## Integrals.
-  # eeta <- exp(eta_timegrid)
-  # int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + 
-  #         apply(eeta[, 2:(sub - 1)], 1, sum))
-  
-  
+
   nstep <- step
   step <- floor(n.iter / step)
   
   ptm <- proc.time()
   for(iter in 1:n.iter) {
-    if(save <- iter %in% iterthin)
+    
+    if(save <- iter %in% iterthin) {
       js <- which(iterthin == iter)
-    
-    #for(i in nx) {
-      # if(i == "gamma") {
-      #   eeta <- exp(eta_timegrid)
-      #   int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + 
-      #                      apply(eeta[, 2:(sub - 1)], 1, sum))
-      # }
-      
-      # prop_fun <- get_jm_prop_fun(i, slice[i], nonlinear)
-      # 3jump
-    
-    eta_T_long <- drop(
-      t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
-    eta_T <- eta$lambda + eta$gamma + eta_T_long
-    
-    ## (1) update lambda.
-    for(j in names(x[[i]]$smooth.construct)) {
-      p.state <- propose_mjm_lambda(x = x[[i]]$smooth.construct[[j]], y = y,
-                                    eta = eta, eta_timegrid = eta_timegrid,
-                                    eta_timegrid_lambda = eta_timegrid_lambda,
-                                    eta_T = eta_T, survtime = survtime, 
-                                    nu = nu_sampler)
-      eta_timegrid_lambda <- eta_timegrid_lambda -
-        x$lambda$smooth.construct[[j]]$state$fitted_timegrid +
-        state$fitted_timegrid
-      eta_timegrid <- eta_timegrid_lambda +
-        eta_timegrid_long
-      eta$lambda <- eta$lambda - fitted(x$lambda$smooth.construct[[j]]$state) +
-        fitted(state)
-      x$lambda$smooth.construct[[j]]$state <- state
     }
     
-    
-    
-      for(sj in names(x[[i]]$smooth.construct)) {
+    for (i in nx) {
+      for (j in names(x[[i]]$smooth.construct)) {
         
-        p.state <- prop_fun(x[[i]]$smooth.construct[[sj]],
-                            y, eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
-                            eta_timegrid_dmu, eta_timegrid_dalpha,
-                            width, sub, nu, status, id = i, int0, nobs,
-                            dx = if(dalpha & (i == "mu")) x[["dmu"]]$smooth.construct[[sj]] else NULL,
-                            xsmalpha = if(nonlinear & (i == "mu")) x$alpha$smooth.construct else NULL, 
-                            knots = if(nonlinear & (i == "mu")) knots else NULL, tp = tp, fac = fac, ...)
-        ## If accepted, set current state to proposed state.
-        accepted <- if(is.na(p.state$alpha)) FALSE else log(runif(1)) <= p.state$alpha
+        p_state <- propose_mjm(predictor = i,
+                               x = x[[i]]$smooth.construct[[j]], y = y,
+                               eta = eta, eta_timegrid = eta_timegrid,
+                               eta_T = eta_T, eta_T_mu = eta_T_mu,
+                               eta_timegrid_alpha = eta_timegrid_alpha,
+                               eta_timegid_mu = eta_timegid_mu, 
+                               eta_timegrid_long = eta_timegrid_long,
+                               eta_timegrid_lambda = eta_timegrid_lambda,
+                               survtime = survtime, logLik_old = logLik_old, 
+                               nsubj = nsubj, gq_weights = gq_weights, 
+                               status = status, nmarker = nmarker, 
+                               nu = nu_sampler)
         
-        #checks# if(i == "mu") cat("\n", sj, round(exp(p.state$alpha), 2))
-        if(i %in% fixed)
-          accepted <- FALSE
-        
-        if(accepted) {
-          if(i %in% c("lambda", "mu", "alpha", "dalpha")) {
-            if(i == "lambda")
-              eta_timegrid_lambda <- eta_timegrid_lambda - x[[i]]$smooth.construct[[sj]]$state$fitted_timegrid + p.state$fitted_timegrid
-            if(i == "mu") {
-              # cat("\n iteration: ", iter, ", predictor: ", i, ", term: ", sj)
-              eta_timegrid_mu <- eta_timegrid_mu - x[[i]]$smooth.construct[[sj]]$state$fitted_timegrid + p.state$fitted_timegrid
-              if(nonlinear){
-                for (j in names(x$alpha$smooth.construct)){
-                  if(j != "model.matrix"){   # only smooth.constructs need to be updated
-                    g_a <- get.par(x$alpha$smooth.construct[[j]]$state$parameters, "b")
-                    Xalpha <- modSplineDesign(knots, as.vector(t(eta_timegrid_mu)), derivs = 0)
-                    Xalpha <- constrain(x$alpha$smooth.construct[[j]], Xalpha)
-                    if(fac)
-                      Xalpha <- Xalpha * x$alpha$smooth.construct[[j]]$by_timegrid
-                    if(tp)  
-                      Xalpha <- rowTensorProduct(Xalpha, Xalpha2) 
-                    alpha_state <- matrix(Xalpha %*% g_a, nrow = nrow(eta_timegrid), ncol = ncol(eta_timegrid), byrow = TRUE)
-                    eta_timegrid_alpha <- eta_timegrid_alpha - x$alpha$smooth.construct[[j]]$state$fitted_timegrid + alpha_state
-                    x$alpha$smooth.construct[[j]]$state$fitted_timegrid <- alpha_state
-                    eta$alpha <- eta$alpha - fitted(x$alpha$smooth.construct[[j]]$state) + alpha_state[, ncol(eta_timegrid)]
-                    x$alpha$smooth.construct[[j]]$state$fitted.values <- alpha_state[, ncol(eta_timegrid)]
-                  } 
-                }
-              }
-              if(dalpha & (sj %in% names(x[["dmu"]]$smooth.construct))) {
-                p.state.dmu <- update_jm_dmu(x[["dmu"]]$smooth.construct[[sj]], x[["mu"]]$smooth.construct[[sj]])
-                eta_timegrid_dmu <- eta_timegrid_dmu - x[["dmu"]]$smooth.construct[[sj]]$state$fitted_timegrid + p.state.dmu$fitted_timegrid
-                eta[["dmu"]] <- eta[["dmu"]] - fitted(x[["dmu"]]$smooth.construct[[sj]]$state) + fitted(p.state.dmu)
-                x[["dmu"]]$smooth.construct[[sj]]$state <- p.state.dmu
-              }
-            }
-            if(i == "alpha"){
-              eta_timegrid_alpha <- eta_timegrid_alpha - x[[i]]$smooth.construct[[sj]]$state$fitted_timegrid + p.state$fitted_timegrid
-            }
-            if(i == "dalpha")
-              eta_timegrid_dalpha <- eta_timegrid_dalpha - x[[i]]$smooth.construct[[sj]]$state$fitted_timegrid + p.state$fitted_timegrid
-            if(nonlinear){
-              eta_timegrid <- eta_timegrid_lambda + eta_timegrid_alpha + eta_timegrid_dalpha * eta_timegrid_dmu
-            } else {
-              eta_timegrid <- eta_timegrid_lambda + eta_timegrid_alpha * eta_timegrid_mu + eta_timegrid_dalpha * eta_timegrid_dmu
-            }
-          }
-          eta[[i]] <- eta[[i]] - fitted(x[[i]]$smooth.construct[[sj]]$state) + fitted(p.state)
-          if(i == "alpha"){
-            if(myplots & iter == round(iter, -1)){
-              par(mfrow=c(2,2))
-              plot(eta_timegrid_mu, eta_timegrid_alpha, main=paste0("alpha: iteration ", iter, ", edf ", round(p.state$edf, 2)))
-              plot(eta_timegrid_mu[, ncol(eta_timegrid_mu)], eta$alpha, main=paste0("alpha: iteration ", iter, ", edf ", round(p.state$edf, 2)))
-              plot(eta_timegrid_mu, p.state$fitted_timegrid, 
-                   main=paste0("alpha: iteration ", iter, ", edf ", round(p.state$edf, 2), ", term: ", sj))
-              abline(h = 0, col = "red")
-              abline(v = median(y[, 3]), col = "red")
-              matplot(t(times), t(eta_timegrid_alpha), main=paste0("alpha: iteration ", iter, ", edf ", round(p.state$edf, 2)), type = "l")
-              Sys.sleep(2)
-            }
-          }
-          if(i == "mu"){
-            if(myplots & iter == round(iter, -1)){
-              par(mfrow=c(2,2))
-              matplot(t(times),t(p.state$fitted_timegrid), type = "l", main = paste0("mu: iteration ", iter, ", edf ", round(p.state$edf, 2), " ", sj))
-              matplot(t(times), t(eta_timegrid_mu), type = "l", main = paste0("mu: iteration ", iter, ", edf ", round(p.state$edf, 2), " ", sj))
-              plot(eta_timegrid_mu, eta_timegrid_alpha, main=paste0("mu: iteration ", iter, ", edf ", round(p.state$edf, 2), "alpha"))
-              plot(eta_timegrid_mu[, ncol(eta_timegrid_mu)], eta$alpha, main=paste0("mu: iteration ", iter, ", edf ", round(p.state$edf, 2), "alpha"))
-              Sys.sleep(1)
-            }
-          }
-          x[[i]]$smooth.construct[[sj]]$state <- p.state 
+        # If accepted, set current state to proposed state
+        accepted <- if(is.na(p_state$xstate$alpha)){
+          FALSE
+        } else {
+          log(runif(1)) <= p_state$xstate$alpha
+        }
+        if (accepted) {
+          
+          # Update the etas
+          switch(i, "lambda" = {
+            eta_T <- p_state$etas$eta_T
+            eta_timegrid <- p_state$etas$eta_timegrid 
+            eta_timegrid_lambda <- p_state$etas$eta_timegrid_lambda
+          }, "alpha" = {
+            eta_T <- p_state$etas$eta_T
+            eta_timegrid <- p_state$etas$eta_timegrid
+            eta_timegrid_long <- p_state$etas$eta_timegrid_long
+            eta_timegrid_alpha <- p_state$etas$eta_timegrid_alpha
+          }, "mu" = {
+            eta_T <- p_state$etas$eta_T
+            eta_T_mu <- p_state$etas$eta_T_mu
+            eta_timegrid <- p_state$etas$eta_timegrid
+            eta_timegrid_long <- p_state$etas$eta_timegrid_long
+            eta_timegrid_mu <- p_state$etas$eta_timegrid_mu
+          })
+          eta <- p_state$etas$eta
+          
+          # Update likelihood and state
+          logLik_old <- p_state$logLik
+          x[[i]]$smooth.construct[[j]]$state <- p_state$xstate
         }
         
         ## Save the samples and acceptance.
         if(save) {
-          samps[[i]][[sj]]$samples[js, ] <- x[[i]]$smooth.construct[[sj]]$state$parameters
-          samps[[i]][[sj]]$edf[js] <- x[[i]]$smooth.construct[[sj]]$state$edf
-          samps[[i]][[sj]]$alpha[js] <- foo(p.state$alpha)
-          samps[[i]][[sj]]$accepted[js] <- accepted
-          if(dalpha & (i == "mu") & (sj %in% names(x[["dmu"]]$smooth.construct))) {
-            samps[["dmu"]][[sj]]$samples[js, ] <- x[["dmu"]]$smooth.construct[[sj]]$state$parameters
-            samps[["dmu"]][[sj]]$edf[js] <- x[["dmu"]]$smooth.construct[[sj]]$state$edf
-            samps[["dmu"]][[sj]]$alpha[js] <- foo(p.state$alpha)
-            samps[["dmu"]][[sj]]$accepted[js] <- accepted
-          }
+          samps[[i]][[j]]$samples[js, ] <- 
+            x[[i]]$smooth.construct[[j]]$state$parameters
+          samps[[i]][[j]]$edf[js] <- x[[i]]$smooth.construct[[j]]$state$edf
+          samps[[i]][[j]]$alpha[js] <- 
+            transform_acceptprop(p_state$xstate$alpha)
+          samps[[i]][[j]]$accepted[js] <- accepted
         }
       }
-    #}
-    
-    if(save) {
-      logLik.samps[js] <- sum((eta_timegrid[,ncol(eta_timegrid)] + eta$gamma) * status, na.rm = TRUE) -
-        exp(eta$gamma) %*% int0 + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
-      logPost.samps[js] <- as.numeric(logLik.samps[js] + get.log.prior(x))
     }
     
-    if(verbose) barfun(ptm, n.iter, iter, step, nstep)
+    if(save) {
+      logLik.samps[js] <- logLik_old
+      logPost.samps[js] <- as.numeric(logLik.samps[js] + get.log.prior(x))
+    }
   }
-  
-  if(verbose) cat("\n")
   
   for(i in names(samps)) {
     for(j in names(samps[[i]])) {
@@ -317,6 +245,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   dev <- -2 * logLik.samps
   mpar <- apply(samps, 2, mean, na.rm = TRUE)
   names(mpar) <- colnames(samps)
+  browser()
   ll <- family$p2logLik(mpar)
   mdev <- -2 * ll
   pd <- mean(dev) - mdev

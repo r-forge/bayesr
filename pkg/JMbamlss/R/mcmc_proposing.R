@@ -1,37 +1,62 @@
 
 # Proposals for all predictors --------------------------------------------
 
-propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, survtime,
+propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                         eta_timegrid_alpha, eta_timegid_mu, eta_timegrid_long,
-                        eta_timegrid_lambda, logLik_old, nsubj, gq_weights,
-                        status, nu) {
+                        eta_timegrid_lambda, survtime, logLik_old, nsubj, 
+                        gq_weights, status, nmarker, nu) {
   
   # Get old parameters
   b_old <- bamlss::get.state(x, "b")
   p_old <- x$prior(x$state$parameters)
   
+  if (predictor %in% c("alpha", "mu")) {
+    delta <- rep(status, nmarker)
+  }
   
   # Calculate Newton step based on old parameter
   switch(predictor,
     "lambda" = {
       int_i <- survint_gq(pred = "lambda", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
-                          int_vec = x$Xgrid, weights = attr(y, "gq_weights"),
+                          int_vec = x$Xgrid, weights = gq_weights,
                           survtime = survtime)
-      x_score <- drop(attr(y, "status") %*% x$XT) - colSums(int_i$score_int)
+      x_score <- drop(status %*% x$XT) - colSums(int_i$score_int)
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "gamma" = {
-      
+      int_i <- survint_gq(pred = "gamma", pre_fac = exp_eta_gamma, 
+                          pre_vec = x$X, omega = exp(eta_timegrid),
+                          weights = gq_weights, survtime = survtime)
+      x_score <- drop(status %*% x$X) - colSums(int_i$score_int)
+      x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "alpha" = {
-      
+      int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
+                          omega = exp(eta_timegrid),
+                          int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
+                          weights = gq_weights, survtime = survtime)
+      x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
+      x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "mu" = {
-      
+      int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
+                          omega = exp(eta_timegrid),
+                          int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                          weights = gq_weights, survtime = survtime)
+      x_score <- drop(
+        crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
+          t(delta * x$XT) %*% eta$alpha) - colSums(int_i$score_int)
+      x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
+        matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "sigma" = {
-      
+      x_score <- crossprod(x$X, -1 + (y[[1]][, "obs"] - eta$mu)^2 / 
+                             exp(eta$sigma)^2)
+      x_H <- 2 * crossprod(x$X * 
+                             drop((y[[1]][, "obs"] - eta$mu) / 
+                                    exp(eta$sigma)^2),
+                           x$X * drop(y[[1]][, "obs"] - eta$mu))
     })
   
   # Include priori in derivatives
@@ -78,19 +103,73 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, survtime,
       x$state$fitted.values <- fit_prop
       
     },
-   "gamma" = {
+    "gamma" = {
+      
+      # fitted values and state
+      fit_prop <- drop(x$X %*% b)
+      eta$gamma <- eta$gamma - fitted(x$state) + fit_prop
+      x$state$fitted.values <- fit_prop
+      
+    },
+    "alpha" = {
+      
+      # timegrids
+      fitted_timegrid_prop <- drop(x$Xgrid %*% b_prop)
+      eta_timegrid_alpha <- eta_timegrid_alpha - x$state$fitted_timegrid + 
+        fitted_timegrid_prop
+      eta_timegrid_long <- drop(
+        t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
+          (eta_timegrid_alpha*eta_timegrid_mu))
+      eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
+      
+      # fitted values
+      fit_prop <- drop(x$X %*% b_prop)
+      eta$alpha <- eta$alpha - fitted(x$state) + fit_prop
+      eta_T_long <- drop(
+        t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+      eta_T <- eta$lambda + eta$gamma + eta_T_long
+      
+      # state
+      x$state$fitted_timegrid <- fitted_timegrid_prop
+      x$state$fitted.values <- fit_prop
+      
+    },
+    "mu" = {
      
-   },
-   "alpha" = {
+      # timegrids
+      fitted_timegrid_prop <- drop(x$Xgrid %*% b_prop)
+      eta_timegrid_mu <- eta_timegrid_mu - x$state$fitted_timegrid + 
+       fitted_timegrid_prop
+      eta_timegrid_long <- drop(
+        t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
+          (eta_timegrid_alpha*eta_timegrid_mu))
+      eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
      
-   },
-   "mu" = {
+      # fitted longitudinal values
+      fit_prop <- drop(x$X %*% b_prop)
+      eta$mu <- eta$mu - fitted(x$state) + fit_prop
+      
+      # fitted survival values
+      fit_T_prop <- drop(x$XT %*% b)
+      eta_T_mu <- eta_T_mu - x$state$fitted_T + fit_T_prop
+      eta_T_long <- drop(
+        t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+      eta_T <- eta$lambda + eta$gamma + eta_T_long
      
-   },
-   "sigma" = {
+     # state
+     x$state$fitted_timegrid <- fitted_timegrid_prop
+     x$state$fitted.values <- fit_prop
+     x$state$fitted_T <- fit_T_prop
      
-   })
-
+    },
+    "sigma" = {
+      
+      # fitted values and state
+      fit_prop <- drop(x$X %*% b)
+      eta$sigma <- eta$sigma - fitted(x$state) + fit_prop
+      x$state$fitted.values <- fit_prop
+      
+    })
   
   # New logLik
   sum_Lambda <- (survtime/2 * exp(eta$gamma)) %*%
@@ -105,23 +184,45 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, survtime,
     "lambda" = {
       int_i <- survint_gq(pred = "lambda", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
-                          int_vec = x$Xgrid, weights = attr(y, "gq_weights"),
+                          int_vec = x$Xgrid, weights = gq_weights,
                           survtime = survtime)
-      x_score <- drop(attr(y, "status") %*% x$XT) - colSums(int_i$score_int)
+      x_score <- drop(status %*% x$XT) - colSums(int_i$score_int)
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
-         "gamma" = {
-           
-         },
-         "alpha" = {
-           
-         },
-         "mu" = {
-           
-         },
-         "sigma" = {
-           
-         })
+    "gamma" = {
+      int_i <- survint_gq(pred = "gamma", pre_fac = exp_eta_gamma, 
+                          pre_vec = x$X, omega = exp(eta_timegrid),
+                          weights = gq_weights, survtime = survtime)
+      x_score <- drop(status %*% x$X) - colSums(int_i$score_int)
+      x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
+    },
+    "alpha" = {
+      int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
+                          omega = exp(eta_timegrid),
+                          int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
+                          weights = gq_weights, survtime = survtime)
+      x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
+      x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
+    },
+    "mu" = {
+      int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
+                          omega = exp(eta_timegrid),
+                          int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                          weights = gq_weights, survtime = survtime)
+      x_score <- drop(
+        crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
+          t(delta * x$XT) %*% eta$alpha) - colSums(int_i$score_int)
+      x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
+        matrix(colSums(int_i$hess_int), ncol = length(b_old))
+    },
+    "sigma" = {
+      x_score <- crossprod(x$X, -1 + (y[[1]][, "obs"] - eta$mu)^2 / 
+                             exp(eta$sigma)^2)
+      x_H <- 2 * crossprod(x$X * 
+                             drop((y[[1]][, "obs"] - eta$mu) / 
+                                    exp(eta$sigma)^2),
+                           x$X * drop(y[[1]][, "obs"] - eta$mu))
+    })
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
   Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
@@ -170,7 +271,21 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, survtime,
                             "lambda" = list(eta = eta, eta_T = eta_T, 
                                             eta_timegrid = eta_timegrid, 
                                             eta_timegrid_lambda = 
-                                              eta_timegrid_lambda)),
+                                              eta_timegrid_lambda),
+                            "gamma" = list(eta = eta),
+                            "alpha" = list(eta = eta, eta_T = eta_T, 
+                                           eta_timegrid = eta_timegrid,
+                                           eta_timegrid_long = 
+                                             eta_timegrid_long,
+                                           eta_timegrid_alpha = 
+                                             eta_timegrid_alpha),
+                            "mu" = list(eta = eta, eta_T = eta_T, 
+                                        eta_T_mu = eta_T_mu,
+                                        eta_timegrid = eta_timegrid,
+                                        eta_timegrid_long = 
+                                          eta_timegrid_long,
+                                        eta_timegrid_mu = eta_timegrid_mu),
+                            "sigma" = list(eta = eta)),
               logLik = logLik))
   
 }
