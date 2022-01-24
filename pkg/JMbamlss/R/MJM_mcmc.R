@@ -5,7 +5,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
                      nu_sampler = 1, ...)
 {
-  
+  browser()
   # Set starting values for the sampling
   if(!is.null(start)) {
     if(is.matrix(start)) {
@@ -161,7 +161,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     
     for (i in nx) {
       for (j in names(x[[i]]$smooth.construct)) {
-        
+        if(i == "alpha") cat(iter, "\n")
         p_state <- propose_mjm(predictor = i,
                                x = x[[i]]$smooth.construct[[j]], y = y,
                                eta = eta, eta_timegrid = eta_timegrid,
@@ -205,7 +205,16 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
           # Update likelihood and state
           logLik_old <- p_state$logLik
           x[[i]]$smooth.construct[[j]]$state <- p_state$xstate
-        }
+        } 
+        #### SOLLTEN NICHT DIE VARIANZ-PARAMETER IMMER UPGEDATED WERDEN?
+        #else {
+        #   x[[i]]$smooth.construct[[j]]$state$parameters <- 
+        #     bamlss::set.par(
+        #       x[[i]]$smooth.construct[[j]]$state$parameters, 
+        #       bamlss::get.par(x[[i]]$smooth.construct[[j]]$state$parameters, 
+        #                       "tau2"), 
+        #       "tau2")
+        # }
         
         ## Save the samples and acceptance.
         if(save) {
@@ -218,7 +227,6 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
         }
       }
     }
-    
     if(save) {
       logLik.samps[js] <- logLik_old
       logPost.samps[js] <- as.numeric(logLik.samps[js] + 

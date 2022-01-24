@@ -203,6 +203,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                           weights = gq_weights, survtime = survtime)
       x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
+      #x_H <- diag(diag(x_H))
     },
     "mu" = {
       int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
@@ -227,6 +228,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
   Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+  if(is.character(Sigma)) browser()
   
   # Get new location parameter for proposal
   mu <- drop(b_prop + nu * Sigma %*% x_score)
@@ -255,17 +257,17 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   ## Sample variance parameter.
   if(!x$fixed & is.null(x$sp) & length(x$S)) {
     if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
-      g <- bamlss::get.par(x$state$parameters, "b")
+      b_prop <- bamlss::get.par(x$state$parameters, "b")
       a <- x$rank / 2 + x$a
-      b <- 0.5 * crossprod(g, x$S[[1]]) %*% g + x$b
+      b <- 0.5 * crossprod(b_prop, x$S[[1]]) %*% b_prop + x$b
       tau2 <- 1 / rgamma(1, a, b)
       x$state$parameters <- bamlss::set.par(x$state$parameters, tau2, "tau2")
     } else {
       i <- grep("tau2", names(x$state$parameters))
       for(j in i) {
         x$state$parameters <- bamlss:::uni.slice(
-          x$state$parameters, x, NULL, NULL, NULL, id = "mu", j, 
-          logPost = uni.slice_tau2_logPost, lower = 0, ll = 0)
+          x$state$parameters, x, NULL, NULL, NULL, id = predictor, j, 
+          logPost = bamlss:::uni.slice_tau2_logPost, lower = 0, ll = 0)
       }
     }
   }

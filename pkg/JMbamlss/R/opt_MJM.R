@@ -252,7 +252,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   # pred_mat <- PredictMat(x$lambda$smooth.construct[[1]], pred_data)
   # plot(pred_data[, 1], pred_mat%*%b_it)
   
-  assign("it_param", it_param, envir = .GlobalEnv)
+  #assign("it_param", it_param, envir = .GlobalEnv)
   logPost <- as.numeric(logLik + bamlss:::get.log.prior(x))
   return(list("fitted.values" = eta, "parameters" = bamlss:::get.all.par(x),
               "logLik" = logLik, "logPost" = logPost,

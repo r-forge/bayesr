@@ -55,11 +55,13 @@ f <- list(
   alpha ~ -1 + marker + s(survtime, by = marker)
 )
 
-# b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-#             sampler = FALSE, maxit = 400)
+b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
+            sampler = FALSE, maxit = 500)
 
 b_sample <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-                   optimizer = FALSE, n.iter = 4, burnin = 1, step = 1)
+                   optimizer = FALSE, start = parameters(b),
+                   nu_sampler = 0.01)
+#, n.iter = 4, burnin = 1, step = 1)
 
 
 
