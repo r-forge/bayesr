@@ -57,11 +57,18 @@ f <- list(
 
 b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
             sampler = FALSE, maxit = 500)
+# load("inst/objects/m_optim.Rdata")
 
 b_sample <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-                   optimizer = FALSE, start = parameters(b),
-                   nu_sampler = 0.01)
+                   optimizer = FALSE, start = parameters(b))
 #, n.iter = 4, burnin = 1, step = 1)
+
+## Problem bei Alpha-Prädiktor:
+# Warum sollte sich die Likelihood so extrem ändern, nur weil andere alpha-
+# Parameter verwendet werden? Zumal die Koeffizienten jetzt nicht heillos unter-
+# schiedlich sind. 
+# Wird vielleicht doch einer der longitudinalen Prädiktoren falsch upgedated?
+# Allerdings, warum sollte es dann zwischendurch immer mal wieder funktionieren?
 
 
 

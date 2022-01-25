@@ -6,6 +6,24 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                         eta_timegrid_lambda, survtime, logLik_old, nsubj, 
                         gq_weights, status, nmarker, nu) {
   
+  if (predictor == "alpha") {
+    # Old logLik -- Why does it change so drastically?
+    sum_Lambda_old <- (survtime/2 * exp(eta$gamma)) %*%
+      (diag(nsubj)%x%t(gq_weights))%*%
+      exp(eta_timegrid)
+    logLik_old_comp <- drop(status %*% eta_T - sum_Lambda_old) +
+      sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
+                log = TRUE))
+    eta_old <- eta
+    eta_timegrid_old <- eta_timegrid
+    eta_T_old <- eta_T
+    
+    # Apparently eta_timegrid has changed drastically, so sum_Lambda is now 
+    # crazy high
+    state_fitted_timegrid_old <- x$state$fitted_timegrid
+    
+  }
+  
   # Get old parameters
   b_old <- bamlss::get.state(x, "b")
   p_old <- x$prior(x$state$parameters)
@@ -64,21 +82,21 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
   
   # Compute the inverse of the hessian.
-  Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+  Sigma_prop <- bamlss:::matrix_inv(x_H, index = NULL)
   
   # Get new location parameter for proposal
-  mu_prop <- drop(b_old + nu * Sigma %*% x_score )
+  mu_prop <- drop(b_old + nu * Sigma_prop %*% x_score )
   
   
   # Sample new parameters.
-  b_prop <- drop(mvtnorm::rmvnorm(n = 1, mean = mu_prop, sigma = Sigma,
+  b_prop <- drop(mvtnorm::rmvnorm(n = 1, mean = mu_prop, sigma = Sigma_prop,
                                   method="chol"))
   names(b_prop) <- names(b_old)
   x$state$parameters <- bamlss::set.par(x$state$parameters, b_prop, "b")
   p_prop <- x$prior(x$state$parameters)
   
   # Compute proposal density of proposed parameter given old
-  q_prop_giv_old <- mvtnorm::dmvnorm(b_prop, mean = mu_prop, sigma = Sigma, 
+  q_prop_giv_old <- mvtnorm::dmvnorm(b_prop, mean = mu_prop, sigma = Sigma_prop,
                                      log = TRUE)
   
   
@@ -203,7 +221,6 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                           weights = gq_weights, survtime = survtime)
       x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
-      #x_H <- diag(diag(x_H))
     },
     "mu" = {
       int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
@@ -257,7 +274,6 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   ## Sample variance parameter.
   if(!x$fixed & is.null(x$sp) & length(x$S)) {
     if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
-      b_prop <- bamlss::get.par(x$state$parameters, "b")
       a <- x$rank / 2 + x$a
       b <- 0.5 * crossprod(b_prop, x$S[[1]]) %*% b_prop + x$b
       tau2 <- 1 / rgamma(1, a, b)

@@ -5,7 +5,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
                      nu_sampler = 1, ...)
 {
-  browser()
+
   # Set starting values for the sampling
   if(!is.null(start)) {
     if(is.matrix(start)) {
@@ -161,7 +161,6 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     
     for (i in nx) {
       for (j in names(x[[i]]$smooth.construct)) {
-        if(i == "alpha") cat(iter, "\n")
         p_state <- propose_mjm(predictor = i,
                                x = x[[i]]$smooth.construct[[j]], y = y,
                                eta = eta, eta_timegrid = eta_timegrid,
@@ -181,6 +180,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
         } else {
           log(runif(1)) <= p_state$xstate$alpha
         }
+        cat(i, ": ", j, " - ", accepted, "\n")
         if (accepted) {
           
           # Update the etas
