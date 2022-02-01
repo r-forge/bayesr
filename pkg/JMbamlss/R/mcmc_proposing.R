@@ -6,23 +6,23 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                         eta_timegrid_lambda, survtime, logLik_old, nsubj, 
                         gq_weights, status, nmarker, nu) {
   
-  if (predictor == "alpha") {
-    # Old logLik -- Why does it change so drastically?
-    sum_Lambda_old <- (survtime/2 * exp(eta$gamma)) %*%
-      (diag(nsubj)%x%t(gq_weights))%*%
-      exp(eta_timegrid)
-    logLik_old_comp <- drop(status %*% eta_T - sum_Lambda_old) +
-      sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
-                log = TRUE))
-    eta_old <- eta
-    eta_timegrid_old <- eta_timegrid
-    eta_T_old <- eta_T
-    
-    # Apparently eta_timegrid has changed drastically, so sum_Lambda is now 
-    # crazy high
-    state_fitted_timegrid_old <- x$state$fitted_timegrid
-    
-  }
+  #if (predictor == "alpha") {
+    # # Old logLik -- Why does it change so drastically?
+    # sum_Lambda_old <- (survtime/2 * exp(eta$gamma)) %*%
+    #   (diag(nsubj)%x%t(gq_weights))%*%
+    #   exp(eta_timegrid)
+    # logLik_old_comp <- drop(status %*% eta_T - sum_Lambda_old) +
+    #   sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
+    #             log = TRUE))
+    # eta_old <- eta
+    # eta_timegrid_old <- eta_timegrid
+    # eta_T_old <- eta_T
+    # 
+    # # Apparently eta_timegrid has changed drastically, so sum_Lambda is now 
+    # # crazy high
+    # state_fitted_timegrid_old <- x$state$fitted_timegrid
+    # 
+  #}
   
   # Get old parameters
   b_old <- bamlss::get.state(x, "b")

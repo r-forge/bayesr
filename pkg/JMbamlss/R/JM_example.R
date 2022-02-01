@@ -28,7 +28,7 @@ if(!exists("d")) {
   
   
   set.seed(1808)
-  d <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121), 
+  d <- simMultiJM(nsub = 50, times = seq(0, 1, length.out = 121),
                   lambda = function(t, x) {
                     1.4*log((120*t + 10)/1000)
                   },
@@ -39,6 +39,19 @@ if(!exists("d")) {
                     1.25 + 0.6*sin(x[, 2]) + (-0.01)*t
                   }), 2))
   mfpca <- preproc_MFPCA(data = d, uni_mean = "y ~ s(obstime) + s(x2)", M = 2)
+  d_simp <- simMultiJM(nsub = 300, times = seq(0, 1, length.out = 121),
+                       nmark = 1, full = TRUE,
+                       lambda = function(t, x) {
+                         1.4*log((120*t + 10)/1000)
+                       },
+                       alpha = list(function(t, x) {
+                         0.3 + 0*t
+                       }),
+                       mu = list(function(t, x){
+                         1.25 + 0.6*sin(x[, 2]) + (-0.01)*t
+                       }),
+                       sigma = function(t, x) {-50 + 0*t})
+  
 }
 
 
@@ -46,21 +59,21 @@ if(!exists("d")) {
 
 # PCRE Model --------------------------------------------------------------
 
-f <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
-  gamma ~ 1,
-  mu ~ -1 + marker + s(obstime, by = marker) +
-    s(id, wfpc.1, wfpc.2, bs = "unc_pcre", xt = list("mfpc" = mfpca)),
-  sigma ~ -1 + marker,
-  alpha ~ -1 + marker + s(survtime, by = marker)
-)
-
-b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-            sampler = FALSE, maxit = 500)
+# f <- list(
+#   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
+#   gamma ~ 1,
+#   mu ~ -1 + marker + s(obstime, by = marker) +
+#     s(id, wfpc.1, wfpc.2, bs = "unc_pcre", xt = list("mfpc" = mfpca)),
+#   sigma ~ -1 + marker,
+#   alpha ~ -1 + marker + s(survtime, by = marker)
+# )
+# 
+# b <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
+#             sampler = FALSE, maxit = 500)
 # load("inst/objects/m_optim.Rdata")
 
-b_sample <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
-                   optimizer = FALSE)#, start = parameters(b))
+# b_sample <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
+                   # optimizer = FALSE)#, start = parameters(b))
 #, n.iter = 4, burnin = 1, step = 1)
 
 ## Problem bei Alpha-Prädiktor:
@@ -89,28 +102,28 @@ b_sample <- bamlss(f, family = mjm_bamlss, data = d, timevar = "obstime",
 
 # Very Simple Example -----------------------------------------------------
 
-set.seed(1808)
-d_simp <- simMultiJM(nsub = 250, times = seq(0, 1, length.out = 121),
-                     nmark = 1, full = TRUE,
-                     lambda = function(t, x) {
-                        1.4*log((120*t + 10)/1000)
-                     },
-                     alpha = list(function(t, x) {
-                        0.3 + 0*t
-                     }),
-                     mu = list(function(t, x){
-                        1.25 + 0.6*sin(x[, 2]) + (-0.01)*t
-                     }),
-                     sigma = function(t, x) {-50 + 0*t})
-ggplot(d_simp$data, aes(x = obstime, y = y, group = id)) + 
-  geom_line() +
-  geom_segment(d_simp$data %>% group_by(id) %>% 
-                 filter(obstime == max(obstime)),
-               mapping = aes(x = obstime, y = y, xend = survtime, yend = y),
-               linetype = "dotted") +
-  geom_point(d_simp$data %>% group_by(id) %>% 
-               filter(obstime == max(obstime)),
-             mapping = aes(x = survtime, shape = factor(event)))
+# set.seed(1808)
+# d_simp <- simMultiJM(nsub = 250, times = seq(0, 1, length.out = 121),
+#                      nmark = 1, full = TRUE,
+#                      lambda = function(t, x) {
+#                         1.4*log((120*t + 10)/1000)
+#                      },
+#                      alpha = list(function(t, x) {
+#                         0.3 + 0*t
+#                      }),
+#                      mu = list(function(t, x){
+#                         1.25 + 0.6*sin(x[, 2]) + (-0.01)*t
+#                      }),
+#                      sigma = function(t, x) {-50 + 0*t})
+# ggplot(d_simp$data, aes(x = obstime, y = y, group = id)) + 
+#   geom_line() +
+#   geom_segment(d_simp$data %>% group_by(id) %>% 
+#                  filter(obstime == max(obstime)),
+#                mapping = aes(x = obstime, y = y, xend = survtime, yend = y),
+#                linetype = "dotted") +
+#   geom_point(d_simp$data %>% group_by(id) %>% 
+#                filter(obstime == max(obstime)),
+#              mapping = aes(x = survtime, shape = factor(event)))
 
 f_simp <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
@@ -120,11 +133,12 @@ f_simp <- list(
   alpha ~ 1
 )
 
-b_simp <- bamlss(f_simp, family = mjm_bamlss, data = d_simp$data, 
-                 timevar = "obstime", sampler = FALSE)
+# b_simp <- bamlss(f_simp, family = mjm_bamlss, data = d_simp$data, 
+#                  timevar = "obstime", sampler = FALSE)
+# load("inst/objects/m_simp_opt.Rdata")
 b_simp_samp <- bamlss(f_simp, family = mjm_bamlss, data = d_simp$data, 
-                 timevar = "obstime", optimizer = FALSE,
-                 start = parameters(b_simp))
+                 timevar = "obstime", optimizer = FALSE, 
+                 start = parameters(b_simp_jm))
 
 f_simp_jm <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
@@ -134,8 +148,7 @@ f_simp_jm <- list(
   alpha ~ 1,
   dalpha ~ -1
 )
-load("inst/objects/m_simp_opt.Rdata")
-debug(bamlss::sam_JM)
-b_simp_jm <- bamlss(f_simp_jm , family = "jm", data = d_simp$data, 
-                    timevar = "obstime", idvar = "id", optimizer = FALSE,
-                    start = parameters(b_simp))
+# 
+# debug(bamlss::sam_JM)
+b_simp_jm <- bamlss(f_simp_jm , family = "jm", data = d_simp$data,
+                    timevar = "obstime", idvar = "id")

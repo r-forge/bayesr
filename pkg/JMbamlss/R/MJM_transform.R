@@ -22,6 +22,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
   }
   smj <- object$x$mu$smooth.construct[[j]]
   idvar <- smj$term[1]
+  message("ID taken to be ", idvar)
   
   
   # Function to transform intervals to [0, 1] for GQ integration
