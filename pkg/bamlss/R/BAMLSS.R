@@ -11905,7 +11905,7 @@ CRPS <- function(object, newdata = NULL, interval = c(-Inf, Inf), FUN = mean, te
     stop("no p() function in family object!")
   if(is.null(newdata))
     newdata <- model.frame(object)
-  par <- as.data.frame(predict(object, newdata = newdata, type = "parameter", drop = FALSE))
+  par <- as.data.frame(predict(object, newdata = newdata, type = "parameter", drop = FALSE, ...))
   if(!is.null(fam$valid.response)) {
     vd <- rep(NA, 2)
     ty <- c(-0.0001, 0.0001)
