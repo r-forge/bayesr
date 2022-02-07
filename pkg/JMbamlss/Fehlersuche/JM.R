@@ -24,7 +24,7 @@ jmFEHLERSUCHE_bamlss <- function(...)
             x2[[i]]$smooth.construct[[j]]$update <- bfit_iwls
         }
         attr(x2, "bamlss.engine.setup") <- TRUE
-        cat2("generating starting model for longitudinal part...\n")
+        bamlss:::cat2("generating starting model for longitudinal part...\n")
         gpar <- opt_bfit(x = x2, y = rval$y[[1]][, "obs", drop = FALSE],
                      family = gF2(gaussian), start = NULL, maxit = 100)$parameters
         if(plot) {
@@ -37,7 +37,7 @@ jmFEHLERSUCHE_bamlss <- function(...)
         y <- rval$y[[1]][attr(rval$y[[1]], "take"), , drop = FALSE]
         attr(y, "width") <- attr(rval$y[[1]], "width")
         attr(y, "subdivisions") <- attr(rval$y[[1]], "subdivisions")
-        cat2("generating starting model for survival part...\n")
+        bamlss:::cat2("generating starting model for survival part...\n")
         spar <- opt_Cox(x = x2, y = list(y), family = gF2("cox"),
                          start = NULL, maxit = 100)$parameters
         if(plot) {
@@ -1887,7 +1887,7 @@ update_jm_dalpha <- function(x, eta, eta_timegrid,
 ## (5) Joint model MCMC.
 sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   n.iter = 1200, burnin = 200, thin = 1, verbose = TRUE, 
-  digits = 4, step = 20, ...)
+  digits = 4, step = 20, prop_pred = NULL, ...)
 {
   ## Hard coded.
   fixed <- NULL
@@ -2099,15 +2099,16 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
     }
   }
   
-  nx2 <- if(dalpha) {
+  nx2 <- if(is.null(prop_pred)){
+  if (dalpha) {
     c("lambda", "gamma", "mu", "sigma", "alpha", "dalpha")
   } else {
     c("lambda", "gamma", "mu", "sigma", "alpha")
-  }
+  }} else {prop_pred}
   
   ## Start sampling.
   if(verbose) {
-    cat2("Starting the sampler...")
+    bamlss:::cat2("Starting the sampler...")
     if(!interactive())
       cat("\n")
   }
@@ -2236,9 +2237,8 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
       logPost.samps[js] <- as.numeric(logLik.samps[js] + bamlss:::get.log.prior(x))
     }
     
-    if(verbose) barfun(ptm, n.iter, iter, step, nstep)
+    if(verbose) bamlss:::barfun(ptm, n.iter, iter, step, nstep)
   }
-  
   if(verbose) cat("\n")
   
   for(i in names(samps)) {
@@ -2269,6 +2269,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
                  "DIC" = rep(DIC, length.out = nrow(samps)),
                  "pd" = rep(pd, length.out = nrow(samps))
   )
+  if (!is.null(prop_pred)) {
+    samps[is.na(samps)] <- 0
+  }
   
   return(as.mcmc(samps))
 }

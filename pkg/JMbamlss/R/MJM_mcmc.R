@@ -3,9 +3,9 @@
 
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
-                     nu_sampler = 1, ...)
+                     nu_sampler = 1, prop_pred = NULL, ...)
 {
-
+########## REMOVE prop_pred
   # Set starting values for the sampling
   if(!is.null(start)) {
     if(is.matrix(start)) {
@@ -17,7 +17,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   }
   
   # Names of parameters/predictors and other attributes
-  nx <- names(x)
+  nx <- if (is.null(prop_pred)) names(x) else prop_pred
   nmarker <- attr(y, "nmarker")
   take_last <- attr(y, "take_last")
   survtime <- y[[1]][, "time"][take_last]
@@ -262,6 +262,10 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                  "DIC" = rep(DIC, length.out = nrow(samps)),
                  "pd" = rep(pd, length.out = nrow(samps))
   )
+  if (is.null(prop_pred)) {
+    samps[is.na(samps)] <- 0
+  }
+  
   
   return(as.mcmc(samps))
 }
