@@ -92,18 +92,17 @@ survint_gqFOR <- function (pred = c("lambda", "gamma", "long"), pre_fac,
                    int_fac[(mi-1)*nsubj*nw + (ni-1)*nw + wi] * 
                    int_vec[(mi-1)*nsubj*nw + (ni-1)*nw + wi, ]
                  
-                 # Create crossproduct for each row
-                 for (pi in seq_len(p)) {
-                   for (pi_cross in seq_len(pi)){
-                     hess_vec_i[(pi-1)*p+pi_cross] <- 
-                       hess_vec_i[(pi_cross-1)*p+pi] <- 
-                       int_fac[(mi-1)*nsubj*nw + (ni-1)*nw + wi]^2 * 
-                       int_vec[(mi-1)*nsubj*nw + (ni-1)*nw + wi, pi] *
-                       int_vec[(mi-1)*nsubj*nw + (ni-1)*nw + wi, pi_cross]
-                   }
-                 }
-                 
                }
+
+               # Create crossproduct for each row
+               for (pi in seq_len(p)) {
+                 for (pi_cross in seq_len(pi)){
+                   hess_vec_i[(pi-1)*p+pi_cross] <- 
+                     hess_vec_i[(pi_cross-1)*p+pi] <- 
+                     score_vec_i[pi] * score_vec_i[pi_cross]
+                 }
+               }
+               
                score_i <- score_i + tmp*score_vec_i
                hess_i <- hess_i + tmp*hess_vec_i
                

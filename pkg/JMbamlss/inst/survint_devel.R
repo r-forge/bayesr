@@ -247,6 +247,7 @@ mu_2 <- function (t) {
 # This gives the functions to integrate (mu1 - Intercept):
 # exp(-0.8*t+0.5*x*(1+t)-3*0.5*t)*(0.5*x) [SCORE]
 # exp(-0.8*t+0.5*x*(1+t)-3*0.5*t)*(0.5*x)^2 [HESS]
+# NOT FINISHED FOR ALL THE ELEMEMNTS!
 int_mu1_one <- function (t, x) {
   list(score_int = c((5*exp(x/2+(t*(-23+5*x))/10)*x)/(-23+5*x) - 
                        (5*exp(x/2)*x)/(-23+5*x),
@@ -293,5 +294,6 @@ survint_gqFOR(pred = "long", pre_fac = exp(eta_gamma),
               survtime = s_times)
 
 # True integral
+# CHECK WHAT IS WRONG HERE
 int_mu1t <- int_mu1(s_times, eta_gamma)
 exp(eta_gamma) * int_mt$score_int
