@@ -195,8 +195,13 @@ survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
   switch(pred, 
          "lambda" = {
            score_int <- pre_fac*gq_mat %*% (omega*int_vec)
-           hess_int <- pre_fac*gq_mat %*% (omega*t(apply(int_vec, 1, 
-                                                         tcrossprod)))
+           hess_int <- if (dim(int_vec)[2] == 1) {
+             pre_fac*gq_mat %*% (omega*do.call(rbind, apply(int_vec, 1,
+                                                            tcrossprod,
+                                                            simplify = FALSE)))
+           } else {
+             pre_fac*gq_mat %*% (omega*t(apply(int_vec, 1, tcrossprod)))
+           }
          },
          "gamma" = {
            pre_fac <- c(pre_fac*gq_mat %*% omega)
