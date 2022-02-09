@@ -23,6 +23,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
     # state_fitted_timegrid_old <- x$state$fitted_timegrid
     # 
   #}
+  n_w <- length(gq_weights)
   
   # Get old parameters
   b_old <- bamlss::get.state(x, "b")
@@ -135,16 +136,15 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       fitted_timegrid_prop <- drop(x$Xgrid %*% b_prop)
       eta_timegrid_alpha <- eta_timegrid_alpha - x$state$fitted_timegrid + 
         fitted_timegrid_prop
-      eta_timegrid_long <- drop(
-        t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-          (eta_timegrid_alpha*eta_timegrid_mu))
+      eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu, 
+                                          nrow = nsubj*n_w, ncol = nmarker))
       eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
       
       # fitted values
       fit_prop <- drop(x$X %*% b_prop)
       eta$alpha <- eta$alpha - fitted(x$state) + fit_prop
-      eta_T_long <- drop(
-        t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+      eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj, 
+                                   ncol = nmarker))
       eta_T <- eta$lambda + eta$gamma + eta_T_long
       
       # state
@@ -158,9 +158,8 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       fitted_timegrid_prop <- drop(x$Xgrid %*% b_prop)
       eta_timegrid_mu <- eta_timegrid_mu - x$state$fitted_timegrid + 
        fitted_timegrid_prop
-      eta_timegrid_long <- drop(
-        t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-          (eta_timegrid_alpha*eta_timegrid_mu))
+      eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu,
+                                          nrow = nsubj*n_w, ncol = nmarker))
       eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
      
       # fitted longitudinal values
@@ -170,8 +169,8 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       # fitted survival values
       fit_T_prop <- drop(x$XT %*% b_prop)
       eta_T_mu <- eta_T_mu - x$state$fitted_T + fit_T_prop
-      eta_T_long <- drop(
-        t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+      eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj, 
+                                   ncol = nmarker))
       eta_T <- eta$lambda + eta$gamma + eta_T_long
      
      # state

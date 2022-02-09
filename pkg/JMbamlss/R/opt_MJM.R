@@ -8,6 +8,13 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
   
+  nsubj <- attr(y, "nsubj")
+  gq_weights <- attr(y, "gq_weights")
+  n_w <- length(gq_weights)
+  take_last <- attr(y, "take_last")
+  take_last_l <- attr(y, "take_last_l")
+  status <- attr(y, "status")
+  survtime <- y[[1]][, "time"][take_last]
   nmarker <- attr(y, "nmarker")
   marker <- attr(y, "marker")
   
@@ -75,19 +82,11 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   }
   
   eta <- bamlss:::get.eta(x, expand = FALSE)
-  eta_timegrid_long <- drop(
-    t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-      (eta_timegrid_alpha*eta_timegrid_mu))
+  eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu,
+                                      nrow = nsubj*n_w, ncol = nmarker))
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
   
-  # Für logLik
-  nsubj <- attr(y, "nsubj")
-  gq_weights <- attr(y, "gq_weights")
-  take_last <- attr(y, "take_last")
-  take_last_l <- attr(y, "take_last_l")
-  status <- attr(y, "status")
-  survtime <- y[[1]][, "time"][take_last]
-  
+  # For algorithm
   eps0 <- eps0_surv <- eps0_long <- eps + 1
   eta0_surv <- do.call("cbind", eta[c("lambda", "gamma")])
   eta0_alpha <- matrix(eta$alpha, nrow = nsubj, ncol = nmarker)
@@ -149,9 +148,10 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
             eta_timegrid_alpha <- eta_timegrid_alpha -
               x$alpha$smooth.construct[[j]]$state$fitted_timegrid +
               state$fitted_timegrid
-            eta_timegrid_long <- drop(
-              t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-                (eta_timegrid_alpha * eta_timegrid_mu))
+            eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha *
+                                                  eta_timegrid_mu,
+                                                nrow = nsubj*n_w,
+                                                ncol = nmarker))
             eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
             x$alpha$smooth.construct[[j]]$state <- state
           }
@@ -171,9 +171,9 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
           eta_timegrid_mu <- eta_timegrid_mu -
             x$mu$smooth.construct[[j]]$state$fitted_timegrid +
             state$fitted_timegrid
-          eta_timegrid_long <- drop(
-            t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-              (eta_timegrid_alpha * eta_timegrid_mu))
+          eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha * 
+                                                eta_timegrid_mu, 
+                                              nrow = nsubj*n_w, ncol = nmarker))
           eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
           eta_T_mu <- eta_T_mu -
             x$mu$smooth.construct[[j]]$state$fitted_T +
@@ -201,8 +201,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
     # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
     # Vektor.
-    eta_T_long <- drop(
-      t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+    eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
+                                 ncol = nmarker))
     eta_T <- eta$lambda + eta$gamma + eta_T_long
     
     sum_Lambda <- (survtime/2 * exp(eta$gamma)) %*%

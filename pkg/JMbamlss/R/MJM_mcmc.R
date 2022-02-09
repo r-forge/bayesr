@@ -23,6 +23,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   survtime <- y[[1]][, "time"][take_last]
   nsubj <- length(survtime)
   gq_weights <- attr(y, "gq_weights")
+  n_w <- length(gq_weights)
   status <- attr(y, "status")
   
   ## Number of observations.
@@ -96,12 +97,11 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   }
   
   # Eta predictors
-  eta_timegrid_long <- drop(
-    t(rep(1, nmarker)) %x% diag(length(eta_timegrid_lambda)) %*%
-      (eta_timegrid_alpha*eta_timegrid_mu))
+  eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu, 
+                                      nrow = nsubj*nw, ncol = nmarker))
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
-  eta_T_long <- drop(
-    t(rep(1, nmarker)) %x% diag(nsubj) %*% (eta$alpha*eta_T_mu))
+  eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
+                               ncol = nmarker))
   eta_T <- eta$lambda + eta$gamma + eta_T_long
   
   # Old logLikelihood and prior.
