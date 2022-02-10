@@ -247,21 +247,20 @@ mu_2 <- function (t) {
 # This gives the functions to integrate (mu1 - Intercept):
 # exp(-0.8*t+0.5*x*(1+t)-3*0.5*t)*(0.5*x) [SCORE]
 # exp(-0.8*t+0.5*x*(1+t)-3*0.5*t)*(0.5*x)^2 [HESS]
-# NOT FINISHED FOR ALL THE ELEMEMNTS!
 int_mu1_one <- function (t, x) {
   list(score_int = c((5*exp(x/2+(t*(-23+5*x))/10)*x)/(-23+5*x) - 
                        (5*exp(x/2)*x)/(-23+5*x),
-                     5*exp((5*x+t*(-8+5*x))/10)*x*(-10+t*(-8+5*x))/(8-5*x)^2 -
-                       5*exp((5*x)/10)*x*(-10)/(8-5*x)^2),
+                     (5*exp((5*x+t*(-23+5*x))/10)*x*(-10+t*(-23+5*x)))/
+                       (23-5*x)^2 - 5*exp((5*x)/10)*x*(-10)/(-23+5*x)^2),
        hess_int = c((5*exp(x/2+(t*(-23+5*x))/10)*x^2)/(2*(-23+5*x)) -
                       (5*exp(x/2)*x^2)/(2*(-23+5*x)),
                     (5*exp((5*x+t*(-23+5*x))/10)*x^2*(-10+t*(-23+5*x)))/
                       (2*(23-5*x)^2) - (5*exp(5*x/10)*x^2*(-10))/(2*(23-5*x)^2),
                     (5*exp((5*x+t*(-23+5*x))/10)*x^2*(-10+t*(-23+5*x)))/
                       (2*(23-5*x)^2) - (5*exp(5*x/10)*x^2*(-10))/(2*(23-5*x)^2),
-                    (5*exp((5*x+t*(-8+5*x))/10)*x^2*
-                       (200+t^2*(8-5*x)^2-20*t*(-8+5*x)))/(2*(-8+5*x)^3) - 
-                      (5*exp(5*x/10)*x^2*200)/(2*(-8+5*x)^3)))
+                    (5*exp((5*x+t*(-23+5*x))/10)*x*
+                       (200+t^2*(23-5*x)^2-20*t*(-23+5*x)))/(-23+5*x)^3 - 
+                      (5*exp(5*x/10)*x*200)/(-23+5*x)^3))
 }
 int_mu1 <- function (t, x) {
   do.call(Map, c(f = rbind, mapply(int_mu1_one, t = t, x = x, 
@@ -292,8 +291,15 @@ survint_gqFOR(pred = "long", pre_fac = exp(eta_gamma),
               int_vec = Xgrid_mu_mul,
               weights = gq$weights,
               survtime = s_times)
+# THERE IS A DIFFERENCE FOR THE LAST ELEMENT OF THE HESSIAN MATRIX BUT ONLY FOR
+# THE SECOND AND THIRD ELEMENT
+survint_gqFOR(pred = "long", pre_fac = exp(eta_gamma)[3],
+              omega = exp(eta_timegrid_mul)[15:21],
+              int_fac = eta_timegrid_alpha_mul[c(15:21, 36:42)],
+              int_vec = Xgrid_mu_mul[c(15:21, 36:42),],
+              weights = gq$weights,
+              survtime = s_times[3])
 
 # True integral
-# CHECK WHAT IS WRONG HERE
 int_mu1t <- int_mu1(s_times, eta_gamma)
-exp(eta_gamma) * int_mt$score_int
+exp(eta_gamma) * int_mu1t$hess_int
