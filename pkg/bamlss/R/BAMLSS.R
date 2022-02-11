@@ -11917,12 +11917,13 @@ CRPS <- function(object, newdata = NULL, interval = c(-Inf, Inf), FUN = mean, te
     if(!vd[2L])
       interval[2L] <- -1e-20
   }
+  interval <- sort(interval)
   crps <- if(is.null(fam$crps)) {
     .CRPS(newdata[[yname]], par, fam, interval)
   } else {
     fam$crps(newdata[[yname]], par)
   }
-  return(FUN(crps, ...))
+  return(FUN(crps))
 }
 
 .CRPS <- function(y, par, family, interval = c(-Inf, Inf)) {
