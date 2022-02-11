@@ -4144,14 +4144,21 @@ tF <- function(x, ...)
   bd <- if(is.null(args$bd)) 1 else args$bd
   args$bd <- NULL
   pr <- args$range
-  check_range <- function(par) {
-    for(j in names(par)) {
-      if(!is.null(pr[[j]])) {
-        par[[j]][par[[j]] < min(pr[[j]])] <- min(pr[[j]])
-        par[[j]][par[[j]] > max(pr[[j]])] <- max(pr[[j]])
+  check_range <- function(x) { return(x) }
+  if(!is.null(pr)) {
+    if(is.list(pr) | is.data.frame(pr)) {
+      check_range <- function(par) {
+        for(j in names(par)) {
+          if(!is.null(pr[[j]])) {
+            if(is.numeric(pr[[j]])) {
+              par[[j]][par[[j]] < min(pr[[j]])] <- min(pr[[j]])
+              par[[j]][par[[j]] > max(pr[[j]])] <- max(pr[[j]])
+            }
+          }
+        }
+        par
       }
     }
-    par
   }
   nx <- names(x$parameters)
   score <- hess <- initialize <- list()
