@@ -230,6 +230,7 @@ list(score = exp(eta_gamma) %*% int_mt$score_int,
 
 # Multiple longitudinal markers -------------------------------------------
 
+# Specify linear predictors
 nmarker <- 2
 alpha_1 <- Vectorize(function (x) {
   0.5*x
@@ -258,16 +259,16 @@ int_mu1_one <- function (t, x) {
                       (2*(23-5*x)^2) - (5*exp(5*x/10)*x^2*(-10))/(2*(23-5*x)^2),
                     (5*exp((5*x+t*(-23+5*x))/10)*x^2*(-10+t*(-23+5*x)))/
                       (2*(23-5*x)^2) - (5*exp(5*x/10)*x^2*(-10))/(2*(23-5*x)^2),
-                    (5*exp((5*x+t*(-23+5*x))/10)*x*
-                       (200+t^2*(23-5*x)^2-20*t*(-23+5*x)))/(-23+5*x)^3 - 
-                      (5*exp(5*x/10)*x*200)/(-23+5*x)^3))
+                    (5*exp((5*x+t*(-23+5*x))/10)*x^2*
+                       (200+t^2*(23-5*x)^2-20*t*(-23+5*x)))/(2*(-23+5*x)^3) - 
+                      (5*exp(5*x/10)*x^2*200)/(2*(-23+5*x)^3)))
 }
 int_mu1 <- function (t, x) {
   do.call(Map, c(f = rbind, mapply(int_mu1_one, t = t, x = x, 
                                    SIMPLIFY = FALSE)))
 }
 
-
+# Set up design matrices
 eta_timegrid_alpha_mul <- c(alpha_1(rep(c(2, 1, 0.5), each = n_gq)), 
                             alpha_2(rep(1, n*n_gq)))
 eta_timegrid_mu_mul <- c(mu_1(int_times), mu_2(int_times))
@@ -276,7 +277,6 @@ eta_timegrid_long_mul <- rowSums(
          nrow = n*n_gq))
 eta_timegrid_mul <- eta_timegrid_lambda + eta_timegrid_long_mul
 Xgrid_mu_mul <- rbind(Xgrid_mu, matrix(0, nrow = n*n_gq, ncol = 2))
-
 
 # GQ
 survint_gq(pred = "long", pre_fac = exp(eta_gamma),
@@ -291,14 +291,6 @@ survint_gqFOR(pred = "long", pre_fac = exp(eta_gamma),
               int_vec = Xgrid_mu_mul,
               weights = gq$weights,
               survtime = s_times)
-# THERE IS A DIFFERENCE FOR THE LAST ELEMENT OF THE HESSIAN MATRIX BUT ONLY FOR
-# THE SECOND AND THIRD ELEMENT
-survint_gqFOR(pred = "long", pre_fac = exp(eta_gamma)[3],
-              omega = exp(eta_timegrid_mul)[15:21],
-              int_fac = eta_timegrid_alpha_mul[c(15:21, 36:42)],
-              int_vec = Xgrid_mu_mul[c(15:21, 36:42),],
-              weights = gq$weights,
-              survtime = s_times[3])
 
 # True integral
 int_mu1t <- int_mu1(s_times, eta_gamma)

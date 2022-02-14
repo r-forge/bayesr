@@ -16,7 +16,12 @@ source("R/opt_MJM.R")
 source("R/opt_updating.R")
 source("R/MJM_mcmc.R")
 source("R/mcmc_proposing.R")
+source("R/survint.R")
 
+# Alternative bamlss Code (more options)
+source("Fehlersuche/JM.R")
+library(Matrix)
+library(mvtnorm)
 
 # Data Generation ---------------------------------------------------------
 
@@ -100,7 +105,7 @@ if(!exists("d")) {
 
 
 
-# Very Simple Example -----------------------------------------------------
+# Very Simple Example ----------------------- ------------------------------
 
 # set.seed(1808)
 # d_simp <- simMultiJM(nsub = 250, times = seq(0, 1, length.out = 121),
@@ -133,7 +138,7 @@ f_simp <- list(
   alpha ~ 1
 )
 
-# b_simp <- bamlss(f_simp, family = mjm_bamlss, data = d_simp$data, 
+# b_simp <- bamlss(f_simp, family = mjm_bamlss, data = d_simp$data,
 #                  timevar = "obstime", sampler = FALSE)
 # load("inst/objects/m_simp_opt.Rdata")
 b_simp_samp <- bamlss(f_simp, family = mjm_bamlss, data = d_simp$data, 
@@ -149,6 +154,6 @@ f_simp_jm <- list(
   dalpha ~ -1
 )
 # 
-# debug(bamlss::sam_JM)
+debug(bamlss::sam_JM)
 b_simp_jm <- bamlss(f_simp_jm , family = "jm", data = d_simp$data,
-                    timevar = "obstime", idvar = "id")
+                    timevar = "obstime", idvar = "id", prop_pred = "lambda")
