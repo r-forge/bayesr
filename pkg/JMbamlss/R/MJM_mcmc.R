@@ -23,7 +23,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   survtime <- y[[1]][, "time"][take_last]
   nsubj <- length(survtime)
   gq_weights <- attr(y, "gq_weights")
-  n_w <- length(gq_weights)
+  nw <- length(gq_weights)
   status <- attr(y, "status")
   
   ## Number of observations.
@@ -180,7 +180,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
         } else {
           log(runif(1)) <= p_state$xstate$alpha
         }
-        cat(i, ": ", j, " - ", accepted, "\n")
+        #cat(i, ": ", j, " - ", accepted, "\n")
         if (accepted) {
           
           # Update the etas

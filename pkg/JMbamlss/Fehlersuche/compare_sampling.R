@@ -16,6 +16,7 @@ source("R/opt_MJM.R")
 source("R/opt_updating.R")
 source("R/MJM_mcmc.R")
 source("R/mcmc_proposing.R")
+source("R/survint.R")
 
 # Alternative bamlss Code (more options)
 source("Fehlersuche/JM.R")

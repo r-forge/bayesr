@@ -24,7 +24,6 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, survtime, ...)
   x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
   
   ## Newton-Raphson.
-print(x$state$parameters["tau21"])
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
   
