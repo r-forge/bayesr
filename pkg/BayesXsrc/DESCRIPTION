@@ -1,6 +1,6 @@
 Package: BayesXsrc
 Version: 3.0-2
-Date: 2021-02-09
+Date: 2021-08-26
 Title: R Package Distribution of the BayesX C++ Sources
 Authors@R: c(person(given = "Nikolaus", family = "Umlauf", role = c("aut", "cre"), email = "Nikolaus.Umlauf@uibk.ac.at",
                comment = c(ORCID = "0000-0003-2160-9803")),
@@ -14,6 +14,6 @@ Description: BayesX performs Bayesian inference in structured additive regressio
 	A convenient R interface is provided in package R2BayesX.
 Depends: R (>= 2.8.0)
 Suggests: R2BayesX
-SystemRequirements: GNU make
+SystemRequirements: GNU make, C++14
 License: GPL-2 | GPL-3
 URL: https://www.uni-goettingen.de/de/bayesx/550513.html
