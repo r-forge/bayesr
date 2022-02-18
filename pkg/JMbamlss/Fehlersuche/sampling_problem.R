@@ -44,9 +44,17 @@ a <- tryCatch({bamlss(f1, data = d$data, family = "jm", timevar = "obstime",
 
 # Sampler in BAMLSS -------------------------------------------------------
 
-b1 <- bamlss(f1, data = d$data, family = "jmFEHLERSUCHE", timevar = "obstime",
-             idvar = "id", subdivisions = 25,# n.iter = 20, burnin = 2,
-             prop_pred = "lambda", optimizer = FALSE, start = parameters(a))
+# b1 <- bamlss(f1, data = d$data, family = "jmFEHLERSUCHE", timevar = "obstime",
+#              idvar = "id", subdivisions = 25,# n.iter = 20, burnin = 2,
+#              prop_pred = "lambda", optimizer = FALSE, start = parameters(a),
+#              verbose_sampler = TRUE, verbose = FALSE)
+sink("bamlss.txt")
+b0 <- bamlss(f1, data = d$data, family = "jmFEHLERSUCHE", timevar = "obstime",
+             idvar = "id", subdivisions = 250, n.iter = 20, burnin = 0,
+             #prop_pred = "lambda",
+             optimizer = FALSE, start = parameters(a),
+             verbose_sampler = TRUE, verbose = FALSE)
+sink()
 
 
 # Fit model in MJM --------------------------------------------------------
@@ -63,6 +71,9 @@ f2 <- list(
 )
 
 # Fit posterior mode
+sink("MJM.txt")
 b2 <- bamlss(f2, data = d$data, family = mjm_bamlss, timevar = "obstime", 
-             #n.iter = 20, burnin = 2, 
-             prop_pred = "lambda", optimizer = FALSE, start = parameters(a))
+             n.iter = 20, burnin = 0, subdivisions = 200,
+             #prop_pred = "lambda", 
+             optimizer = FALSE, start = parameters(a), verbose_sampler = TRUE)
+sink()

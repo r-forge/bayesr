@@ -1887,7 +1887,7 @@ update_jm_dalpha <- function(x, eta, eta_timegrid,
 ## (5) Joint model MCMC.
 sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   n.iter = 1200, burnin = 200, thin = 1, verbose = TRUE, 
-  digits = 4, step = 20, prop_pred = NULL, ...)
+  digits = 4, step = 20, prop_pred = NULL, verbose_sampler = FALSE, ...)
 {
   ## Hard coded.
   fixed <- NULL
@@ -2137,7 +2137,8 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
                             width, sub, nu, status, id = i, int0, nobs,
                             dx = if(dalpha & (i == "mu")) x[["dmu"]]$smooth.construct[[sj]] else NULL,
                             xsmalpha = if(nonlinear & (i == "mu")) x$alpha$smooth.construct else NULL, 
-                            knots = if(nonlinear & (i == "mu")) knots else NULL, tp = tp, fac = fac, ...)
+                            knots = if(nonlinear & (i == "mu")) knots else NULL, tp = tp, fac = fac, 
+                            verbose_sampler = verbose_sampler, ...)
         ## If accepted, set current state to proposed state.
         accepted <- if(is.na(p.state$alpha)) FALSE else log(runif(1)) <= p.state$alpha
         
@@ -2395,7 +2396,7 @@ propose_jm_slice <- function(x, y,
 propose_jm_lambda <- function(x, y,
                               eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
                               eta_timegrid_dmu, eta_timegrid_dalpha,
-                              width, sub, nu, status, id, ...)
+                              width, sub, nu, status, id, verbose_sampler, ...)
 {
   nonlinear <- attr(y, "nonlinear")
   ## The time-dependent design matrix for the grid.
@@ -2484,6 +2485,11 @@ propose_jm_lambda <- function(x, y,
     }
   }
   
+  if(verbose_sampler) {
+    cat("lambda LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
+  }
+  
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   # cat(paste("\n",pibeta, pibetaprop, qbeta, qbetaprop, p1, p2, x$state$alpha, sep=";"))
@@ -2499,7 +2505,8 @@ propose_jm_mu <- function(x, ...)
 propose_jm_mu_simple <- function(x, y,
                                  eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
                                  eta_timegrid_dmu, eta_timegrid_dalpha,
-                                 width, sub, nu, status, id, dx = NULL, ...)
+                                 width, sub, nu, status, id, dx = NULL,
+                                 verbose_sampler, ...)
 {
   ## The time-dependent design matrix for the grid.
   X <- x$fit.fun_timegrid(NULL)
@@ -2606,6 +2613,10 @@ propose_jm_mu_simple <- function(x, y,
       }
     }
   }
+  if(verbose_sampler) {
+    cat("mu LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
+  }
   
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
@@ -2617,7 +2628,8 @@ propose_jm_mu_simple <- function(x, y,
 propose_jm_mu_Matrix <- function(x, y,
                                  eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
                                  eta_timegrid_dmu, eta_timegrid_dalpha,
-                                 width, sub, nu, status, id, dx = NULL, ...)
+                                 width, sub, nu, status, id, dx = NULL, 
+                                 verbose_sampler, ...)
 {
   
   ## The time-dependent design matrix for the grid.
@@ -2787,6 +2799,11 @@ propose_jm_mu_Matrix <- function(x, y,
     }
   }
   
+  if(verbose_sampler) {
+    cat("mu LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
+  }
+  
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   
@@ -2797,7 +2814,7 @@ propose_jm_mu_Matrix <- function(x, y,
 propose_jm_alpha <- function(x, y,
                              eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
                              eta_timegrid_dmu, eta_timegrid_dalpha,
-                             width, sub, nu, status, id, ...)
+                             width, sub, nu, status, id, verbose_sampler, ...)
 {
   ## The time-dependent design matrix for the grid.
   X <- x$fit.fun_timegrid(NULL)
@@ -2881,6 +2898,11 @@ propose_jm_alpha <- function(x, y,
                                         NULL, id = "alpha", j, logPost = uni.slice_tau2_logPost, lower = 0, ll = 0)
       }
     }
+  }
+  
+  if(verbose_sampler) {
+    cat("alpha LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
   }
   
   ## Compute acceptance probablity.
@@ -2987,7 +3009,8 @@ propose_jm_dalpha <- function(x, y,
 propose_jm_gamma <- function(x, y,
                              eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
                              eta_timegrid_dmu, eta_timegrid_dalpha,
-                             width, sub, nu, status, id, int, nobs, ...)
+                             width, sub, nu, status, id, int, nobs, 
+                             verbose_sampler, ...)
 {
   ## Timegrid lambda.
   eeta <- exp(eta_timegrid)
@@ -3070,6 +3093,11 @@ propose_jm_gamma <- function(x, y,
     }
   }
   
+  if(verbose_sampler) {
+    cat("gamma LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
+  }
+  
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   
@@ -3080,7 +3108,8 @@ propose_jm_gamma <- function(x, y,
 propose_jm_sigma <- function(x, y,
                              eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
                              eta_timegrid_dmu, eta_timegrid_dalpha,
-                             width, sub, nu, status, id, int, ...)
+                             width, sub, nu, status, id, int, 
+                             verbose_sampler, ...)
 {
   ## Timegrid lambda.
   eeta <- exp(eta_timegrid)
@@ -3155,6 +3184,11 @@ propose_jm_sigma <- function(x, y,
                                         NULL, id = "sigma", j, logPost = uni.slice_tau2_logPost, lower = 0, ll = 0)
       }
     }
+  }
+  
+  if(verbose_sampler) {
+    cat("sigma LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
   }
   
   ## Compute acceptance probablity.

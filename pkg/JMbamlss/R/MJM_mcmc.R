@@ -3,7 +3,8 @@
 
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
-                     nu_sampler = 1, prop_pred = NULL, ...)
+                     nu_sampler = 1, prop_pred = NULL, verbose_sampler = FALSE,
+                     ...)
 {
 ########## REMOVE prop_pred
   # Set starting values for the sampling
@@ -172,7 +173,8 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                survtime = survtime, logLik_old = logLik_old, 
                                nsubj = nsubj, gq_weights = gq_weights, 
                                status = status, nmarker = nmarker, 
-                               nu = nu_sampler)
+                               nu = nu_sampler,
+                               verbose_sampler = verbose_sampler)
         
         # If accepted, set current state to proposed state
         accepted <- if(is.na(p_state$xstate$alpha)){

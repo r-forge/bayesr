@@ -160,7 +160,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
         bamlss:::drop.terms.bamlss(object$x[[i]]$terms, sterms = FALSE,
                                    keep.response = FALSE), object$model.frame,
         if(i == "lambda") grid else grid_l, yname, 
-        if(i != "mu") timevar else timevar_mu,
+        if(i != "mu") timevar else c(timevar_mu, timevar),
         if(i == "lambda") take_last else take_last_l,
         idvar = if (i == "lambda") idvar else NULL,
         timevar2 = if (i == "lambda") timevar_mu else NULL)
@@ -381,7 +381,7 @@ param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar,
             } else {
               rep(1, length(grid[[i]]))
             }})
-          # evaluate variable on that grid
+          # evaluate var iable on that grid
           evalgrid <- lapply(1:length(idata), function(i){
             values[[i]][igrid[[i]]]})
           df <- data.frame(unlist(evalgrid))

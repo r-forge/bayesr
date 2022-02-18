@@ -4,7 +4,7 @@
 propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                         eta_timegrid_alpha, eta_timegrid_mu, eta_timegrid_long,
                         eta_timegrid_lambda, survtime, logLik_old, nsubj, 
-                        gq_weights, status, nmarker, nu) {
+                        gq_weights, status, nmarker, nu, verbose_sampler) {
   
   #if (predictor == "alpha") {
     # # Old logLik -- Why does it change so drastically?
@@ -287,7 +287,11 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
     }
   }
   
-
+  if(verbose_sampler) {
+    cat(predictor, "LLO:", logLik_old, "LLN:", logLik, 
+        "PropO:", q_old_giv_prop, "PropN:", q_prop_giv_old, 
+        "PriO:", p_old, "PriN:", p_prop, "\n")
+  }
   
   return(list(xstate = x$state,
               etas = switch(predictor,
