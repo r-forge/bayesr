@@ -22,7 +22,7 @@ citEntry(entry = "Article",
   paste("Nikolaus Umlauf, Daniel Adler, Thomas Kneib, Stefan Lang, Achim Zeileis (2015).",
         "Structured Additive Regression Models: An R Interface to BayesX.",
         "Journal of Statistical Software, 63(21), 1-46.",
-        "URL http://www.jstatsoft.org/v63/i21/.")
+        "URL https://www.jstatsoft.org/v63/i21/.")
 )
 
 citEntry(entry = "Manual",
