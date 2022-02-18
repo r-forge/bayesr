@@ -1,3 +1,7 @@
+Changes in Version 3.0-2
+
+  o Bug fixing.
+
 Changes in Version 3.0-0
 
   o New release of BayesXsrc accompanying the forthcoming release of
@@ -19,7 +23,7 @@ Changes in Version 2.1-1
 Changes in Version 2.1-0
 
   o First CRAN version of the BayesXsrc package, accompanying the release
-    of BayesX 2.1 at http://www.BayesX.org/.
+    of BayesX 2.1 at https://www.uni-goettingen.de/de/bayesx/550513.html.
     
   o The R package BayesXsrc provides the BayesX command line tool for easy
     installation from within R. A convenient R interface to prepare data and
