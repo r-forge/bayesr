@@ -73,7 +73,7 @@ f2 <- list(
 # Fit posterior mode
 sink("MJM.txt")
 b2 <- bamlss(f2, data = d$data, family = mjm_bamlss, timevar = "obstime", 
-             n.iter = 20, burnin = 0, subdivisions = 200,
+             n.iter = 20, burnin = 0, subdivisions = 50,
              #prop_pred = "lambda", 
              optimizer = FALSE, start = parameters(a), verbose_sampler = TRUE)
 sink()

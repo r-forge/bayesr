@@ -160,7 +160,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
         bamlss:::drop.terms.bamlss(object$x[[i]]$terms, sterms = FALSE,
                                    keep.response = FALSE), object$model.frame,
         if(i == "lambda") grid else grid_l, yname, 
-        if(i != "mu") timevar else c(timevar_mu, timevar),
+        if(i != "mu") timevar else timevar_mu,
         if(i == "lambda") take_last else take_last_l,
         idvar = if (i == "lambda") idvar else NULL,
         timevar2 = if (i == "lambda") timevar_mu else NULL)
@@ -417,6 +417,12 @@ param_time_transform_mjm <- function(x, formula, data, grid, yname, timevar,
   }
   
   x$Xgrid <- model.matrix(formula, data = X)
+  # If the timevariate in the longitudinal part is included, then change
+  # longitudinal time to survival time
+  if (grepl(timevar, deparse(formula[[2]]))) {
+    form <- gsub(timevar, yname, deparse(formula[[2]]))
+    formula <- update.formula(formula, as.formula(paste("~", form)))
+  }
   x$XT <- model.matrix(formula, data = data)
   
   x
