@@ -53,7 +53,7 @@ b0 <- bamlss(f1, data = d$data, family = "jmFEHLERSUCHE", timevar = "obstime",
              idvar = "id", subdivisions = 250, n.iter = 20, burnin = 0,
              #prop_pred = "lambda",
              optimizer = FALSE, start = parameters(a),
-             verbose_sampler = TRUE, verbose = FALSE)
+             verbose_sampler = TRUE, verbose = FALSE, prop_list = TRUE)
 sink()
 
 
@@ -71,9 +71,10 @@ f2 <- list(
 )
 
 # Fit posterior mode
-sink("MJM.txt")
+sink("MJM_prop.txt")
 b2 <- bamlss(f2, data = d$data, family = mjm_bamlss, timevar = "obstime", 
-             n.iter = 20, burnin = 0, subdivisions = 50,
+             n.iter = 20, burnin = 0, subdivisions = 200,
              #prop_pred = "lambda", 
-             optimizer = FALSE, start = parameters(a), verbose_sampler = TRUE)
+             optimizer = FALSE, start = parameters(a), verbose_sampler = TRUE,
+             prop_list = prop_list)
 sink()

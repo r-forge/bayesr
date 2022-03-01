@@ -1887,7 +1887,8 @@ update_jm_dalpha <- function(x, eta, eta_timegrid,
 ## (5) Joint model MCMC.
 sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   n.iter = 1200, burnin = 200, thin = 1, verbose = TRUE, 
-  digits = 4, step = 20, prop_pred = NULL, verbose_sampler = FALSE, ...)
+  digits = 4, step = 20, prop_pred = NULL, verbose_sampler = FALSE,
+  prop_list = FALSE, ...)
 {
   ## Hard coded.
   fixed <- NULL
@@ -2112,6 +2113,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
     if(!interactive())
       cat("\n")
   }
+  if (prop_list) {
+    prop_list <- list()
+  } else prop_list <- NULL
   
   nstep <- step
   step <- floor(n.iter / step)
@@ -2121,12 +2125,21 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
     if(save <- iter %in% iterthin)
       js <- which(iterthin == iter)
     
+    if (!is.null(prop_list)) {
+      prop_list[[iter]] <- list()
+      nx_iter <- 1
+    }
+    
     for(i in nx2) {
       if(i == "gamma") {
         eeta <- exp(eta_timegrid)
         int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1)], 1, sum))
       }
       
+      if (!is.null(prop_list)) {
+        prop_list[[iter]][[nx_iter]] <- list()
+        sj_iter <- 1
+      }
       prop_fun <- get_jm_prop_fun(i, slice[i], nonlinear)
       # 3jump
       for(sj in names(x[[i]]$smooth.construct)) {
@@ -2141,6 +2154,12 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
                             verbose_sampler = verbose_sampler, ...)
         ## If accepted, set current state to proposed state.
         accepted <- if(is.na(p.state$alpha)) FALSE else log(runif(1)) <= p.state$alpha
+        
+        # Save proposed parameters
+        if (!is.null(prop_list)) {
+          prop_list[[iter]][[nx_iter]][[sj_iter]] <- p.state$parameter
+          sj_iter <- sj_iter + 1
+        }
         
         #checks# if(i == "mu") cat("\n", sj, round(exp(p.state$alpha), 2))
         if(i %in% fixed)
@@ -2230,6 +2249,7 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
           }
         }
       }
+      nx_iter <- nx_iter + 1
     }
     
     if(save) {
@@ -2272,6 +2292,10 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
   )
   if (!is.null(prop_pred)) {
     samps[is.na(samps)] <- 0
+  }
+  
+  if (!is.null(prop_list)) {
+    assign("prop_list", prop_list, envir = .GlobalEnv)
   }
   
   return(as.mcmc(samps))

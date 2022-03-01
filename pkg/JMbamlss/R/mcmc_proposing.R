@@ -4,7 +4,8 @@
 propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                         eta_timegrid_alpha, eta_timegrid_mu, eta_timegrid_long,
                         eta_timegrid_lambda, survtime, logLik_old, nsubj, 
-                        gq_weights, status, nmarker, nu, verbose_sampler) {
+                        gq_weights, status, nmarker, nu, verbose_sampler,
+                        prop) {
   
   #if (predictor == "alpha") {
     # # Old logLik -- Why does it change so drastically?
@@ -90,8 +91,13 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   
   
   # Sample new parameters.
-  b_prop <- drop(mvtnorm::rmvnorm(n = 1, mean = mu_prop, sigma = Sigma_prop,
-                                  method="chol"))
+  if(is.null(prop)) {
+    b_prop <- drop(mvtnorm::rmvnorm(n = 1, mean = mu_prop, sigma = Sigma_prop,
+                                    method="chol"))
+  } else {
+    b_prop <- prop[seq_along(mu_prop)]
+  }
+
   names(b_prop) <- names(b_old)
   x$state$parameters <- bamlss::set.par(x$state$parameters, b_prop, "b")
   p_prop <- x$prior(x$state$parameters)

@@ -4,7 +4,7 @@
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
                      nu_sampler = 1, prop_pred = NULL, verbose_sampler = FALSE,
-                     ...)
+                     prop_list = NULL, ...)
 {
 ########## REMOVE prop_pred
   # Set starting values for the sampling
@@ -156,11 +156,18 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   ptm <- proc.time()
   for(iter in 1:n.iter) {
     
+    if (!is.null(prop_list)) {
+      nx_iter <- 1
+    }
     if(save <- iter %in% iterthin) {
       js <- which(iterthin == iter)
     }
     
     for (i in nx) {
+      
+      if(!is.null(prop_list)) {
+        j_iter <- 1
+      }
       for (j in names(x[[i]]$smooth.construct)) {
         p_state <- propose_mjm(predictor = i,
                                x = x[[i]]$smooth.construct[[j]], y = y,
@@ -174,7 +181,10 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                nsubj = nsubj, gq_weights = gq_weights, 
                                status = status, nmarker = nmarker, 
                                nu = nu_sampler,
-                               verbose_sampler = verbose_sampler)
+                               verbose_sampler = verbose_sampler, 
+                               prop = if(!is.null(prop_list)) {
+                                 prop_list[[iter]][[nx_iter]][[j_iter]]
+                               } else NULL)
         
         # If accepted, set current state to proposed state
         accepted <- if(is.na(p_state$xstate$alpha)){
@@ -227,6 +237,13 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
             transform_acceptprop(p_state$xstate$alpha)
           samps[[i]][[j]]$accepted[js] <- accepted
         }
+        if (!is.null(prop_list)){
+          j_iter <- j_iter + 1
+        }
+      }
+      
+      if(!is.null(prop_list)) {
+        nx_iter <- nx_iter + 1
       }
     }
     if(save) {
