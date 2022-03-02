@@ -200,6 +200,8 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
             eta_T <- p_state$etas$eta_T
             eta_timegrid <- p_state$etas$eta_timegrid 
             eta_timegrid_lambda <- p_state$etas$eta_timegrid_lambda
+          }, "gamma" = {
+            eta_T <- p_state$etas$eta_T
           }, "alpha" = {
             eta_T <- p_state$etas$eta_T
             eta_timegrid <- p_state$etas$eta_timegrid

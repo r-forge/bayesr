@@ -132,7 +132,9 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       
       # fitted values and state
       fit_prop <- drop(x$X %*% b_prop)
+      eta_T <- eta_T - eta$gamma
       eta$gamma <- eta$gamma - fitted(x$state) + fit_prop
+      eta_T <- eta_T + eta$gamma
       x$state$fitted.values <- fit_prop
       
     },
@@ -305,7 +307,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                             eta_timegrid = eta_timegrid, 
                                             eta_timegrid_lambda = 
                                               eta_timegrid_lambda),
-                            "gamma" = list(eta = eta),
+                            "gamma" = list(eta = eta, eta_T = eta_T),
                             "alpha" = list(eta = eta, eta_T = eta_T, 
                                            eta_timegrid = eta_timegrid,
                                            eta_timegrid_long = 
