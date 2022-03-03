@@ -12,6 +12,9 @@ int_i <- survint_gq(pred = "long", pre_fac = exp(eta$gamma),
                     omega = exp(eta_timegrid),
                     int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
                     weights = gq_weights, survtime = survtime)
+# Quite large computationally
+# Or load result
+# load("Fehlersuche/Unterschiede_survint/int_i.RData")
 
 
 # Compare survival integral in gradient
