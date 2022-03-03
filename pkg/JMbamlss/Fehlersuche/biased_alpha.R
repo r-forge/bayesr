@@ -62,6 +62,7 @@ m_bamlss$parameters$alpha
 
 
 
+
 # Own Implementation ------------------------------------------------------
 
 f_mjm <- list(
@@ -74,4 +75,13 @@ f_mjm <- list(
 m_mjm <- bamlss(f_mjm, family = "mjm", data = dat_unc$data, 
                    timevar = "obstime", sampler = FALSE)
 m_mjm$parameters$alpha
+
+
+fam <- family(m_bamlss)
+
+par1 <- parameters(m_bamlss)
+par2 <- parameters(m_mjm)
+
+fam$p2logLik(par1)
+fam$p2logLik(par2)
 
