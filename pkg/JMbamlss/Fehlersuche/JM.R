@@ -364,7 +364,7 @@ jm_transform <- function(x, y, data, terms, knots, formula, family,
   ## Sparse matrix setup for mu/dmu.
   for(j in c("mu", if(dalpha) "dmu" else NULL)) {
     for(sj in seq_along(x[[j]]$smooth.construct)) {
-      x[[j]]$smooth.construct[[sj]] <- sparse_Matrix_setup(x[[j]]$smooth.construct[[sj]], sparse = sparse, take = take, nonlinear = nonlinear)
+      x[[j]]$smooth.construct[[sj]] <- sparse_Matrix_setup(x[[j]]$smooth.construct[[sj]], sparse = sparse, take = take_last, nonlinear = nonlinear)
     }
   }
   
@@ -2130,6 +2130,8 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
       nx_iter <- 1
     }
     
+    if (verbose_sampler) cat("Iteration", iter, "\n")
+    
     for(i in nx2) {
       if(i == "gamma") {
         eeta <- exp(eta_timegrid)
@@ -2143,7 +2145,6 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
       prop_fun <- get_jm_prop_fun(i, slice[i], nonlinear)
       # 3jump
       for(sj in names(x[[i]]$smooth.construct)) {
-        
         p.state <- prop_fun(x[[i]]$smooth.construct[[sj]],
                             y, eta, eta_timegrid, eta_timegrid_lambda, eta_timegrid_mu, eta_timegrid_alpha,
                             eta_timegrid_dmu, eta_timegrid_dalpha,
@@ -2249,7 +2250,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
           }
         }
       }
-      nx_iter <- nx_iter + 1
+      if (!is.null(prop_list)) {
+        nx_iter <- nx_iter + 1
+      }
     }
     
     if(save) {
@@ -2509,14 +2512,16 @@ propose_jm_lambda <- function(x, y,
     }
   }
   
-  if(verbose_sampler) {
-    cat("lambda LLO:", pibeta, "LLN:", pibetaprop, 
-        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
-  }
-  
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   # cat(paste("\n",pibeta, pibetaprop, qbeta, qbetaprop, p1, p2, x$state$alpha, sep=";"))
+  
+  if(verbose_sampler) {
+    cat("lambda LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "Alph:",
+        exp(x$state$alpha), "\n")
+  }
+  
   return(x$state)
 }
 
@@ -2637,13 +2642,14 @@ propose_jm_mu_simple <- function(x, y,
       }
     }
   }
-  if(verbose_sampler) {
-    cat("mu LLO:", pibeta, "LLN:", pibetaprop, 
-        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
-  }
   
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
+  if(verbose_sampler) {
+    cat("mu LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "Alph:",
+        exp(x$state$alpha), "\n")
+  }
   
   return(x$state)
 }
@@ -2823,13 +2829,15 @@ propose_jm_mu_Matrix <- function(x, y,
     }
   }
   
-  if(verbose_sampler) {
-    cat("mu LLO:", pibeta, "LLN:", pibetaprop, 
-        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
-  }
   
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
+  
+  if(verbose_sampler) {
+    cat("mu LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "Alph:",
+        exp(x$state$alpha), "\n")
+  }
   
   return(x$state)
 }
@@ -2923,14 +2931,16 @@ propose_jm_alpha <- function(x, y,
       }
     }
   }
+ 
+  ## Compute acceptance probablity.
+  x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   
   if(verbose_sampler) {
     cat("alpha LLO:", pibeta, "LLN:", pibetaprop, 
-        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "Alph:",
+        exp(x$state$alpha), "\n")
   }
   
-  ## Compute acceptance probablity.
-  x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   return(x$state)
 }
 
@@ -3117,13 +3127,14 @@ propose_jm_gamma <- function(x, y,
     }
   }
   
-  if(verbose_sampler) {
-    cat("gamma LLO:", pibeta, "LLN:", pibetaprop, 
-        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
-  }
-  
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
+  
+  if(verbose_sampler) {
+    cat("gamma LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "Alph:",
+        exp(x$state$alpha), "\n")
+  }
   
   return(x$state)
 }
@@ -3210,13 +3221,14 @@ propose_jm_sigma <- function(x, y,
     }
   }
   
-  if(verbose_sampler) {
-    cat("sigma LLO:", pibeta, "LLN:", pibetaprop, 
-        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "\n")
-  }
-  
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
+  
+  if(verbose_sampler) {
+    cat("sigma LLO:", pibeta, "LLN:", pibetaprop, 
+        "PropO:", qbeta, "PropN:", qbetaprop, "PriO:", p1, "PriN:", p2, "Alph:",
+        exp(x$state$alpha), "\n")
+  }
   
   return(x$state)
 }
