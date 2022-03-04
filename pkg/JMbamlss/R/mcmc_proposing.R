@@ -275,11 +275,15 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
     bamlss:::sum_diag(matrix(colSums(int_i$hess_int), ncol = length(b_prop)) %*%
                         Sigma)
   }
-    
   
   
   ## Sample variance parameter.
   if(!x$fixed & is.null(x$sp) & length(x$S)) {
+    if (!is.null(prop)) {
+      taus <- grep("tau2", names(prop))
+      x$state$parameters <- bamlss::set.par(x$state$parameters, prop[taus], 
+                                            "tau2")
+    } else {
     if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
       a <- x$rank / 2 + x$a
       b <- 0.5 * crossprod(b_prop, x$S[[1]]) %*% b_prop + x$b
@@ -292,7 +296,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
           x$state$parameters, x, NULL, NULL, NULL, id = predictor, j, 
           logPost = bamlss:::uni.slice_tau2_logPost, lower = 0, ll = 0)
       }
-    }
+    } }
   }
   
   if(verbose_sampler) {

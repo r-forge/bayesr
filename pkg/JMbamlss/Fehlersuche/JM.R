@@ -2159,6 +2159,7 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
         # Save proposed parameters
         if (!is.null(prop_list)) {
           prop_list[[iter]][[nx_iter]][[sj_iter]] <- p.state$parameter
+          attr(prop_list[[iter]][[nx_iter]][[sj_iter]], "acc") <- accepted
           sj_iter <- sj_iter + 1
         }
         

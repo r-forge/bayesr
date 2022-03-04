@@ -163,6 +163,11 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
       js <- which(iterthin == iter)
     }
     
+    if(verbose_sampler) {
+      cat("Iteration", iter, "\n")
+    }
+    #if(iter == 2) browser()
+    
     for (i in nx) {
       
       if(!is.null(prop_list)) {
@@ -187,11 +192,13 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                } else NULL)
         
         # If accepted, set current state to proposed state
-        accepted <- if(is.na(p_state$xstate$alpha)){
+        accepted <- if(!is.null(prop_list)) {
+          attr(prop_list[[iter]][[nx_iter]][[j_iter]], "acc")
+        } else {if(is.na(p_state$xstate$alpha)){
           FALSE
         } else {
           log(runif(1)) <= p_state$xstate$alpha
-        }
+        }}
         #cat(i, ": ", j, " - ", accepted, "\n")
         if (accepted) {
           
