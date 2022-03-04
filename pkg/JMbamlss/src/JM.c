@@ -60,6 +60,10 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
   PROTECT(hess_int = allocVector(REALSXP, nsubj * p * p));
   ++nProtected;
 
+  SEXP hess;
+  PROTECT(hess = allocMatrix(REALSXP, p, p));
+  ++nProtected;
+
   // Iterators.
   int i, j;
 
