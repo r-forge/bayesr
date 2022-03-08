@@ -39,6 +39,8 @@
                 hess_i <- hess_i + tmp*hess
                 
               }
+
+print(hess)
               
               # Individual weights
               tmp <- survtime[ni] / 2 * pre_fac[ni]
@@ -133,13 +135,14 @@ survint_C <- function(pred = c("lambda", "gamma", "long"),
 }
 
 if(FALSE) {
+  setwd("~/svn/bayesr/pkg/JMbamlss/R")
   load(file = "../Fehlersuche/Unterschiede_survint/survint_mjm.RData")
 
   source("compile.R")
   source("survint.R")
   compile()
 
-  int0 <- survint_gq0(pred = "long", pre_fac = exp(eta$gamma),
+  int0 <- survint_gq0(pred = "lambda", pre_fac = exp(eta$gamma),
     omega = exp(eta_timegrid),
     int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
     weights = gq_weights, survtime = survtime)
