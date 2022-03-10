@@ -3769,7 +3769,12 @@ print.boost_summary <- function(x, summary = TRUE, plot = TRUE,
         }
         matplot(x$loglik, type = "l", lty = 1,
           xlab = "Iteration", ylab = "LogLik contribution", col = cols[as.factor(xn)],
-          lwd = args$lwd)
+          lwd = args$lwd, axes = FALSE)
+        box()
+        axis(2)
+        at <- pretty(1:nrow(x$loglik))
+        at[1L] <- 1
+        axis(1, at = at)
         abline(v = x$mstop, lwd = 3, col = "lightgray")
         cn <- colnames(x$loglik)
         if(!is.null(args$drop)) {
