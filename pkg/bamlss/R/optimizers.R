@@ -5712,12 +5712,17 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
       }
       beta[[i]][["p"]] <- rep(0, ncol(x[[i]]$model.matrix))
       names(beta[[i]][["p"]]) <- colnames(x[[i]]$model.matrix)
+      start_ok <- FALSE
       if(!is.null(start)) {
         start2 <- start[paste0(i, ".p.", colnames(x[[i]]$model.matrix))]
         start2 <- start2[!is.na(start2)]
-        names(start2) <- gsub(paste0(i, ".p."), "", names(start2))
-        beta[[i]][["p"]][names(start2)] <- start2
-      } else {
+        if(length(start2)) {
+          start_ok <- TRUE
+          names(start2) <- gsub(paste0(i, ".p."), "", names(start2))
+          beta[[i]][["p"]][names(start2)] <- start2
+        }
+      }
+      if(!start_ok) {
         if(!is.null(family$initialize) & is.null(offset) & initialize) {
           if(noff) {
             shuffle_id <- sample(seq_len(N))
@@ -5839,27 +5844,33 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
         } else {
           tau2[[i]][[j]] <- rep(100, length(x[[i]]$smooth.construct[[j]]$S))
         }
-        if(is.null(start)) {
-          beta[[i]][[paste0("s.", j)]] <- rep(0, ncX)
-          if(inherits(x[[i]]$smooth.construct[[j]], "nnet0.smooth")) {
-            npar <- x[[i]]$smooth.construct[[j]]$state$parameters
-            npar <- npar[!grepl("tau2", names(npar))]
-            beta[[i]][[paste0("s.", j)]] <- npar
-          }
-        } else {
+
+        start_ok <- FALSE
+        if(!is.null(start)) {
           if(inherits(x[[i]]$smooth.construct[[j]], "nnet0.smooth")) {
             start2 <- start[grep(paste0(i, ".s.", j, "."), names(start), fixed = TRUE)]
             start2 <- start2[!grepl("tau2", names(start2))]
           } else {
             start2 <- start[paste0(i, ".s.", j, ".b", 1:ncX)]
           }
-          if(any(is.na(start2)))
-            stop("dimensions do not match, check starting values!")
-          beta[[i]][[paste0("s.", j)]] <- if(all(is.na(start2))) rep(0, ncX) else start2
+          if(!all(is.na(start2))) {
+            if(any(is.na(start2)))
+              stop("dimensions do not match, check starting values!")
+            start_ok <- TRUE
+            beta[[i]][[paste0("s.", j)]] <- if(all(is.na(start2))) rep(0, ncX) else start2
+            if(inherits(x[[i]]$smooth.construct[[j]], "nnet0.smooth")) {
+              npar <- x[[i]]$smooth.construct[[j]]$state$parameters
+              npar <- npar[!grepl("tau2", names(npar))]
+              names(beta[[i]][[paste0("s.", j)]]) <- names(npar)
+            }
+          }
+        }
+        if(!start_ok) {
+          beta[[i]][[paste0("s.", j)]] <- rep(0, ncX)
           if(inherits(x[[i]]$smooth.construct[[j]], "nnet0.smooth")) {
             npar <- x[[i]]$smooth.construct[[j]]$state$parameters
             npar <- npar[!grepl("tau2", names(npar))]
-            names(beta[[i]][[paste0("s.", j)]]) <- names(npar)
+            beta[[i]][[paste0("s.", j)]] <- npar
           }
         }
 
