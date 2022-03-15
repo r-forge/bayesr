@@ -103,8 +103,7 @@
                 }
                 
                 score_i <- score_i + tmp*score_vec_i
-                hess_i <- hess_i + tmp*hess_vec_i
-                
+                hess_i <- hess_i + tmp*hess_vec_i             
               }
               
               # Individual weights
@@ -139,12 +138,12 @@ if(FALSE) {
   source("survint.R")
   compile()
 
-  int0 <- survint_gq0(pred = "gamma", pre_fac = exp(eta$gamma),
+  int0 <- survint_gq0(pred = "long", pre_fac = exp(eta$gamma),
     omega = exp(eta_timegrid), pre_vec = x$X,
     int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
     weights = gq_weights, survtime = survtime)
 
-  int1 <- survint_C(pred = "gamma", pre_fac = exp(eta$gamma), pre_vec = x$X, omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, int_vec = x$Xgrid, weights = gq_weights, survtime = survtime)
+  int1 <- survint_C(pred = "long", pre_fac = exp(eta$gamma), pre_vec = x$X, omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, int_vec = x$Xgrid, weights = gq_weights, survtime = survtime)
 
   par(mfrow = c(1, 2))
   plot(int0$score_int, int1$score_int)
