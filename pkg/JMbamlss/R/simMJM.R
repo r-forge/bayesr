@@ -1,0 +1,387 @@
+# Zusätzlich:
+# Parametrische Modelle spezifizieren
+# Hauptkomponenten übergeben
+
+
+
+
+# Simulation Function for (Multivariate) JMs ------------------------------
+
+
+# Adapt the structure given by simJM function in bamlss
+
+#' @param nsub Number of subjects.
+#' @param times Vector of time points.
+#' @param probmiss Probability of missingness.
+#' @param maxfac Factor changing the uniform censoring interval.
+#' @param nmark Number of markers.
+#' @param param_assoc Parametric association between the markers (Defaults to 
+#'   FALSE). If TRUE, then specify the normal covariance matrix with argument
+#'   re_cov_mat and include the random effects in argument mu. If FALSE, then 
+#'   principal components are used to model the association structure.
+#' @param M Number of principal components.
+#' @param FPC_bases FunData object. If supplied, use the contained FPC as basis
+#'   for the association structure.
+#' @param FPC_evals Vector of eigenvalues. If supplied, use the provided
+#'   eigenvalues for the association structure.
+#' @param mfpc_args List containing the named arguments "type", "eFunType",
+#'   "ignoreDeg", "eValType" of function simMultiFunData and "eValScale" for
+#'   scaling the eigenvalues.
+#' @param re_cov_mat If supplied, a covariance matrix to use for drawing the 
+#'   random effects needed for the association structure.
+#' @param ncovar Number of covariates.
+#' @param lambda Additive predictor of time-varying survival covariates.
+#' @param gamma Additive predictor of time-constant survival covariates.
+#' @param alpha List of length nmark containing the additive predictors of the
+#'   association.
+#' @param mu List of length nmark containing the additive predictors of the 
+#'   longitudinal part.
+#' @param sigma Additive predictor of the variance.
+#' @param tmax Maximal time point of observations.
+#' @param seed Seed for reproducibility.
+#' @param full Create a wide-format data.frame and a short one containing only
+#'   survival info.
+simMJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
+                   maxfac = 1.5, nmark = 2, param_assoc = FALSE, M = 6,
+                   FPC_bases = NULL, FPC_evals = NULL,
+                   mfpc_args = list(type = "split", eFunType = "Poly",
+                                    ignoreDeg = NULL, eValType = "linear",
+                                    eValScale = 1),
+                   re_cov_mat = NULL, ncovar = 2,
+                   lambda = function(t, x) {
+                     1.4*log((t + 10)/1000)
+                   },
+                   gamma = function(x) {
+                     - 1.5 + 0.3*x[, 1]
+                   },
+                   alpha = rep(list(function(t, x) {
+                     0.3 + 0*t
+                   }), nmark),
+                   mu = rep(list(function(t, x){
+                     1.25 + 0.6*sin(x[, 2]) + (-0.01)*t
+                   }), nmark),
+                   sigma = function(t, x) {
+                     0.3 + 0*t + I(x$marker == "m2")*0.2
+                   }, 
+                   tmax = NULL, seed = NULL, 
+                   full = FALSE, file = NULL){
+  
+  # Some basic checks
+  if(length(alpha) != length(mu)) {
+    stop("alpha and mu must have same length.\n")
+  }
+  if(length(mu) != nmark) {
+    stop("Predictors must be specified for all markers.\n")
+  }
+  if(!is.null(re_cov_mat) & !param_assoc) {
+    stop("Either REs or PCREs need to be specified properly.\n")
+  }
+  if(param_assoc & is.null(re_cov_mat)) {
+    stop("Specify the RE covariance matrix.\n")
+  }
+  if(is.null(tmax)){
+    tmax <- max(times)
+  }
+
+  
+  
+  # Generate input
+  id <- rep(1:nsub, each = length(times))
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  x <- gen_x(nsub, ncovar = ncovar)
+  
+  if (param_assoc) {
+    temp <- gen_b(nsub = nsub, re_cov_mat = re_cov_mat)
+  } else {
+    temp <- gen_fpc(times = times, nsub = nsub, M = M, FPC_bases = FPC_bases,
+                    FPC_evals = FPC_evals, mfpc_args = mfpc_args, tmax = tmax)
+  }
+  
+  r <- temp[[1]]
+  b_set <- temp[[2]]
+  
+  data_short <- rJM(hazard, censoring, x, r, tmin = times[1], tmax = tmax, 
+                    maxfac = maxfac) 
+  
+  
+  ## Create the full simulated data
+  data_base <- cbind(id, data_short[id,], obstime = rep(times, nsub))
+  i <- !duplicated(data_base$id)
+  data_base$id <- as.factor(data_base$id)
+  
+  # gamma and lambda have only joint intercept which is estimated in
+  # predictor gamma
+  f_lambda <- lambda(data_short$survtime)
+  data_base$lambda <- lambda(data_base$obstime) - mean(f_lambda)
+  data_base$gamma <- gamma(x[id, ]) + mean(f_lambda)
+  
+  data_long <- do.call(rbind, rep(list(data_base), nmark))
+  data_long$marker <- factor(rep(paste0("m", seq_len(nmark)),
+                                 each = length(id)))
+  data_long$mu <- do.call(c, mu_fun(data_base$obstime, x[id, ], r[id,], mu,
+                                    b_set))
+  data_long$alpha <- do.call(c, lapply(alpha, function(alpha_k) {
+    alpha_k(data_base$obstime, x[id, ])
+  }))
+  data_long$sigma <- sigma(t = data_long$obstime, x = data_long)
+  fpcs <- do.call(rbind, lapply(mfpc(argvals = rep(list(data_base$obstime), 
+                                                   nmark), mfpc_args = b_set,
+                                     M = M), function (mark) {
+                                       t(mark@X)
+                                     }))
+  data_long <- cbind(data_long,
+                     fpc = fpcs,
+                     wfpc = t(t(fpcs)*b_set$evals))
+  
+  # Hypothetical longitudinal data
+  data_hypo <- data_long
+  
+  # Data at survival time
+  data_short$lambda <- lambda(data_short$survtime) - mean(f_lambda)
+  data_short$gamma <- gamma(x) + mean(f_lambda)
+  shortmu <- do.call(c, mu_fun(data_short$survtime, x, r, mu, b_set))
+  shortalpha <- do.call(c, lapply(alpha, function(alpha_k) {
+    alpha_k(data_short$survtime, x)
+  }))
+  data_short <- do.call(rbind, rep(list(data_short), nmark))
+  data_short$marker <- factor(rep(paste0("m", seq_len(nmark)),
+                                  each = nrow(x)))
+  data_short$alpha <- shortalpha
+  data_short$mu <- shortmu
+  data_short$sigma <- sigma(t = data_short$survtime, x = data_short)
+  attr(data_short, "f_lambda") <- f_lambda
+  
+  # censoring                   
+  data_long <- data_long[data_long$obstime <= data_long$survtime,]
+  
+  # saving data without longitudinal missings
+  data_full <- data_long
+  
+  # inducing longitudinal missings
+  data_long <- miss_fct(data_long, probmiss)
+  
+  # Draw longitudinal observations
+  data_long$y <- rnorm(nrow(data_long), data_long$mu, sd = exp(data_long$sigma))
+  
+  
+  if(full){
+    
+    # FPC basis functions
+    fpc_base <- mfpc(argvals = rep(list(times), nmark), mfpc_args = b_set,
+                     M = M)
+    
+    d <- list(data = data_long, data_full = data_full, data_hypo = data_hypo,
+              fpc_base = fpc_base, data_short = data_short)
+  } else {
+    d <- data_long
+  }
+  if(!is.null(file)) { 
+    save(d, file = file) 
+    invisible(d) 
+  } else { 
+    return(d) 
+  } 
+}
+
+
+# Censoring ---------------------------------------------------------------
+
+## specify censoring function (aus CoxFlexBoost) changed into uniformly (as 
+## too much censoring)
+## added censoring at tmax
+censoring <- function(time, tmax, maxfac){
+  ## censoring times are independent uniformly distributed
+  censor_time <- runif(n = length(time), min = 0, max = maxfac*tmax)
+  censor_time <- ifelse(censor_time > tmax, tmax, censor_time)
+  event <- (time <= censor_time)
+  survtime <- apply(cbind(time, censor_time), 1, min)
+  ## return matrix of observed survival times and event indicator
+  return(cbind(survtime, event))
+}
+
+
+
+# Missings ----------------------------------------------------------------
+
+
+## introduce random missings 
+## (excluding the first measurement to ensure all subjects remain in the data)
+miss_fct <- function(data, prop, obstime = "obstime"){
+  select <- which(data[[obstime]] > 0) 
+  n <- length(select)
+  n_miss <- round(prop*n, 0)
+  miss <- sample(select, n_miss)
+  if (length(miss) > 0) {
+    data <- data[-miss,]
+  }
+  return(data)
+}
+
+
+
+# Baseline covariates -----------------------------------------------------
+
+
+## generate baseline covariates 
+gen_x <- function(nsub, ncovar){
+  x <- matrix(data = NA, nrow = nsub, ncol = ncovar)
+  for(i in seq_len(ncovar)) {
+    x[, i] <- runif(n = nsub, min = -3, max = 3)
+  }
+  colnames(x) <- paste0("x", seq_len(ncovar))
+  data.frame(x)
+} 
+
+
+
+# Generate Parametric REs -------------------------------------------------
+
+gen_b <- function (nsub, re_cov_mat) {
+  
+  r <- mvtnorm::rmvnorm(n = nsub, sigma = re_cov_mat)
+  out <- list(r, list())
+}
+
+
+
+# MFPC Basis --------------------------------------------------------------
+
+
+
+## generate the multivariate functional principal component basis
+mfpc <- function(argvals, mfpc_args, M) {
+  bases <- switch(mfpc_args$type,
+                  split = simMultiSplit(argvals = argvals, M = M,
+                                        eFunType = mfpc_args$eFunType,
+                                        ignoreDeg = mfpc_args$ignoreDeg,
+                                        eValType = mfpc_args$eValType,
+                                        s = mfpc_args$mfpc_seed),
+                  weighted = simMultiWeight(argvals = argvals, M = M,
+                                            eFunType = mfpc_args$eFunType,
+                                            ignoreDeg = mfpc_args$ignoreDeg,
+                                            eValType = mfpc_args$eValType,
+                                            alpha = mfpc_args$mfpc_seed),
+                  stop(paste("Choose either 'split' or 'weighted' for the", 
+                             "simulation of multivariate functional data.")))
+  if (M == 1) {
+    bases <- funData::multiFunData(lapply(bases, "/", 
+                                          sqrt(funData::norm(bases))))
+  }
+  bases
+}
+
+
+# FPC-based RE ------------------------------------------------------------
+
+
+## generate functional principal component based random effects
+gen_fpc <- function(times, nsub, M, mfpc_args, tmax, seed = NULL){
+  if(!is.null(seed)) set.seed(seed)
+  
+  evals <- funData::eVal(M = M, type = mfpc_args$eValType)
+  evals <- mfpc_args$eValScale * evals
+  
+  scores <- mvtnorm::rmvnorm(nsub, sigma = diag(evals),
+                             method="chol")
+  colnames(scores) <- paste0("s", 1:M)
+  
+  mfpc_seed <- switch(mfpc_args$type, 
+                      "split" = sample(c(-1, 1), nmark, 0.5),
+                      "weight" = stats::runif(nmark, 0.2, 0.8))
+  b_set <- c(list(tmin = min(c(times, tmax)), tmax = tmax, M = M,
+                  mfpc_seed = mfpc_seed, evals = evals), mfpc_args)
+  return(list(scores, b_set))
+}
+
+
+
+# Calculate mu ------------------------------------------------------------
+
+
+## compute predictors
+## individual longitudinal trajectories
+mu_fun <-  function(time, x, r, mu, b_set){
+  
+  # duplicate scores for the multiple integration points
+  if(is.null(dim(r))){
+    r <- matrix(r, nrow = length(time), ncol = b_set$M, byrow=TRUE)
+  }
+  
+  # Evaluate the functional principal component bases for different markers
+  pc_bases <- lapply(mfpc(argvals = rep(list(c(b_set$tmin, time, b_set$tmax)),
+                                        length(mu)),
+                          mfpc_args = b_set, M = b_set$M),
+                     function (fundat){
+                       t(fundat@X)[-c(1, 2+length(time)), ]
+                     })
+  
+  mapply(function (mu_k, pc_k) {
+    mu_k(t = time, x = x) + apply(pc_k*r, 1, sum)
+  }, mu_k = mu, pc_k = pc_bases, SIMPLIFY = FALSE)
+}
+
+
+# Calculate Hazard --------------------------------------------------------
+
+
+## full hazard
+hazard <-  function(time, x, r, ...){
+  # mu_fun könnte auch hier als Objekt erstellt und unten ersetzt werden
+  # ich brauche also nur eine Funktion, die mit gegeben time, x und r mu auf
+  # allen markern auswertet
+  exp(lambda(time, x) + gamma(x) + 
+        Reduce('+', mapply(function(alpha_k, mu_k) {
+          alpha_k(time, x)*mu_k
+        }, alpha_k = alpha, mu_k = mu_fun(time, x, r, mu, b_set),
+        SIMPLIFY = FALSE)))
+}
+
+
+## Code from bamlss package, slightly adapted
+rJM <- function (hazard, censoring, x, r, subdivisions = 1000, tmin = 0, 
+                 tmax, maxfac, file = NULL, ...) 
+{
+  nsub <- nrow(x)
+  time <- rep(NA, nsub)
+  Hazard <- function(hazard, time, x, r) {
+    integrate(hazard, 0, time, x = x, r = r, 
+              subdivisions = subdivisions)$value
+  }
+  InvHazard <- function(Hazard, hazard, x, r, tmin, tmax) {
+    negLogU <- -log(runif(1, 0, 1))
+    rootfct <- function(time) {
+      negLogU - Hazard(hazard, time, x, r)
+    }
+    if (rootfct(tmin) < 0) {
+      return(0)
+    }
+    else {
+      root <- try(uniroot(rootfct, interval = c(0, tmax))$root, 
+                  silent = TRUE)
+      root <- if (inherits(root, "try-error")) {
+        tmax + 0.01
+      }
+      else {
+        root
+      }
+    }
+    return(root)
+  }
+  cumhaz <- rep(NA, nsub)
+  survprob <- rep(NA, nsub)
+  for (i in 1:nsub) {
+    time[i] <- InvHazard(Hazard, hazard, x[i, ], r[i, ], 
+                         tmin, tmax)
+    cumhaz[i] <- Hazard(hazard, time[i], x[i, ], r[i, ])
+    survprob[i] <- exp((-1) * cumhaz[i])
+  }
+  time_event <- censoring(time, tmax, maxfac)
+  data_short <- data.frame(survtime = time_event[, 1], 
+                           event = time_event[, 2], x, r, cumhaz = cumhaz)
+  names(data_short) <- gsub(".", "", names(data_short), fixed = TRUE)
+  return(data_short)
+}
+
+

@@ -376,7 +376,8 @@ simMultiWeight <- function (argvals, M, eFunType, ignoreDeg = NULL, eValType,
   for (j in seq_len(p)) {
     if (dimsSupp[j] == 1) 
       basis[[j]] <- weight[j] * funData::eFun(argvals[[j]][[1]], M = M[[j]], 
-                                              ignoreDeg = ignoreDeg[[j]], type = eFunType[[j]])
+                                              ignoreDeg = ignoreDeg[[j]], 
+                                              type = eFunType[[j]])
     else basis[[j]] <- weight[j] * tensorProduct(
       funData::eFun(argvals[[j]][[1]], M = M[[j]][1], 
                     ignoreDeg = ignoreDeg[[j]][[1]], type = eFunType[[j]][1]), 
