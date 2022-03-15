@@ -117,6 +117,7 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
   double *pre_fac_ptr = REAL(pre_fac);
   double *score_int_ptr = REAL(score_int);
   double *hess_int_ptr = REAL(hess_int);
+  double *pre_vec_ptr = REAL(pre_vec);
 
   // Others.
   double tmp = 0.0;
@@ -165,8 +166,50 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
 
   // Gamma.
   if(predictor == 2) {
+    nr = nrows(pre_vec);
     for(i = 0; i < nsubj; i++) {
+      tmp = 0.0;
+      for(j = 0; j < nw; j++) {
+        tmp += weights_ptr[j] * omega_ptr[i * nw + j];
+      }
+      tmp = survtime_ptr[i] / 2.0 * tmp * pre_fac_ptr[i];
 
+      j = 0;
+      for(ii = 0; ii < p; ii++) {
+        score_int_ptr[i + ii * nsubj] = tmp * pre_vec_ptr[i + ii * nr];
+        for(jj = 0; jj < p; jj++) {
+          hess_int_ptr[i + j * nsubj] = tmp * pre_vec_ptr[i + ii * nr] * pre_vec_ptr[i + jj * nr];
+          j += 1;
+        }
+      }
+    }
+  }
+
+  // Long.
+  if(predictor == 3) {
+    for(i = 0; i < nsubj; i++) {
+      for(ii = 0; ii < p; ii++) {
+        score_i_ptr[ii] = 0.0;
+        for(jj = 0; jj < p; jj++) {
+          if(ii <= jj) {
+            hess_i_ptr[ii + p * jj] = 0.0;
+          }
+          hess_i_ptr[jj + p * ii] = hess_i_ptr[ii + p * jj];
+        }
+      }
+
+      for(j = 0; j < nw; j++) {
+        tmp = weights_ptr[j] * omega_ptr[i * nw + j];
+
+        for(ii = 0; ii < p; ii++) {
+          for(jj = 0; jj < p; jj++) {
+            if(ii <= jj) {
+
+            }
+            hess_ptr[jj + ii * p] = hess_ptr[ii + jj * p];
+          }
+        }
+      }
     }
   }
 

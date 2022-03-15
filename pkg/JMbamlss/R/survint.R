@@ -10,6 +10,7 @@
    # Set up the matrices for score and hess
    nsubj <- length(survtime)
    p <- if (pred == "gamma") ncol(pre_vec) else ncol(int_vec)
+
    score_int <- matrix(0, nrow = nsubj, ncol = p)
    hess_int <- matrix(0, nrow = nsubj, ncol = p^2)
    
@@ -56,13 +57,11 @@
               survint_i <- 0
               for (wi in seq_len(nw)) {
                 survint_i <- survint_i +
-                  omega[(ni - 1)*nw + wi] * weights[wi]
+                  omega[(ni-1)*nw + wi] * weights[wi]
               }
               tmp <-  survtime[ni] / 2 * survint_i * pre_fac[ni] 
- 
               score_int[ni,] <- tmp * pre_vec[ni, ]
               hess_int[ni,] <- tmp * tcrossprod(pre_vec[ni, ])
-              
             }
           },
           "long" = {
@@ -140,12 +139,12 @@ if(FALSE) {
   source("survint.R")
   compile()
 
-  int0 <- survint_gq0(pred = "lambda", pre_fac = exp(eta$gamma),
-    omega = exp(eta_timegrid),
+  int0 <- survint_gq0(pred = "gamma", pre_fac = exp(eta$gamma),
+    omega = exp(eta_timegrid), pre_vec = x$X,
     int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
     weights = gq_weights, survtime = survtime)
 
-  int1 <- survint_C(pred = "lambda", pre_fac = exp(eta$gamma), omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, int_vec = x$Xgrid, weights = gq_weights, survtime = survtime)
+  int1 <- survint_C(pred = "gamma", pre_fac = exp(eta$gamma), pre_vec = x$X, omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, int_vec = x$Xgrid, weights = gq_weights, survtime = survtime)
 
   par(mfrow = c(1, 2))
   plot(int0$score_int, int1$score_int)
