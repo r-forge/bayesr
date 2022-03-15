@@ -64,6 +64,12 @@ void pmat(SEXP mat)
   Rprintf("\n");
 }
 
+void merr()
+{
+  char *m = "stopped";
+  error(m);
+}
+
 /* (2) Suvival integral function */
 SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
   SEXP int_fac, SEXP int_vec, SEXP weights, SEXP survtime)
@@ -78,52 +84,111 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
     p = ncols(pre_vec);
 
   SEXP score_int;
-  PROTECT(score_int = allocVector(REALSXP, nsubj * p));
+  PROTECT(score_int = allocMatrix(REALSXP, nsubj, p));
   ++nProtected;
 
   SEXP hess_int;
-  PROTECT(hess_int = allocVector(REALSXP, nsubj * p * p));
+  PROTECT(hess_int = allocMatrix(REALSXP, nsubj, p * p));
   ++nProtected;
 
   SEXP hess;
   PROTECT(hess = allocMatrix(REALSXP, p, p));
   ++nProtected;
 
+  SEXP hess_i;
+  PROTECT(hess_i = allocMatrix(REALSXP, p, p));
+  ++nProtected;
+
+  SEXP score_i;
+  PROTECT(score_i = allocVector(REALSXP, p));
+  ++nProtected;
+
   // Iterators.
-  int i, j, ii, jj;
+  int i, j, ii, jj, nr, nc;
 
   // Pointers.
   double *weights_ptr = REAL(weights);
   double *omega_ptr = REAL(omega);
   double *int_vec_ptr = REAL(int_vec);
   double *hess_ptr = REAL(hess);
+  double *score_i_ptr = REAL(score_i);
+  double *hess_i_ptr = REAL(hess_i);
+  double *survtime_ptr = REAL(survtime);
+  double *pre_fac_ptr = REAL(pre_fac);
+  double *score_int_ptr = REAL(score_int);
+  double *hess_int_ptr = REAL(hess_int);
 
   // Others.
-  double score_i = 0.0;
-  double hess_i = 0.0;
   double tmp = 0.0;
+
+  nr = nrows(int_vec);
+  nc = ncols(int_vec);
+
+// int_vec: 
 
   // Lambda.
   if(predictor == 1) {
     for(i = 0; i < nsubj; i++) {
-      score_i = 0.0;
-      hess_i = 0.0;
+      for(ii = 0; ii < p; ii++) {
+        score_i_ptr[ii] = 0.0;
+        for(jj = 0; jj < p; jj++) {
+          if(ii <= jj) {
+            hess_i_ptr[ii + p * jj] = 0.0;
+          }
+          hess_i_ptr[jj + p * ii] = hess_i_ptr[ii + p * jj];
+        }
+      }
       for(j = 0; j < nw; j++) {
-        tmp = weights_ptr[j] * omega_ptr[(i - 1) * nw + j];
+        tmp = weights_ptr[j] * omega_ptr[i * nw + j];
         for(ii = 0; ii < p; ii++) {
           for(jj = 0; jj < p; jj++) {
             if(ii <= jj) {
-              hess_ptr[ii + jj * p] = int_vec_ptr[(i - 1) * nw + i + jj * p];
+              hess_ptr[ii + jj * p] = int_vec_ptr[i * nw + j + ii * nr] * int_vec_ptr[i * nw + j + jj * nr];
+              hess_i_ptr[ii + jj * p] += tmp * hess_ptr[ii + jj * p];
             }
-            hess_ptr[ii + jj * p] = hess_ptr[jj + ii * p];
+            hess_ptr[jj + ii * p] = hess_ptr[ii + jj * p];
+            hess_i_ptr[jj + ii * p] = hess_i_ptr[ii + jj * p];
           }
+          score_i_ptr[ii] += tmp * int_vec_ptr[i * nw + j + ii * nr];
         }
-pmat(hess);
+      }
+
+      tmp = survtime_ptr[i] / 2.0 * pre_fac_ptr[i];
+
+      for(ii = 0; ii < p * p; ii++) {
+        if(ii < p)
+          score_int_ptr[i + ii * nsubj] = tmp * score_i_ptr[ii];
+        hess_int_ptr[i + ii * nsubj] = tmp * hess_i_ptr[ii];
       }
     }
   }
 
+  // Gamma.
+  if(predictor == 2) {
+    for(i = 0; i < nsubj; i++) {
+
+    }
+  }
+
+  /* Stuff everything together. */
+  SEXP rval;
+  PROTECT(rval = allocVector(VECSXP, 2));
+  ++nProtected;
+
+  SET_VECTOR_ELT(rval, 0, score_int);
+  SET_VECTOR_ELT(rval, 1, hess_int);
+
+  SEXP nrval;
+  PROTECT(nrval = allocVector(STRSXP, 2));
+  ++nProtected;
+
+  SET_STRING_ELT(nrval, 0, mkChar("score_int"));
+  SET_STRING_ELT(nrval, 1, mkChar("hess_int"));
+        
+  setAttrib(rval, R_NamesSymbol, nrval);
+
   UNPROTECT(nProtected);
-  return hess;
+
+  return rval;
 }
 

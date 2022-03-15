@@ -35,12 +35,10 @@
                       int_vec[(ni-1)*nw + wi, pi_cross]
                   }
                 }
+
                 score_i <- score_i + tmp*int_vec[(ni-1)*nw + wi, ]
                 hess_i <- hess_i + tmp*hess
-                
               }
-
-print(hess)
               
               # Individual weights
               tmp <- survtime[ni] / 2 * pre_fac[ni]
@@ -113,7 +111,7 @@ print(hess)
               # Individual weights
               tmp <- survtime[ni] / 2 * pre_fac[ni]
               score_int[ni,] <- tmp * score_i
-              hess_int[ni,] <- tmp * hess_i
+              hess_int[ni,] <- tmp * hess_i 
             }
           })
    
@@ -148,6 +146,13 @@ if(FALSE) {
     weights = gq_weights, survtime = survtime)
 
   int1 <- survint_C(pred = "lambda", pre_fac = exp(eta$gamma), omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, int_vec = x$Xgrid, weights = gq_weights, survtime = survtime)
+
+  par(mfrow = c(1, 2))
+  plot(int0$score_int, int1$score_int)
+  abline(0,1)
+  plot(int0$hess_int, int1$hess_int)
+  abline(0,1)
+
 }
 
 # Old version of survival integral GQ -------------------------------------
