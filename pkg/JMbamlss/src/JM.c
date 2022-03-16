@@ -111,7 +111,6 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
   PROTECT(score_vec_i = allocVector(REALSXP, p));
   ++nProtected;
 
-
   // Iterators.
   int i, j, ii, jj, nr, nc;
 
@@ -145,10 +144,7 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
       for(ii = 0; ii < p; ii++) {
         score_i_ptr[ii] = 0.0;
         for(jj = 0; jj < p; jj++) {
-          if(ii <= jj) {
-            hess_i_ptr[ii + p * jj] = 0.0;
-          }
-          hess_i_ptr[jj + p * ii] = hess_i_ptr[ii + p * jj];
+          hess_i_ptr[ii + p * jj] = 0.0;
         }
       }
       for(j = 0; j < nw; j++) {
@@ -185,7 +181,6 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
         tmp += weights_ptr[j] * omega_ptr[i * nw + j];
       }
       tmp = survtime_ptr[i] / 2.0 * tmp * pre_fac_ptr[i];
-
       j = 0;
       for(ii = 0; ii < p; ii++) {
         score_int_ptr[i + ii * nsubj] = tmp * pre_vec_ptr[i + ii * nr];
@@ -205,16 +200,16 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
       for(ii = 0; ii < p; ii++) {
         score_i_ptr[ii] = 0.0;
         for(jj = 0; jj < p; jj++) {
-          if(ii <= jj) {
-            hess_i_ptr[ii + p * jj] = 0.0;
-          }
-          hess_i_ptr[jj + p * ii] = hess_i_ptr[ii + p * jj];
+          hess_i_ptr[ii + p * jj] = 0.0;
         }
-        score_vec_i_ptr[ii] = 0.0;
       }
 
       for(j = 0; j < nw; j++) {
         tmp = weights_ptr[j] * omega_ptr[i * nw + j];
+
+        for(ii = 0; ii < p; ii++) {
+          score_vec_i_ptr[ii] = 0.0;
+        }
 
         for(ii = 0; ii < nmarker; ii++) {
           for(jj = 0; jj < p; jj++) {
@@ -225,18 +220,14 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
 
         for(ii = 0; ii < p; ii++) {
           for(jj = 0; jj < p; jj++) {
-            if(ii <= jj) {
-              hess_vec_i_ptr[ii + jj * p] = score_vec_i_ptr[ii] * score_vec_i_ptr[jj];
-
-            }
-            hess_vec_i_ptr[jj + ii * p] = hess_vec_i_ptr[ii + jj * p];
+            hess_vec_i_ptr[ii + jj * p] = score_vec_i_ptr[ii] * score_vec_i_ptr[jj];
           }
         }
 
         for(ii = 0; ii < p; ii++) {
           score_i_ptr[ii] += tmp * score_vec_i_ptr[ii];
           for(jj = 0; jj < p; jj++) {
-            hess_i_ptr[ii + jj * p] = tmp * hess_vec_i_ptr[ii + jj * p];
+            hess_i_ptr[ii + jj * p] += tmp * hess_vec_i_ptr[ii + jj * p];
           }
         }
       }

@@ -86,7 +86,6 @@
                 
                 # Iterate over markers
                 for(mi in seq_len(nmarker)) {
-                  
                   score_vec_i <- score_vec_i +
                     int_fac[(mi-1)*nsubj*nw + (ni-1)*nw + wi] * 
                     int_vec[(mi-1)*nsubj*nw + (ni-1)*nw + wi, ]
@@ -103,7 +102,7 @@
                 }
                 
                 score_i <- score_i + tmp*score_vec_i
-                hess_i <- hess_i + tmp*hess_vec_i             
+                hess_i <- hess_i + tmp*hess_vec_i
               }
               
               # Individual weights
@@ -150,7 +149,6 @@ if(FALSE) {
   abline(0,1)
   plot(int0$hess_int, int1$hess_int)
   abline(0,1)
-
 }
 
 # Old version of survival integral GQ -------------------------------------
