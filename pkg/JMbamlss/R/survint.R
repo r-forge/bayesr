@@ -125,7 +125,11 @@ survint_C <- function(pred = c("lambda", "gamma", "long"),
     "gamma" = 2L,
     "long" = 3L
   )
-
+  
+  if (is.null(pre_vec)) pre_vec <- 0
+  if (is.null(int_fac)) int_fac <- 0
+  if (is.null(int_vec)) int_vec <- 0
+    
   .Call("survint", pred, pre_fac, pre_vec, omega, int_fac, int_vec, weights, survtime)
 }
 
@@ -142,7 +146,10 @@ if(FALSE) {
     int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
     weights = gq_weights, survtime = survtime)
 
-  int1 <- survint_C(pred = "long", pre_fac = exp(eta$gamma), pre_vec = x$X, omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, int_vec = x$Xgrid, weights = gq_weights, survtime = survtime)
+  int1 <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
+                    omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, 
+                    int_vec = x$Xgrid, weights = gq_weights,
+                    survtime = survtime)
 
   par(mfrow = c(1, 2))
   plot(int0$score_int, int1$score_int)

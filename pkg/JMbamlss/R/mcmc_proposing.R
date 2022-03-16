@@ -37,7 +37,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   # Calculate Newton step based on old parameter
   switch(predictor,
     "lambda" = {
-      int_i <- survint_gq0(pred = "lambda", pre_fac = exp(eta$gamma),
+      int_i <- survint_C(pred = "lambda", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
                           int_vec = x$Xgrid, weights = gq_weights,
                           survtime = survtime)
@@ -45,14 +45,14 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "gamma" = {
-      int_i <- survint_gq0(pred = "gamma", pre_fac = exp(eta$gamma), 
+      int_i <- survint_C(pred = "gamma", pre_fac = exp(eta$gamma), 
                           pre_vec = x$X, omega = exp(eta_timegrid),
                           weights = gq_weights, survtime = survtime)
       x_score <- drop(status %*% x$X) - colSums(int_i$score_int)
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "alpha" = {
-      int_i <- survint_gq0(pred = "long", pre_fac = exp(eta$gamma),
+      int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
                           int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
                           weights = gq_weights, survtime = survtime)
@@ -60,7 +60,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "mu" = {
-      int_i <- survint_gq0(pred = "long", pre_fac = exp(eta$gamma),
+      int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
                           int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
                           weights = gq_weights, survtime = survtime)
@@ -207,7 +207,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   # Calculate Newton step based on proposed parameter and updated etas
   switch(predictor,
     "lambda" = {
-      int_i <- survint_gq0(pred = "lambda", pre_fac = exp(eta$gamma),
+      int_i <- survint_C(pred = "lambda", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
                           int_vec = x$Xgrid, weights = gq_weights,
                           survtime = survtime)
@@ -215,14 +215,14 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "gamma" = {
-      int_i <- survint_gq0(pred = "gamma", pre_fac = exp(eta$gamma), 
+      int_i <- survint_C(pred = "gamma", pre_fac = exp(eta$gamma), 
                           pre_vec = x$X, omega = exp(eta_timegrid),
                           weights = gq_weights, survtime = survtime)
       x_score <- drop(status %*% x$X) - colSums(int_i$score_int)
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "alpha" = {
-      int_i <- survint_gq0(pred = "long", pre_fac = exp(eta$gamma),
+      int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
                           int_fac = eta_timegrid_mu, int_vec = x$Xgrid,
                           weights = gq_weights, survtime = survtime)
@@ -230,7 +230,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_H <- matrix(colSums(int_i$hess_int), ncol = length(b_old))
     },
     "mu" = {
-      int_i <- survint_gq0(pred = "long", pre_fac = exp(eta$gamma),
+      int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
                           omega = exp(eta_timegrid),
                           int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
                           weights = gq_weights, survtime = survtime)

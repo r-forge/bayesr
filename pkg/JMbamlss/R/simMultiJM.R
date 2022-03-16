@@ -1,4 +1,5 @@
-
+# Muss noch implementieren, dass man auch konkrete FPC Basen und Eigenwerte
+# übergeben kann
 
 # New Simulation Function For Multivariate JMs Based On FPCs --------------
 
@@ -10,7 +11,20 @@
 #' @param probmiss Probability of missingness.
 #' @param maxfac Factor changing the uniform censoring interval.
 #' @param nmark Number of markers.
+#' @param param_assoc Parametric association between the markers (Defaults to 
+#'   FALSE). If TRUE, then specify the normal covariance matrix with argument
+#'   re_cov_mat and include the random effects in argument mu. If FALSE, then 
+#'   principal components are used to model the association structure.
 #' @param M Number of principal components.
+#' @param FPC_bases FunData object. If supplied, use the contained FPC as basis
+#'   for the association structure.
+#' @param FPC_evals Vector of eigenvalues. If supplied, use the provided
+#'   eigenvalues for the association structure.
+#' @param mfpc_args List containing the named arguments "type", "eFunType",
+#'   "ignoreDeg", "eValType" of function simMultiFunData and "eValScale" for
+#'   scaling the eigenvalues.
+#' @param re_cov_mat If supplied, a covariance matrix to use for drawing the 
+#'   random effects needed for the association structure.
 #' @param ncovar Number of covariates.
 #' @param lambda Additive predictor of time-varying survival covariates.
 #' @param gamma Additive predictor of time-constant survival covariates.
@@ -24,9 +38,15 @@
 #' @param mfpc_args List containing the named arguments "type", "eFunType",
 #'   "ignoreDeg", "eValType" of function simMultiFunData and "eValScale" for
 #'   scaling the eigenvalues.
-#' @param full Create a wide-format data.frame and 
+#' @param full Create a wide-format data.frame and a short one containing only
+#'   survival info.
 simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
-                       maxfac = 1.5, nmark = 2, M = 6, ncovar = 2,
+                       maxfac = 1.5, nmark = 2,param_assoc = FALSE, M = 6, 
+                       FPC_bases = NULL, FPC_evals = NULL, 
+                       mfpc_args = list(type = "split", eFunType = "Poly",
+                                        ignoreDeg = NULL, eValType = "linear",
+                                        eValScale = 1),
+                       re_cov_mat = NULL, ncovar = 2,
                        lambda = function(t, x) {
                          1.4*log((t + 10)/1000)
                        },
@@ -43,16 +63,20 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                          0.3 + 0*t + I(x$marker == "m2")*0.2
                        }, 
                        tmax = NULL, seed = NULL, 
-                       mfpc_args = list(type = "split", eFunType = "Poly",
-                                        ignoreDeg = NULL, eValType = "linear",
-                                        eValScale = 1),
                        full = FALSE, file = NULL){
 
+  # Some basic checks
   if(length(alpha) != length(mu)) {
     stop("alpha and mu must have same length.\n")
   }
   if(length(mu) != nmark) {
     stop("Predictors must be specified for all markers.\n")
+  }
+  if(!is.null(re_cov_mat) & !param_assoc) {
+    stop("Either REs or PCREs need to be specified properly.\n")
+  }
+  if(param_assoc & is.null(re_cov_mat)) {
+    stop("Specify the RE covariance matrix.\n")
   }
   if(is.null(tmax)){
     tmax <- max(times)
@@ -94,8 +118,23 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
       x[, i] <- runif(n = nsub, min = -3, max = 3)
     }
     colnames(x) <- paste0("x", seq_len(ncovar))
-    data.frame(x)
+    facs <- list()
+    for(i in seq_len(ncovar)) {
+      facs[[i]] <- sample(c(0, 1), size = nsub, replace = TRUE)
+    }
+    names(facs) <- paste0("x", ncovar + seq_len(ncovar))
+    data.frame(x, facs)
   } 
+  
+  ## generate parametric random effects
+  gen_b <- function (nsub, re_cov_mat) {
+    
+    r <- mvtnorm::rmvnorm(n = nsub, sigma = re_cov_mat)
+    colnames(r) <- paste0("r", seq_len(nrow(re_cov_mat)))
+    r <- data.frame(r)
+    out <- list(r, list())
+  }
+  
   
   
   ## generate the multivariate functional principal component basis
@@ -121,21 +160,30 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   }
   
   ## generate functional principal component based random effects
-  gen_fpc <- function(times, nsub, M, mfpc_args, tmax, seed = NULL){
+  gen_fpc <- function(times, nsub, M, FPC_bases = NULL, FPC_evals = NULL,
+                      mfpc_args, tmax, seed = NULL){
     if(!is.null(seed)) set.seed(seed)
     
-    evals <- funData::eVal(M = M, type = mfpc_args$eValType)
-    evals <- mfpc_args$eValScale * evals
+    if (!is.null(FPC_evals)) {
+      evals <- FPC_evals
+    } else {
+      evals <- funData::eVal(M = M, type = mfpc_args$eValType)
+      evals <- mfpc_args$eValScale * evals
+    }
     
     scores <- mvtnorm::rmvnorm(nsub, sigma = diag(evals),
                                method="chol")
     colnames(scores) <- paste0("s", 1:M)
     
-    mfpc_seed <- switch(mfpc_args$type, 
-                        "split" = sample(c(-1, 1), nmark, 0.5),
-                        "weight" = stats::runif(nmark, 0.2, 0.8))
-    b_set <- c(list(tmin = min(c(times, tmax)), tmax = tmax, M = M,
-                    mfpc_seed = mfpc_seed, evals = evals), mfpc_args)
+    if (!is.null(FPC_bases)) {
+      b_set <- list("FPC_bases" = FPC_bases)
+    } else {
+      mfpc_seed <- switch(mfpc_args$type, 
+                          "split" = sample(c(-1, 1), nmark, 0.5),
+                          "weight" = stats::runif(nmark, 0.2, 0.8))
+      b_set <- c(list(tmin = min(c(times, tmax)), tmax = tmax, M = M,
+                      mfpc_seed = mfpc_seed, evals = evals), mfpc_args)
+    }
     return(list(scores, b_set))
   }
   
@@ -143,33 +191,45 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   ## individual longitudinal trajectories
   mu_fun <-  function(time, x, r, mu, b_set){
     
-    # duplicate scores for the multiple integration points
-    if(is.null(dim(r))){
-      r <- matrix(r, nrow = length(time), ncol = b_set$M, byrow=TRUE)
+    # parametric random effects
+    if (length(b_set) == 0){
+      out <- lapply(mu, function (mu_k) {
+        mu_k(t = time, x = x, r = r)
+      })
+      
+    } else {
+      
+      # duplicate scores for the multiple integration points
+      if(is.null(dim(r))){
+        r <- matrix(r, nrow = length(time), ncol = b_set$M, byrow=TRUE)
+      }
+      
+      # Evaluate the functional principal component bases for different markers
+      pc_bases <- lapply(
+        mfpc(argvals = rep(list(c(b_set$tmin, time, b_set$tmax)),
+                           length(mu)),
+             mfpc_args = b_set, M = b_set$M), 
+        function (fundat){
+          t(fundat@X)[-c(1, 2+length(time)), ]
+        })
+      out <- mapply(function (mu_k, pc_k) {
+        mu_k(t = time, x = x) + apply(pc_k*r, 1, sum)
+      }, mu_k = mu, pc_k = pc_bases, SIMPLIFY = FALSE)
     }
     
-    # Evaluate the functional principal component bases for different markers
-    pc_bases <- lapply(mfpc(argvals = rep(list(c(b_set$tmin, time, b_set$tmax)),
-                                          length(mu)),
-                            mfpc_args = b_set, M = b_set$M),
-                       function (fundat){
-                         t(fundat@X)[-c(1, 2+length(time)), ]
-                       })
-    
-    mapply(function (mu_k, pc_k) {
-      mu_k(t = time, x = x) + apply(pc_k*r, 1, sum)
-    }, mu_k = mu, pc_k = pc_bases, SIMPLIFY = FALSE)
+    out
+
   }
   
   ## full hazard
   hazard <-  function(time, x, r, ...){
-    # mu_fun könnte auch hier als Objekt erstellt und unten ersetzt werden
-    # ich brauche also nur eine Funktion, die mit gegeben time, x und r mu auf
-    # allen markern auswertet
+    
+    mu_list <- mu_fun(time, x, r, mu, b_set)
+    
     exp(lambda(time, x) + gamma(x) + 
           Reduce('+', mapply(function(alpha_k, mu_k) {
             alpha_k(time, x)*mu_k
-          }, alpha_k = alpha, mu_k = mu_fun(time, x, r, mu, b_set),
+          }, alpha_k = alpha, mu_k = mu_list,
           SIMPLIFY = FALSE)))
   }
   
@@ -213,8 +273,13 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
       survprob[i] <- exp((-1) * cumhaz[i])
     }
     time_event <- censoring(time, tmax, maxfac)
+    haz <- rep(NA, nsub)
+    for (i in 1:nsub){
+      haz[i] <- hazard(time = time_event[i, 1], x[i, ], r[i, ])
+    }
     data_short <- data.frame(survtime = time_event[, 1], 
-                             event = time_event[, 2], x, r, cumhaz = cumhaz)
+                             event = time_event[, 2], x, r, cumhaz = cumhaz,
+                             hazard = haz)
     names(data_short) <- gsub(".", "", names(data_short), fixed = TRUE)
     return(data_short)
   }
@@ -228,8 +293,12 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   x <- gen_x(nsub, ncovar = ncovar)
   
 
-  temp <- gen_fpc(times = times, nsub = nsub, M = M, mfpc_args = mfpc_args,
-                  tmax = tmax)
+  if (param_assoc) {
+    temp <- gen_b(nsub = nsub, re_cov_mat = re_cov_mat)
+  } else {
+    temp <- gen_fpc(times = times, nsub = nsub, M = M, FPC_bases = FPC_bases,
+                    FPC_evals = FPC_evals, mfpc_args = mfpc_args, tmax = tmax)
+  }
   r <- temp[[1]]
   b_set <- temp[[2]]
   
@@ -257,19 +326,22 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                        alpha_k(data_base$obstime, x[id, ])
                      }))
   data_long$sigma <- sigma(t = data_long$obstime, x = data_long)
-  fpcs <- do.call(rbind, lapply(mfpc(argvals = rep(list(data_base$obstime), 
-                                                   nmark), mfpc_args = b_set,
-                                     M = M), function (mark) {
-                                       t(mark@X)
-                                     }))
-  data_long <- cbind(data_long,
-                     fpc = fpcs,
-                     wfpc = t(t(fpcs)*b_set$evals))
+  if (!param_assoc) {
+    fpcs <- do.call(rbind, lapply(mfpc(argvals = rep(list(data_base$obstime), 
+                                                     nmark), mfpc_args = b_set,
+                                       M = M), function (mark) {
+                                         t(mark@X)
+                                       }))
+    data_long <- cbind(data_long,
+                       fpc = fpcs,
+                       wfpc = t(t(fpcs)*b_set$evals))
+  }
   
   # Hypothetical longitudinal data
   data_hypo <- data_long
   
   # Data at survival time
+  data_short$id <- factor(seq_len(nsub))
   data_short$lambda <- lambda(data_short$survtime) - mean(f_lambda)
   data_short$gamma <- gamma(x) + mean(f_lambda)
   shortmu <- do.call(c, mu_fun(data_short$survtime, x, r, mu, b_set))
@@ -299,12 +371,14 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   if(full){
     
-    # FPC basis functions
-    fpc_base <- mfpc(argvals = rep(list(times), nmark), mfpc_args = b_set,
-                     M = M)
+    if (!param_assoc) {
+      # FPC basis functions
+      fpc_base <- mfpc(argvals = rep(list(times), nmark), mfpc_args = b_set,
+                       M = M)
+    }
     
     d <- list(data = data_long, data_full = data_full, data_hypo = data_hypo,
-              fpc_base = fpc_base, data_short = data_short)
+              fpc_base = if (!param_assoc) fpc_base, data_short = data_short)
   } else {
     d <- data_long
   }
