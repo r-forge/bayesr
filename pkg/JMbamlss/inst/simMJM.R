@@ -1,6 +1,7 @@
 # Data Generation
 source("R/simMultiJM.R")
 source("R/preprocessing.R")
+source("R/eval_mfun.R")
 
 dat <- simMultiJM(param_assoc = TRUE, 
                   re_cov_mat = matrix(c(1, 0.5, 0.1, 0.1,
@@ -54,17 +55,12 @@ dat <- simMultiJM(nsub = 500, times = seq(0, 25, by = 0.25), probmiss = 0.75,
                   tmax = NULL, seed = 1808, 
                   full = TRUE, file = NULL)
 
-# which observations have only one observation per dimension
-remove_ids <- Reduce(union, lapply(split(dat$data, dat$data$marker),
-                                   function(x) {
-                                     names(which(table(x$id) < 10))
-                                   }))
-# WARUM MUSS MAN DIE OBS HIER WEGSCHMEISSEN?
-dat_small <- dat$data[!dat$data$id %in% remove_ids, ]
-mfpca <- preproc_MFPCA(data = dat_small, 
-                       uni_mean = "y ~ obstime + x3 + obstime:x3", M = 2)
+mfpca <- preproc_MFPCA(data = dat$data, 
+                       uni_mean = "y ~ obstime + x3 + obstime:x3", M = 2, 
+                       npc = 2)
 
-# MAN MUSS AUCH NOCH DIE HAUPTKOMPONENTEN AN DIE DATEN RANHAENGEN UND GEWICHTEN!
+data_prep <- attach_wfpc(mfpca, dat$data)
+
 
 f <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
@@ -75,4 +71,18 @@ f <- list(
   alpha ~ -1 + marker
 )
 
-b_sim <- bamlss(f, family = mjm_bamlss, data = dat$data, timevar = "obstime")
+# Helperfunction PCRE
+source("R/pcre_smooth.R")
+
+# Family Construction
+source("R/mjm_bamlss.R")
+source("R/MJM_transform.R")
+source("R/opt_MJM.R")
+source("R/opt_updating.R")
+source("R/MJM_mcmc.R")
+source("R/mcmc_proposing.R")
+source("R/survint.R")
+source("R/compile.R")
+compile_alex(dir = "~/Dokumente/Arbeit/Greven/JM/JMbamlss/src/")
+
+b_sim <- bamlss(f, family = mjm_bamlss, data = data_prep, timevar = "obstime")

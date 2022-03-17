@@ -15,8 +15,9 @@
 #' @param time String giving the name of the longitudinal time variable.
 #' @param id String giving the name of the identifier.
 #' @param M Number of mFPCs to compute in the MFPCA.
+#' @param npc Number of univariate principal components to use in PACE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
-                           time = "obstime", id = "id", M = 2) {
+                           time = "obstime", id = "id", M = 2, npc = NULL) {
   require(bamlss)
   require(MFPCA)
   
@@ -34,7 +35,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
                  X = split(mark$res, mark[, id]))
   })
   FPCA <- lapply(m_irregFunData, function(mark) {
-    PACE(mark)
+    PACE(mark, npc = npc)
   })
   mFData <- multiFunData(lapply(FPCA, "[[", "fit"))
   uniExpansions <- lapply(FPCA, function (mark) {
@@ -87,4 +88,33 @@ create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1),
                 functions = bases,
                 meanFunction = mean)
   return(mfpca)
+}
+
+
+#------------------------------------------------------------------------------#
+# Attach Weighted Functional Principal Components to the Data
+#------------------------------------------------------------------------------#
+#' Attach Weighted Functional Principal Components to the Data
+#' 
+#' @param mfpc MFPCA object from which to extract the weighted FPCS.
+#' @param data Data set to which the weighted FPCS are to be attached.
+attach_wfpc <- function(mfpca, data, obstime = "obstime", marker = "marker"){
+  
+  # Is the data sorted by marker
+  if (all(order(data[[marker]]) != seq_len(nrow(data)))) message("ORDER!")
+  
+  wfpc <- NULL
+  
+  splitdat <- split(data[[obstime]], data[[marker]])
+  
+  # eval_mpfc evaluates on all markers, so choose only the current one
+  for (mark in seq_along(levels(data[[marker]]))) {
+    mobs <- length(splitdat[[mark]])
+    tot_wfpc <- eval_mfpc(mfpca = mfpca, timepoints = splitdat[[mark]])
+    wfpc <- rbind(wfpc, tot_wfpc[(mark-1)*mobs + seq_len(mobs), ])
+  }
+  
+  data <- cbind(data, wfpc)
+  data
+  
 }
