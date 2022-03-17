@@ -2,6 +2,7 @@
 source("R/simMultiJM.R")
 source("R/preprocessing.R")
 source("R/eval_mfun.R")
+library(tidyverse)
 
 dat <- simMultiJM(param_assoc = TRUE, 
                   re_cov_mat = matrix(c(1, 0.5, 0.1, 0.1,
@@ -23,7 +24,7 @@ dat <- simMultiJM(param_assoc = TRUE,
 # Mauff et al. (2020): Joint model with multiple longitudinal outcomes and a
 # time-to-event outcome: a corrected two-stage approach
 
-dat <- simMultiJM(nsub = 500, times = seq(0, 25, by = 0.25), probmiss = 0.75,
+dat <- simMultiJM(nsub = 150, times = seq(0, 25, by = 0.25), probmiss = 0.75,
                   maxfac = 1.5, nmark = 2, param_assoc = TRUE, M = NULL, 
                   FPC_bases = NULL, FPC_evals = NULL, mfpc_args = NULL,
                   re_cov_mat = matrix(c(0.68, -0.08, 0.1, 0.1, 
@@ -55,6 +56,23 @@ dat <- simMultiJM(nsub = 500, times = seq(0, 25, by = 0.25), probmiss = 0.75,
                   tmax = NULL, seed = 1808, 
                   full = TRUE, file = NULL)
 
+aha <- unique(dat$data_short[which(dat$data_short$survtime < 25.1 &
+                                     dat$data_short$survtime > 20), "id"])
+
+ggplot(dat$data %>% filter(id %in% aha), aes(x = obstime, y = y, color = id)) +
+  geom_line() +
+  facet_grid(~marker) + 
+  geom_segment(dat$data %>% group_by(id, marker) %>%
+                 filter(obstime == max(obstime),
+                        id %in% aha),
+               mapping = aes(x = obstime, y = y, xend = survtime, yend = y),
+               linetype = "dotted") +
+  geom_point(dat$data %>% group_by(id, marker) %>%
+               filter(obstime == max(obstime),
+                      id %in% aha),
+             mapping = aes(x = survtime, shape = factor(event)))
+
+
 mfpca <- preproc_MFPCA(data = dat$data, 
                        uni_mean = "y ~ obstime + x3 + obstime:x3", M = 2, 
                        npc = 2)
@@ -63,10 +81,26 @@ data_prep <- attach_wfpc(mfpca, dat$data)
 
 
 f <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
     s(id, wfpc.1, wfpc.2, bs = "unc_pcre", xt = list("mfpc" = mfpca)),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+f1 <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
+    s(id, bs = "re") + s(id, obstime, bs = "re"),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+f2 <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
+    s(id, marker, bs = "re") + s(id, marker, obstime, bs = "re"),
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
 )
@@ -83,6 +117,21 @@ source("R/MJM_mcmc.R")
 source("R/mcmc_proposing.R")
 source("R/survint.R")
 source("R/compile.R")
-compile_alex(dir = "~/Dokumente/Arbeit/Greven/JM/JMbamlss/src/")
+compile_alex()
 
-b_sim <- bamlss(f, family = mjm_bamlss, data = data_prep, timevar = "obstime")
+
+sink("sim_f1.txt")
+b_sim <- bamlss(f1, family = mjm_bamlss, data = data_prep, timevar = "obstime",
+                verbose_sampler = TRUE)
+sink()
+
+
+sink("sim_f.txt")
+b_sim <- bamlss(f1, family = mjm_bamlss, data = data_prep, timevar = "obstime",
+                verbose_sampler = TRUE)
+sink()
+
+sink("sim_f2.txt")
+b_sim <- bamlss(f2, family = mjm_bamlss, data = data_prep, timevar = "obstime",
+                verbose_sampler = TRUE)
+sink()

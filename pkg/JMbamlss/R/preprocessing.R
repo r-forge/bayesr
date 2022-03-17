@@ -33,7 +33,18 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     mark <- mark[order(mark[, time]), ]
     irregFunData(argvals = split(mark[, time], mark[, id]), 
                  X = split(mark$res, mark[, id]))
+    
   })
+  if (!is.null(npc)) {
+    rem <- lapply(m_irregFunData, function (mark) {
+      which(lapply(mark@argvals, length) < npc)
+    })
+    rem <- Reduce(union, rem)
+    take <- seq_len(nObs(m_irregFunData[[1]]))[-rem]
+    m_irregFunData <- lapply(m_irregFunData, function (mark) {
+      extractObs(mark, obs = take)
+    })
+  }
   FPCA <- lapply(m_irregFunData, function(mark) {
     PACE(mark, npc = npc)
   })
