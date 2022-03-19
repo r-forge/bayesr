@@ -1,5 +1,4 @@
-# Muss noch implementieren, dass man auch konkrete FPC Basen und Eigenwerte
-# übergeben kann
+
 
 # New Simulation Function For Multivariate JMs Based On FPCs --------------
 
@@ -80,6 +79,20 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   }
   if(is.null(tmax)){
     tmax <- max(times)
+  }
+  if(!is.null(FPC_bases)) {
+    if (M < nObs(FPC_bases)) {
+      fpc_base <- extractObs(FPC_bases, seq_len(M))
+    } else {
+      M <- nObs(FPC_bases)
+    }
+    if (!is.null(FPC_evals)) {
+      if (length(FPC_evals) < nObs(FPC_bases)) {
+        stop("Wrong number of eigenvalues supplied.")
+      } else {
+        FPC_evals <- FPC_evals[seq_len(M)]
+      }
+    }
   }
   
   
@@ -176,7 +189,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     colnames(scores) <- paste0("s", 1:M)
     
     if (!is.null(FPC_bases)) {
-      b_set <- list("FPC_bases" = FPC_bases)
+      b_set <- list("FPC_bases" = FPC_bases, "M" = M, "evals" = evals)
     } else {
       mfpc_seed <- switch(mfpc_args$type, 
                           "split" = sample(c(-1, 1), nmark, 0.5),
@@ -205,13 +218,19 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
       }
       
       # Evaluate the functional principal component bases for different markers
-      pc_bases <- lapply(
-        mfpc(argvals = rep(list(c(b_set$tmin, time, b_set$tmax)),
-                           length(mu)),
-             mfpc_args = b_set, M = b_set$M), 
-        function (fundat){
-          t(fundat@X)[-c(1, 2+length(time)), ]
-        })
+      if(is.null(b_set$FPC_bases)) {
+        pc_bases <- lapply(
+          mfpc(argvals = rep(list(c(b_set$tmin, time, b_set$tmax)),
+                             length(mu)),
+               mfpc_args = b_set, M = b_set$M), 
+          function (fundat){
+            t(fundat@X)[-c(1, 2+length(time)), ]
+          })
+      } else {
+        pc_bases <- lapply(b_set$FPC_bases, eval_fundata, 
+                           evalpoints = time)
+      }
+      
       out <- mapply(function (mu_k, pc_k) {
         mu_k(t = time, x = x) + apply(pc_k*r, 1, sum)
       }, mu_k = mu, pc_k = pc_bases, SIMPLIFY = FALSE)
@@ -327,11 +346,18 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                      }))
   data_long$sigma <- sigma(t = data_long$obstime, x = data_long)
   if (!param_assoc) {
-    fpcs <- do.call(rbind, lapply(mfpc(argvals = rep(list(data_base$obstime), 
-                                                     nmark), mfpc_args = b_set,
-                                       M = M), function (mark) {
-                                         t(mark@X)
-                                       }))
+    if (is.null(FPC_bases)) {
+      fpcs <- do.call(rbind, lapply(mfpc(argvals = rep(list(data_base$obstime), 
+                                                       nmark), 
+                                         mfpc_args = b_set, M = M), 
+                                    function (mark) {
+                                      t(mark@X)
+                                    }))
+    } else {
+      fpcs <- do.call(rbind, lapply(b_set$FPC_bases, eval_fundata, 
+                                    evalpoints = data_base$obstime))
+    }
+    
     data_long <- cbind(data_long,
                        fpc = fpcs,
                        wfpc = t(t(fpcs)*b_set$evals))
@@ -373,12 +399,14 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     
     if (!param_assoc) {
       # FPC basis functions
-      fpc_base <- mfpc(argvals = rep(list(times), nmark), mfpc_args = b_set,
-                       M = M)
+      if (is.null(FPC_bases)) {
+        FPC_bases <- mfpc(argvals = rep(list(times), nmark), mfpc_args = b_set,
+                          M = M)
+      }
     }
     
     d <- list(data = data_long, data_full = data_full, data_hypo = data_hypo,
-              fpc_base = if (!param_assoc) fpc_base, data_short = data_short)
+              fpc_base = if (!param_assoc) FPC_bases, data_short = data_short)
   } else {
     d <- data_long
   }

@@ -147,7 +147,7 @@ dap <- simMultiJM(nsub = 150, times = seq(0, 25, by = 0.25), probmiss = 0.75,
                   FPC_bases = NULL, FPC_evals = NULL,
                   mfpc_args = list(type = "split", eFunType = "Poly",
                                    ignoreDeg = NULL, eValType = "linear",
-                                   eValScale = 800), # Vielleicht mal 0.6
+                                   eValScale = 800),
                   ncovar = 2,
                   lambda = function(t, x) {
                     1.65 * t^(0.65)
@@ -207,3 +207,36 @@ fpc_base <- multiFunData(
 )
 plot(fpc_base)
 norm(fpc_base)
+
+dap <- simMultiJM(nsub = 150, times = seq(0, 25, by = 0.25), probmiss = 0.75,
+                  maxfac = 1.5, nmark = 2, param_assoc = FALSE, M = 4, 
+                  FPC_bases = fpc_base, FPC_evals = NULL,
+                  mfpc_args = list(eValType = "linear", eValScale = 800),
+                  ncovar = 2,
+                  lambda = function(t, x) {
+                    1.65 * t^(0.65)
+                  },
+                  gamma = function(x) {
+                    - 5.8 + 0.48*x[, 3]
+                  },
+                  alpha = list(function(t, x) {
+                    0.64 + 0*t
+                  }, function(t, x) {
+                    -0.64 + 0*t
+                  }),
+                  mu = list(function(t, x){
+                    2.13 + 0.24*t - 0.25*x[, 3] - 0.05*t*x[, 3]
+                  }, function(t, x, r){
+                    2.13 + 0.24*t - 0.25*x[, 3] - 0.05*t*x[, 3]
+                  }),
+                  sigma = function(t, x) {
+                    log(0.6) + 0*t
+                  }, 
+                  tmax = NULL, seed = 1808, 
+                  full = TRUE, file = NULL)
+
+ggplot(dap$data, aes(x = obstime, y = y, color = id)) +
+  geom_line() +
+  facet_grid(~marker) +
+  theme(legend.position = "none")
+  
