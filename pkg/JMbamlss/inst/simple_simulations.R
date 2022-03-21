@@ -29,7 +29,7 @@ source("R/survint.R")
 source("R/compile.R")
 
 # Compile the C function
-compile_alex(dir = "~/Dokumente/Arbeit/Greven/JM/JMbamlss/src/")
+compile_alex()
 
 
 # Compare Simple Data Generation Models -----------------------------------
@@ -80,14 +80,30 @@ f_indepri_onere <- list(
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
 )
-f_indepri_onere <- list(
+f_indepri_byre <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
-    s(id, I(marker=="m1"), bs = "re") + s(id, I(marker=="m2"), bs = "re"),
+    s(id, by = marker, bs = "re"),
 sigma ~ -1 + marker,
 alpha ~ -1 + marker
 )
+
+# Models using random effects
+set.seed(1808)
+sink("indepri_onere.txt")
+b_indepri_onere <- bamlss(f_indepri_onere, family = mjm_bamlss, 
+                          data = d_indepri, timevar = "obstime",
+                          verbose_sampler = TRUE)
+sink()
+
+set.seed(1808)
+sink("indepri_byre.txt")
+b_indepri_byre <- bamlss(f_indepri_byre, family = mjm_bamlss, 
+                          data = d_indepri, timevar = "obstime",
+                          verbose_sampler = TRUE)
+sink()
+
 
 # Use an appropriate FPC basis
 seq <- seq(0, 25, by = 0.25)
@@ -105,10 +121,14 @@ fpc_base_one <- multiFunData(
 
 mfpca_indepri <- list(
   functions = fpc_base_one,
-  values = # Wie sollen die Eigenvalues gewählt werden?
+  values = c(17, 17)
 )
 
-# Use different model specifications
+
+# Attach the FPCS
+d_indepri <- attach_wfpc(mfpca_indepri, d_indepri)
+
+# Use principal components
 f_indepri_onepcre <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
   gamma ~ 1 + x3,
@@ -122,8 +142,30 @@ f_indepri_twopcre <- list(
   Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
-    s(id, wfpc.1 bs = "unc_pcre", xt = list("mfpc" = mfpca_indepri)) +
-    s(id, wfpc.2 bs = "unc_pcre", xt = list("mfpc" = mfpca_indepri)) ,
+    s(id, wfpc.1, bs = "unc_pcre",
+      xt = list("mfpc" = list(functions = extractObs(fpc_base_one, 1),
+                              values = c(17)))) +
+    s(id, wfpc.2, bs = "unc_pcre",
+      xt = list("mfpc" = list(functions = extractObs(fpc_base_one, 2),
+                              values = c(17)))),
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
 )
+
+# Models using PCREs
+set.seed(1808)
+sink("indepri_onepcre.txt")
+b_indepri_onepcre <- bamlss(f_indepri_onepcre, family = mjm_bamlss, 
+                            data = d_indepri, timevar = "obstime",
+                            verbose_sampler = TRUE)
+sink()
+
+set.seed(1808)
+sink("indepri_twopcre.txt")
+b_indepri_twopcre <- bamlss(f_indepri_twopcre, family = mjm_bamlss, 
+                            data = d_indepri, timevar = "obstime",
+                            verbose_sampler = TRUE)
+sink()
+
+save(b_indepri_onere, b_indepri_byre, b_indepri_onepcre, b_indepri_twopcre,
+     file = "inst/objects/indepri_models.Rdata")
