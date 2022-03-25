@@ -63,10 +63,12 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
 create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1), 
                                type = "split", eFunType = "Poly",
                                ignoreDeg = NULL, eValType = "linear",
-                               eValScale = 1) {
+                               eValScale = 1, evals = NULL) {
   
-  evals <- funData::eVal(M = M, type = eValType)
-  evals <- eValScale * evals
+  if (is.null(evals)) {
+    evals <- funData::eVal(M = M, type = eValType)
+    evals <- eValScale * evals
+  }
   
   mfpc_seed <- switch(type, 
                       "split" = sample(c(-1, 1), nmarker, 0.5),
