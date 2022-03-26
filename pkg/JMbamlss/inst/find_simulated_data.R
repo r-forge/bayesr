@@ -1,3 +1,11 @@
+library(survival)
+library(bamlss)
+library(MFPCA)
+library(tidyverse)
+source("R/preprocessing.R")
+source("R/simMultiJM.R")
+source("R/eval_mfun.R")
+
 
 # Generate data with independent random intercepts
 d_indepri <- simMultiJM(nsub = 150, times = seq(0, 25, by = 0.25), 
@@ -61,11 +69,20 @@ sink()
 
 set.seed(188)
 ids <- sample(1:150, 5)
-ggplot(d_indepri$data %>% filter(id %in% ids), 
+p <- ggplot(d_indepri$data %>% filter(id %in% ids) %>% 
+         mutate(marker = recode_factor(marker, "m1" = "Marker 1",
+                                       "m2" = "Marker 2")), 
        aes(x = obstime, y = y, color = id)) +
-  geom_line() +
-  facet_grid(~marker) +
-  theme(legend.position = "none")
+  theme_bw(base_size = 22) +
+  geom_line(size = 1.2) +
+  facet_grid(marker~.) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time")
+
+pdf("../../../JointModel/Fig3.pdf", width = 6, height = 6)
+p
+dev.off()
 
 times <- seq(0, 20, 1)
 newdat <- d_indepri$data_short[rep(1:150, each = length(times)), ]
@@ -78,6 +95,14 @@ newdat <- cbind(newdat, wfpcs)
 newdat$mu <- predict(b_sim, newdat, model = "mu")
 
 newdat <- left_join(newdat,
-                    dat %>% mutate(y = b$y[[1]][, 3]) %>% 
-                      select("id", "obstime", "y"),
-                    by = c("id", "obstime"))
+                    d_indepri$data %>% mutate(y = b_sim$y[[1]][, 3]) %>% 
+                      select("id", "obstime", "y", "marker"),
+                    by = c("id", "obstime", "marker"))
+p <- ggplot(data = newdat %>% filter(id %in% ids), aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 22) +
+  geom_line(aes(y = mu), size = 1.2) +
+  geom_point(aes(y = y, shape = id), size = 3) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_grid(~marker)
