@@ -6526,3 +6526,21 @@ bbfit_plot <- function(x, name = NULL, ...)
   return(invisible(x))
 }
 
+new_formula <- function(object, thres = 0) {
+  sel <- contribplot(object, plot = FALSE)
+  yname <- bamlss:::response.name(object)
+  formula <- list()
+  for(i in names(sel$selfreqs)) {
+    eff <- sel$selfreqs[[i]][sel$selfreqs[[i]] > thres, , drop = FALSE]
+    eff <- rownames(eff)
+    eff <- gsub("s.", "", eff, fixed = TRUE)
+    eff <- eff[eff != "p"]
+    if(length(eff)) {
+      eff <- paste(sort(eff), collapse = "+")
+      formula[[i]] <- as.formula(paste("~", eff))
+    }
+  }
+  fc <- paste0("update(formula[[1L]],", yname, " ~ .)")
+  formula[[1L]] <- eval(parse(text = fc))
+  return(formula)
+}
