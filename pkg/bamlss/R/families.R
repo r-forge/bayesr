@@ -5315,37 +5315,74 @@ log1pexp <- function(x)
   return(x)
 }
 
+
 ELF_bamlss <- function(..., tau = 0.5)
 {
   if(tau < 0.001 | tau > (1 - 0.001))
     stop("tau must be between 0 and 1!")
-
-  lambda <- 0.05
-
+  
+  lambda <- 0.0001
+  
   rval <- list(
     "family" = "Elf density",
     "names" = c("mu", "sigma"),
     "links" = c(mu = "identity", sigma = "log"),
-    "d" = function(y, par, log = FALSE) {
-      r <- y - par$mu
-
+    "d" = function(y, par, log = F) {
+      r <- y - par$mu # 2*par$mu vergleiche https://www.tandfonline.com/doi/suppl/10.1080/01621459.2020.1725521/suppl_file/uasa_a_1725521_sm0369.pdf Seite 8 ll(.) 
+      #      d <- (1 - tau) * r/par$sigma - par$lambda * log(1 + exp(r/(par$lambda * par$sigma))) -
+      #        log(par$lambda * par$sigma * beta(par$lambda *(1 - tau), par$lambda*tau))
+      
+      ## library("Deriv")
+      ## e <- expression((1 - tau) * (y-mu)/s - lam * log(1 + exp((y-mu)/(lam*s))) - log(lam * s * beta(lam*(1 - tau), lam*tau)))
+      ## Deriv(e, cache.exp = FALSE, "mu")
+      
       d <- (1 - tau) * r/par$sigma - lambda * log1pexp(r/(lambda * par$sigma)) -
         log(lambda * par$sigma * beta(lambda *(1 - tau), lambda*tau))
-
+      
       if(!log)
         d <- exp(d)
-
+      
       return(d)
     },
+    
+    "score" = list(
+      "mu" = function(y, par, ...) {
+        .e2 <- 0.5 + 0.5*tanh((y - par$mu)/(2*lambda * par$sigma))
+        score <- (.e2 + tau - 1)/par$sigma
+        return(score)
+      },
+      "sigma" = function(y, par, ...) {
+        .e1 <- 0.5 + 0.5*tanh((y - par$mu)/(2*lambda * par$sigma))
+        score <- (.e1 + tau -1) * (y - par$mu)/par$sigma^2 - 1/par$sigma
+        return(score)
+      }
+    ),
+    "hess" = list(
+      "mu" = function(y, par, ...) {
+        .e2 <- 1/cosh((y - par$mu)/(2*lambda * par$sigma))^2
+        hess <- .e2 / (-4*lambda * par$sigma^2)
+        return(hess)
+      },
+      "sigma" = function(y, par, ...) {
+        .e1 <- 0.5 + 0.5*tanh((y - par$mu)/(2*lambda * par$sigma))
+        .e2 <- 1/cosh((y - par$mu)/(2*lambda * par$sigma))^2
+        hess <- (1-tau - .e1 - 0.5*(y-par$mu)* .e2 / (4*lambda * par$sigma ) )  + 1/par$sigma^2
+        hess <- (2 * (y - par$mu)/par$sigma^3) * hess
+        return(hess)
+      }
+    ),
     "initialize" = list(
       "mu"    = function(y, ...) { (y + quantile(y, prob = tau)) / 2 },
       "sigma"    = function(y, ...) { sd((y - quantile(y, prob = tau)) / 2) }
     )
   )
 
+  rval$score <- rval$hess <- NULL
+  
   class(rval) <- "family.bamlss"
   rval
 }
+
 
 nbinom_bamlss <- function(...) {
 ### neg bin

@@ -1611,7 +1611,7 @@ bfit_iwls <- function(x, family, y, eta, id, weights, criterion, ...)
     assign("ic00_val", objfun(tau2 <- get.state(x, "tau2")), envir = env)
 
     tau2 <- tau2.optim(objfun, start = tau2)
-    
+
     if(!is.null(env$state))
       return(env$state)
     
