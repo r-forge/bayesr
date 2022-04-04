@@ -160,13 +160,15 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
     scale2(sort(rnorm(length(unique(fac)), sd = 1))[fac], -0.5, 0.5)
   }
 
+  sd1 <- FALSE
   if(sd < 0) {
+    sd1 <- TRUE
     sd <- exp(-2 + sin(d$x1 * 2 *pi - pi) - d$x2)
   }
   
   ## Response.
   if(ti == "none") {
-    if(sd < 1) {
+    if(sd1) {
       d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat), -1, 1))
     } else {
       d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat) + f5(id) + f6(fac), -1, 1))
