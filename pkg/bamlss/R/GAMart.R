@@ -166,7 +166,11 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
   
   ## Response.
   if(ti == "none") {
-    d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat) + f5(id) + f6(fac), -1, 1))
+    if(sd < 1) {
+      d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat), -1, 1))
+    } else {
+      d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat) + f5(id) + f6(fac), -1, 1))
+    }
   } else {
     if(ti == "main")
       d$eta <- with(d, scale2(f1(lon) + f3(lat) + f4(lon, lat), -1, 1))
