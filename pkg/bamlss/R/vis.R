@@ -322,7 +322,8 @@ plot2d.default <- function(x, residuals, range, col.residuals = "black",
   }
   for(k in 2L:ncol(x)) {
     coll <- specs$col.lines[k - 1L]
-    coll[is.na(coll)] <- 1
+    if(ncol(x) == 2L)
+      coll[is.na(coll)] <- 1
     lines(x[,k] ~ x[,1L], lty = specs$lty[k - 1L], lwd = specs$lwd[k - 1L], 
       col = coll)
   }

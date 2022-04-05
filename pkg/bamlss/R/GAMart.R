@@ -192,8 +192,11 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
   d$cens <- ifelse(ystar > 0.0, ystar, 0.0)
   d <- d[, c("num", "pnum", "bnum", "cnum", "bin", "cat", "cens", "eta", "x1", "x2", "x3", "fac", "id", "lon", "lat", "err")]
 
-  if(sd1)
-    d <- d[, c("num", "x1", "x2", "x3", "lon", "lat")]
+  if(sd1) {
+    for(j in 4:6)
+      d[[paste0("x", j)]] <- runif(n, 0, 1)
+    d <- d[, c("num", "x1", "x2", "x3", "x4", "x5", "lon", "lat")]
+  }
 
   d
 }

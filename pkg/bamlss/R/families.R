@@ -1235,6 +1235,43 @@ beta1_bamlss <- function(ar.start, ...)
 }
 
 
+GP_bamlss <- function(...)
+{
+  rval <- list(
+    "family" = "GP",
+    "names" = c("xi", "sigma", "mu"),
+    "links" = c(xi = "log", sigma = "log", mu = "identity"),
+    "valid.response" = function(x) {
+      if(is.factor(x) | is.character(x))
+        stop("the response should be numeric!")
+      return(TRUE)
+    },
+    "d" = function(y, par, log = FALSE) {
+      d <- -log(par$sigma) - (1 / par$xi + 1) * log(1 + par$xi * (y - par$mu) / par$sigma)
+      if(any(i <- (par$xi >= 0) & (y < par$mu))) {
+        d[i] <- -1e+05
+      }
+      if(any(i <- (par$xi < 0) & (y < par$mu))) {
+        d[i] <- -1e+05
+      }
+      if(any(i <- (par$xi < 0) & (y > (par$mu - par$sigma/par$xi)))) {
+        d[i] <- -1e+05
+      }
+      if(!log)
+        d <- exp(d)
+      d
+    }
+  )
+  rval$initialize <- list(
+    "xi" = function(y, ...) { rep(mean(y) + 0.5, length(y)) },
+    "sigma" = function(y, ...) { rep(sd(y), length(y)) },
+    "mu" = function(y, ...) { rep(0, length(y)) }
+  )
+  class(rval) <- "family.bamlss"
+  rval
+}
+
+
 gpareto_bamlss <- function(...)
 {
   rval <- list(
