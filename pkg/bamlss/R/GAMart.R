@@ -195,7 +195,7 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
   if(sd1) {
     for(j in 4:6)
       d[[paste0("x", j)]] <- runif(n, 0, 1)
-    d <- d[, c("num", "x1", "x2", "x3", "x4", "x5", "lon", "lat")]
+    d <- d[, c("num", "x1", "x2", "x3", "x4", "x5", "x6", "lon", "lat")]
   }
 
   d
