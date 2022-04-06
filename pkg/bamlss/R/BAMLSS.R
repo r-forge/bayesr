@@ -842,9 +842,12 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          } else {
 #            nd[[j]] <- sample(rep(xq, length.out = 1000L))
 #          }
-          xmin <- ffbase::min.ff(data[[j]])
-          xmax <- ffbase::max.ff(data[[j]])
-          nd[[j]] <- seq(xmin, xmax, length = 1000L)
+          #xmin <- ffbase::min.ff(data[[j]])
+          #xmax <- ffbase::max.ff(data[[j]])
+
+          ux <- ffbase::unique.ff(data[[j]])
+          ux_ind <- floor(seq(1, length(ux), length = 1000L))
+          nd[[j]] <- ux[ux_ind]
         } else {
           nd[[j]] <- sample(rep(unique(data[[j]]), length.out = 1000L))
         }
