@@ -113,7 +113,7 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
   if(seed) set.seed(111)
 
   if(sd < 0)
-    return(dgp_NO(n = n))
+    return(dgp_NO(nobs = n))
 
   ti <- match.arg(ti)
 
