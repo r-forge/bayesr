@@ -126,6 +126,11 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
     "lat" = sample(seq(0, 1, length = n2), size = n, replace = TRUE)
   )
 
+  if(sd < 0) {
+    d$lon <- runif(n, 0, 1)
+    d$lat <- runif(n, 0, 1)
+  }
+
   i <- match.index(d[, c("lon", "lat")])
   d$id <- as.factor(i$match.index)
 
