@@ -3585,7 +3585,7 @@ compute_s.effect <- function(x, get.X, fit.fun, psamples,
       nd <- as.data.frame(nd)
       if(nt == 2L) {
         pid <- chull(as.matrix(data[, tterms]))
-        pol <- data[c(pid, pid[1]), ]
+        pol <- data[c(pid, pid[1]), tterms]
         pip <- point.in.polygon(nd[, 1], nd[, 2], pol[, 1], pol[, 2])
         if(any(pip > 0)) {
           nd[pip < 1, ] <- NA
