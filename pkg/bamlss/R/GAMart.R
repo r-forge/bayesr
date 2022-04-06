@@ -112,6 +112,9 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
 {
   if(seed) set.seed(111)
 
+  if(sd < 0)
+    return(dgp_NO(n = n))
+
   ti <- match.arg(ti)
 
   n2 <- ceiling(sqrt(n))
@@ -125,11 +128,6 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
     "lon" = sample(seq(0, 1, length = n2), size = n, replace = TRUE),
     "lat" = sample(seq(0, 1, length = n2), size = n, replace = TRUE)
   )
-
-  if(sd < 0) {
-    d$lon <- runif(n, 0, 1)
-    d$lat <- runif(n, 0, 1)
-  }
 
   i <- match.index(d[, c("lon", "lat")])
   d$id <- as.factor(i$match.index)
@@ -165,19 +163,13 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
     scale2(sort(rnorm(length(unique(fac)), sd = 1))[fac], -0.5, 0.5)
   }
 
-  sd1 <- FALSE
   if(sd < 0) {
-    sd1 <- TRUE
     sd <- exp(-2 + sin(d$x1 * 2 *pi - pi) - d$x2)
   }
   
   ## Response.
   if(ti == "none") {
-    if(sd1) {
-      d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat), -1, 1))
-    } else {
-      d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat) + f5(id) + f6(fac), -1, 1))
-    }
+    d$eta <- with(d, scale2(f1(x1) + f2(x2) + f3(x3) + f4(lon, lat) + f5(id) + f6(fac), -1, 1))
   } else {
     if(ti == "main")
       d$eta <- with(d, scale2(f1(lon) + f3(lat) + f4(lon, lat), -1, 1))
@@ -196,12 +188,6 @@ GAMart <- function(n = 500, sd = 0.1, seed = FALSE, ti = c("none", "vcm", "main"
   ystar <- d$eta + rnorm(n, sd = 1)
   d$cens <- ifelse(ystar > 0.0, ystar, 0.0)
   d <- d[, c("num", "pnum", "bnum", "cnum", "bin", "cat", "cens", "eta", "x1", "x2", "x3", "fac", "id", "lon", "lat", "err")]
-
-  if(sd1) {
-    for(j in 4:6)
-      d[[paste0("x", j)]] <- runif(n, 0, 1)
-    d <- d[, c("num", "x1", "x2", "x3", "x4", "x5", "x6", "lon", "lat")]
-  }
 
   d
 }
@@ -224,6 +210,65 @@ Crazy <- function(n = 1000) {
   d$eta[d$x <= -2] <- - 1.5
   d$eta[d$x >= -2 & d$x <= -1] <- 0
   d$y <- d$eta + rnorm(n, sd = 0.1)
+  return(d)
+}
+
+## Data generating process for NO.
+dgp_NO <- function(nobs = 1000, nnoise = 2, rho = 0) {
+  p <- 4 + nnoise
+  d <- matrix(runif(nobs * p, -2, 2), ncol = p)
+  
+  S <- rho^as.matrix(dist(1:p))
+  d <- matrix(d, ncol = p, nrow = nobs) %*% chol(S)
+  
+  d1 <- matrix(runif(nobs * 2, -2, 2), ncol = 2)
+  d <- cbind(d, d1)
+  rm(d1)
+  colnames(d) <- c(paste("x", 1:p, sep = ""), "lon", "lat")
+  d <- as.data.frame(d)
+  
+  cx <- function(x) {
+    x <- (x - mean(x)) / sd(x)
+    return(x)
+  }
+  
+  f1 <- function(x) {
+    f <- x
+    cx(f)
+  }
+  f2 <- function(x) {
+    f <- x + ((2*x - 2)^2) / 5.5
+    cx(f)
+  }
+  f3 <- function(x) {
+    f <- -x + pi * sin(pi * x)
+    cx(f)
+  }
+  f4 <- function(x) {
+    f <- 0.5 * x + 15 * dnorm(2 * (x - 0.2)) - dnorm(x + 0.4)
+    cx(f)
+  }
+  f2d <- function(lon, lat) {
+    f <- sin(lon) * cos(0.5 * lat)
+    cx(f)
+  }
+  
+  f1 <- f1(d$x1)          
+  f2 <- f2(d$x2)      
+  f3 <- f3(d$x3)          
+  f4 <- f4(d$x4)
+  f2d <- f2d(d$lon, d$lat)
+  
+  eta.mu <- f1 + f3 + f2d
+  eta.sigma <- f2 + f3 + f4
+  
+  scale <- 5 / max(eta.sigma)
+  shift <- -mean(eta.sigma) * scale + log(4)
+  
+  eta.sigma <- eta.sigma * scale + shift
+  
+  d$y <- eta.mu + rnorm(nobs, sd = sqrt(exp(eta.sigma)))
+  
   return(d)
 }
 
