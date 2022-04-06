@@ -48,10 +48,10 @@ ggplot(d_indepri$data, aes(x = obstime, y = y, color = id)) +
 
 
 f <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 5, bs = "ps"),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + 
-    s(id, wfpc.1, wfpc.2, wfpc.3, wfpc.4, wfpc.5, wfpc.6, wfpc.7, wfpc.8,
+    s(id, wfpc.1, wfpc.2, wfpc.3, wfpc.4, wfpc.5, wfpc.6, wfpc.7,
       bs = "unc_pcre", xt = list("mfpc" = mfpca)),
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
@@ -61,10 +61,26 @@ mfpca <- create_true_MFPCA(M = 8, nmarker = 2, argvals = seq(0, 25, by = 0.25),
                            type = "split", eFunType = "PolyHigh",
                            ignoreDeg = 1, eValType = "linear",
                            eValScale = 1, evals = c(80:73))
-sink("find_sim.txt")
-b_sim <- bamlss(f, family = mjm_bamlss, data = d_indepri$data, 
-                timevar = "obstime", verbose_sampler = TRUE)
+
+# Helperfunction PCRE
+source("R/pcre_smooth.R")
+
+# Family Construction
+source("R/mjm_bamlss.R")
+source("R/MJM_transform.R")
+source("R/opt_MJM.R")
+source("R/opt_updating.R")
+source("R/MJM_mcmc.R")
+source("R/mcmc_proposing.R")
+source("R/survint.R")
+source("R/compile.R")
+compile_alex()
+
+sink("find_sim1.txt")
+b_sim1 <- bamlss(f, family = mjm_bamlss, data = d_indepri$data, 
+                timevar = "obstime", maxit = 1200, verbose_sampler = TRUE)
 sink()
+save(b_sim1, file = "inst/objects/find_sim1.Rdata")
 
 
 set.seed(188)
@@ -93,15 +109,54 @@ newdat <- rbind(newdat,
                 newdat %>% mutate(marker = fct_recode(marker, "m2" = "m1")))
 newdat <- cbind(newdat, wfpcs)
 newdat$mu <- predict(b_sim, newdat, model = "mu")
+newdat$fre <- predict(b_sim, newdat, model = "mu", term = "id", 
+                      intercept = FALSE)
 
-newdat <- left_join(newdat,
-                    d_indepri$data %>% mutate(y = b_sim$y[[1]][, 3]) %>% 
-                      select("id", "obstime", "y", "marker"),
-                    by = c("id", "obstime", "marker"))
-p <- ggplot(data = newdat %>% filter(id %in% ids), aes(x = obstime, colour = id)) +
+
+ggplot(data = newdat %>% filter(id %in% ids), aes(x = obstime, colour = id)) +
   theme_bw(base_size = 22) +
   geom_line(aes(y = mu), size = 1.2) +
-  geom_point(aes(y = y, shape = id), size = 3) +
+  geom_line(data = d_indepri$data %>% filter(id %in% ids),
+            aes(y = y), size = 0.5, linetype = "dashed") +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_grid(~marker)
+
+ggplot(newdat, aes(x = obstime, group = id)) + 
+  geom_line(aes(y = wfpc.1), color = "red") + 
+  geom_line(aes(y = wfpc.2), color = "blue") + 
+  geom_line(aes(y = wfpc.3), color = "green") +
+  facet_grid(~marker)
+
+ggplot(newdat, aes(x = obstime, group = id, y = mu)) + 
+  geom_line() +
+  facet_grid(~marker)
+
+newdat_id <- newdat %>% filter(id %in% ids) %>% droplevels() %>% split(.$id)
+pars_id <- lapply(ids, function(i) (1+(i-1)*8):(1+(i-1)*8+7))
+samp_means <- summary(b_sim$samples, quantiles = 0.5)$quantiles
+newdat_id <- do.call(rbind, mapply(function(dat, pars) {
+  ps <- samp_means[12:1211][pars]
+  dat$fri_man <- c(as.matrix(dat[, 25:32]) %*% ps)
+  dat
+}, dat = newdat_id, pars = pars_id, SIMPLIFY = FALSE))
+
+ggplot(data = newdat_id, aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 22) +
+  geom_line(aes(y = fre), size = 1.2) +
+  geom_line(aes(y = fri_man), size = 1.2, linetype = "dashed") +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_grid(~marker)
+
+
+ggplot(data = newdat %>% filter(id %in% ids), aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 22) +
+  geom_line(aes(y = mu), size = 1.2) +
+  geom_line(data = d_indepri$data %>% filter(id %in% ids),
+            aes(y = y), size = 0.5, linetype = "dashed") +
   theme(legend.position = "none") +
   scale_y_continuous("Marker") +
   scale_x_continuous("Time") +
