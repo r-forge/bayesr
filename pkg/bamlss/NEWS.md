@@ -1,3 +1,9 @@
+# bamlss 1.1-7
+
+* Full support for scaleable distributional regression models.
+
+* Bug fixing/C code.
+
 # bamlss 1.1-6
 
 * JSS paper published <doi:10.18637/jss.v100.i04>.
