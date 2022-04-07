@@ -6,7 +6,7 @@
 
 # bamlss 1.1-6
 
-* JSS paper published <doi:10.18637/jss.v100.i04>.
+* JSS paper published <https://www.jstatsoft.org/article/view/v100i04>.
 
 # bamlss 1.1-5
 

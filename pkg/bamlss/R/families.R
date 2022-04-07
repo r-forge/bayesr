@@ -4181,7 +4181,7 @@ tF <- function(x, ...)
   bd <- if(is.null(args$bd)) 1 else args$bd
   args$bd <- NULL
   pr <- args$range
-  check_range <- function(x) { return(x) }
+  check_range <- function(par) { return(par) }
   if(!is.null(pr)) {
     if(is.list(pr) | is.data.frame(pr)) {
       check_range <- function(par) {

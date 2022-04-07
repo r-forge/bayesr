@@ -5734,7 +5734,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
           } else {
             shuffle_id <- NULL
             for(ii in bamlss_chunk(y)) {
-              shuffle_id <- ffbase::ffappend(shuffle_id, if(shuffle) sample(ii) else ii)
+              shuffle_id <- ffappend(shuffle_id, if(shuffle) sample(ii) else ii)
             }
           }
           if(!srandom) {
@@ -5801,7 +5801,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
           } else {
             shuffle_id <- NULL
             for(ii in bamlss_chunk(y)) {
-              shuffle_id <- ffbase::ffappend(shuffle_id, if(shuffle) sample(ii) else ii)
+              shuffle_id <- ffappend(shuffle_id, if(shuffle) sample(ii) else ii)
             }
           }
           if(!srandom) {
@@ -5912,7 +5912,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
       } else {
         shuffle_id <- NULL
         for(ii in bamlss_chunk(y)) {
-          shuffle_id <- ffbase::ffappend(shuffle_id, if(shuffle) sample(ii) else ii)
+          shuffle_id <- ffappend(shuffle_id, if(shuffle) sample(ii) else ii)
         }
       }
     } else {
@@ -6528,7 +6528,7 @@ bbfit_plot <- function(x, name = NULL, ...)
 
 new_formula <- function(object, thres = 0) {
   sel <- contribplot(object, plot = FALSE)
-  yname <- bamlss:::response.name(object)
+  yname <- response.name(object)
   formula <- list()
   for(i in names(sel$selfreqs)) {
     eff <- sel$selfreqs[[i]][sel$selfreqs[[i]] > thres, , drop = FALSE]

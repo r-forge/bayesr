@@ -268,7 +268,6 @@ design.construct <- function(formula, data = NULL, knots = NULL,
   if(!no_ff) {
     stopifnot(requireNamespace("bit"))
     stopifnot(requireNamespace("ff"))
-    stopifnot(requireNamespace("ffbase"))
   }
 
   ff_name <- list(...)$ff_name
@@ -790,6 +789,131 @@ ff_ncol <- function(x, value)
 #  result
 #}
 
+## From ffbase.
+emptyLogger <- function(...) invisible()
+
+Log <- new.env()
+Log$info <- if (interactive()) cat else emptyLogger
+
+Log$chunk <- function(i){
+  if (is.na(i[3])){
+    Log$info("\r< Processing chunk:",i," >")    
+  } else {
+    if (i[1]==1) Log$info("\n")
+    Log$info("\r< Processing :",round(100*(i[2])/i[3]), "% >" , sep="")
+    if (i[2] == i[3]){
+      Log$info("\r")
+    }
+  } 
+}
+
+unique_ff <- function(x, incomparables = FALSE, fromLast = FALSE, trace=FALSE, ...){
+  #browser()
+  if (!identical(incomparables, FALSE)){
+    .NotYetUsed("incomparables != FALSE")
+  }
+  if(ff::vmode(x) == "integer" & length(res <- levels(x))>0){    
+    ## Something strange is happening for factors with fforder, reported to ff maintainer, doing a workaround
+    if(any(is.na(x))){
+      res <- c(res, NA)
+    }
+    res <- ff::ff(res, levels = res)
+  }else{
+    ## Order the ff    
+    xorder <- ff::fforder(x, decreasing = fromLast, na.last = TRUE)
+    xchunk <- bit::chunk(x, ...)
+    ## Chunkwise adding of unique elements to the unique ff_vector called res
+    res <- NULL
+    lastel <- NULL
+    for (i in xchunk){
+      #if (trace){
+      #  message(sprintf("%s, working on x chunk %s:%s", Sys.time(), min(i), max(i)))
+      #}
+      Log$chunk(i)
+      iorder <- xorder[i]
+      iorder <- as.integer(iorder) # make sure it is not a Date
+      xi <- x[iorder]
+      xi <- unique(xi)
+      ## exclude the first row if it was already in the unique ffdf as this is the last one from the previous unique
+      if(sum(duplicated(c(xi[1], lastel)))>0){
+        xi <- xi[-1]  
+      }   
+      if(length(xi) > 0){   
+        ## Add the result to an ff_vector
+        lastel <- xi[length(xi)]
+        res <- ffappend(x=res, xi)
+      }
+    }
+  }  
+  res
+}
+
+appendLevels <- function(...) 
+{
+  unique(unlist(lapply(list(...), function(x) {
+      if (is.factor(x)) 
+          levels(x)
+      else x
+  })))
+}
+
+coerce_to_highest_vmode <- function(x, y, onlytest = TRUE) 
+{
+  test <- data.frame(x.vmode = ff::vmode(x), y.vmode = ff::vmode(y), 
+      stringsAsFactors = FALSE)
+    test$maxffmode <- apply(test[, , drop = FALSE], MARGIN = 1, 
+        FUN = function(x) names(ff::maxffmode(x)))
+    needtocoerce <- list(coerce = test$x.vmode != test$maxffmode, 
+        coerceto = test$maxffmode)
+    if (onlytest) {
+        return(needtocoerce)
+    }
+    if (sum(needtocoerce$coerce) > 0) {
+        if (inherits(x, "ffdf")) {
+            for (i in which(needtocoerce$coerce == TRUE)) {
+                column <- names(x)[i]
+                x[[column]] <- ff::clone.ff(x[[column]], vmode = needtocoerce$coerceto[i])
+            }
+            x <- x[names(x)]
+        }
+        else {
+            x <- ff::clone.ff(x, vmode = needtocoerce$coerceto)
+        }
+    }
+    x
+}
+
+ffappend <- function(x, y, adjustvmode=TRUE, ...){
+   if (is.null(x)){
+      if (ff::is.ff(y)){
+		    return(ff::clone.ff(y))
+	    } else {
+        return (if (length(y)) ff::as.ff(y))
+	    }
+   }
+   #TODO check if x and y are compatible
+   len <- length(x)
+   to <- length(y)
+   if (!to) return(x)
+   
+   length(x) <- len + to 
+   if (ff::is.factor(x)){
+      levels(x) <- appendLevels(levels(x), levels(y))  
+   }
+   ## Upgrade to a higher vmode if needed
+   if(adjustvmode==TRUE) {
+	   x <- coerce_to_highest_vmode(x=x, y=y, onlytest=FALSE)
+   }
+   for (i in bit::chunk(y)){
+     #Log$chunk(i)
+     if (is.atomic(y)){
+			 i <- bit::as.which(i)
+	   }
+	   x[(i+len)] <- y[i]
+   }
+   x
+}
+
 smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = NULL, ...)
 {
   object$xt$center <- TRUE
@@ -845,7 +969,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
           #xmin <- ffbase::min.ff(data[[j]])
           #xmax <- ffbase::max.ff(data[[j]])
 
-          ux <- ffbase::unique.ff(data[[j]])
+          ux <- unique_ff(data[[j]])
           ux_ind <- floor(seq(1, length(ux), length = 1000L))
           nd[[j]] <- ux[ux_ind]
         } else {
@@ -931,7 +1055,7 @@ ffmatrixmult <- function(x,y=NULL,xt=FALSE,yt=FALSE,ram.output=FALSE, override.b
 	{i1<-NULL; i2<- NULL} #To avoid errors in R CMD check
 
   stopifnot(requireNamespace("ff"))
-  stopifnot(requireNamespace("ffbase"))
+  ##stopifnot(requireNamespace("ffbase"))
 
 	dimx<-dim(x)
 	if(!is.null(y)) dimy<-dim(y)
