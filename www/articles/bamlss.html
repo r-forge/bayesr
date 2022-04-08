@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.7</span>
       </span>
     </div>
 
@@ -244,7 +244,7 @@
 ## Sampler summary:
 ## -
 ## DIC = 408.9675 logLik = -201.0372 pd = 6.8932
-## runtime = 1.643
+## runtime = 1.517
 ## ---
 ## Optimizer summary:
 ## -
@@ -356,17 +356,17 @@
 ## -
 ## Parametric coefficients:
 ##               Mean   2.5%    50%  97.5% parameters
-## (Intercept) -25.13 -29.36 -25.35 -20.34     -25.14
+## (Intercept) -25.47 -36.71 -25.60 -13.99     -25.55
 ## -
 ## Acceptance probability:
-##       Mean 2.5% 50% 97.5%
-## alpha    1    1   1     1
+##         Mean   2.5%    50% 97.5%
+## alpha 1.0000 0.9998 1.0000     1
 ## -
 ## Smooth terms:
 ##                     Mean      2.5%       50%     97.5% parameters
-## s(times).tau21 425657.47 175634.81 372121.15 914429.32   209325.2
-## s(times).alpha      1.00      1.00      1.00      1.00         NA
-## s(times).edf       14.24     12.64     14.22     15.97       13.6
+## s(times).tau21 3.759e+05 7.055e+04 3.070e+05 1.190e+06  30521.547
+## s(times).alpha 1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA
+## s(times).edf   8.427e+00 6.327e+00 8.375e+00 1.096e+01      4.748
 ## ---
 ## Formula sigma:
 ## ---
@@ -374,27 +374,27 @@
 ## -
 ## Parametric coefficients:
 ##              Mean  2.5%   50% 97.5% parameters
-## (Intercept) 2.680 2.549 2.676 2.831      2.581
+## (Intercept) 3.874 3.874 3.874 3.874      3.874
 ## -
 ## Acceptance probability:
-##         Mean   2.5%    50% 97.5%
-## alpha 0.9664 0.7510 1.0000     1
+##            Mean      2.5%       50% 97.5%
+## alpha 1.319e-05 1.363e-12 1.708e-08     0
 ## -
 ## Smooth terms:
-##                     Mean      2.5%       50%     97.5% parameters
-## s(times).tau21 1.458e+02 2.384e+01 1.213e+02 4.604e+02     81.406
-## s(times).alpha 5.385e-01 7.903e-04 5.069e-01 1.000e+00         NA
-## s(times).edf   9.415e+00 6.491e+00 9.500e+00 1.259e+01      8.675
+##                   Mean    2.5%     50%   97.5% parameters
+## s(times).tau21  4.6002  0.1863  2.4613 19.4002     43.489
+## s(times).alpha  0.7193  0.1353  0.7937  1.0000         NA
+## s(times).edf    3.8224  1.9144  3.7280  6.1762      7.493
 ## ---
 ## Sampler summary:
 ## -
-## DIC = 1115.068 logLik = -545.2265 pd = 24.6149
-## runtime = 4.328
+## DIC = 1320.076 logLik = -654.3239 pd = 11.4283
+## runtime = 3.811
 ## ---
 ## Optimizer summary:
 ## -
-## AICc = 1123.881 edf = 24.2718 logLik = -531.975
-## logPost = -747.4106 nobs = 133 runtime = 0.463</code></pre>
+## AICc = 1440.122 edf = 14.2415 logLik = -703.976
+## logPost = -879.0406 nobs = 133 runtime = 0.047</code></pre>
 <p>showing, e.g., the acceptance probabilities of the MCMC chains (<code>alpha</code>), the estimated degrees of freedom of the optimizer and the successive sampler (<code>edf</code>), the final AIC and DIC as well as parametric model coefficients (in this case only the intercepts). As mentioned in the first example, using MCMC involves convergence checks of the sampled parameters. The easiest diagnostics are traceplots</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/plot">plot</a></span>(b, <span class="dt">which =</span> <span class="st">"samples"</span>)</a></code></pre></div>
 <p><img src="bamlss_files/figure-html/unnamed-chunk-23-1.png" width="864" style="display: block; margin: auto;"> Note again that this call would show all traceplots, for convenience we only show the plots for the intercepts. In this case, the traceplots do not indicate convergence of the Markov chains for parameter <code>"mu"</code>. To fix this, the number of iterations can be increased and also the burnin and thinning parameters can be adapted (see <code><a href="http://www.bamlss.org/reference/GMCMC.html">sam_GMCMC()</a></code>). Further inspections are the maximum autocorrelation of all parameters, using <code><a href="http://www.bamlss.org/reference/plot.bamlss.html">plot.bamlss()</a></code> setting argument <code>which = "max-acf"</code>, besides other convergence diagnostics, e.g., diagnostics that are part of the <em>coda</em> package <span class="citation">(Plummer et al. 2006)</span>.</p>
