@@ -2,7 +2,7 @@
 # MJM_transform -----------------------------------------------------------
 
 MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
-                          ...) {
+                          idvar = NULL, ...) {
   
   
   # Gaussian Quadrature
@@ -20,9 +20,11 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
   } else {
     j <- which(class_mu == "pcre.random.effect")
   }
-  smj <- object$x$mu$smooth.construct[[j]]
-  idvar <- smj$term[1]
-  message("ID taken to be ", idvar)
+  if (is.null(idvar)) {
+    smj <- object$x$mu$smooth.construct[[j]]
+    idvar <- smj$term[1]
+    message("ID taken to be ", idvar)
+  }
   
   
   # Function to transform intervals to [0, 1] for GQ integration

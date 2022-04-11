@@ -57,10 +57,10 @@ f <- list(
   alpha ~ -1 + marker
 )
 
-mfpca <- create_true_MFPCA(M = 8, nmarker = 2, argvals = seq(0, 25, by = 0.25),
+mfpca <- create_true_MFPCA(M = 7, nmarker = 2, argvals = seq(0, 25, by = 0.25),
                            type = "split", eFunType = "PolyHigh",
                            ignoreDeg = 1, eValType = "linear",
-                           eValScale = 1, evals = c(80:73))
+                           eValScale = 1, evals = c(80:74))
 
 # Helperfunction PCRE
 source("R/pcre_smooth.R")
@@ -81,6 +81,32 @@ b_sim1 <- bamlss(f, family = mjm_bamlss, data = d_indepri$data,
                 timevar = "obstime", maxit = 1200, verbose_sampler = TRUE)
 sink()
 save(b_sim1, file = "inst/objects/find_sim1.Rdata")
+
+
+# Why is sigma not accepted? ----------------------------------------------
+
+
+b <- bamlss(f, family = mjm_bamlss, data = d_indepri$data, 
+            timevar = "obstime", optimizer = FALSE, start = parameters(b_sim1))
+mfpca <- create_true_MFPCA(M = 3, nmarker = 2, argvals = seq(0, 25, by = 0.25),
+                           type = "split", eFunType = "PolyHigh",
+                           ignoreDeg = 1, eValType = "linear",
+                           eValScale = 1, evals = c(80:78))
+f1 <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 5, bs = "ps"),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + 
+    s(id, wfpc.1, wfpc.2, wfpc.3,
+      bs = "unc_pcre", xt = list("mfpc" = mfpca)),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+sink("find_sim2.txt")
+b_sim2 <- bamlss(f1, family = mjm_bamlss, data = d_indepri$data, 
+                 timevar = "obstime", maxit = 1200, verbose_sampler = TRUE)
+sink()
+
+# Plot --------------------------------------------------------------------
 
 
 set.seed(188)

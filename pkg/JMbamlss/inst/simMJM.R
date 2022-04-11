@@ -3,6 +3,7 @@ source("R/simMultiJM.R")
 source("R/preprocessing.R")
 source("R/eval_mfun.R")
 library(tidyverse)
+library(MFPCA)
 
 dat <- simMultiJM(param_assoc = TRUE, 
                   re_cov_mat = matrix(c(1, 0.5, 0.1, 0.1,
@@ -56,26 +57,34 @@ dat <- simMultiJM(nsub = 150, times = seq(0, 25, by = 0.25), probmiss = 0.75,
                   tmax = NULL, seed = 1808, 
                   full = TRUE, file = NULL)
 
-aha <- unique(dat$data_short[which(dat$data_short$survtime < 25.1 &
+set.seed(1808)
+ids <- unique(dat$data_short[which(dat$data_short$survtime < 25.1 &
                                      dat$data_short$survtime > 20), "id"])
 
-ggplot(dat$data %>% filter(id %in% aha), aes(x = obstime, y = y, color = id)) +
+ggplot(dat$data %>% filter(id %in% ids), aes(x = obstime, y = y, color = id)) +
   geom_line() +
   facet_grid(~marker) + 
   geom_segment(dat$data %>% group_by(id, marker) %>%
                  filter(obstime == max(obstime),
-                        id %in% aha),
+                        id %in% ids),
                mapping = aes(x = obstime, y = y, xend = survtime, yend = y),
                linetype = "dotted") +
   geom_point(dat$data %>% group_by(id, marker) %>%
                filter(obstime == max(obstime),
-                      id %in% aha),
+                      id %in% ids),
              mapping = aes(x = survtime, shape = factor(event)))
 
 
 mfpca <- preproc_MFPCA(data = dat$data, 
                        uni_mean = "y ~ obstime + x3 + obstime:x3", M = 2, 
                        npc = 2)
+
+# Hier sollte man noch eine vernünftige Basis erstellen,
+# also so dass linearer Trend und Intercept über die Dimensionen getrennt sind
+mfpca_tru <- create_true_MFPCA(M = 2, nmarker = 2, 
+                               argvals = seq(0, 25, by = 0.25),
+                               type = "split", eFunType = "Poly",
+                               eValType = "linear", evals = c(1, 1))
 
 data_prep <- attach_wfpc(mfpca, dat$data)
 
@@ -104,6 +113,14 @@ f2 <- list(
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
 )
+f3 <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
+    s(id, by = marker, bs = "re") + s(id, obstime, bs = "re", by = marker),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
 
 # Helperfunction PCRE
 source("R/pcre_smooth.R")
@@ -120,24 +137,41 @@ source("R/compile.R")
 compile_alex()
 
 
-sink("sim_f1.txt")
-b_sim1 <- bamlss(f1, family = mjm_bamlss, data = data_prep, timevar = "obstime",
-                verbose_sampler = TRUE)
-sink()
-save(b_sim1, file = "inst/objects/param_sim01.Rdata")
-
-
 sink("sim_f.txt")
 b_sim <- bamlss(f, family = mjm_bamlss, data = data_prep, timevar = "obstime",
                 verbose_sampler = TRUE)
 sink()
 save(b_sim, file = "inst/objects/param_sim00.Rdata")
 
+sink("sim_f1.txt")
+b_sim1 <- bamlss(f1, family = mjm_bamlss, data = data_prep, timevar = "obstime",
+                 verbose_sampler = TRUE)
+sink()
+save(b_sim1, file = "inst/objects/param_sim01.Rdata")
+
 sink("sim_f2.txt")
 b_sim2 <- bamlss(f2, family = mjm_bamlss, data = data_prep, timevar = "obstime",
                 verbose_sampler = TRUE)
 sink()
 save(b_sim2, file = "inst/objects/param_sim02.Rdata")
+
+sink("sim_f3.txt")
+b_sim3 <- bamlss(f3, family = mjm_bamlss, data = data_prep, timevar = "obstime",
+                 maxit = 1200, verbose_sampler = TRUE)
+sink()
+save(b_sim3, file = "inst/objects/param_sim03.Rdata")
+
+
+ggplot(dat$data %>% mutate(fit0 = b_sim$fitted.values$mu, 
+                           fit3 = b_sim3$fitted.values$mu) %>% 
+         filter(id %in% ids), 
+                           aes(x = obstime, color = id)) +
+  geom_point(aes(y = y), size = 1.3) +
+  geom_line(aes(y = fit0)) +
+  geom_line(aes(y = fit3), linetype = "dotted") +
+  facet_grid(~marker)
+summary(b_sim$samples[[1]][, grep("accepted", colnames(b_sim$samples[[1]]))])
+summary(b_sim3$samples[[1]][, grep("accepted", colnames(b_sim3$samples[[1]]))])
 
 
 # Parametric-like PCA Model -----------------------------------------------

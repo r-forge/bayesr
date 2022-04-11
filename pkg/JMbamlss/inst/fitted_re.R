@@ -38,7 +38,7 @@ newdat <- newdat[newdat$survtime > newdat$obstime, ]
 wfpcs <- eval_mfpc(mfpca, timepoints = newdat$obstime)
 newdat <- rbind(newdat,
                 newdat %>% mutate(marker = fct_recode(marker, "m2" = "m1")))
-newdat <- cbind(newdat, wfpcs) %>% filter(id %in% ids) %>% droplevels()
+newdat <- cbind(newdat, wfpcs) %>% filter(id %in% ids)
 
 
 
@@ -49,7 +49,7 @@ newdat$fri_pred <- predict(b_sim, newdat, model = "mu", term = "id",
                            intercept = FALSE)
 
 # Predict functional random intercepts manually
-newdat_id <- newdat %>% split(.$id)
+newdat_id <- newdat %>% droplevels() %>% split(.$id)
 pars_id <- lapply(ids, function(i) (1+(i-1)*8):(1+(i-1)*8+7))
 samp_means <- summary(b_sim$samples, quantiles = 0.5)$quantiles
 newdat_id <- do.call(rbind, mapply(function(dat, pars) {
