@@ -130,6 +130,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     
     if (max(c(eps0_surv, eps0_long)) < alpha.eps) {
       alpha_update <- TRUE
+      cat("It ", iter, "-- Start Alpha Update", "\n")
     }
     if (opt_long) {
       ## (3) update alpha.

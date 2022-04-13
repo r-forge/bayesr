@@ -130,7 +130,7 @@ mfpca_indepri <- list(
 
 
 # Attach the FPCS
-d_indepri$data <- attach_wfpc(mfpca_indepri, d_indepri$data)
+d_indepri_data <- attach_wfpc(mfpca_indepri, d_indepri$data)
 
 # Use principal components
 f_indepri_onepcre <- list(
@@ -160,14 +160,14 @@ f_indepri_twopcre <- list(
 set.seed(1808)
 sink("indepri_onepcre.txt")
 b_indepri_onepcre <- bamlss(f_indepri_onepcre, family = mjm_bamlss, 
-                            data = d_indepri$data, timevar = "obstime",
+                            data = d_indepri_data, timevar = "obstime",
                             verbose_sampler = TRUE)
 sink()
 
 set.seed(1808)
 sink("indepri_twopcre.txt")
 b_indepri_twopcre <- bamlss(f_indepri_twopcre, family = mjm_bamlss, 
-                            data = d_indepri$data, timevar = "obstime",
+                            data = d_indepri_data, timevar = "obstime",
                             verbose_sampler = TRUE)
 sink()
 
@@ -215,6 +215,52 @@ summary(b_indepri_onepcre$samples[[
   1]][, grep("accepted", colnames(b_indepri_onepcre$samples[[1]]))])$statistics
 
 
+# Estimate the FPC-basis from the data
+mfpca_indepri_est <- preproc_MFPCA(data = d_indepri$data,
+                                   uni_mean = "y ~ obstime + x3 + obstime:x3",
+                                   M = 2, npc = 3)
+d_indepri_est <- attach_wfpc(mfpca_indepri_est, d_indepri$data)
+set.seed(1808)
+sink("indepri_onepcre_est.txt")
+b_indepri_onepcre_est <- bamlss(f_indepri_onepcre, family = mjm_bamlss, 
+                                data = d_indepri_est, timevar = "obstime",
+                                verbose_sampler = TRUE)
+sink()
+
+set.seed(1808)
+sink("indepri_twopcre_est.txt")
+b_indepri_twopcre_est <- bamlss(f_indepri_twopcre, family = mjm_bamlss, 
+                                data = d_indepri_est, timevar = "obstime",
+                                verbose_sampler = TRUE)
+sink()
+save(b_indepri_onepcre_est, b_indepri_twopcre_est, 
+     file = "inst/objects/indepri_est_models.Rdata")
+
+
+p_est_one <- ggplot(data = d_indepri$data %>% 
+                      mutate(fit_onepcre = b_indepri_onepcre$fitted.values$mu, 
+                             fit_onepcre_est = 
+                               b_indepri_onepcre_est$fitted.values$mu) %>% 
+                      filter(id %in% ids), aes(x = obstime, color = id)) +
+  geom_point(aes(y = y), size = 1.3) +
+  geom_line(aes(y = fit_onepcre), linetype = "dotted") +
+  geom_line(aes(y = fit_onepcre_est), linetype = "dashed") +
+  geom_line(aes(y = mu)) +
+  facet_grid(~marker)
+
+p_est_two <- ggplot(data = d_indepri$data %>% 
+                      mutate(fit_twopcre = b_indepri_twopcre$fitted.values$mu, 
+                             fit_twopcre_est = 
+                               b_indepri_twopcre_est$fitted.values$mu) %>% 
+                      filter(id %in% ids), aes(x = obstime, color = id)) +
+  geom_point(aes(y = y), size = 1.3) +
+  geom_line(aes(y = fit_twopcre), linetype = "dotted") +
+  geom_line(aes(y = fit_twopcre_est), linetype = "dashed") +
+  geom_line(aes(y = mu)) +
+  facet_grid(~marker)
+
+
+
 
 # Independent RI + RS -----------------------------------------------------
 
@@ -258,3 +304,31 @@ p_indeprirs <- ggplot(d_indeprirs$data, aes(x = obstime, y = y, color = id)) +
   facet_grid(~marker) +
   theme(legend.position = "none")
 
+f_indeprirs_re <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
+    s(id, marker, bs = "re") + s(id, marker, obstime, bs = "re"),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+
+set.seed(1808)
+sink("indeprirs_re.txt")
+b_indeprirs_re <- bamlss(f_indeprirs_re, family = mjm_bamlss, 
+                         data = d_indeprirs$data, timevar = "obstime",
+                         maxit = 500, verbose_sampler = TRUE)
+sink()
+save(b_indeprirs_re, file = "inst/objects/indeprirs_models.Rdata")
+
+set.seed(1808)
+ids <- sample(unique(d_indeprirs$data_short[which(
+  d_indeprirs$data_short$survtime < 25.1 &d_indeprirs$data_short$survtime > 20), 
+  "id"]), 5, replace = FALSE)
+p_rirs_re <- ggplot(data = d_indeprirs$data %>% 
+                      mutate(fit = b_indeprirs_re$fitted.values$mu) %>% 
+                      filter(id %in% ids), aes(x = obstime, color = id)) +
+  geom_point(aes(y = y), size = 1.3) +
+  geom_line(aes(y = fit), linetype = "dotted") +
+  geom_line(aes(y = mu)) +
+  facet_grid(~marker)

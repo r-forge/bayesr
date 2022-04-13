@@ -1,0 +1,83 @@
+---
+title: "Simple MJMs"
+author: "Alex"
+date: "4/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MFPCA)
+library(tidyverse)
+library(Matrix)
+library(mvtnorm)
+library(survival)
+library(bamlss)
+
+
+# Data Generation
+source("R/simMultiJM.R")
+source("R/preprocessing.R")
+
+# Helperfunction PCRE
+source("R/eval_mfun.R")
+source("R/pcre_smooth.R")
+
+# Family Construction
+source("R/mjm_bamlss.R")
+source("R/MJM_transform.R")
+source("R/opt_MJM.R")
+source("R/opt_updating.R")
+source("R/MJM_mcmc.R")
+source("R/mcmc_proposing.R")
+source("R/survint.R")
+
+```
+
+## Idea
+
+Start with simple simulation scenarios for a proof of concept. In particular, start with a multivariate joint model, where the intra-subject association of the longitudinal part is induced only by a random intercept. Then expand it further to more complex scenarios.
+
+The proof of concept follows the outline:
+* Data generation
+* Data preparation
+* Model formula
+* Model fit
+* Sampling statistics
+
+## Random Intercept Model
+
+```{r, eval = FALSE}
+# Generate data with independent random intercepts
+d_indepri <- simMultiJM(nsub = 150, times = seq(0, 25, by = 0.25), 
+                        probmiss = 0.75, maxfac = 1.5,
+                        nmark = 2, param_assoc = TRUE, M = NULL, 
+                        FPC_bases = NULL, FPC_evals = NULL, mfpc_args = NULL,
+                        re_cov_mat = matrix(c(0.68, 0, 0, 0.68), ncol = 2), 
+                        ncovar = 2,
+                        lambda = function(t, x) {
+                          1.37 * t^(0.37)
+                        },
+                        gamma = function(x) {
+                          - 5.8 + 0.48*x[, 3]
+                        },
+                        alpha = list(function(t, x) {
+                          0.64 + 0*t
+                        }, function(t, x) {
+                          -0.64 + 0*t
+                        }),
+                        mu = list(function(t, x, r){
+                          2.13 + 0.24*t - 0.25*x[, 3] - 0.05*t*x[, 3] + 
+                            r[, 1]
+                        }, function(t, x, r){
+                          2.13 + 0.24*t - 0.25*x[, 3] - 0.05*t*x[, 3] + 
+                            r[, 2]
+                        }),
+                        sigma = function(t, x) {
+                          log(0.6) + 0*t
+                        }, 
+                        tmax = NULL, seed = 1808, 
+                        full = TRUE, file = NULL)
+
+```
+
