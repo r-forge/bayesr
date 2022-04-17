@@ -189,10 +189,10 @@ bayesx.control(model.name = "bayesx.estim",
   \url{http://www.BayesX.org}.
 
   Belitz C, Lang S (2008). Simultaneous selection of variables and smoothing parameters in 
-    structured additive regression models. \emph{Computational Statistics \& Data Analysis}, 
+    structured additive regression models. \emph{Computational Statistics & Data Analysis}, 
     \bold{53}, 61--81.
 
-  Chambers JM, Hastie TJ (eds.) (1992). \emph{Statistical Models in S}. Chapman \& Hall, 
+  Chambers JM, Hastie TJ (eds.) (1992). \emph{Statistical Models in S}. Chapman & Hall, 
     London.
 
   Umlauf N, Adler D, Kneib T, Lang S, Zeileis A (2015).

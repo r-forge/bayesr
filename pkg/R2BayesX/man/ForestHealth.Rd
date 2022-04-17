@@ -44,7 +44,7 @@ A data frame containing 1793 observations on 16 variables.
 }
 
 \references{
-  Kneib, T. & Fahrmeir, L. (2010): A Space-Time Study on Forest Health. In: Chandler, R. E. \& 
+  Kneib, T. & Fahrmeir, L. (2010): A Space-Time Study on Forest Health. In: Chandler, R. E. & 
     Scott, M. (eds.): Statistical Methods for Trend Detection and Analysis in the Environmental 
     Sciences, Wiley.
 

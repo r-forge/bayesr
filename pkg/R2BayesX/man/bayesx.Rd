@@ -164,7 +164,7 @@ bayesx(formula, data, weights = NULL, subset = NULL,
     URL \url{http://www.jstatsoft.org/v14/i11/}.
 
   Brezger A, Lang S (2006). Generalized Structured Additive Regression Based on Bayesian P-Splines.
-    \emph{Computational Statistics \& Data Analysis}, \bold{50}, 947--991.
+    \emph{Computational Statistics & Data Analysis}, \bold{50}, 947--991.
 
   Fahrmeir L, Kneib T, Lang S (2004). Penalized Structured Additive Regression for Space Time Data: 
     A Bayesian Perspective. \emph{Statistica Sinica}, \bold{14}, 731--761.
