@@ -5,7 +5,12 @@ Predict.matrix.pcre2.random.effect <- function(object, data)
 {
   if(is.null(object$xt$mfpc))
     stop("need mfpa object!")
-  X <- eval_mfpc(object$xt$mfpc, data[[object$timevar]])
+  
+  # If basis should be evaluated for different marker timepoints, then
+  # which_marker is not NULL
+  which_marker <- attr(object, "which_marker")
+  X <- eval_mfpc(object$xt$mfpc, data[[object$timevar]], which_marker)
+  
   if(ncol(X) != (length(object$term) - 2))
     stop("check M argument in MFPCA()!")
   X <- data.frame(data[[object$term[1]]], X)
@@ -91,7 +96,12 @@ Predict.matrix.unc_pcre.random.effect <- function(object, data){
   
   if(is.null(object$xt$mfpc))
     stop("need mfpa object!")
-  X <- eval_mfpc(object$xt$mfpc, data[[object$timevar]])
+  
+  # If basis should be evaluated for different marker timepoints, then
+  # which_marker is not NULL
+  which_marker <- attr(object, "which_marker")
+  X <- eval_mfpc(object$xt$mfpc, data[[object$timevar]], which_marker)
+  
   if(ncol(X) != (length(object$term) - 2))
     stop("check M argument in MFPCA()!")
   X <- data.frame(data[[object$term[1]]], X)
@@ -102,5 +112,5 @@ Predict.matrix.unc_pcre.random.effect <- function(object, data){
   X_id <- model.matrix(as.formula(paste("~ 0 +", object$term[1])), X)
   X_ef <- model.matrix(as.formula(
     paste("~ 0 +", paste(object$term[-1], collapse="+"))), X)
-  tensor.prod.model.matrix(list(X_id, X_ef))
+  mgcv::tensor.prod.model.matrix(list(X_id, X_ef))
 }

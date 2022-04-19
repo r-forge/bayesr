@@ -15,7 +15,7 @@ mjm_bamlss <- function(...)
     "transform" = MJM_transform,
     "optimizer" = opt_MJM,
     "sampler" = MJM_mcmc,
-    "predict" = NULL
+    "predict" = MJM_predict
   )
   
   class(rval) <- "family.bamlss"

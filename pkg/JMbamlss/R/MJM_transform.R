@@ -26,6 +26,8 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
     message("ID taken to be ", idvar)
   }
   
+  # Get marker variable (fixed for now) - for MJM_predict()
+  marker_name <- "marker"
   
   # Function to transform intervals to [0, 1] for GQ integration
   create_grid <- function(time) {
@@ -71,6 +73,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
   attr(object$y, "nsubj") <- nsubj
   attr(object$y, "nmarker") <- nmarker
   attr(object$y, "marker") <- marker
+  attr(object$y, "marker_name") <- marker_name
   
   
   # DESIGN CONSTRUCT
@@ -212,14 +215,16 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
         pn <- paste(j, if(sj != "model.matrix") "s" else "p", sep = ".")
         cn <- colnames(object$x[[j]]$smooth.construct[[sj]]$X)
         if(is.null(cn))
-          cn <- paste("b", 1:ncol(object$x[[j]]$smooth.construct[[sj]]$X), sep = "")
+          cn <- paste("b", 1:ncol(object$x[[j]]$smooth.construct[[sj]]$X), 
+                      sep = "")
         pn0 <- paste(pn, sj, sep = ".")
         pn <- paste(pn0, cn, sep = ".")
         if(all(is.na(par[pn]))) {
           if(sj == "model.matrix")
             pn <- gsub(".p.model.matrix.", ".p.", pn, fixed = TRUE)
         }
-        eta[[j]] <- eta[[j]] + object$x[[j]]$smooth.construct[[sj]]$X %*% par[pn]
+        eta[[j]] <- eta[[j]] + 
+          object$x[[j]]$smooth.construct[[sj]]$X %*% par[pn]
         if(!(j %in% c("gamma", "sigma"))) {
           eta_timegrid[[j]] <- eta_timegrid[[j]] + 
             object$x[[j]]$smooth.construct[[sj]]$Xgrid %*% par[pn]
@@ -247,7 +252,7 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
     sum_Lambda <- drop(y2[, 1]/2 * exp(eta$gamma)) %*%
       (diag(nsubj)%x%t(gq$weights))%*%
       exp(eta_timegrid)
-    logLik <- drop(object$y[[1]][, "status"][take_last] %*% eta_T - sum_Lambda) +
+    logLik <- drop(object$y[[1]][, "status"][take_last] %*% eta_T- sum_Lambda) +
       sum(dnorm(object$y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
                 log = TRUE))
     if(logPost)

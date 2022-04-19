@@ -1,0 +1,352 @@
+## Prediction.
+MJM_predict <- function(object, newdata,
+                        type = c("link", "parameter", "probabilities", "cumhaz",
+                                 "loglik"),
+                       dt, steps, id,
+                       FUN = function(x) { mean(x, na.rm = TRUE) },
+                       subdivisions = 100, cores = NULL,
+                       chunks = 1, verbose = FALSE,  ...)
+{
+  # if(attr(object$y[[1]], "nonlinear") & 
+  #    any(type %in% c("probabilities", "cumhaz"))){
+  #   stop("Computation of cumulative hazard and survival probabilities", 
+  #        "are currently under construction for associations which are",
+  #        "nonlinear in mu."))
+  # }
+  if(missing(dt)) dt <- 0
+  if(missing(steps)) steps <- 1
+  if(missing(id)) i <- NULL else i <- id
+  idvar <- attr(object$y[[1]], "idvar")
+  
+  if(length(type) > 1)
+    type <- type[1]
+  type <- match.arg(type)
+  loglik <- type == "loglik"
+  if(loglik) {
+    type <- "cumhaz"
+    dt <- 0
+  }
+  
+  if(type == "probabilities"){
+    if(!is.null(newdata)){
+      warning("The provided newdata will be ignored for the prediction",
+              "of conditional survival probabilities.")
+      newdata <- NULL
+    }
+    if(dt == 0){
+      stop("Please specify a time window for the prediction of conditional", 
+           "survival probabilities.")
+    }
+  }
+  
+  if(type == "cumhaz" & !is.null(newdata) & dt > 0){
+    warning("The provided newdata will be ignored for the prediction of", 
+            "conditional survival t + dt.")
+    newdata <- NULL
+  }
+  
+  # calculate_mu <- FALSE
+  # if(
+  #   # only if nonlinear effect
+  #   attr(object$y[[1]], "nonlinear") &
+  #   # only if alpha amongst predicted effects
+  #   (("alpha" %in% list(...)$model) | is.null(list(...)$model)) & 
+  #   # only if mu is not explicitely specified in newdata
+  #   (is.null(newdata)|is.null(newdata$mu))                        
+  # ){
+  #   calculate_mu <- TRUE
+  # }
+  
+  if(is.null(newdata)){
+    newdata <- model.frame(object) 
+  }
+  
+  # if(calculate_mu){
+  #   object$family$predict <- NULL
+  #   long_timevar <- attr(object$y[[1]], "timevar")["mu"]
+  #   surv_timevar <- attr(object$y[[1]], "timevar")["lambda"]
+  #   tempdata <- newdata
+  #   tempdata[, long_timevar] <- tempdata[, surv_timevar]
+  #   mu <- predict.bamlss(object, model = "mu", newdata = tempdata, 
+  #                        type = type, cores = cores, chunks = chunks,
+  #                        verbose = verbose)
+  #   newdata$mu <- mu
+  # }
+  
+  if(!(type %in% c("probabilities", "cumhaz"))) {
+    
+    object$family$predict <- NULL
+    
+    # Check for PCRE-term
+    pcre_mu <- lapply(object$x$mu$smooth.construct, function (x) {
+      any(grepl("pcre.random.effect", class(x), fixed = TRUE))
+    })
+    for (j in which(unlist(pcre_mu))) {
+      
+      # Compute the evaluated fpc basis functions for the newdata
+      attr(object$x$mu$smooth.construct[[j]], "which_marker") <- 
+        newdata[, attr(object$y, "marker_name")]
+      
+      # MUSS MAN NICHT VIELLEICHT NOCH AUFPASSEN, DASS DIE BENENNUNG DER 
+      # MATRIZEN RICHTIG IST?
+    }
+    
+    # Als Service sollte die MJM_predict() Funktion erst mal nicht benötigen, 
+    # dass man auch noch die Hauptkomponenten-Funktion übergibt. Also man über-
+    # gibt den Datensatz ganz normal, ohne Basisfunktionen, und die Predict-
+    # Funktion nutzt die Information, die im Smooth enthalten ist, um die
+    # zusätzlichen Variablen aufzubauen. Wenn die mgcv-Predict Funktionen
+    # brauchen, dass alle Variablennamen im Datensatz enthalten sind, dann
+    # kann man ja erst mal einen Block 0er mit den richtigen Namen anhängen und
+    # es dann über die pcre-predict Funktion dann wieder ausgleichen?
+    # 
+    # Aber man sollte alle Daten übergeben, die man auch predicten möchte, also 
+    # nicht wie früher gedacht, nur den Datensatz auf einer Dimension und dann
+    # predicted die Funktion auf allen Daten. Das würde nicht in das Konzept von
+    # R passen und so schlimm ist es auch nicht, weil man dann ja nur die
+    # Markerinfo anpassen muss, wenn die FPCs vom Code übernommen werden.
+    # 
+    # Also reicht es wahrscheinlich, als Attribut des smooths die Marker-
+    # Variable zu speichern. Am effizientesten wäre es wohl dann, die Info an
+    # die eval_mfpc - Funktion weiterzureichen. Die kann dann für den Fall, dass
+    # Marker-Info vorhanden ist, das prm-Objekt über einen mapply Call aufrufen.
+    # Dann braucht man aber auch in der Transform-Funktion nichts ändern - bzw.
+    # hat man die Option, das zu machen, falls sich herausstellen sollte, dass
+    # es mit den Designmatritzen noch nicht so richtig klappt, wenn man unter-
+    # schiedlich viele Beobachtungen auf den Markern hat... 
+    
+    return(bamlss:::predict.bamlss(object, newdata = newdata, type = type,
+                                   FUN = FUN, cores = cores, chunks = chunks, 
+                                   verbose = verbose, ...))
+  }
+  
+  if(object$family$family != "jm")
+    stop("object must be a joint-model!")
+  
+  dalpha <- has_pterms(object$x$dalpha$terms) | (length(object$x$dalpha$smooth.construct) > 0)
+  
+  timevar <- attr(object$y[[1]], "timevar")
+  tmax_model <- max(newdata[,timevar["lambda"]])
+  
+  if(!is.null(i)){
+    if(!is.character(i))
+      i <- levels(newdata[[idvar]])[i]
+    newdata <- subset(newdata, newdata[[idvar]] %in% i)
+  }
+  
+  tmax_pred <- max(newdata[,timevar["mu"]]) + dt
+  
+  if(tmax_pred > tmax_model){
+    warning("Predictions should not be made beyond the modelled time range. 
+            Please adjust the time window dt accordingly.")
+  }
+  
+  
+  
+  ## Create the time grid.  
+  grid <- function(lower, upper, length) {
+    seq(from = lower, to = upper, length = length)
+  }
+  
+  jm_probs <- function(data) {
+    
+    if(dt == 0){
+      take <- !duplicated(data[, c(timevar["lambda"], idvar)])
+      dsurv <- subset(data, take)
+      timegrid <- lapply(dsurv[[timevar["lambda"]]], function(x){grid(0, x, subdivisions)})
+    } else {
+      take <- !duplicated(data[, c(timevar["lambda"], idvar)], fromLast = TRUE)
+      dsurv <- subset(data, take)
+      timegrid <- lapply(dsurv[[timevar["mu"]]], function(x){grid(x, x+dt, subdivisions)})
+    }
+    nobs <- nrow(dsurv)
+    gdim <- c(length(timegrid), length(timegrid[[1]]))
+    width <- rep(NA, nobs)
+    for(i in 1:nobs)
+      width[i] <- timegrid[[i]][2] - timegrid[[i]][1]
+    
+    pred.setup <- predict.bamlss(object, data, type = "link",
+                                 get.bamlss.predict.setup = TRUE, ...)
+    
+    enames <- pred.setup$enames
+    
+    pred_gamma <- with(pred.setup, .predict.bamlss("gamma",
+                                                   object$x$gamma, samps, enames$gamma, intercept,
+                                                   nsamps, dsurv))
+    
+    pred_lambda <- with(pred.setup, .predict.bamlss.surv.td("lambda",
+                                                            object$x$lambda$smooth.construct, samps, enames$lambda, intercept,
+                                                            nsamps, dsurv, timevar["lambda"], timegrid,
+                                                            drop.terms.bamlss(object$x$lambda$terms, sterms = FALSE, keep.response = FALSE),
+                                                            type = 2))
+    #!# Todo: Fix prediction for nonlinear
+    pred_mu <- with(pred.setup, .predict.bamlss.surv.td("mu",
+                                                        object$x$mu$smooth.construct, samps, enames$mu, intercept,
+                                                        nsamps, dsurv, timevar["mu"], timegrid,
+                                                        drop.terms.bamlss(object$x$mu$terms, sterms = FALSE, keep.response = FALSE)))
+    
+    pred_alpha <- with(pred.setup, .predict.bamlss.surv.td("alpha",
+                                                           object$x$alpha$smooth.construct, samps, enames$alpha, intercept,
+                                                           nsamps, dsurv, timevar["lambda"], timegrid,
+                                                           drop.terms.bamlss(object$x$alpha$terms, sterms = FALSE, keep.response = FALSE)))
+    
+    if(dalpha) {
+      pred_dalpha <- with(pred.setup, .predict.bamlss.surv.td("dalpha",
+                                                              object$x$dalpha$smooth.construct, samps, enames$dalpha, intercept,
+                                                              nsamps, dsurv, timevar["lambda"], timegrid,
+                                                              drop.terms.bamlss(object$x$dalpha$terms, sterms = FALSE, keep.response = FALSE)))
+      
+      pred_dmu <- with(pred.setup, .predict.bamlss.surv.td("dmu",
+                                                           object$x$dmu$smooth.construct, samps, enames$dmu, intercept,
+                                                           nsamps, dsurv, timevar["mu"], timegrid,
+                                                           drop.terms.bamlss(object$x$dmu$terms, sterms = FALSE, keep.response = FALSE),
+                                                           derivMat = TRUE))
+    }
+    if(attr(object$y[[1]], "nonlinear")){
+      eta_timegrid <- if(dalpha) {
+        pred_lambda + pred_alpha + pred_dalpha * pred_dmu
+      } else {
+        pred_lambda + pred_alpha
+      }
+    } else {
+      eta_timegrid <- if(dalpha) {
+        pred_lambda + pred_alpha * pred_mu + pred_dalpha * pred_dmu
+      } else {
+        pred_lambda + pred_alpha * pred_mu
+      }
+    }
+    
+    if(loglik) {
+      eta_gamma <- predict.bamlss(object, data[take, , drop = FALSE], model = "gamma")
+      eta_mu <- predict.bamlss(object, data, model = "mu")
+      eta_sigma <- predict.bamlss(object, data, model = "sigma")
+      mf <- model.frame(object, data = data)
+      y <- mf[, grep("Surv", names(mf), fixed = TRUE)]
+      eta_timegrid <- matrix(eta_timegrid, nrow = gdim[1], ncol = gdim[2], byrow = TRUE)
+      eeta <- exp(eta_timegrid)
+      int <- width * (0.5 * (eeta[, 1] + eeta[, subdivisions]) + apply(eeta[, 2:(subdivisions - 1)], 1, sum))
+      ll <- sum((eta_timegrid[, ncol(eta_timegrid)] + eta_gamma) * y[take, "status"], na.rm = TRUE) -
+        exp(eta_gamma) %*% int + sum(dnorm(y[, "obs"], mean = eta_mu, sd = exp(eta_sigma), log = TRUE))
+      return(drop(ll))
+    }
+    
+    if(dt == 0){
+      probs <- NULL
+      for(i in 1:ncol(eta_timegrid)) {
+        eta <- matrix(eta_timegrid[, i], nrow = gdim[1], ncol = gdim[2], byrow = TRUE)
+        eeta <- exp(eta)
+        int <- width * (0.5 * (eeta[, 1] + eeta[, subdivisions]) + apply(eeta[, 2:(subdivisions - 1), drop = FALSE], 1, sum))
+        probs <- if(type == "probabilities") {
+          cbind(probs, exp(-1 * exp(pred_gamma[, i]) * int))
+        } else {
+          cbind(probs, exp(pred_gamma[, i]) * int)
+        }
+      }
+      
+      if(!is.null(FUN)) {
+        if(is.matrix(probs)) {
+          if(ncol(probs) > 1)
+            probs <- apply(probs, 1, FUN)
+          probs <- t(probs) 
+        } 
+      }
+      
+    } else {
+      lprobs <- lapply(1:steps, function(x){
+        probs <- NULL
+        sub <- round(subdivisions/steps * x)
+        for(i in 1:ncol(eta_timegrid)) {
+          eta <- matrix(eta_timegrid[, i], nrow = gdim[1], ncol = gdim[2], byrow = TRUE)
+          eeta <- exp(eta)
+          int <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1), drop = FALSE], 1, sum))
+          probs <- if(type == "probabilities") {
+            cbind(probs, exp(-1 * exp(pred_gamma[, i]) * int))
+          } else {
+            cbind(probs, exp(pred_gamma[, i]) * int)
+          }
+        }
+        
+        if(!is.null(FUN)) {
+          if(is.matrix(probs)) {
+            if(ncol(probs) > 1)
+              probs <- apply(probs, 1, FUN)
+            probs <- t(probs) 
+          } 
+        }
+        probs
+      }) 
+      
+      probs <- lprobs
+      names(probs) <- paste("Time after last longitudinal observation:", (1:steps)*dt/steps) 
+    }
+    
+    
+    return(probs)
+  }
+  
+  ia <- interactive()
+  
+  if(is.null(cores)) {
+    if(chunks < 2) {
+      probs <- jm_probs(newdata)
+    } else {
+      id <- sort(rep(1:chunks, length.out = nrow(newdata)))
+      newdata <- split(newdata, id)
+      chunks <- length(newdata)
+      probs <- NULL
+      for(i in 1:chunks) {
+        if(verbose) {
+          cat(if(ia) "\r" else "\n")
+          cat("predicting chunk", i, "of", chunks, "...")
+          if(.Platform$OS.type != "unix" & ia) flush.console()
+        }
+        if(i < 2) {
+          probs <- jm_probs(newdata[[i]])
+        } else {
+          if(is.null(dim(probs))) {
+            probs <- c(probs, jm_probs(newdata[[i]]))
+          } else {
+            probs <- rbind(probs, jm_probs(newdata[[i]]))
+          }
+        }
+      }
+      if(verbose) cat("\n")
+    }
+  } else {
+    parallel_fun <- function(i) {
+      if(chunks < 2) {
+        pr <- jm_probs(newdata[[i]])
+      } else {
+        idc <- sort(rep(1:chunks, length.out = nrow(newdata[[i]])))
+        nd <- split(newdata[[i]], idc)
+        chunks <- length(nd)
+        pr <- NULL
+        for(j in 1:chunks) {
+          if(j < 2) {
+            pr <- jm_probs(nd[[j]])
+          } else {
+            if(is.null(dim(pr))) {
+              pr <- c(pr, jm_probs(nd[[j]]))
+            } else {
+              pr <- rbind(pr, jm_probs(nd[[j]]))
+            }
+          }
+        }
+      }
+      return(pr)
+    }
+    
+    id <- sort(rep(1:cores, length.out = nrow(newdata)))
+    newdata <- split(newdata, id)
+    cores <- length(newdata)
+    probs <- parallel::mclapply(1:cores, parallel_fun, mc.cores = cores)
+    
+    probs <- if(is.matrix(probs[[1]])) {
+      do.call("rbind", probs)
+    } else {
+      do.call("c", probs)
+    }
+  }
+  
+  return(probs)
+}
