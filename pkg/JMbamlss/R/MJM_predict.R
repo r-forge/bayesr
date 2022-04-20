@@ -87,33 +87,16 @@ MJM_predict <- function(object, newdata,
       attr(object$x$mu$smooth.construct[[j]], "which_marker") <- 
         newdata[, attr(object$y, "marker_name")]
       
-      # MUSS MAN NICHT VIELLEICHT NOCH AUFPASSEN, DASS DIE BENENNUNG DER 
-      # MATRIZEN RICHTIG IST?
+      # Check and attach missing FPCbasis (set to 0)
+      add_fpc <- which(!object$x$mu$smooth.construct[[j]]$term %in% 
+                         colnames(newdata))
+      if (length(add_fpc) > 0) {
+        for (add in add_fpc) {
+          newdata[[object$x$mu$smooth.construct[[j]]$term[add]]] <- 0
+        }
+      }
+      
     }
-    
-    # Als Service sollte die MJM_predict() Funktion erst mal nicht benötigen, 
-    # dass man auch noch die Hauptkomponenten-Funktion übergibt. Also man über-
-    # gibt den Datensatz ganz normal, ohne Basisfunktionen, und die Predict-
-    # Funktion nutzt die Information, die im Smooth enthalten ist, um die
-    # zusätzlichen Variablen aufzubauen. Wenn die mgcv-Predict Funktionen
-    # brauchen, dass alle Variablennamen im Datensatz enthalten sind, dann
-    # kann man ja erst mal einen Block 0er mit den richtigen Namen anhängen und
-    # es dann über die pcre-predict Funktion dann wieder ausgleichen?
-    # 
-    # Aber man sollte alle Daten übergeben, die man auch predicten möchte, also 
-    # nicht wie früher gedacht, nur den Datensatz auf einer Dimension und dann
-    # predicted die Funktion auf allen Daten. Das würde nicht in das Konzept von
-    # R passen und so schlimm ist es auch nicht, weil man dann ja nur die
-    # Markerinfo anpassen muss, wenn die FPCs vom Code übernommen werden.
-    # 
-    # Also reicht es wahrscheinlich, als Attribut des smooths die Marker-
-    # Variable zu speichern. Am effizientesten wäre es wohl dann, die Info an
-    # die eval_mfpc - Funktion weiterzureichen. Die kann dann für den Fall, dass
-    # Marker-Info vorhanden ist, das prm-Objekt über einen mapply Call aufrufen.
-    # Dann braucht man aber auch in der Transform-Funktion nichts ändern - bzw.
-    # hat man die Option, das zu machen, falls sich herausstellen sollte, dass
-    # es mit den Designmatritzen noch nicht so richtig klappt, wenn man unter-
-    # schiedlich viele Beobachtungen auf den Markern hat... 
     
     return(bamlss:::predict.bamlss(object, newdata = newdata, type = type,
                                    FUN = FUN, cores = cores, chunks = chunks, 

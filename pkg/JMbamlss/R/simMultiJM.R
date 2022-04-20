@@ -360,7 +360,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     
     data_long <- cbind(data_long,
                        fpc = fpcs,
-                       wfpc = t(t(fpcs)*b_set$evals))
+                       wfpc = t(t(fpcs)*sqrt(b_set$evals)))
   }
   
   # Hypothetical longitudinal data
