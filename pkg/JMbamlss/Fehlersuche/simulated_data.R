@@ -100,7 +100,9 @@ source("R/mcmc_proposing.R")
 source("R/survint.R")
 b_jm <- bamlss(f_jm , family = "jm", data = dat_a, timevar = "obstime",
                idvar = "id")
+sink("b_simdat.txt")
 b_mjm <- bamlss(f_mjm, family = mjm_bamlss, data = dat_a, timevar = "obstime")
+sink()
 
 
 # Weißt was, jetzt fangen wir erst mal an mit den Basics:

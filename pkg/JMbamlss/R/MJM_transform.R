@@ -74,6 +74,8 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
   attr(object$y, "nmarker") <- nmarker
   attr(object$y, "marker") <- marker
   attr(object$y, "marker_name") <- marker_name
+  attr(object$y, "timevar") <- c("lambda" = timevar, "mu" = timevar_mu)
+  attr(object$y, "idvar") <- idvar
   
   
   # DESIGN CONSTRUCT

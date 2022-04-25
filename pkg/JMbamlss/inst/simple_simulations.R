@@ -77,7 +77,7 @@ p_indepri <- ggplot(d_indepri$data, aes(x = obstime, y = y, color = id)) +
 
 # Appropriate would be to use two independent random effects
 f_indepri_onere <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
     s(id, marker, bs = "re"),
@@ -85,7 +85,7 @@ f_indepri_onere <- list(
   alpha ~ -1 + marker
 )
 f_indepri_byre <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
     s(id, by = marker, bs = "re"),
@@ -98,14 +98,14 @@ set.seed(1808)
 sink("indepri_onere.txt")
 b_indepri_onere <- bamlss(f_indepri_onere, family = mjm_bamlss, 
                           data = d_indepri$data, timevar = "obstime",
-                          verbose_sampler = TRUE)
+                          maxit = 1000, verbose_sampler = TRUE)
 sink()
 
 set.seed(1808)
 sink("indepri_byre.txt")
 b_indepri_byre <- bamlss(f_indepri_byre, family = mjm_bamlss, 
-                          data = d_indepri$data, timevar = "obstime",
-                          verbose_sampler = TRUE)
+                         data = d_indepri$data, timevar = "obstime",
+                         maxit = 1000, verbose_sampler = TRUE)
 sink()
 
 
@@ -134,7 +134,7 @@ d_indepri_data <- attach_wfpc(mfpca_indepri, d_indepri$data)
 
 # Use principal components
 f_indepri_onepcre <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
     s(id, wfpc.1, wfpc.2, bs = "unc_pcre", xt = list("mfpc" = mfpca_indepri)),
@@ -143,7 +143,7 @@ f_indepri_onepcre <- list(
 )
 
 f_indepri_twopcre <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
     s(id, wfpc.1, bs = "unc_pcre",
@@ -161,14 +161,14 @@ set.seed(1808)
 sink("indepri_onepcre.txt")
 b_indepri_onepcre <- bamlss(f_indepri_onepcre, family = mjm_bamlss, 
                             data = d_indepri_data, timevar = "obstime",
-                            verbose_sampler = TRUE)
+                            maxit = 1000, verbose_sampler = TRUE)
 sink()
 
 set.seed(1808)
 sink("indepri_twopcre.txt")
 b_indepri_twopcre <- bamlss(f_indepri_twopcre, family = mjm_bamlss, 
                             data = d_indepri_data, timevar = "obstime",
-                            verbose_sampler = TRUE)
+                            maxit = 1000, verbose_sampler = TRUE)
 sink()
 
 save(b_indepri_onere, b_indepri_byre, b_indepri_onepcre, b_indepri_twopcre,
@@ -224,14 +224,14 @@ set.seed(1808)
 sink("indepri_onepcre_est.txt")
 b_indepri_onepcre_est <- bamlss(f_indepri_onepcre, family = mjm_bamlss, 
                                 data = d_indepri_est, timevar = "obstime",
-                                verbose_sampler = TRUE)
+                                maxit = 1000, verbose_sampler = TRUE)
 sink()
 
 set.seed(1808)
 sink("indepri_twopcre_est.txt")
 b_indepri_twopcre_est <- bamlss(f_indepri_twopcre, family = mjm_bamlss, 
                                 data = d_indepri_est, timevar = "obstime",
-                                verbose_sampler = TRUE)
+                                maxit = 1000, verbose_sampler = TRUE)
 sink()
 save(b_indepri_onepcre_est, b_indepri_twopcre_est, 
      file = "inst/objects/indepri_est_models.Rdata")
@@ -305,7 +305,7 @@ p_indeprirs <- ggplot(d_indeprirs$data, aes(x = obstime, y = y, color = id)) +
   theme(legend.position = "none")
 
 f_indeprirs_re <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 3),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
     s(id, marker, bs = "re") + s(id, marker, obstime, bs = "re"),
@@ -317,9 +317,10 @@ set.seed(1808)
 sink("indeprirs_re.txt")
 b_indeprirs_re <- bamlss(f_indeprirs_re, family = mjm_bamlss, 
                          data = d_indeprirs$data, timevar = "obstime",
-                         maxit = 500, verbose_sampler = TRUE)
+                         maxit = 1000, verbose_sampler = TRUE)
 sink()
 save(b_indeprirs_re, file = "inst/objects/indeprirs_models.Rdata")
+load("inst/objects/indeprirs_models.Rdata")
 
 set.seed(1808)
 ids <- sample(unique(d_indeprirs$data_short[which(
@@ -332,3 +333,5 @@ p_rirs_re <- ggplot(data = d_indeprirs$data %>%
   geom_line(aes(y = fit), linetype = "dotted") +
   geom_line(aes(y = mu)) +
   facet_grid(~marker)
+summary(b_indeprirs_re$samples[[
+  1]][, grep("accepted", colnames(b_indeprirs_re$samples[[1]]))])$statistics
