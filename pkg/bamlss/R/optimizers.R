@@ -2581,7 +2581,7 @@ opt_boost <- boost <- function(x, y, family, weights = NULL, offset = NULL,
               nthreads = nthreads)
           } else {
             try(.Call("boost_fit", x[[i]]$smooth.construct[[j]], grad, nu2,
-              if(!is.null(weights)) as.numeric(weights[, i]) else numeric(0), rho, PACKAGE = "bamlss"), silent = TRUE)
+              if(!is.null(weights)) as.numeric(weights[, i]) else numeric(0), rho), silent = TRUE)
           }
         } else {
           x[[i]]$smooth.construct[[j]][["boost.fit"]](x = x[[i]]$smooth.construct[[j]],
@@ -3229,6 +3229,7 @@ boost_transform <- function(x, y, df = NULL, family,
   }
   
   if(initialize) {
+    nobs <- if(is.null(dim(y))) length(y) else nrow(y)
     eta <- get.eta(x)
     eta <- init.eta(eta, y, family, nobs)
     if(!is.null(offset)) {
@@ -3238,7 +3239,6 @@ boost_transform <- function(x, y, df = NULL, family,
           eta[[j]] <- eta[[j]] + offset[[j]]
       }
     }
-    nobs <- length(eta[[1]])
     start <- unlist(lapply(eta, mean, na.rm = TRUE))
 
     par <- rep(0, length(nx))

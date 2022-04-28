@@ -1544,7 +1544,6 @@ models for longitudinal and time-to-event data using the modular BAMLSS framewor
   estimated effects.}
 \end{figure}
 
-
 \section{Summary and Discussion}\label{sec:conclusion}
 
 This paper combines frequently-used algorithms for the estimation of additive Bayesian models
