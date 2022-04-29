@@ -26,6 +26,7 @@ source("R/MJM_mcmc.R")
 source("R/mcmc_proposing.R")
 source("R/survint.R")
 source("R/compile.R")
+source("R/MJM_predict.R")
 
 # Compile the C function
 compile_alex()
@@ -335,3 +336,126 @@ p_rirs_re <- ggplot(data = d_indeprirs$data %>%
   facet_grid(~marker)
 summary(b_indeprirs_re$samples[[
   1]][, grep("accepted", colnames(b_indeprirs_re$samples[[1]]))])$statistics
+
+
+
+# Use an appropriate FPC basis
+seq <- seq(0, 25, by = 0.25)
+fund <- eFun(argvals = seq, M = 2, type = "Poly")
+fpc_base_two <- multiFunData(
+  funData(argvals = seq,
+          X = matrix(c(fund@X[1, ],
+                       rep(0, length(seq)),
+                       fund@X[2, ],
+                       rep(0, length(seq))),
+                     nrow = 4, byrow = TRUE)),
+  funData(argvals = seq,
+          X = matrix(c(rep(0, length(seq)),
+                       fund@X[1, ],
+                       rep(0, length(seq)),
+                       fund@X[2, ]),
+                     nrow = 4, byrow = TRUE))
+)
+
+mfpca_indeprirs <- list(
+  functions = fpc_base_two,
+  values = c(1, 1, 1, 1)
+)
+
+# Use MFPCA to get a functioning FPC basis for the covariance operator
+set.seed(1808)
+n <- 100000
+b <- mvtnorm::rmvnorm(n = n, mean = c(0,0,0,0), 
+                      sigma = diag(c(0.68, 0.28, 0.68, 0.28)))
+
+mfun <- multiFunData(
+  funData(argvals = seq,
+          X = (b[, 1:2] %*% matrix(c(rep(1, length(seq)), seq),
+                                   byrow = TRUE, ncol = length(seq)))),
+  funData(argvals = seq,
+          X = (b[, 3:4] %*% matrix(c(rep(1, length(seq)), seq),
+                                   byrow = TRUE, ncol = length(seq))))
+)
+mfpca_est2 <- MFPCA(mFData = mfun, M = 4, 
+                    uniExpansions = list(list(type = "uFPCA"),
+                                         list(type = "uFPCA")))
+mfpca_est4 <- MFPCA(mFData = mfun, M = 4, 
+                    uniExpansions = list(list(type = "uFPCA", npc = 2),
+                                         list(type = "uFPCA", npc = 2)))
+save(mfpca_est2, mfpca_est4, file = "inst/objects/indeprirs_mfpca.Rdata")  
+
+
+# Attach the FPCS
+d_indeprirs_data <- attach_wfpc(mfpca_indeprirs, d_indeprirs$data)
+d_indeprirs_data_est2 <- attach_wfpc(mfpca_est2, d_indeprirs$data)
+d_indeprirs_data_est4 <- attach_wfpc(mfpca_est4, d_indeprirs$data)
+
+# Formulas
+f_indeprirs_pcre <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
+    s(id, wfpc.1, wfpc.2, bs = "unc_pcre",
+      xt = list("mfpc" = 
+                  list(functions = extractObs(mfpca_indeprirs$functions, 1:2),
+                       values = c(1, 1)))) +
+    s(id, wfpc.3, wfpc.4, bs = "unc_pcre",
+      xt = list("mfpc" = 
+                  list(functions = extractObs(mfpca_indeprirs$functions, 3:4),
+                              values = c(1, 1)))),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+
+f_indeprirs_pcre_est2 <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
+    s(id, wfpc.1, wfpc.2, bs = "unc_pcre",
+      xt = list("mfpc" = mfpca_est2)),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+
+f_indeprirs_pcre_est4 <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10),
+  gamma ~ 1 + x3,
+  mu ~ -1 + marker + obstime:marker + x3:marker + obstime:marker:x3 +
+    s(id, wfpc.1, wfpc.2, wfpc.3, wfpc.4, bs = "unc_pcre",
+      xt = list("mfpc" = mfpca_est4)),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+
+set.seed(1808)
+sink("indeprirs_pcre.txt")
+b_indeprirs_pcre <- bamlss(f_indeprirs_pcre, family = mjm_bamlss, 
+                           data = d_indeprirs_data, timevar = "obstime",
+                           maxit = 1000, verbose_sampler = TRUE)
+sink()
+set.seed(1808)
+sink("indeprirs_pcre_est2.txt")
+b_indeprirs_pcre_est2 <- bamlss(f_indeprirs_pcre_est2, family = mjm_bamlss, 
+                                data = d_indeprirs_data_est2,
+                                timevar = "obstime",
+                                maxit = 1000, verbose_sampler = TRUE)
+sink()
+set.seed(1808)
+sink("indeprirs_pcre_est4.txt")
+b_indeprirs_pcre_est4 <- bamlss(f_indeprirs_pcre_est4, family = mjm_bamlss, 
+                                data = d_indeprirs_data_est4, 
+                                timevar = "obstime",
+                                maxit = 1000, verbose_sampler = TRUE)
+sink()
+
+save(b_indeprirs_pcre, b_indeprirs_pcre_est2, b_indeprirs_pcre_est4,
+     file = "inst/objects/indeprirs_pcre_models.Rdata")
+
+d_indeprirs_data_est4$fit <- predict(b_indeprirs_pcre_est4, model = "mu")
+
+ggplot(data = d_indeprirs_data_est4 %>% 
+         filter(id %in% ids), aes(x = obstime, color = id)) +
+  geom_point(aes(y = y), size = 1.3) +
+  geom_line(aes(y = fit), linetype = "dotted") +
+  geom_line(aes(y = mu)) +
+  facet_grid(~marker)

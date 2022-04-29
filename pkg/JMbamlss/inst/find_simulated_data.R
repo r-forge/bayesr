@@ -48,19 +48,19 @@ ggplot(d_indepri$data, aes(x = obstime, y = y, color = id)) +
 
 
 f <- list(
-  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 5, bs = "ps"),
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 10, bs = "ps"),
   gamma ~ 1 + x3,
   mu ~ -1 + marker + obstime:marker + x3:marker + 
-    s(id, wfpc.1, wfpc.2, wfpc.3, wfpc.4, wfpc.5, wfpc.6, wfpc.7,
+    s(id, wfpc.1, wfpc.2, wfpc.3, wfpc.4, wfpc.5, wfpc.6, wfpc.7, wfpc.8,
       bs = "unc_pcre", xt = list("mfpc" = mfpca)),
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
 )
 
-mfpca <- create_true_MFPCA(M = 7, nmarker = 2, argvals = seq(0, 25, by = 0.25),
+mfpca <- create_true_MFPCA(M = 8, nmarker = 2, argvals = seq(0, 25, by = 0.25),
                            type = "split", eFunType = "PolyHigh",
                            ignoreDeg = 1, eValType = "linear",
-                           eValScale = 1, evals = c(80:74))
+                           eValScale = 1, evals = c(80:73))
 
 # Helperfunction PCRE
 source("R/pcre_smooth.R")
@@ -72,15 +72,16 @@ source("R/opt_MJM.R")
 source("R/opt_updating.R")
 source("R/MJM_mcmc.R")
 source("R/mcmc_proposing.R")
+source("R/MJM_predict.R")
 source("R/survint.R")
 source("R/compile.R")
 compile_alex()
 
-sink("find_sim1.txt")
+sink("find_sim200422.txt")
 b_sim1 <- bamlss(f, family = mjm_bamlss, data = d_indepri$data, 
                 timevar = "obstime", maxit = 1200, verbose_sampler = TRUE)
 sink()
-save(b_sim1, file = "inst/objects/find_sim1.Rdata")
+save(b_sim1, file = "inst/objects/find_sim200422.Rdata")
 
 
 # Why is sigma not accepted? ----------------------------------------------
