@@ -5278,7 +5278,7 @@ opt_isgd <- function(x, y, family, weights = NULL, offset = NULL,
     for(nxi in nx) zetaVec[[nxi]] <- numeric(N)
     ptm <- proc.time()
     for(i in seq.int(N)) {
-        cat(sprintf("   * no. obs %i\r", i))
+        cat(sprintf("   * nobs %i\r", i))
 
         ## evaluate gammaFun for current iteration
         gamma <- gammaFun(i + i.state) 
@@ -5469,7 +5469,7 @@ sgd_grep_X <- function(x) {
 
 #  ptm <- proc.time()
 #  while(k <= N) {
-#    cat(sprintf("   * no. obs %i\r", k))
+#    cat(sprintf("   * nobs %i\r", k))
 
 #    take <- (k - batch + 1L):k
 
@@ -6374,9 +6374,9 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
           }
         }
         if(iter < 2) {
-          cat(sprintf("   * iter %i, no. obs %i, edf %f\r", iter, btxt, round(edf, 4)))
+          cat(sprintf("   * iter %i, nobs %i, edf %f\r", iter, btxt, round(edf, 4)))
         } else {
-          cat(sprintf("   * iter %i, no. obs %i, eps %f, edf %f\r", iter, btxt, round(eps, 4), round(edf, 2)))
+          cat(sprintf("   * iter %i, nobs %i, eps %f, edf %f\r", iter, btxt, round(eps, 4), round(edf, 2)))
         }
       }
 
