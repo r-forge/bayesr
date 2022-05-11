@@ -3,7 +3,8 @@
 # Optimizer for MJM -------------------------------------------------------
 
 opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
-                    opt_long = TRUE, alpha.eps = 0.001, ...) {
+                    opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
+                    ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -74,8 +75,11 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   }
   
   if(!is.null(x$sigma$smooth.construct$model.matrix)) {
-    x$sigma$smooth.construct$model.matrix$state$parameters[seq_len(nmarker)] <- 
-      tapply(y[[1]][, "obs"], marker, function(x) log(sd(x, na.rm = TRUE)))
+    if(is.null(start)) {
+      x$sigma$smooth.construct$model.matrix$state$parameters[
+        seq_len(nmarker)] <- tapply(y[[1]][, "obs"], marker,
+                                    function(x) log(sd(x, na.rm = TRUE)))
+    }
     x$sigma$smooth.construct$model.matrix$state$fitted.values <-
       x$sigma$smooth.construct$model.matrix$X %*% 
       x$sigma$smooth.construct$model.matrix$state$parameters
@@ -93,10 +97,13 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   eta0 <- cbind(eta0_surv, eta0_alpha)
   eta0_long <- do.call("cbind", eta[c("mu", "sigma")])
   iter <- 0
-  alpha_update <- FALSE
+  alpha_update <- if(is.null(start)) FALSE else TRUE
+  logLik0 <- log(0)
   
   # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
-  # it_param <- list()
+  if (par_trace) {
+    it_param <- list()
+  }
   
   # Updating the predictors
   while((eps0 > eps) & (iter < maxit)) {
@@ -128,7 +135,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       }
     }
     
-    if (max(c(eps0_surv, eps0_long)) < alpha.eps) {
+    if (!alpha_update && max(c(eps0_surv, eps0_long)) < alpha.eps) {
       alpha_update <- TRUE
       cat("It ", iter, "-- Start Alpha Update", "\n")
     }
@@ -212,6 +219,13 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     logLik <- drop(status %*% eta_T - sum_Lambda) +
       sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
                 log = TRUE))
+    
+    if (logLik < logLik0) {
+      #browser()
+      cat("Wrong turn in iteration ", iter)
+    } else {
+      logLik0 <- logLik
+    }
     # Eigentlich sollte hier doch auch über die Log-Posterior das Max gebildet
     # werden? Die Score und Hesse-Funktionen beziehen nämlich schon die Prioris
     # mit ein
@@ -231,14 +245,18 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     eps0 <- mean(c(eps0_surv, eps0_alpha, eps0_long))
     
     #if (iter %% 5 == 0) {
-    cat("It ", iter,", LogLik ", logLik, "\n")
+    cat("It ", iter,", LogLik ", logLik, ", Post", 
+        as.numeric(logLik + bamlss:::get.log.prior(x)), "\n")
     #}
     eta0_surv <- eta1_surv
     eta0_alpha <- eta1_alpha
     eta0_long <- eta1_long
     
     # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
-    # it_param[[iter]] <- bamlss:::get.all.par(x)
+    if (par_trace) {
+      it_param[[iter]] <- bamlss:::get.all.par(x)
+    }
+    
   }
   
   # Log-Posterior ausrechnen und ausgeben
@@ -258,7 +276,8 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   return(list("fitted.values" = eta, "parameters" = bamlss:::get.all.par(x),
               "logLik" = logLik, "logPost" = logPost,
               "hessian" = bamlss:::get.hessian(x),
-              "converged" = iter < maxit))
+              "converged" = iter < maxit, 
+              "par_trace" = if (par_trace) it_param else NULL))
   
   assign("b", x, envir = .GlobalEnv)
   assign("eta", list(eta = eta,
