@@ -111,7 +111,12 @@ create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1),
 #' 
 #' @param mfpc MFPCA object from which to extract the weighted FPCS.
 #' @param data Data set to which the weighted FPCS are to be attached.
-attach_wfpc <- function(mfpca, data, obstime = "obstime", marker = "marker"){
+#' @param obstime Name of the time variable in data set at which points to 
+#'  evaluate.
+#' @param marker Name of the marker variable in the data set which separates the
+#'  data.
+attach_wfpc <- function(mfpca, data, obstime = "obstime", marker = "marker",
+                        eval_weight = TRUE){
   
   # Is the data sorted by marker
   if (all(order(data[[marker]]) != seq_len(nrow(data)))) message("ORDER!")
@@ -123,8 +128,9 @@ attach_wfpc <- function(mfpca, data, obstime = "obstime", marker = "marker"){
   # eval_mpfc evaluates on all markers, so choose only the current one
   for (mark in seq_along(levels(data[[marker]]))) {
     mobs <- length(splitdat[[mark]])
-    tot_wfpc <- eval_mfpc(mfpca = mfpca, timepoints = splitdat[[mark]])
-    wfpc <- rbind(wfpc, tot_wfpc[(mark-1)*mobs + seq_len(mobs), ])
+    tot_wfpc <- eval_mfpc(mfpca = mfpca, timepoints = splitdat[[mark]],
+                          eval_weight = eval_weight)
+    wfpc <- rbind(wfpc, tot_wfpc[(mark-1)*mobs + seq_len(mobs), , drop = FALSE])
   }
   
   data <- cbind(data, wfpc)

@@ -9,7 +9,9 @@ Predict.matrix.pcre2.random.effect <- function(object, data)
   # If basis should be evaluated for different marker timepoints, then
   # which_marker is not NULL
   which_marker <- attr(object, "which_marker")
-  X <- eval_mfpc(object$xt$mfpc, data[[object$timevar]], which_marker)
+  eval_w <- if(is.null(object$xt$eval_weight)) FALSE else object$xt$eval_weight
+  X <- eval_mfpc(mfpca = object$xt$mfpc, timepoints = data[[object$timevar]], 
+                 marker = which_marker, eval_weight = eval_w)
   
   if(ncol(X) != (length(object$term) - 2))
     stop("check M argument in MFPCA()!")
@@ -100,7 +102,9 @@ Predict.matrix.unc_pcre.random.effect <- function(object, data){
   # If basis should be evaluated for different marker timepoints, then
   # which_marker is not NULL
   which_marker <- attr(object, "which_marker")
-  X <- eval_mfpc(object$xt$mfpc, data[[object$timevar]], which_marker)
+  eval_w <- if(is.null(object$xt$eval_weight)) FALSE else object$xt$eval_weight
+  X <- eval_mfpc(mfpca = object$xt$mfpc, timepoints = data[[object$timevar]],
+                 marker = which_marker, eval_weight = eval_w)
   
   if(ncol(X) != (length(object$term) - 2))
     stop("check M argument in MFPCA()!")

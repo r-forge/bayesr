@@ -48,7 +48,7 @@ eval_fundata <- function(funData, evalpoints) {
 # eval_fundata(fu_muln, c(0.39, 0.7))
 
 
-eval_mfpc <- function(mfpca, timepoints, marker = NULL) {
+eval_mfpc <- function(mfpca, timepoints, marker = NULL, eval_weight = FALSE) {
   eigenfct <- mfpca$functions
   eigenval <- mfpca$values
   K <- length(eigenfct)
@@ -80,9 +80,16 @@ eval_mfpc <- function(mfpca, timepoints, marker = NULL) {
     prm <- prm[order(ordering), , drop = FALSE]
   }
 
-  colnames(prm) <- paste0("wfpc.", seq_len(ncol(prm)))
-  # weight with eigenvalues
-  t(t(prm) * sqrt(eigenval))
+  if (eval_weight) {
+    colnames(prm) <- paste0("wfpc.", seq_len(ncol(prm)))
+    # weight with eigenvalues
+    t(t(prm) * sqrt(eigenval))
+  } else {
+    colnames(prm) <- paste0("fpc.", seq_len(ncol(prm)))
+    # no weighting
+    t(t(prm))
+  }
+
 }
 
 # eval_mfpc(uFPCA, 0.39)

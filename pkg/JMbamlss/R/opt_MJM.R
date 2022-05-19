@@ -213,6 +213,9 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
                                  ncol = nmarker))
     eta_T <- eta$lambda + eta$gamma + eta_T_long
     
+    # Das könnte man auch weglassen, um es schneller zu machen, weil das Stop-
+    # Kriterium nicht von der Likelihood abhängt, sondern nur von den Eta-
+    # Änderungen
     sum_Lambda <- (survtime/2 * exp(eta$gamma)) %*%
       (diag(nsubj)%x%t(gq_weights))%*%
       exp(eta_timegrid)
@@ -220,12 +223,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
                 log = TRUE))
     
-    if (logLik < logLik0) {
-      #browser()
-      cat("Wrong turn in iteration ", iter)
-    } else {
-      logLik0 <- logLik
-    }
     # Eigentlich sollte hier doch auch über die Log-Posterior das Max gebildet
     # werden? Die Score und Hesse-Funktionen beziehen nämlich schon die Prioris
     # mit ein
