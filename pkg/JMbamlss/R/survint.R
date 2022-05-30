@@ -116,6 +116,25 @@
  }
 
 ## New C version.
+survint_alex <- function(pred = c("lambda", "gamma", "long"),
+  pre_fac, pre_vec = NULL, omega, int_fac = NULL,
+  int_vec = NULL, weights, survtime)
+{
+  pred <- switch(pred,
+    "lambda" = 1L,
+    "gamma" = 2L,
+    "long" = 3L
+  )
+  
+  if (is.null(pre_vec)) pre_vec <- 0
+  if (is.null(int_fac)) int_fac <- 0
+  if (is.null(int_vec)) int_vec <- 0
+    
+  .Call("survint_alex", pred, pre_fac, pre_vec, omega, int_fac, int_vec, weights, survtime)
+}
+
+
+## New C version.
 survint_C <- function(pred = c("lambda", "gamma", "long"),
   pre_fac, pre_vec = NULL, omega, int_fac = NULL,
   int_vec = NULL, weights, survtime)
@@ -135,11 +154,11 @@ survint_C <- function(pred = c("lambda", "gamma", "long"),
 
 if(FALSE) {
   setwd("~/svn/bayesr/pkg/JMbamlss/R")
-  load(file = "../Fehlersuche/Unterschiede_survint/survint_mjm.RData")
+  load(file = "Fehlersuche/Unterschiede_survint/survint_mjm.RData")
 
-  source("compile.R")
-  source("survint.R")
-  compile()
+  source("R/compile.R")
+  source("R/survint.R")
+  compile("~/Dokumente/Arbeit/Greven/JM/JMbamlss/src/")
 
   int0 <- survint_gq0(pred = "long", pre_fac = exp(eta$gamma),
     omega = exp(eta_timegrid), pre_vec = x$X,
@@ -150,12 +169,19 @@ if(FALSE) {
                     omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, 
                     int_vec = x$Xgrid, weights = gq_weights,
                     survtime = survtime)
+  int2 <- survint_alex(pred = "long", pre_fac = exp(eta$gamma),
+                       omega = exp(eta_timegrid), int_fac = eta_timegrid_alpha, 
+                       int_vec = x$Xgrid, weights = gq_weights,
+                       survtime = survtime)
 
   par(mfrow = c(1, 2))
   plot(int0$score_int, int1$score_int)
   abline(0,1)
   plot(int0$hess_int, int1$hess_int)
   abline(0,1)
+  str(int1)
+  str(int2)
+
 }
 
 # Old version of survival integral GQ -------------------------------------
