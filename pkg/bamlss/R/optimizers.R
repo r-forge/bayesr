@@ -1590,7 +1590,7 @@ bfit_iwls <- function(x, family, y, eta, id, weights, criterion, ...)
       eta2[[id]] <- eta2[[id]] + fit
       ic <- get.ic(family, y, family$map2par(eta2), edf0 + edf, length(z), criterion, ...)
 
-      if(!is.null(env$ic_val) & FALSE) {
+      if(!is.null(env$ic_val)) {
         if((ic < env$ic_val) & (ic < env$ic00_val)) {
           par <- c(g, tau2)
           names(par) <- names(x$state$parameters)
@@ -1639,6 +1639,7 @@ bfit_iwls <- function(x, family, y, eta, id, weights, criterion, ...)
       U <- chol2inv(chol(W)) %*% t(V)
       g <- drop(g - t(U) %*% x$C %*% g)
     }
+    x$state$parameters <- set.par(x$state$parameters, g, "b")
   }
   
   ## Compute fitted values.
