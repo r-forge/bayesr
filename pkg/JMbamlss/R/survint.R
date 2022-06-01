@@ -115,25 +115,7 @@
    list(score_int = score_int, hess_int = hess_int)
  }
 
-## New C version.
-survint_alex <- function(pred = c("lambda", "gamma", "long"),
-  pre_fac, pre_vec = NULL, omega, int_fac = NULL,
-  int_vec = NULL, weights, survtime)
-{
-  pred <- switch(pred,
-    "lambda" = 1L,
-    "gamma" = 2L,
-    "long" = 3L
-  )
-  
-  if (is.null(pre_vec)) pre_vec <- 0
-  if (is.null(int_fac)) int_fac <- 0
-  if (is.null(int_vec)) int_vec <- 0
-    
-  .Call("survint_alex", pred, pre_fac, pre_vec, omega, int_fac, int_vec, weights, survtime)
-}
-
-
+ 
 ## New C version.
 survint_C <- function(pred = c("lambda", "gamma", "long"),
   pre_fac, pre_vec = NULL, omega, int_fac = NULL,

@@ -77,11 +77,12 @@ source("R/survint.R")
 source("R/compile.R")
 compile_alex()
 
-sink("find_sim200422.txt")
+sink("find_sim050522.txt")
 b_sim1 <- bamlss(f, family = mjm_bamlss, data = d_indepri$data, 
-                timevar = "obstime", maxit = 1200, verbose_sampler = TRUE)
+                timevar = "obstime", maxit = 1200, verbose_sampler = TRUE,
+                sampler = FALSE)
 sink()
-save(b_sim1, file = "inst/objects/find_sim200422.Rdata")
+save(b_sim1, file = "inst/objects/find_sim050522.Rdata")
 
 
 # Why is sigma not accepted? ----------------------------------------------

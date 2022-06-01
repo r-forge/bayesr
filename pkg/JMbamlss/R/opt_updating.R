@@ -20,8 +20,8 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, survtime, ...)
   
   # Status from MJM_transform
   # XT from sm_time_transform_mjm()
-  x_score <- drop(attr(y, "status") %*% x$XT) - colSums(int_i$score_int)
-  x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
+  x_score <- drop(attr(y, "status") %*% x$XT) - int_i$score_int
+  x_H <- matrix(int_i$hess_int, ncol = b_p)
   
   ## Newton-Raphson.
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
@@ -53,8 +53,8 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, survtime, ...) {
                       omega = exp(eta_timegrid),
                       weights = attr(y, "gq_weights"),
                       survtime = survtime)
-  x_score <- drop(attr(y, "status") %*% x$X) - colSums(int_i$score_int)
-  x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
+  x_score <- drop(attr(y, "status") %*% x$X) - int_i$score_int
+  x_H <- matrix(int_i$hess_int, ncol = b_p)
   
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
@@ -88,8 +88,8 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
   
   delta <- rep(attr(y, "status"), nmarker)
   
-  x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - colSums(int_i$score_int)
-  x_H <- matrix(colSums(int_i$hess_int), ncol = b_p)
+  x_score <- drop(t(delta * x$XT) %*% eta_T_mu) - int_i$score_int
+  x_H <- matrix(int_i$hess_int, ncol = b_p)
   
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
@@ -126,9 +126,9 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
   delta <- rep(attr(y, "status"), nmarker)
   x_score <- drop(
     crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-      t(delta * x$XT) %*% eta$alpha) - colSums(int_i$score_int)
+      t(delta * x$XT) %*% eta$alpha) - int_i$score_int
   x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
-    matrix(colSums(int_i$hess_int), ncol = b_p)
+    matrix(int_i$hess_int, ncol = b_p)
   
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
