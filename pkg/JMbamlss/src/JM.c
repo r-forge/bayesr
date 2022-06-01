@@ -137,13 +137,14 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
   nr = nrows(int_vec);
   nc = ncols(int_vec);
 
-// int_vec: 
+  // Initialize output. 
   for(ii = 0; ii < p; ii++){
-    score_int_ptr[ii] = 0;
-    for(jj = 0; jj < p; jj++){
-      hess_int_ptr[jj] = 0;
-    }
+    score_int_ptr[ii] = 0.0;
   }
+  for(jj = 0; jj < p*p; jj++){
+    hess_int_ptr[jj] = 0.0;
+  }
+
   // Lambda.
   if(predictor == 1) {
     for(i = 0; i < nsubj; i++) {
