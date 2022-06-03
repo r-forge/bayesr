@@ -14,10 +14,13 @@
 #' @param uni_mean String to crate a formula for the univariate addtive models.
 #' @param time String giving the name of the longitudinal time variable.
 #' @param id String giving the name of the identifier.
-#' @param M Number of mFPCs to compute in the MFPCA.
+#' @param M Number of mFPCs to compute in the MFPCA. If not supplied, it
+#'  defaults to the maximum number of computable mFPCs.
 #' @param npc Number of univariate principal components to use in PACE.
+#' @param pve_uni Proportion of univariate variance explained.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
-                           time = "obstime", id = "id", M = 2, npc = NULL) {
+                           time = "obstime", id = "id", M = NULL, npc = NULL,
+                           pve_uni = 0.999) {
   require(bamlss)
   require(MFPCA)
   
@@ -46,12 +49,15 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     })
   }
   FPCA <- lapply(m_irregFunData, function(mark) {
-    PACE(mark, npc = npc)
+    PACE(mark, npc = npc, pve = pve_uni)
   })
   mFData <- multiFunData(lapply(FPCA, "[[", "fit"))
   uniExpansions <- lapply(FPCA, function (mark) {
     list(type = "given", functions = mark$functions)
   })
+  if (is.null(M)) {
+    M <- sum(sapply(FPCA, "[[", "npc"))
+  }
   MFPCA <- MFPCA(mFData = mFData, M = M, uniExpansions = uniExpansions)
 }
 
@@ -111,12 +117,14 @@ create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1),
 #' 
 #' @param mfpc MFPCA object from which to extract the weighted FPCS.
 #' @param data Data set to which the weighted FPCS are to be attached.
+#' @param n Number of FPCs to attach. Defaults to NULL which corresponds to all
+#'  FPCs in mfpc.
 #' @param obstime Name of the time variable in data set at which points to 
 #'  evaluate.
 #' @param marker Name of the marker variable in the data set which separates the
 #'  data.
-attach_wfpc <- function(mfpca, data, obstime = "obstime", marker = "marker",
-                        eval_weight = TRUE){
+attach_wfpc <- function(mfpca, data, n = NULL, obstime = "obstime", marker = "marker",
+                        eval_weight = FALSE){
   
   # Is the data sorted by marker
   if (all(order(data[[marker]]) != seq_len(nrow(data)))) message("ORDER!")
@@ -124,6 +132,11 @@ attach_wfpc <- function(mfpca, data, obstime = "obstime", marker = "marker",
   wfpc <- NULL
   
   splitdat <- split(data[[obstime]], data[[marker]])
+  
+  if (!is.null(n)) {
+    mfpca <- list(values = mfpca$values[seq_len(n)],
+                  functions = extractObs(mfpca$functions, obs = seq_len(n)))
+  }
   
   # eval_mpfc evaluates on all markers, so choose only the current one
   for (mark in seq_along(levels(data[[marker]]))) {
