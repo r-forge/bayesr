@@ -217,10 +217,14 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
         r <- matrix(r, nrow = length(time), ncol = b_set$M, byrow=TRUE)
       }
       
+      # FPCs are normalized on the interval up to tmax so do a 'last value 
+      # carried forward' type of evaluation
+      time_out <- ifelse(time > tmax, tmax, time)
+      
       # Evaluate the functional principal component bases for different markers
       if(is.null(b_set$FPC_bases)) {
         pc_bases <- lapply(
-          mfpc(argvals = rep(list(c(b_set$tmin, time, b_set$tmax)),
+          mfpc(argvals = rep(list(c(b_set$tmin, time_out, b_set$tmax)),
                              length(mu)),
                mfpc_args = b_set, M = b_set$M), 
           function (fundat){
@@ -228,7 +232,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
           })
       } else {
         pc_bases <- lapply(b_set$FPC_bases, eval_fundata, 
-                           evalpoints = time)
+                           evalpoints = time_out)
       }
       
       out <- mapply(function (mu_k, pc_k) {

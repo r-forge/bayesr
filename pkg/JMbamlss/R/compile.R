@@ -33,7 +33,7 @@ compile_alex <- function(location = c("workstation", "laptop", "server_linux",
       location, 
       "workstation" = "~/Documents/joint_models/bayesr/pkg/JMbamlss/src",
       "laptop" = "~/Dokumente/Arbeit/Greven/JM/JMbamlss/src",
-      "server_linux" = "H:/volkmana.hub/JMbamlss/src",
+      "server_linux" = "~/H:/volkmana.hub/JMbamlss/src",
       "server_windows" = "H:/JMbamlss/src")
   }
   dir <- path.expand(dir)

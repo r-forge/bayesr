@@ -2,16 +2,17 @@
 # Set Up Small Simulation -------------------------------------------------
 
 
+
 # Set up R session --------------------------------------------------------
 
 
 
 # Specify location
-location <- "laptop"
+location <- "workstation"
 if(location %in% c("server_linux", "server_windows")){
-  .libPaths(if (location == "server_linux") "H:/volkmana.hub/R4_linux"
+  .libPaths(if (location == "server_linux") "~/H:/volkmana.hub/R4_linux"
             else "H:/R4_windows")
-  setwd(if (location == "server_linux") "H:/volkmana.hub/JMbamlss"
+  setwd(if (location == "server_linux") "~/H:/volkmana.hub/JMbamlss"
         else "H:/JMbamlss")
 }
 
@@ -21,6 +22,7 @@ library(survival)
 library(bamlss)
 library(MFPCA)
 library(tidyverse)
+library(parallel)
 source("R/preprocessing.R")
 source("R/simMultiJM.R")
 source("R/eval_mfun.R")
@@ -37,12 +39,21 @@ source("R/compile.R")
 compile_alex(location)
 
 
+# Setting for the simulation
+start <- 100
+stop <- 101
+number_cores <- 2
+setting <- "A"
+dir.create(paste0("simulation/", setting), showWarnings = FALSE)
+Sys.time()
+sessionInfo()
 
 
 # Objects for all clusters ------------------------------------------------
 
 
 # Prepare the model using the true FPCs
+set.seed(1808)
 mfpca <- create_true_MFPCA(M = 3, nmarker = 2, argvals = seq(0, 1, by = 0.01),
                            type = "split", eFunType = "PolyHigh",
                            ignoreDeg = 1, eValType = "linear",
@@ -66,15 +77,15 @@ f_tru <- list(
 
 # Simulation function -----------------------------------------------------
 
-simulate_models <- function (i, start){
-  seed <- (start + i)
+simulate_models <- function (i){
+  seed <- i
   
   # Simulate the data
   simdat <- simMultiJM(nsub = 150, times = seq(0, 1, by = 0.01), 
                        probmiss = 0.75, maxfac = 2,
                        nmark = 2, param_assoc = FALSE, M = 3, 
-                       FPC_bases = NULL, 
-                       FPC_evals = c(0.8, 0.5, 0.3),
+                       FPC_bases = mfpca$functions, 
+                       FPC_evals = mfpca$values,
                        mfpc_args = list(type = "split", eFunType = "PolyHigh",
                                         ignoreDeg = 1, eValType = "linear",
                                         eValScale = 1),
@@ -118,14 +129,43 @@ simulate_models <- function (i, start){
     as.formula(paste0(
       "mu ~ -1 + marker + obstime:marker + x3:marker + ",
       paste0(lapply(seq_len(nfpc), function(x) {
-        paste0("s(id, fpc.", x, ", bs = unc_pcre, xt = list('mfpc' =",
+        paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' =",
                " mfpca_list[[", x, "]]))")
       }), collapse = " + "))),
     sigma ~ -1 + marker,
     alpha ~ -1 + marker
   )
   
+  # Estimate the model using the true FPCs
+  b_tru <- try(bamlss(f_tru, family = mjm_bamlss, data = simdat$data, 
+                      timevar = "obstime", maxit = 1500, n.iter = 23000,
+                      burnin = 3000, thin = 20))
+  
+  # Estimate the model using the estimated FPCs
+  b_est <- try(bamlss(f_est, family = mjm_bamlss, data = simdat_es, 
+                      timevar = "obstime", maxit = 1500, n.iter = 23000,
+                      burnin = 3000, thin = 20))
+ 
+  # Output of simulation
+  out <- list(simdat = simdat, simdat_es = simdat_es,
+              b_tru = b_tru, b_est = b_est)
+  try(save(out, file = paste0("simulation/", setting, "/sim", i, ".Rdata")))
+  NULL
 }
 
-}
+
+
+# Simulation --------------------------------------------------------------
+
+# Actual parallel section
+cat(paste("Parallelization:", start, "-", stop, "on", number_cores, "cores.\n"))
+cl <- makeForkCluster(number_cores)
+sim <- parLapply(cl, start:stop, simulate_models)
+stopCluster(cl)
+Sys.time()
+
+rm(list =ls())
+quit("no")
+
+
  

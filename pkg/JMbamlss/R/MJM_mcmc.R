@@ -3,7 +3,7 @@
 
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
-                     nu_sampler = 1, prop_pred = NULL, verbose_sampler = FALSE,
+                     nu_sampler = 1, prop_pred = NULL, verbose = FALSE,
                      prop_list = NULL, ...)
 {
 ########## REMOVE prop_pred
@@ -163,7 +163,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
       js <- which(iterthin == iter)
     }
     
-    if(verbose_sampler) {
+    if(verbose) {
       cat("Iteration", iter, "\n")
     }
     #if(iter == 2) browser()
@@ -186,7 +186,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                nsubj = nsubj, gq_weights = gq_weights, 
                                status = status, nmarker = nmarker, 
                                nu = nu_sampler,
-                               verbose_sampler = verbose_sampler, 
+                               verbose_sampler = verbose, 
                                prop = if(!is.null(prop_list)) {
                                  prop_list[[iter]][[nx_iter]][[j_iter]]
                                } else NULL)

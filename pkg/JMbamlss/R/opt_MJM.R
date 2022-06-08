@@ -4,7 +4,7 @@
 
 opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
-                    ...) {
+                    verbose = FALSE, ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -241,10 +241,10 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     eps0_long <- mean(abs((eta1_long - eta0_long) / eta1_long), na.rm = TRUE)
     eps0 <- mean(c(eps0_surv, eps0_alpha, eps0_long))
     
-    #if (iter %% 5 == 0) {
+    if (verbose) {
     cat("It ", iter,", LogLik ", logLik, ", Post", 
         as.numeric(logLik + bamlss:::get.log.prior(x)), "\n")
-    #}
+    }
     eta0_surv <- eta1_surv
     eta0_alpha <- eta1_alpha
     eta0_long <- eta1_long
