@@ -130,7 +130,7 @@ simulate_models <- function (i){
       "mu ~ -1 + marker + obstime:marker + x3:marker + ",
       paste0(lapply(seq_len(nfpc), function(x) {
         paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' =",
-               " mfpca_list[[", x, "]]))")
+               " mfpca_es_list[[", x, "]]))")
       }), collapse = " + "))),
     sigma ~ -1 + marker,
     alpha ~ -1 + marker
