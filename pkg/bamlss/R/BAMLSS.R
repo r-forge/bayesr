@@ -4048,6 +4048,7 @@ predict.bamlss <- function(object, newdata, model = NULL, term = NULL, match.nam
   }
   enames <- lapply(lapply(enames, unique), function(x) {
     x <- x[!is.na(x)]
+    x <- x[x != ""]
     return(if(length(x) < 1) NULL else x)
   })
   if(all(is.null(unlist(enames))))
@@ -7936,6 +7937,19 @@ Predict.matrix.harmon.smooth <- function(object, data, knots)
   X
 }
 
+## From geoR.
+matern <- function (u, phi, kappa) 
+{
+  if(is.vector(u)) names(u) <- NULL
+  if(is.matrix(u)) dimnames(u) <- list(NULL, NULL)
+  uphi <- u/phi
+  uphi <- ifelse(u > 0,
+                 (((2^(-(kappa-1)))/ifelse(0, Inf,gamma(kappa))) *
+                  (uphi^kappa) *
+                  besselK(x=uphi, nu=kappa)), 1)    
+  uphi[u > 600*phi] <- 0 
+  return(uphi)
+}
 
 ## Kriging smooth constructor.
 ## Evaluate a kriging
@@ -7944,12 +7958,12 @@ krDesign1D <- function(z, knots = NULL, rho = NULL,
   phi = NULL, v = NULL, c = NULL, ...)
 {
   rho <- if(is.null(rho)) {
-    geoR::matern
+    matern
   } else rho
   knots <- if(is.null(knots)) sort(unique(z)) else knots
   v <- if(is.null(v)) 2.5 else v
   c <- if(is.null(c)) {
-    optim(1, geoR::matern, phi = 1, kappa = v, method = "L-BFGS-B", lower = 1e-10)$par
+    optim(1, matern, phi = 1, kappa = v, method = "L-BFGS-B", lower = 1e-10)$par
   } else c
   phi <- if(is.null(phi)) max(abs(diff(range(knots)))) / c else phi
   B <- NULL
@@ -7967,7 +7981,7 @@ krDesign2D <- function(z1, z2, knots = 10, rho = NULL,
   isotropic = TRUE, ...)
 {
   rho <- if(is.null(rho)) {
-    geoR::matern
+    matern
   } else rho
   if(is.null(psi)) psi <- 1
   if(is.null(delta)) delta <- 1
