@@ -115,8 +115,10 @@ simulate_models <- function (i){
   # Prepare the model using estimated FPCs
   mfpca_es <- preproc_MFPCA(simdat$data, 
                             uni_mean = "y ~ 1 + obstime + x3 + obstime:x3")
-  nfpc <- min(which(cumsum(mfpca_es$values)/sum(mfpca_es$values) > 0.95))
-  mfpca_es_list <- lapply(seq_len(nfpc), function (i, mfpca = mfpca_es) {
+  vals <- which(mfpca_es$values > 0)
+  nfpc <- min(which(
+    cumsum(mfpca_es$values[vals])/sum(mfpca_es$values[vals]) > 0.95))
+  mfpca_es_list <- lapply(vals[seq_len(nfpc)], function (i, mfpca = mfpca_es) {
     list(functions = extractObs(mfpca$functions, i),
          values = mfpca$values[i])
   })
@@ -129,8 +131,8 @@ simulate_models <- function (i){
     as.formula(paste0(
       "mu ~ -1 + marker + obstime:marker + x3:marker + ",
       paste0(lapply(seq_len(nfpc), function(x) {
-        paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' =",
-               " mfpca_es_list[[", x, "]]))")
+        paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
+               "mfpca_es_list[[", x, "]]))")
       }), collapse = " + "))),
     sigma ~ -1 + marker,
     alpha ~ -1 + marker

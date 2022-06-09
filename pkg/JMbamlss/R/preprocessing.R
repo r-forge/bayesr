@@ -16,13 +16,19 @@
 #' @param id String giving the name of the identifier.
 #' @param M Number of mFPCs to compute in the MFPCA. If not supplied, it
 #'  defaults to the maximum number of computable mFPCs.
+#' @param method Which package to use for the univariate FPCA. Either function
+#'  'FPCA' from package \code{fdapace} or function 'PACE' from package 
+#'  \code{MFPCA}.
 #' @param npc Number of univariate principal components to use in PACE.
-#' @param pve_uni Proportion of univariate variance explained.
+#' @param fve_uni Fraction of univariate variance explained for method FPCA.
+#' @param pve_uni Proportion of univariate variance explained for method PACE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
-                           time = "obstime", id = "id", M = NULL, npc = NULL,
-                           pve_uni = 0.999) {
+                           time = "obstime", id = "id", M = NULL, 
+                           method = c("FPCA", "PACE"), npc = NULL,
+                           fve_uni = 1, pve_uni = 0.999) {
   require(bamlss)
   require(MFPCA)
+  method <- match.arg(method)
   
   marker_dat <- split(data, data$marker)
   
@@ -32,32 +38,74 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     mark$res <- bam(formula = uni_mean, data = mark)$residuals
     mark
   })
-  m_irregFunData <- lapply(marker_dat, function (mark) {
-    mark <- mark[order(mark[, time]), ]
-    irregFunData(argvals = split(mark[, time], mark[, id]), 
-                 X = split(mark$res, mark[, id]))
+  
+  if(method == "FPCA") {
+    require(fdapace)
     
-  })
-  if (!is.null(npc)) {
-    rem <- lapply(m_irregFunData, function (mark) {
-      which(lapply(mark@argvals, length) < npc)
+    # Construct objects for FPCA function
+    ly <- lapply(marker_dat, function (mark) {
+      mark <- mark[order(mark[, time]), ]
+      split(mark$res, mark[, id])
     })
-    rem <- Reduce(union, rem)
-    take <- seq_len(nObs(m_irregFunData[[1]]))[-rem]
-    m_irregFunData <- lapply(m_irregFunData, function (mark) {
-      extractObs(mark, obs = take)
+    lt <- lapply(marker_dat, function (mark) {
+      mark <- mark[order(mark[, time]), ]
+      split(mark[, time], mark[, id])
     })
+    
+    # FPCA for each marker
+    FPCA <- mapply(fdapace::FPCA, Ly = ly, Lt = lt, SIMPLIFY = FALSE,
+                   MoreArgs = list(optns = list(FVEthreshold = fve_uni,
+                                                nRegGrid = 101)))
+    
+    # Construct multivariate FunData and estimated FPCs
+    mFData <- multiFunData(lapply(FPCA, function (mark) {
+      funData(argvals = mark$workGrid, X = fitted(mark))
+    }))
+    uniExpansions <- lapply(FPCA, function (mark) {
+      list(type = "given", functions = funData(argvals = mark$workGrid,
+                                               X = t(mark$phi)))
+    })
+    if (is.null(M)) {
+      M <- sum(sapply(FPCA, "[[", "selectK"))
+    }
+    
+  } else {
+    
+    # Construct irregular FunData
+    m_irregFunData <- lapply(marker_dat, function (mark) {
+      mark <- mark[order(mark[, time]), ]
+      irregFunData(argvals = split(mark[, time], mark[, id]), 
+                   X = split(mark$res, mark[, id]))
+    })
+    
+    # Remove observations with too few scalar observations
+    if (!is.null(npc)) {
+      rem <- lapply(m_irregFunData, function (mark) {
+        which(lapply(mark@argvals, length) < npc)
+      })
+      rem <- Reduce(union, rem)
+      take <- seq_len(nObs(m_irregFunData[[1]]))[-rem]
+      m_irregFunData <- lapply(m_irregFunData, function (mark) {
+        extractObs(mark, obs = take)
+      })
+    }
+    
+    # Use PACE function for each marker
+    FPCA <- lapply(m_irregFunData, function(mark) {
+      PACE(mark, npc = npc, pve = pve_uni)
+    })
+    
+    # Construct multivariate FunData and estimated FPCs
+    mFData <- multiFunData(lapply(FPCA, "[[", "fit"))
+    uniExpansions <- lapply(FPCA, function (mark) {
+      list(type = "given", functions = mark$functions)
+    })
+    if (is.null(M)) {
+      M <- sum(sapply(FPCA, "[[", "npc"))
+    }
   }
-  FPCA <- lapply(m_irregFunData, function(mark) {
-    PACE(mark, npc = npc, pve = pve_uni)
-  })
-  mFData <- multiFunData(lapply(FPCA, "[[", "fit"))
-  uniExpansions <- lapply(FPCA, function (mark) {
-    list(type = "given", functions = mark$functions)
-  })
-  if (is.null(M)) {
-    M <- sum(sapply(FPCA, "[[", "npc"))
-  }
+  
+
   MFPCA <- MFPCA(mFData = mFData, M = M, uniExpansions = uniExpansions)
 }
 
