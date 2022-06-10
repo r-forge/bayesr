@@ -17,15 +17,15 @@
 #' @param M Number of mFPCs to compute in the MFPCA. If not supplied, it
 #'  defaults to the maximum number of computable mFPCs.
 #' @param method Which package to use for the univariate FPCA. Either function
-#'  'FPCA' from package \code{fdapace} or function 'PACE' from package 
-#'  \code{MFPCA}.
+#'  'FPCA' from package \code{fdapace}, 'fpca.sc' from package \code{refund}, or 
+#'  function 'PACE' from package \code{MFPCA}.
 #' @param npc Number of univariate principal components to use in PACE.
 #' @param fve_uni Fraction of univariate variance explained for method FPCA.
 #' @param pve_uni Proportion of univariate variance explained for method PACE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
                            time = "obstime", id = "id", M = NULL, 
-                           method = c("FPCA", "PACE"), npc = NULL,
-                           fve_uni = 1, pve_uni = 0.999) {
+                           method = c("FPCA", "fpca.sc", "PACE"), npc = NULL,
+                           fve_uni = 0.99, pve_uni = 0.99) {
   require(bamlss)
   require(MFPCA)
   method <- match.arg(method)
@@ -39,7 +39,35 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     mark
   })
   
-  if(method == "FPCA") {
+  if (method == "fpca.sc") {
+    require(refund)
+    
+    # Construct objects for fpca.sc function
+    lY <- lapply(marker_dat, function (mark) {
+      data.frame(".id" = mark[, id],
+                 ".index" = mark[, time],
+                 ".value" = mark$res)
+    })
+    
+    # FPCA for each marker
+    FPCA <- lapply(lY, function(y) {
+      refund::fpca.sc(ydata = y, pve = pve_uni)
+    })
+    
+    # Construct multivariate FunData and estimated FPCs
+    mFData <- multiFunData(lapply(FPCA, function (mark) {
+      funData(argvals = mark$argvals, X = mark$Yhat)
+    }))
+    uniExpansions <- lapply(FPCA, function (mark) {
+      list(type = "given", functions = funData(argvals = mark$argvals,
+                                               X = t(mark$efunctions)))
+    })
+    if (is.null(M)) {
+      M <- sum(sapply(FPCA, "[[", "npc"))
+    }
+    
+    
+  } else if (method == "FPCA") {
     require(fdapace)
     
     # Construct objects for FPCA function
@@ -69,7 +97,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
       M <- sum(sapply(FPCA, "[[", "selectK"))
     }
     
-  } else {
+  } else if (method == "PACE") {
     
     # Construct irregular FunData
     m_irregFunData <- lapply(marker_dat, function (mark) {
