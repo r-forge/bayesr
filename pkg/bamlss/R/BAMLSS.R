@@ -7,6 +7,7 @@ bamlss.frame <- function(formula, data = NULL, family = "gaussian",
 {
   ## Parse family object.
   family <- bamlss.family(family, ...)
+  envir_formula <- environment(formula)
 
   ## Parse formula.
   if(!inherits(formula, "bamlss.formula"))
@@ -148,7 +149,7 @@ bamlss.frame <- function(formula, data = NULL, family = "gaussian",
   ## Assign the 'x' master object.
   bf$x <- design.construct(bf$terms, data = bf$model.frame, knots = knots,
     model.matrix = model.matrix, smooth.construct = smooth.construct, model = NULL,
-    scale.x = scale.x, specials = specials, ...)
+    scale.x = scale.x, specials = specials, envir_formula = envir_formula, ...)
 
   bf$knots <- knots
 
@@ -246,6 +247,10 @@ design.construct <- function(formula, data = NULL, knots = NULL,
   doCmat <- list(...)$Cmat
   if(is.null(doCmat))
     doCmat <- FALSE
+
+  envir_formula <- list(...)$envir_formula
+  if(is.null(envir_formula))
+    envir_formula <- parent.frame()
 
   if(is.null(gam.side))
     gam.side <- FALSE
@@ -372,7 +377,7 @@ design.construct <- function(formula, data = NULL, knots = NULL,
         sid <- NULL
       if(!is.null(sid) | !is.null(fterms)) {
         sterms <- sterm_labels <- attr(tx, "term.labels")[sid]
-        sterms <- lapply(sterms, function(x) { eval(parse(text = x)) })
+        sterms <- lapply(sterms, function(x) { eval(parse(text = x), envir = envir_formula) })
         nst <- NULL
         for(j in seq_along(sterms)) {
           sl <- sterms[[j]]$label

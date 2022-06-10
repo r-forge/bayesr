@@ -4553,7 +4553,7 @@ dl.bamlss <- function(object,
   if(is.null(l1) & !is.null(l2))
     pen <- paste0('regularizer_l2(', l2, ')')
   if(!is.null(l1) & !is.null(l2))
-    pen <- paste0('regularizer_l1_l2(', l1,, ', ',  l2, ')')
+    pen <- paste0('regularizer_l1_l2(', l1, ', ',  l2, ')')
 
   for(j in 1:length(X)) {
     inputs[[j]] <- keras::layer_input(shape = ncol(X[[j]]))
