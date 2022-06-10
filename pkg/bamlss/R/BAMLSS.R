@@ -7,11 +7,11 @@ bamlss.frame <- function(formula, data = NULL, family = "gaussian",
 {
   ## Parse family object.
   family <- bamlss.family(family, ...)
-  envir_formula <- environment(formula)
 
   ## Parse formula.
   if(!inherits(formula, "bamlss.formula"))
     formula <- bamlss.formula(formula, family, specials, env = parent.frame())
+  envir_formula <- environment(formula)
   if(!is.null(attr(formula, "orig.formula")))
     formula <- attr(formula, "orig.formula")
 
