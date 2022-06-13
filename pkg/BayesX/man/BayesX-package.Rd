@@ -19,7 +19,7 @@
 \references{
   Belitz C, Brezger A, Kneib T, Lang S (2011). \pkg{BayesX} - Software for Bayesian Inference in 
     Structured Additive Regression Models. Version 2.0.1. 
-    URL \url{http://www.BayesX.org}.
+    URL \url{https://www.uni-goettingen.de/de/bayesx/550513.html}.
 }
 
 \keyword{package}
