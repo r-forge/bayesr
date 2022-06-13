@@ -6,18 +6,21 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LASSO-Type Penalization in the Framework of Generalized Additive Models for Location, Scale and Shape • bamlss</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="LASSO-Type Penalization in the Framework of Generalized Additive Models for Location, Scale and Shape">
-<meta property="og:description" content="">
-<meta name="twitter:card" content="summary">
+<meta property="og:description" content="bamlss">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -30,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
       </span>
     </div>
 
@@ -46,7 +49,7 @@
   <a href="../articles/bamlss.html">Get started</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Vignettes
      
     <span class="caret"></span>
@@ -91,7 +94,7 @@
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Publications
      
     <span class="caret"></span>
@@ -127,10 +130,11 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>LASSO-Type Penalization in the Framework of Generalized Additive Models for Location, Scale and Shape</h1>
+      <h1 data-toc-skip>LASSO-Type Penalization in the Framework of Generalized Additive Models for Location, Scale and Shape</h1>
             
       
       
@@ -140,9 +144,9 @@
 
     
     
-<div id="intro" class="section level2">
-<h2 class="hasAnchor">
-<a href="#intro" class="anchor"></a>Intro</h2>
+<div class="section level2">
+<h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
+</h2>
 <p>The article <strong>LASSO-type penalization in the framework of generalized additive models for location, scale and shape</strong> <span class="citation">(Groll et al. 2019)</span> presents a regularization approach for high-dimensional data set-ups in the framework of GAMLSS. It is designed for linear covariate effects and is based on L<span class="math inline">\(_{1}\)</span>-type penalties. The following three penalization options are provided:</p>
 <ul>
 <li>the conventional least absolute shrinkage and selection operator (LASSO) for metric covariates,</li>
@@ -151,111 +155,121 @@
 </ul>
 <p>This vignette provides some example code how to set up LASSO-type penalized models using <em>bamlss</em>.</p>
 </div>
-<div id="munich-rental-guide-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#munich-rental-guide-data" class="anchor"></a>Munich rental guide data</h2>
+<div class="section level2">
+<h2 id="munich-rental-guide-data">Munich rental guide data<a class="anchor" aria-label="anchor" href="#munich-rental-guide-data"></a>
+</h2>
 <p>We follow the example in the article <span class="citation">(Groll et al. 2019)</span> and use Munich rental guide data to illustrate the modeling approach. Unfortunately, we cannot use the original data shown in the paper because of copywright reasons. However, an older version of the data is available in the supplementary materials of the Regression book <span class="citation">(Fahrmeir et al. 2013)</span>. The data can be loaded into R with</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">file_url &lt;-<span class="st"> "http://www.bamlss.org/misc/rent99.raw"</span></a>
-<a class="sourceLine" id="cb1-2" title="2">rent99 &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/read.table">read.table</a></span>(file_url, <span class="dt">header =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">file_url</span> <span class="op">&lt;-</span> <span class="st">"http://www.bamlss.org/misc/rent99.raw"</span>
+<span class="va">rent99</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="va">file_url</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>The response is the monthly rent per square meter in Euro (<code>rentsqm</code>). In this example we use the year of construction (<code>yearc</code>), area (<code>area</code>) and the location classification (`location’, derived from expert knowledge) of the apartment as covariates. Following the example <span class="citation">(Groll et al. 2019)</span>, the two continuous covariates are categorized</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co">## Create factors of continuous covariates.</span></a>
-<a class="sourceLine" id="cb2-2" title="2">rent99<span class="op">$</span>yearc &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">ordered</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">floor</a></span>(rent99<span class="op">$</span>yearc <span class="op">/</span><span class="st"> </span><span class="dv">10</span>) <span class="op">*</span><span class="st"> </span><span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb2-3" title="3">rent99<span class="op">$</span>area &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cut">cut</a></span>(rent99<span class="op">$</span>area, <span class="dt">breaks =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">20</span>, <span class="dv">160</span>, <span class="dt">by =</span> <span class="dv">20</span>),</a>
-<a class="sourceLine" id="cb2-4" title="4">  <span class="dt">include.lowest =</span> <span class="ot">TRUE</span>, <span class="dt">right =</span> <span class="ot">FALSE</span>, <span class="dt">ordered =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb2-5" title="5"></a>
-<a class="sourceLine" id="cb2-6" title="6"><span class="co">## Also transform to factor.</span></a>
-<a class="sourceLine" id="cb2-7" title="7">rent99<span class="op">$</span>location &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">as.factor</a></span>(rent99<span class="op">$</span>location)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## Create factors of continuous covariates.</span>
+<span class="va">rent99</span><span class="op">$</span><span class="va">yearc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">ordered</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">rent99</span><span class="op">$</span><span class="va">yearc</span> <span class="op">/</span> <span class="fl">10</span><span class="op">)</span> <span class="op">*</span> <span class="fl">10</span><span class="op">)</span>
+<span class="va">rent99</span><span class="op">$</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">rent99</span><span class="op">$</span><span class="va">area</span>, breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">160</span>, by <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,
+  include.lowest <span class="op">=</span> <span class="cn">TRUE</span>, right <span class="op">=</span> <span class="cn">FALSE</span>, ordered <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="co">## Also transform to factor.</span>
+<span class="va">rent99</span><span class="op">$</span><span class="va">location</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">rent99</span><span class="op">$</span><span class="va">location</span><span class="op">)</span></code></pre></div>
 <p>We fit a Gaussian GAMLSS and use for both distribution parameters, i.e. <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>, using the following code</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co">## Model formula.</span></a>
-<a class="sourceLine" id="cb3-2" title="2">f &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb3-3" title="3">  rentsqm <span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/lasso.html">la</a></span>(area,<span class="dt">fuse=</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/lasso.html">la</a></span>(yearc,<span class="dt">fuse=</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/lasso.html">la</a></span>(location,<span class="dt">fuse=</span><span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb3-4" title="4">  sigma <span class="op">~</span><span class="st"> </span><span class="kw"><a href="../reference/lasso.html">la</a></span>(area,<span class="dt">fuse=</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/lasso.html">la</a></span>(yearc,<span class="dt">fuse=</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="../reference/lasso.html">la</a></span>(location,<span class="dt">fuse=</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb3-5" title="5">)</a>
-<a class="sourceLine" id="cb3-6" title="6"></a>
-<a class="sourceLine" id="cb3-7" title="7"><span class="co">## LASSO model based on lambda grid,</span></a>
-<a class="sourceLine" id="cb3-8" title="8"><span class="co">## use special opt_lasso() estimation engine.</span></a>
-<a class="sourceLine" id="cb3-9" title="9">rentmodel &lt;-<span class="st"> </span><span class="kw"><a href="../reference/bamlss.html">bamlss</a></span>(f, <span class="dt">data =</span> rent99, <span class="dt">optimizer =</span> opt_lasso, <span class="dt">sampler =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-10" title="10">  <span class="dt">criterion =</span> <span class="st">"BIC"</span>, <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">multiple =</span> <span class="ot">TRUE</span>, <span class="dt">upper =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="dv">6</span>), <span class="dt">lower =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(<span class="dv">0</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## Model formula.</span>
+<span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
+  <span class="va">rentsqm</span> <span class="op">~</span> <span class="fu"><a href="../reference/lasso.html">la</a></span><span class="op">(</span><span class="va">area</span>,fuse<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/lasso.html">la</a></span><span class="op">(</span><span class="va">yearc</span>,fuse<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/lasso.html">la</a></span><span class="op">(</span><span class="va">location</span>,fuse<span class="op">=</span><span class="fl">1</span><span class="op">)</span>,
+  <span class="va">sigma</span> <span class="op">~</span> <span class="fu"><a href="../reference/lasso.html">la</a></span><span class="op">(</span><span class="va">area</span>,fuse<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/lasso.html">la</a></span><span class="op">(</span><span class="va">yearc</span>,fuse<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/lasso.html">la</a></span><span class="op">(</span><span class="va">location</span>,fuse<span class="op">=</span><span class="fl">1</span><span class="op">)</span>
+<span class="op">)</span>
+
+<span class="co">## LASSO model based on lambda grid,</span>
+<span class="co">## use special opt_lasso() estimation engine.</span>
+<span class="va">rentmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">rent99</span>, optimizer <span class="op">=</span> <span class="va">opt_lasso</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span>,
+  criterion <span class="op">=</span> <span class="st">"BIC"</span>, nlambda <span class="op">=</span> <span class="fl">100</span>, multiple <span class="op">=</span> <span class="cn">TRUE</span>, upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span>, lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>where arguments <code>upper</code> and <code>lower</code> define the limits of the LASSO tuning parameters. Estimation in this case is based on the BIC using a two dimensional grid search with <span class="math inline">\(200 \times 200\)</span> iterations. Note that <code>fuse=1</code> is used for nominal fusion and <code>fuse=2</code> for ordinal fusion within the special <code><a href="../reference/lasso.html">la()</a></code> model term constructor function.</p>
 <p>The resulting marginal BIC curves can be visualized with</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="../reference/pathplot.html">pathplot</a></span>(rentmodel, <span class="dt">which =</span> <span class="st">"criterion"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/pathplot.html">pathplot</a></span><span class="op">(</span><span class="va">rentmodel</span>, which <span class="op">=</span> <span class="st">"criterion"</span><span class="op">)</span></code></pre></div>
 <p><img src="lasso_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;"> In this example both tuning parameters have the same value, also indicated by the gray dashed vertical lines. The coefficient paths w.r.t. the tuning parameters can be plotted, e.g., for parameter <span class="math inline">\(\mu\)</span>, with</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="../reference/pathplot.html">pathplot</a></span>(rentmodel, <span class="dt">which =</span> <span class="st">"parameters"</span>, <span class="dt">model =</span> <span class="st">"mu"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/pathplot.html">pathplot</a></span><span class="op">(</span><span class="va">rentmodel</span>, which <span class="op">=</span> <span class="st">"parameters"</span>, model <span class="op">=</span> <span class="st">"mu"</span><span class="op">)</span></code></pre></div>
 <p><img src="lasso_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;"> The legend on the right hand side of the plot is not necessarily very nice (too long). One option to select specific paths for plotting is to set the <code>name</code> argument in <code><a href="../reference/pathplot.html">pathplot()</a></code>, e.g., plotting the coefficient paths for the year of construction for parameter <span class="math inline">\(\mu\)</span> can be done by</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="../reference/pathplot.html">pathplot</a></span>(rentmodel, <span class="dt">which =</span> <span class="st">"parameters"</span>, <span class="dt">model =</span> <span class="st">"mu"</span>,</a>
-<a class="sourceLine" id="cb6-2" title="2">  <span class="dt">name =</span> <span class="st">"mu.s.la(yearc).yearc"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/pathplot.html">pathplot</a></span><span class="op">(</span><span class="va">rentmodel</span>, which <span class="op">=</span> <span class="st">"parameters"</span>, model <span class="op">=</span> <span class="st">"mu"</span>,
+  name <span class="op">=</span> <span class="st">"mu.s.la(yearc).yearc"</span><span class="op">)</span></code></pre></div>
 <p><img src="lasso_files/figure-html/unnamed-chunk-8-1.png" width="480" style="display: block; margin: auto;"> The plotting function also replaces the names of the coefficients such that the labeling in the plot is easy to read. The plot shows that very old apartments are all shrinked out of the model, whereas apartments from 1950 and younger enter the model and categories are not fused.</p>
 <p>Similarly, the effect on parameter <span class="math inline">\(\sigma\)</span> for the <code>area</code> of the apartment can be plotted by</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw"><a href="../reference/pathplot.html">pathplot</a></span>(rentmodel, <span class="dt">which =</span> <span class="st">"parameters"</span>, <span class="dt">model =</span> <span class="st">"sigma"</span>,</a>
-<a class="sourceLine" id="cb7-2" title="2">  <span class="dt">name =</span> <span class="st">"sigma.s.la(area).area"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/pathplot.html">pathplot</a></span><span class="op">(</span><span class="va">rentmodel</span>, which <span class="op">=</span> <span class="st">"parameters"</span>, model <span class="op">=</span> <span class="st">"sigma"</span>,
+  name <span class="op">=</span> <span class="st">"sigma.s.la(area).area"</span><span class="op">)</span></code></pre></div>
 <p><img src="lasso_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;"> The plot shows that almost all categories of covariate <code>area</code> are fused using the BIC for tuning parameter selection and uncertainty seems to be lowest for larger apartments.</p>
 </div>
-<div id="single-tuning-parameters-" class="section level2">
-<h2 class="hasAnchor">
-<a href="#single-tuning-parameters-" class="anchor"></a>Single tuning parameters.</h2>
+<div class="section level2">
+<h2 id="single-tuning-parameters-">Single tuning parameters.<a class="anchor" aria-label="anchor" href="#single-tuning-parameters-"></a>
+</h2>
 <p>In <em>bamlss</em>, it is also possible to estimate single tuning parameters for each LASSO term. The main advantage of the single tuning parameter selection is that in principle classical LASSO and fused LASSO terms can be mixed, which is not the case if only single tuning parameters, one for each distributional parameter (e.g., <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> using the Gaussian distribution), is used.</p>
 <p>E.g., using the Munich rent data, we could estimate the model with the default backfitting model fitting engine <code><a href="../reference/bfit.html">opt_bfit()</a></code></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">rentmodel_s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/bamlss.html">bamlss</a></span>(f, <span class="dt">data =</span> rent99, <span class="dt">optimizer =</span> opt_bfit, <span class="dt">sampler =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb8-2" title="2">  <span class="dt">criterion =</span> <span class="st">"BIC"</span>, <span class="dt">nu =</span> <span class="dv">1</span>, <span class="dt">start =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/coef">coef</a></span>(rentmodel, <span class="dt">mstop =</span> <span class="kw"><a href="../reference/lasso.html">lasso_stop</a></span>(rentmodel)))</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rentmodel_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">rent99</span>, optimizer <span class="op">=</span> <span class="va">opt_bfit</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span>,
+  criterion <span class="op">=</span> <span class="st">"BIC"</span>, nu <span class="op">=</span> <span class="fl">1</span>, start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">rentmodel</span>, mstop <span class="op">=</span> <span class="fu"><a href="../reference/lasso.html">lasso_stop</a></span><span class="op">(</span><span class="va">rentmodel</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>using the estimated parameters of the first model as starting values (<code>mstop</code> is the optimum stopping iteration of the <code><a href="../reference/lasso.html">opt_lasso()</a></code> optimizer). Note that we also optimize the step length of the backfitting algorithm by setting <code>nu = 1</code>. To compare both models by BIC, the <code><a href="../reference/lasso.html">lasso_stop()</a></code> functions returns the optimum iteration of the <code><a href="../reference/lasso.html">opt_lasso()</a></code> optimizer</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw"><a href="../reference/lasso.html">lasso_stop</a></span>(rentmodel)</a></code></pre></div>
-<pre><code>## [1] 6764
-## attr(,"stats")
-##        logLik       logPost           BIC           edf     lambda.mu 
-## -6.492676e+03 -4.811313e+05  1.310644e+04  1.507328e+01  8.862405e+00 
-##  lambda.sigma 
-##  6.954535e+00</code></pre>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/lasso.html">lasso_stop</a></span><span class="op">(</span><span class="va">rentmodel</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## [1] 6764</span>
+<span class="co">## attr(,"stats")</span>
+<span class="co">##        logLik       logPost           BIC           edf     lambda.mu </span>
+<span class="co">## -6.492676e+03 -4.811313e+05  1.310644e+04  1.507328e+01  8.862405e+00 </span>
+<span class="co">##  lambda.sigma </span>
+<span class="co">##  6.954535e+00</span></code></pre>
 <p>along the estimated degrees of freedom and the BIC. Similarly, the BIC of the second model can be extracted with</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/AIC">BIC</a></span>(rentmodel_s)</a></code></pre></div>
-<pre><code>## [1] 13102.81</code></pre>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">BIC</a></span><span class="op">(</span><span class="va">rentmodel_s</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## [1] 13102.81</span></code></pre>
 <p>which is slightly a bit smaller than the first model suggesting that the grid search method is most probably enough in this case.</p>
 <p>Using the <code><a href="../reference/lasso.html">lasso_stop()</a></code> function, we can also extract the corresponding predictions.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict</a></span>(rentmodel, <span class="dt">mstop =</span> <span class="kw"><a href="../reference/lasso.html">lasso_stop</a></span>(rentmodel))</a></code></pre></div>
-<p>Note that the default in <code><a href="https://www.rdocumentation.org/packages/stats/topics/coef">coef()</a></code> and <code><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict()</a></code> would be to use the last LASSO iteration otherwise.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">rentmodel</span>, mstop <span class="op">=</span> <span class="fu"><a href="../reference/lasso.html">lasso_stop</a></span><span class="op">(</span><span class="va">rentmodel</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>Note that the default in <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code> and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> would be to use the last LASSO iteration otherwise.</p>
 </div>
-<div id="references" class="section level2 unnumbered">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
+<div class="section level2 unnumbered">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references">
 <div id="ref-bamlss:Fahrmeir+Kneib+Lang+Marx:2013">
 <p>Fahrmeir, Ludwig, Thomas Kneib, Stefan Lang, and Brian Marx. 2013. <em>Regression – Models, Methods and Applications</em>. Berlin: Springer-Verlag.</p>
 </div>
 <div id="ref-bamlss:Groll+Hambuckers+Kneib+Umlauf:2019">
-<p>Groll, Andreas, Julien Hambuckers, Thomas Kneib, and Nikolaus Umlauf. 2019. “LASSO-Type Penalization in the Framework of Generalized Additive Models for Location, Scale and Shape.” <em>Computational Statistics &amp; Data Analysis</em> 140: 59–74. <a href="https://doi.org/10.1016/j.csda.2019.06.005" class="uri">https://doi.org/10.1016/j.csda.2019.06.005</a>.</p>
+<p>Groll, Andreas, Julien Hambuckers, Thomas Kneib, and Nikolaus Umlauf. 2019. “LASSO-Type Penalization in the Framework of Generalized Additive Models for Location, Scale and Shape.” <em>Computational Statistics &amp; Data Analysis</em> 140: 59–74. <a href="https://doi.org/10.1016/j.csda.2019.06.005" class="external-link uri">https://doi.org/10.1016/j.csda.2019.06.005</a>.</p>
 </div>
 <div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
 </div>
 </div>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li><a href="#intro">Intro</a></li>
-      <li><a href="#munich-rental-guide-data">Munich rental guide data</a></li>
-      <li><a href="#single-tuning-parameters-">Single tuning parameters.</a></li>
-      <li><a href="#references">References</a></li>
-      </ul>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
 </div>
-      </div>
 
 </div>
+
 
 
       <footer><div class="copyright">
-  <p>Developed by Nikolaus Umlauf, Nadja Klein, Achim Zeileis, Thorsten Simon.</p>
+  <p></p>
+<p>Developed by Nikolaus Umlauf, Nadja Klein, Achim Zeileis, Thorsten Simon.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
+
       </footer>
 </div>
+
+  
+
 
   
 
