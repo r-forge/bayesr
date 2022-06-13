@@ -34,7 +34,7 @@ bnd2sp(bndObject)
   \code{\link{read.bnd}}, \code{\link{write.bnd}} for the interface to
   the BayesX files.}
 \examples{
-## bnd to sp:
+\dontrun{## bnd to sp:
 germany <- read.bnd(system.file("examples/germany2001.bnd", package="BayesX"))
 spGermany <- bnd2sp(germany)
 
@@ -73,6 +73,6 @@ originalContainsData <- data.frame(inner=names(germany)[whichInner],
 
 stopifnot(all(bndContainsData[order(bndContainsData$inner), ] ==
               originalContainsData[order(originalContainsData$inner), ]))
-}
+}}
 \keyword{spatial}
 
