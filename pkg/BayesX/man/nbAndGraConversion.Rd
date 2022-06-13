@@ -27,7 +27,7 @@ gra2nb(graObject)
   \code{\link{read.gra}}, \code{\link{write.gra}} for the interface to
   the BayesX files.} 
 \examples{
-## first nb to gra:
+\dontrun{## first nb to gra:
 library(spdep)
 library(maptools)
 columbus <- readShapePoly(system.file("etc/shapes/columbus.shp", package="spdep")[1])
@@ -51,6 +51,6 @@ all.equal(newColNb, colNb,
           check.attributes=FALSE)
 attr(newColNb, "call")
 attr(colNb, "call")
-}
+}}
 
 \keyword{spatial}
