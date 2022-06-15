@@ -10,8 +10,9 @@
 # Specify location
 location <- "workstation"
 if(location %in% c("server_linux", "server_windows")){
-  .libPaths(if (location == "server_linux") "~/H:/volkmana.hub/R4_linux"
-            else "H:/R4_windows")
+  .libPaths(if (location == "server_linux") {
+    c("~/H:/volkmana.hub/R4_linux_b", "~/H:/volkmana.hub/R4_linux")
+  } else "H:/R4_windows")
   setwd(if (location == "server_linux") "~/H:/volkmana.hub/JMbamlss"
         else "H:/JMbamlss")
 }
