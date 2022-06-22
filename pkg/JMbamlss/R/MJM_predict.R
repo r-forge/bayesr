@@ -2,7 +2,6 @@
 MJM_predict <- function(object, newdata,
                         type = c("link", "parameter", "probabilities", 
                                  "cumhaz"),
-                                 #"loglik"),
                        dt, id,
                        FUN = function(x) { mean(x, na.rm = TRUE) },
                        subdivisions = 7, cores = NULL,
@@ -10,7 +9,6 @@ MJM_predict <- function(object, newdata,
 {
   
   if(missing(dt)) dt <- 0
-  if(missing(steps)) steps <- 1
   if(missing(id)) i <- NULL else i <- id
   idvar <- attr(object$y, "idvar")
   marker_name <- attr(object$y, "marker_name")
@@ -21,11 +19,6 @@ MJM_predict <- function(object, newdata,
   if(length(type) > 1)
     type <- type[1]
   type <- match.arg(type)
-  #loglik <- type == "loglik"
-  # if(loglik) {
-  #   type <- "cumhaz"
-  #   dt <- 0
-  # }
   
   if(type == "probabilities"){
     if(!is.null(newdata)){
@@ -187,28 +180,7 @@ MJM_predict <- function(object, newdata,
                                        c(2, 1, 3)))
     
     eta_timegrid <- pred_lambda + eta_timegrid_long
-
     
-    # if(loglik) {
-    #   eta_gamma <- bamlss:::predict.bamlss(object, data[take, , drop = FALSE], 
-    #                                        model = "gamma")
-    #   eta_mu <- bamlss:::predict.bamlss(object, data, model = "mu")
-    #   eta_sigma <- bamlss:::predict.bamlss(object, data, model = "sigma")
-    #   browser()
-    #   eta_timegrid <- matrix(eta_timegrid, nrow = gdim[1], ncol = gdim[2], 
-    #                          byrow = TRUE)
-    #   eeta <- exp(eta_timegrid)
-    #   y <- data[, grep("Surv", names(data), fixed = TRUE)]
-    #   # ANPASSEN
-    #   int <- width * (0.5 * (eeta[, 1] + eeta[, subdivisions]) + 
-    #                     apply(eeta[, 2:(subdivisions - 1)], 1, sum))
-    #   ll <- sum((eta_timegrid[, ncol(eta_timegrid)] + 
-    #                eta_gamma) * y[take, "status"], na.rm = TRUE) -
-    #     exp(eta_gamma) %*% int + sum(dnorm(y[, "obs"], mean = eta_mu,
-    #                                        sd = exp(eta_sigma), log = TRUE))
-    #   return(drop(ll))
-    # }
-    browser()
     if(dt == 0){
       
       # Only for cumulative hazard so integral starts at 0
@@ -233,41 +205,30 @@ MJM_predict <- function(object, newdata,
       }
       
     } else {
-      lprobs <- lapply(seq_len(steps), function(x){
-        probs <- matrix(nrow = nobs,  ncol = ncol(eta_timegrid))
-        sub <- round(subdivisions/steps * x)
-        for(i in seq_len(ncol(eta_timegrid))) {
-          eta <- matrix(eta_timegrid[, i], nrow = gdim[1], ncol = gdim[2], 
-                        byrow = TRUE)
-          eeta <- exp(eta)
-          # ANPASSEN
-          # GQ integral
-          int <- dsurv[[timevar["lambda"]]] / 2 * rowSums(t(gq$weights*t(eeta)))
-          
-          probs[, i] <- exp(pred_gamma[, i]) * int
-          
-          int <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + 
-                            apply(eeta[, 2:(sub - 1), drop = FALSE], 1, sum))
-          probs <- if(type == "probabilities") {
-            cbind(probs, exp(-1 * exp(pred_gamma[, i]) * int))
-          } else {
-            cbind(probs, exp(pred_gamma[, i]) * int)
-          }
-        }
+      # Only starts after survival time
+      probs <- matrix(nrow = nobs,  ncol = ncol(eta_timegrid))
+      for(i in seq_len(ncol(eta_timegrid))) {
+        eta <- matrix(eta_timegrid[, i], nrow = gdim[1], ncol = gdim[2],
+                      byrow = TRUE)
+        eeta <- exp(eta)
         
-        if(!is.null(FUN)) {
-          if(is.matrix(probs)) {
-            if(ncol(probs) > 1)
-              probs <- apply(probs, 1, FUN)
-            probs <- t(probs) 
-          } 
-        }
-        probs
-      }) 
+        # GQ integral
+        int <- dt / 2 * rowSums(t(gq$weights*t(eeta)))
+        
+        probs[, i] <- exp(pred_gamma[, i]) * int
+        
+      }
+      if (type == "probabilities") {
+        probs <- exp(-1 * probs)
+      }
       
-      probs <- lprobs
-      names(probs) <- paste("Time after last longitudinal observation:", 
-                            (1:steps)*dt/steps) 
+      if(!is.null(FUN)) {
+        if(is.matrix(probs)) {
+          if(ncol(probs) > 1)
+            probs <- apply(probs, 1, FUN)
+          probs <- t(probs) 
+        } 
+      }
     }
     
     
@@ -338,7 +299,7 @@ MJM_predict <- function(object, newdata,
     }
   }
   
-  return(probs)
+  return(drop(probs))
 }
 
 
