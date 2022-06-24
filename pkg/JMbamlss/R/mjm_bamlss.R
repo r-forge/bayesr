@@ -13,7 +13,7 @@ mjm_bamlss <- function(...)
     "names" = c("lambda", "gamma", "mu", "sigma", "alpha"),
     "links" = links,
     "transform" = MJM_transform,
-    "optimizer" = opt_MJM,
+    "optimizer" = MJM_opt,
     "sampler" = MJM_mcmc,
     "predict" = MJM_predict
   )

@@ -15,10 +15,11 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
   ## place
   class_mu <- lapply(object$x$mu$smooth.construct, class)
   class_mu <- sapply(class_mu, function(x) x[1])
-  if(!any(class_mu == "pcre.random.effect")){
+  if(!any(class_mu %in% c("pcre.random.effect", "unc_pcre.random.effect"))){
     j <- length(class_mu)
   } else {
-    j <- which(class_mu == "pcre.random.effect")
+    j <- which(class_mu %in% c("pcre.random.effect",
+                               "unc_pcre.random.effect"))[1]
   }
   if (is.null(idvar)) {
     smj <- object$x$mu$smooth.construct[[j]]

@@ -2,7 +2,7 @@
 
 # Optimizer for MJM -------------------------------------------------------
 
-opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
+MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
                     verbose = FALSE, ...) {
   
@@ -18,6 +18,7 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   survtime <- y[[1]][, "time"][take_last]
   nmarker <- attr(y, "nmarker")
   marker <- attr(y, "marker")
+  logLik <- NULL
   
 
   ## Set alpha/mu/sigma intercept starting value.
@@ -98,7 +99,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   eta0_long <- do.call("cbind", eta[c("mu", "sigma")])
   iter <- 0
   alpha_update <- if(is.null(start)) FALSE else TRUE
-  logLik0 <- log(0)
   
   # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
   if (par_trace) {
@@ -207,23 +207,25 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       }
     }
 
-    # Likelihood calculation
-    # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
-    # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
-    # Vektor.
-    eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
-                                 ncol = nmarker))
-    eta_T <- eta$lambda + eta$gamma + eta_T_long
-    
-    # Das könnte man auch weglassen, um es schneller zu machen, weil das Stop-
-    # Kriterium nicht von der Likelihood abhängt, sondern nur von den Eta-
-    # Änderungen
-    sum_Lambda <- (survtime/2 * exp(eta$gamma)) %*%
-      (diag(nsubj)%x%t(gq_weights))%*%
-      exp(eta_timegrid)
-    logLik <- drop(status %*% eta_T - sum_Lambda) +
-      sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
-                log = TRUE))
+   
+    if (verbose) {
+      # Likelihood calculation
+      # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
+      # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
+      # Vektor.
+      eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
+                                   ncol = nmarker))
+      eta_T <- eta$lambda + eta$gamma + eta_T_long
+      sum_Lambda <- drop(crossprod(survtime/2 * exp(eta$gamma), 
+        colSums(gq_weights*matrix(exp(eta_timegrid), ncol = nsubj, 
+                                  nrow = length(gq_weights)))))
+      logLik <- drop(crossprod(status, eta_T)) - sum_Lambda +
+        sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
+                  log = TRUE))
+      cat("It ", iter,", LogLik ", logLik, ", Post", 
+          as.numeric(logLik + bamlss:::get.log.prior(x)), "\n")
+    }
+
     
     # Eigentlich sollte hier doch auch über die Log-Posterior das Max gebildet
     # werden? Die Score und Hesse-Funktionen beziehen nämlich schon die Prioris
@@ -243,10 +245,6 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     eps0_long <- mean(abs((eta1_long - eta0_long) / eta1_long), na.rm = TRUE)
     eps0 <- mean(c(eps0_surv, eps0_alpha, eps0_long))
     
-    if (verbose) {
-    cat("It ", iter,", LogLik ", logLik, ", Post", 
-        as.numeric(logLik + bamlss:::get.log.prior(x)), "\n")
-    }
     eta0_surv <- eta1_surv
     eta0_alpha <- eta1_alpha
     eta0_long <- eta1_long
@@ -271,6 +269,17 @@ opt_MJM <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   # plot(pred_data[, 1], pred_mat%*%b_it)
   
   #assign("it_param", it_param, envir = .GlobalEnv)
+  if (is.null(logLik)) {
+    eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
+                                 ncol = nmarker))
+    eta_T <- eta$lambda + eta$gamma + eta_T_long
+    sum_Lambda <- drop(crossprod(survtime/2 * exp(eta$gamma), 
+      colSums(gq_weights*matrix(exp(eta_timegrid), ncol = nsubj, 
+                                nrow = length(gq_weights)))))
+    logLik <- drop(crossprod(status, eta_T)) - sum_Lambda +
+      sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
+                log = TRUE))
+  }
   logPost <- as.numeric(logLik + bamlss:::get.log.prior(x))
   return(list("fitted.values" = eta, "parameters" = bamlss:::get.all.par(x),
               "logLik" = logLik, "logPost" = logPost,

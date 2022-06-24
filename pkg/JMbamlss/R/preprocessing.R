@@ -19,12 +19,16 @@
 #' @param method Which package to use for the univariate FPCA. Either function
 #'  'FPCA' from package \code{fdapace}, 'fpca.sc' from package \code{refund}, or 
 #'  function 'PACE' from package \code{MFPCA}.
-#' @param npc Number of univariate principal components to use in PACE.
+#' @param nbasis Number of B-spline basis functions for mean estimate and
+#'  bivariate smoothing of covariance surface for methods fpca.sc, PACE.
+#' @param npc Number of univariate principal components to use in fpca.sc, PACE.
 #' @param fve_uni Fraction of univariate variance explained for method FPCA.
-#' @param pve_uni Proportion of univariate variance explained for method PACE.
+#' @param pve_uni Proportion of univariate variance explained for method 
+#'  fpca.sc,PACE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
                            time = "obstime", id = "id", M = NULL, 
-                           method = c("FPCA", "fpca.sc", "PACE"), npc = NULL,
+                           method = c("fpca.sc", "FPCA", "PACE"), nbasis = 10,
+                           npc = NULL,
                            fve_uni = 0.99, pve_uni = 0.99) {
   require(bamlss)
   require(MFPCA)
@@ -51,7 +55,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     
     # FPCA for each marker
     FPCA <- lapply(lY, function(y) {
-      refund::fpca.sc(ydata = y, pve = pve_uni)
+      refund::fpca.sc(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc)
     })
     
     # Construct multivariate FunData and estimated FPCs
@@ -120,7 +124,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     
     # Use PACE function for each marker
     FPCA <- lapply(m_irregFunData, function(mark) {
-      PACE(mark, npc = npc, pve = pve_uni)
+      PACE(mark, npc = npc, pve = pve_uni, nbasis = nbasis)
     })
     
     # Construct multivariate FunData and estimated FPCs
