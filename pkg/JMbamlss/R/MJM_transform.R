@@ -343,7 +343,7 @@ sm_time_transform_mjm_pcre <- function(x, data, grid, yname, timevar, take,
     X[[x$by]] <- rep(data[[x$by]], each = length(grid[[1]]))
   
   if(!"unc_pcre.random.effect" %in% class(x)) {
-    class(x) <- "pcre2.random.effect"
+    class(x) <- c("pcre2.random.effect", "pcre.random.effect", "random.effect")
   }
   x$term <- c(x$term, timevar)
   x$timevar <- timevar
