@@ -2222,9 +2222,9 @@ SEXP quick_quantiles(SEXP X, SEXP samples)
   PROTECT(PM = allocVector(REALSXP, nr));
   ++nProtected;
 
-  double np11 = iter * 0.025;
+  double np11 = iter * (1.0 - 0.025);
   double np12 = iter * 0.5;
-  double np13 = iter * 0.975;
+  double np13 = iter * (1.0 - 0.975);
     
   int np1 = iter - np11;
   int np2 = iter - np12;

@@ -1,3 +1,8 @@
+---
+title: "A Lego Toolbox for Flexible Bayesian Regression (and Beyond)"
+author: "Nikolaus Umlauf, Nadja Klein, Achim Zeileis, Thorsten Simon"
+---
+
 # A Lego Toolbox for Flexible Bayesian Regression (and Beyond)
 
 ```{r, echo=FALSE, message=FALSE, results='hide'}
@@ -38,17 +43,17 @@ mtext(expression(paste(accel, "~ N(", mu, "=", f(times), ",", log(sigma), "=", f
 
 ---
 
-![](misc/firemodel-effects-spatial-tc.png){width=50%}
-![](misc/firemodel-effects-spatial-td.png){width=50%}
+![](../../www/misc/firemodel-effects-spatial-tc.png){width=49%}
+![](../../www/misc/firemodel-effects-spatial-td.png){width=49%}
 
-![](misc/firemodel-effects-baseline.png){width=50%}
-![](misc/firemodel-effects-daytime-curves.png){width=50%}
+![](../../www/misc/firemodel-effects-baseline.png){width=49%}
+![](../../www/misc/firemodel-effects-daytime-curves.png){width=49%}
 
 ## Prediction
 
 ---
 
-![](misc/rainmodel-effects-predict.png){width=100%}
+![](../../www/misc/rainmodel-effects-predict.png){width=100%}
 
 ## Model diagnostics
 
@@ -60,7 +65,7 @@ plot(b, which = 3, spar = FALSE, col = "lightgray")
 plot(b, which = 4, spar = FALSE)
 ```
 
-![](misc/traceplot-03.png){width=100%}
+![](../../www/misc/traceplot-03.png){width=100%}
 
 ## Extensible model terms and model fitting engines
 

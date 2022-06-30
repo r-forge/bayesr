@@ -85,6 +85,7 @@ reference:
     - '`stabsel`'
     - '`bboost`'
     - '`boost2`'
+    - '`opt_isgd`'
   - title: Samplers
     desc: >
       Sampler functions that can be used for model fitting using `bamlss()`
@@ -166,5 +167,6 @@ reference:
     - '`summary.bamlss`'
     - '`surv_transform`'
     - '`terms.bamlss`'
+    - '`trans_AR1`'
     - '`WAIC`'
 
