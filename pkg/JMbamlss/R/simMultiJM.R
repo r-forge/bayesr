@@ -10,10 +10,11 @@
 #' @param probmiss Probability of missingness.
 #' @param maxfac Factor changing the uniform censoring interval.
 #' @param nmark Number of markers.
-#' @param param_assoc Parametric association between the markers (Defaults to 
-#'   FALSE). If TRUE, then specify the normal covariance matrix with argument
-#'   re_cov_mat and include the random effects in argument mu. If FALSE, then 
-#'   principal components are used to model the association structure.
+#' @param long_assoc Longitudinal association between the markers (Defaults to 
+#'   "FPC"). If "splines" or "param", then specify the normal covariance matrix
+#'   with argument 're_cov_mat' and include the random effects in argument mu.
+#'    If "FPC", then principal components are used to model the association 
+#'    structure.
 #' @param M Number of principal components.
 #' @param FPC_bases FunData object. If supplied, use the contained FPC as basis
 #'   for the association structure.
@@ -40,7 +41,8 @@
 #' @param full Create a wide-format data.frame and a short one containing only
 #'   survival info.
 simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
-                       maxfac = 1.5, nmark = 2,param_assoc = FALSE, M = 6, 
+                       maxfac = 1.5, nmark = 2, 
+                       long_assoc = c("FPC", "splines", "param"), M = 6, 
                        FPC_bases = NULL, FPC_evals = NULL, 
                        mfpc_args = list(type = "split", eFunType = "Poly",
                                         ignoreDeg = NULL, eValType = "linear",
@@ -64,6 +66,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                        tmax = NULL, seed = NULL, 
                        full = FALSE, file = NULL){
 
+  long_assoc <- match.arg(long_assoc)
   # Some basic checks
   if(length(alpha) != length(mu)) {
     stop("alpha and mu must have same length.\n")
@@ -71,10 +74,10 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   if(length(mu) != nmark) {
     stop("Predictors must be specified for all markers.\n")
   }
-  if(!is.null(re_cov_mat) & !param_assoc) {
+  if(!is.null(re_cov_mat) & long_assoc == "FPC") {
     stop("Either REs or PCREs need to be specified properly.\n")
   }
-  if(param_assoc & is.null(re_cov_mat)) {
+  if(long_assoc != "FPC" & is.null(re_cov_mat)) {
     stop("Specify the RE covariance matrix.\n")
   }
   if(is.null(tmax)){
@@ -210,7 +213,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
         mu_k(t = time, x = x, r = r)
       })
       
-    } else {
+    } else if (long_assoc == "FPC") {
       
       # duplicate scores for the multiple integration points
       if(is.null(dim(r))){
@@ -238,6 +241,31 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
       out <- mapply(function (mu_k, pc_k) {
         mu_k(t = time, x = x) + apply(pc_k*r, 1, sum)
       }, mu_k = mu, pc_k = pc_bases, SIMPLIFY = FALSE)
+      
+    } else {
+      
+      # Use last-value-carried forward if time is larger than tmax otherwise
+      # error in splineDesign
+      time_out <- ifelse(time > tmax, tmax, time)
+      
+      # Slightly different for spline based random effects
+      spline_base <- splines::splineDesign(
+        knots = c(rep(b_set$tmin, 3), b_set$knots, rep(tmax, 3)),
+        x = time_out, ord = 4, derivs = 0)
+      
+      # random effects are different over the markers but the splines are the
+      # same
+      # duplicate scores for the multiple integration points
+      if(dim(r)[1] == 1){
+        r <- matrix(as.matrix(r), nrow = length(time), ncol = ncol(r), byrow=TRUE)
+      }
+      random_list <- lapply(seq_len(nmark), function(ind) {
+        r[, (ind-1)*ncol(spline_base) + seq_len(ncol(spline_base))]
+      })
+      
+      out <- mapply(function (mu_k, ran_k) {
+        mu_k(t = time, x = x) + apply(spline_base * ran_k, 1, sum)
+      }, mu_k = mu, ran_k = random_list, SIMPLIFY = FALSE)
     }
     
     out
@@ -316,8 +344,13 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   x <- gen_x(nsub, ncovar = ncovar)
   
 
-  if (param_assoc) {
+  if (long_assoc != "FPC") {
     temp <- gen_b(nsub = nsub, re_cov_mat = re_cov_mat)
+    if (long_assoc == "splines") {
+      temp[[2]] <- list(knots = seq(times[1], tmax,
+                                    length.out = nrow(re_cov_mat) / nmark - 2),
+                        tmin = times[1])
+    }
   } else {
     temp <- gen_fpc(times = times, nsub = nsub, M = M, FPC_bases = FPC_bases,
                     FPC_evals = FPC_evals, mfpc_args = mfpc_args, tmax = tmax)
@@ -349,7 +382,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                        alpha_k(data_base$obstime, x[id, ])
                      }))
   data_long$sigma <- sigma(t = data_long$obstime, x = data_long)
-  if (!param_assoc) {
+  if (long_assoc == "FPC") {
     if (is.null(FPC_bases)) {
       fpcs <- do.call(rbind, lapply(mfpc(argvals = rep(list(data_base$obstime), 
                                                        nmark), 
@@ -365,6 +398,20 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     data_long <- cbind(data_long,
                        fpc = fpcs,
                        wfpc = t(t(fpcs)*sqrt(b_set$evals)))
+  } else if (long_assoc == "splines") {
+    
+    # add spline based random effects
+    spline_base <- splines::splineDesign(
+      knots = c(rep(b_set$tmin, 3), b_set$knots, rep(tmax, 3)),
+      x = data_base$obstime, ord = 4, derivs = 0)
+    random_list <- lapply(seq_len(nmark), function(ind) {
+      r[id, (ind-1)*ncol(spline_base) + seq_len(ncol(spline_base))]
+    })
+    
+    data_long$fre <- do.call(c, lapply(random_list, function (ran_k) {
+      apply(spline_base * ran_k, 1, sum)
+    }))
+    
   }
   
   # Hypothetical longitudinal data
@@ -401,7 +448,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   if(full){
     
-    if (!param_assoc) {
+    if (long_assoc == "FPC") {
       # FPC basis functions
       if (is.null(FPC_bases)) {
         FPC_bases <- mfpc(argvals = rep(list(times), nmark), mfpc_args = b_set,
@@ -410,7 +457,8 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     }
     
     d <- list(data = data_long, data_full = data_full, data_hypo = data_hypo,
-              fpc_base = if (!param_assoc) FPC_bases, data_short = data_short)
+              fpc_base = if (long_assoc == "FPC") FPC_bases,
+              data_short = data_short)
   } else {
     d <- data_long
   }

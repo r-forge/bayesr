@@ -67,7 +67,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_score <- drop(
         crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
           t(delta * x$XT) %*% eta$alpha) - int_i$score_int
-      x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
+      x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
         matrix(int_i$hess_int, ncol = length(b_old))
     },
     "sigma" = {
@@ -237,7 +237,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       x_score <- drop(
         crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
           t(delta * x$XT) %*% eta$alpha) - int_i$score_int
-      x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
+      x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
         matrix(int_i$hess_int, ncol = length(b_old))
     },
     "sigma" = {
