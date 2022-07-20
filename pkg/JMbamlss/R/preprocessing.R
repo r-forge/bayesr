@@ -17,8 +17,8 @@
 #' @param M Number of mFPCs to compute in the MFPCA. If not supplied, it
 #'  defaults to the maximum number of computable mFPCs.
 #' @param method Which package to use for the univariate FPCA. Either function
-#'  'FPCA' from package \code{fdapace}, 'fpca.sc' from package \code{refund}, or 
-#'  function 'PACE' from package \code{MFPCA}.
+#'  adapted function 'fpca', 'FPCA' from package \code{fdapace}, 'fpca.sc' from
+#'  package \code{refund}, or function 'PACE' from package \code{MFPCA}.
 #' @param nbasis Number of B-spline basis functions for mean estimate and
 #'  bivariate smoothing of covariance surface for methods fpca.sc, PACE.
 #' @param npc Number of univariate principal components to use in fpca.sc, PACE.
@@ -27,8 +27,8 @@
 #'  fpca.sc,PACE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
                            time = "obstime", id = "id", M = NULL, 
-                           method = c("fpca.sc", "FPCA", "PACE"), nbasis = 10,
-                           npc = NULL,
+                           method = c("fpca", "fpca.sc", "FPCA", "PACE"), 
+                           nbasis = 10, npc = NULL,
                            fve_uni = 0.99, pve_uni = 0.99) {
   require(bamlss)
   require(MFPCA)
@@ -43,7 +43,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     mark
   })
   
-  if (method == "fpca.sc") {
+  if (method == "fpca.sc" | method == "fpca") {
     require(refund)
     
     # Construct objects for fpca.sc function
@@ -54,9 +54,15 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     })
     
     # FPCA for each marker
-    FPCA <- lapply(lY, function(y) {
-      refund::fpca.sc(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc)
-    })
+    if (method == "fpca.sc") {
+      FPCA <- lapply(lY, function(y) {
+        refund::fpca.sc(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc)
+      })
+    } else {
+      FPCA <- lapply(lY, function(y) {
+        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc)
+      })
+    }
     
     # Construct multivariate FunData and estimated FPCs
     mFData <- multiFunData(lapply(FPCA, function (mark) {
