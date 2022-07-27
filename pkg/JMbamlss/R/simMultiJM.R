@@ -250,7 +250,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
       
       # Slightly different for spline based random effects
       spline_base <- splines::splineDesign(
-        knots = c(rep(b_set$tmin, 3), b_set$knots, rep(tmax, 3)),
+        knots = b_set$knots,
         x = time_out, ord = 4, derivs = 0)
       
       # random effects are different over the markers but the splines are the
@@ -347,8 +347,15 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   if (long_assoc != "FPC") {
     temp <- gen_b(nsub = nsub, re_cov_mat = re_cov_mat)
     if (long_assoc == "splines") {
-      temp[[2]] <- list(knots = seq(times[1], tmax,
-                                    length.out = nrow(re_cov_mat) / nmark - 2),
+      
+      nk <- nrow(re_cov_mat) / nmark - 2
+      x_r <- tmax - times[1]
+      xl <- times[1] - x_r*0.001
+      xu <- tmax + x_r*0.001
+      dx <- (xu - xl)/(nk - 1)
+      kn <- seq(xl - dx * 3, xu + dx * 3, length = nk + 2 * 3)
+      
+      temp[[2]] <- list(knots = kn,
                         tmin = times[1])
     }
   } else {
@@ -402,7 +409,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     
     # add spline based random effects
     spline_base <- splines::splineDesign(
-      knots = c(rep(b_set$tmin, 3), b_set$knots, rep(tmax, 3)),
+      knots = b_set$knots,
       x = data_base$obstime, ord = 4, derivs = 0)
     random_list <- lapply(seq_len(nmark), function(ind) {
       r[id, (ind-1)*ncol(spline_base) + seq_len(ncol(spline_base))]
