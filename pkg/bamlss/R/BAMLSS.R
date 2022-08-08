@@ -1015,6 +1015,9 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
       cat("  .. ..", paste0(formatC(np / nobs * 100, width = 7), "%"))
       k <- k + 1
     }
+    for(j in 1:ncol(object[["X"]])) {
+      object[["X"]][, j] <- object[["X"]][, j] - mean(object[["X"]][, j], na.rm = TRUE)
+    }
     saveRDS(object[["X"]], file = paste0(xfile, ".rds"))
     cat("\n")
   }
