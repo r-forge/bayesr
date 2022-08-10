@@ -924,6 +924,11 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
   object$xt$center <- TRUE
   object$xt$nocenter <- FALSE
   terms <- object$term
+  if(length(object$term) < 2) {
+    if(inherits(object, "tp.smooth.spec")) {
+      class(object) <- "ps.smooth.spec"
+    }
+  }
   if(object$by != "NA") {
     if(!grepl(paste0("by=", object$by), object$label, fixed = TRUE)) {
       object$label <- strsplit(object$label, "")[[1]]
@@ -1016,7 +1021,10 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
       k <- k + 1
     }
     for(j in 1:ncol(object[["X"]])) {
-      object[["X"]][, j] <- object[["X"]][, j] - mean(object[["X"]][, j], na.rm = TRUE)
+      vj <- var(object[["X"]][, j], na.rm = TRUE)
+      if(vj < 1e-15) {
+        stop("smooth constructor returns constants, maybe use s(..., bs='ps') instead!")
+      }
     }
     saveRDS(object[["X"]], file = paste0(xfile, ".rds"))
     cat("\n")
