@@ -106,6 +106,7 @@ contribplot(x, ...)
 \dontrun{## Simulate data.
 set.seed(123)
 d <- GAMart(n = 27000, sd = -1)
+d$id <- factor(sample(1:20, size = nrow(d), replace = TRUE))
 
 ## Write data to disc.
 tf <- tempdir()
@@ -113,7 +114,7 @@ write.table(d, file.path(tf, "d.raw"), quote = FALSE, row.names = FALSE, sep = "
 
 ## Model formula.
 f <- list(
-  y ~ s(x1,k=40) + s(x2,k=40) + s(x3,k=40) + te(lon,lat,k=10),
+  y ~ s(x1,k=40) + s(x2,k=40) + s(x3,k=40) + te(lon,lat,k=10) + s(id,bs="re"),
   sigma ~ s(x1,k=40) + s(x2,k=40) + s(x3,k=40) + te(lon,lat,k=10)
 )
 

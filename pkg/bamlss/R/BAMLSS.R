@@ -996,6 +996,9 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
   if(file.exists(paste0(xfile, ".rds"))) {
     object[["X"]] <- readRDS(paste0(xfile, ".rds"))
     bit::physical(object[["X"]])$filename <- paste0(xfile, ".ff")
+    if(file.exists(paste0(xfile, "_cmean.rds"))) {
+      object$ff_mean <- readRDS(paste0(xfile, "_cmean.rds"))
+    }
   } else {
     object[["X"]] <- ff::ff(0.0,
       length = nrow(data) * ncol(object[["X"]]),
@@ -1020,16 +1023,22 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
       cat("  .. ..", paste0(formatC(np / nobs * 100, width = 7), "%"))
       k <- k + 1
     }
-    object$ff_mean <- rep(0, ncol(object[["X"]]))
+    if(!inherits(object, "random.effect"))
+      object$ff_mean <- rep(0, ncol(object[["X"]]))
     for(j in 1:ncol(object[["X"]])) {
       vj <- var(object[["X"]][, j], na.rm = TRUE)
       if(vj < 1e-15) {
         stop("smooth constructor returns constants, maybe use s(..., bs='ps') instead!")
       }
-      object$ff_mean[j] <- mean(object[["X"]][, j], na.rm = TRUE)
-      object[["X"]][, j] <- object[["X"]][, j] - object$ff_mean[j]
+      if(!inherits(object, "random.effect")) {
+        object$ff_mean[j] <- mean(object[["X"]][, j], na.rm = TRUE)
+        object[["X"]][, j] <- object[["X"]][, j] - object$ff_mean[j]
+      }
     }
     saveRDS(object[["X"]], file = paste0(xfile, ".rds"))
+    if(!is.null(object$ff_mean)) {
+      saveRDS(object$ff_mean, file = paste0(xfile, "_cmean.rds"))
+    }
     cat("\n")
   }
   if(!inherits(object, "nnet0.smooth") & FALSE) {
@@ -1066,8 +1075,13 @@ Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
   } else {
     X <- object$PredictMat(object, data)
   }
-  for(j in 1:ncol(X))
-    X[, j] <- X[, j] - object$ff_mean[j]
+  if(!inherits(object, "random.effect")) {
+print(object$ff_mean)
+print(class(object))
+print(object$term)
+    for(j in 1:ncol(X))
+      X[, j] <- X[, j] - object$ff_mean[j]
+  }
   return(X)
 }
 
