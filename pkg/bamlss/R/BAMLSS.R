@@ -1066,7 +1066,7 @@ Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
   } else {
     X <- object$PredictMat(object, data)
   }
-  for(j in 1:ncol(object[["X"]]))
+  for(j in 1:ncol(X))
     X[, j] <- X[, j] - object$ff_mean[j]
   return(X)
 }
