@@ -1020,11 +1020,14 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
       cat("  .. ..", paste0(formatC(np / nobs * 100, width = 7), "%"))
       k <- k + 1
     }
+    object$ff_mean <- rep(0, ncol(object[["X"]]))
     for(j in 1:ncol(object[["X"]])) {
       vj <- var(object[["X"]][, j], na.rm = TRUE)
       if(vj < 1e-15) {
         stop("smooth constructor returns constants, maybe use s(..., bs='ps') instead!")
       }
+      object$ff_mean[j] <- mean(object[["X"]][, j], na.rm = TRUE)
+      object[["X"]][, j] <- object[["X"]][, j] - object$ff_mean[j]
     }
     saveRDS(object[["X"]], file = paste0(xfile, ".rds"))
     cat("\n")
@@ -1063,6 +1066,8 @@ Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
   } else {
     X <- object$PredictMat(object, data)
   }
+  for(j in 1:ncol(object[["X"]]))
+    X[, j] <- X[, j] - object$ff_mean[j]
   return(X)
 }
 
