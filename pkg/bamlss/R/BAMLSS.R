@@ -1076,9 +1076,6 @@ Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
     X <- object$PredictMat(object, data)
   }
   if(!inherits(object, "random.effect")) {
-print(object$ff_mean)
-print(class(object))
-print(object$term)
     for(j in 1:ncol(X))
       X[, j] <- X[, j] - object$ff_mean[j]
   }
