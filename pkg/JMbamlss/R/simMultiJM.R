@@ -8,6 +8,8 @@
 #' @param nsub Number of subjects.
 #' @param times Vector of time points.
 #' @param probmiss Probability of missingness.
+#' @param max_obs Maximal number of observations per individual and marker. 
+#'   Defaults to no upper limit.
 #' @param maxfac Factor changing the uniform censoring interval.
 #' @param nmark Number of markers.
 #' @param long_assoc Longitudinal association between the markers (Defaults to 
@@ -41,7 +43,7 @@
 #' @param full Create a wide-format data.frame and a short one containing only
 #'   survival info.
 simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
-                       maxfac = 1.5, nmark = 2, 
+                       max_obs = length(times), maxfac = 1.5, nmark = 2, 
                        long_assoc = c("FPC", "splines", "param"), M = 6, 
                        FPC_bases = NULL, FPC_evals = NULL, 
                        mfpc_args = list(type = "split", eFunType = "Poly",
@@ -114,14 +116,30 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   
   
   ## introduce random missings 
-  ## (excluding the first measurement to ensure all subjects remain in the data)
-  miss_fct <- function(data, prop, obstime = "obstime"){
+  ## (excluding the first measurement to ensure all subjects remain in the data 
+  # but if there is a maximal number of observations than we don't necessarily 
+  # have the first longitudinal observation)
+  miss_fct <- function(data, prop, max_obs, obstime = "obstime"){
+    
     select <- which(data[[obstime]] > 0) 
     n <- length(select)
     n_miss <- round(prop*n, 0)
     miss <- sample(select, n_miss)
     if (length(miss) > 0) {
       data <- data[-miss,]
+    }
+    if (max_obs < length(times)) {
+      id_mark <- split(data, interaction(data$id, data$marker))
+      select <- do.call(c, lapply(id_mark, function(x) {
+        if (nrow(x) < max_obs) {
+          rep(TRUE, times = nrow(x))
+        } else {
+          c(TRUE, sample(c(rep(TRUE, times = max_obs - 1), 
+                           rep(FALSE, times = nrow(x) - max_obs)),
+                         nrow(x) - 1, replace = FALSE))
+        }
+      }))
+      data <- data[select, ]
     }
     return(data)
   }
@@ -447,7 +465,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
   data_full <- data_long
   
   # inducing longitudinal missings
-  data_long <- miss_fct(data_long, probmiss)
+  data_long <- miss_fct(data_long, probmiss, max_obs)
   
   # Draw longitudinal observations
   data_long$y <- rnorm(nrow(data_long), data_long$mu, sd = exp(data_long$sigma))
