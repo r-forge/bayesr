@@ -351,6 +351,7 @@ design.construct <- function(formula, data = NULL, knots = NULL,
             dim = c(nobs, ncol(mm_test)))
           k <- 1
           np <- 0
+          cat("  .. ff processing model.matrix\n")
           for(ic in bamlss_chunk(data)) {
             obj$model.matrix[ic, ] <- model.matrix(mm_terms, data = data[ic, ])
             np <- np + length(ic)
@@ -461,6 +462,7 @@ design.construct <- function(formula, data = NULL, knots = NULL,
                   ff_name = ff_name, nthres = nthres)
                 smt <- list(smt)
               } else {
+print(tsm)
                 smt <- smoothCon(tsm, data, knots,
                   absorb.cons = if(is.null(absorb.cons)) acons else absorb.cons,
                   sparse.cons = sparse.cons, scale.penalty=TRUE)
