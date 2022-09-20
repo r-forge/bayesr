@@ -5859,6 +5859,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
           } else {
             start2 <- start[paste0(i, ".s.", j, ".b", 1:ncX)]
           }
+
           if(!all(is.na(start2))) {
             if(any(is.na(start2)))
               stop("dimensions do not match, check starting values!")
@@ -6235,6 +6236,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
 #              }
               if((((ll1 > ll0) & (epsll > eps_loglik)) | always) & accept) {
                 tau2[[i]][[j]] <- tau2s
+
                 S <- 0
                 for(l in 1:length(tau2[[i]][[j]])) {
                   S <- S + 1/tau2[[i]][[j]][l] * if(is.function(x[[i]]$smooth.construct[[j]]$S[[l]])) {

@@ -360,6 +360,7 @@ design.construct <- function(formula, data = NULL, knots = NULL,
             cat("  .. ..", paste0(formatC(np / nobs * 100, width = 7), "%"))
             k <- k + 1
           }
+          cat("\n")
           colnames(obj$model.matrix) <- colnames(mm_test)
         }
       }
@@ -978,12 +979,13 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          } else {
 #            nd[[j]] <- sample(rep(xq, length.out = 1000L))
 #          }
-          #xmin <- ffbase::min.ff(data[[j]])
-          #xmax <- ffbase::max.ff(data[[j]])
+          xmin <- ffbase::min.ff(data[[j]])
+          xmax <- ffbase::max.ff(data[[j]])
+          nd[[j]] <- seq(xmin, xmax, length = 1000L)
 
-          ux <- unique_ff(data[[j]])
-          ux_ind <- floor(seq(1, length(ux), length = 1000L))
-          nd[[j]] <- ux[ux_ind]
+#          ux <- unique_ff(data[[j]])
+#          ux_ind <- floor(seq(1, length(ux), length = 1000L))
+#          nd[[j]] <- ux[ux_ind]
         } else {
           nd[[j]] <- sample(rep(unique(data[[j]]), length.out = 1000L))
         }
@@ -991,6 +993,9 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     }
     nd <- as.data.frame(nd)
   }
+  options(warn = 2)
+  cat("\n")
+  print(object$term)
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
     knots = knots, absorb.cons = nrow(data) <= nthres)[[1L]]
   rm(nd)
@@ -1025,6 +1030,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
       cat("  .. ..", paste0(formatC(np / nobs * 100, width = 7), "%"))
       k <- k + 1
     }
+    cat("\n")
     if(!inherits(object, "random.effect"))
       object$ff_mean <- rep(0, ncol(object[["X"]]))
     for(j in 1:ncol(object[["X"]])) {
@@ -1041,7 +1047,6 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     if(!is.null(object$ff_mean)) {
       saveRDS(object$ff_mean, file = paste0(xfile, "_cmean.rds"))
     }
-    cat("\n")
   }
   if(!inherits(object, "nnet0.smooth") & FALSE) {
     csum <- 0
