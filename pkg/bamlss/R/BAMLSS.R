@@ -463,7 +463,6 @@ design.construct <- function(formula, data = NULL, knots = NULL,
                   ff_name = ff_name, nthres = nthres)
                 smt <- list(smt)
               } else {
-print(tsm)
                 smt <- smoothCon(tsm, data, knots,
                   absorb.cons = if(is.null(absorb.cons)) acons else absorb.cons,
                   sparse.cons = sparse.cons, scale.penalty=TRUE)
@@ -993,9 +992,6 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     }
     nd <- as.data.frame(nd)
   }
-  options(warn = 2)
-  cat("\n")
-  print(object$term)
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
     knots = knots, absorb.cons = nrow(data) <= nthres)[[1L]]
   rm(nd)
