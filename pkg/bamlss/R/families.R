@@ -5869,7 +5869,7 @@ bqr_bamlss <- function(...)
 }
 
 
-dgp_bamlss <- function(...)
+dgp_bamlss <- DGP_bamlss <- function(...)
 {
   fam <- gpareto_bamlss()
 
