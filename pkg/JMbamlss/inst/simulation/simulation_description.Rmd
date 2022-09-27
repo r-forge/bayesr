@@ -1,0 +1,203 @@
+---
+title: "Simulation Description"
+author: "Alex"
+date: '2022-09-15'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Matrix)
+library(survival)
+library(MFPCA)
+library(tidyverse)
+source("../../R/mfpca_sim.R")
+```
+
+## Simulation Scenario I
+
+### Description of multivariate association structure
+
+This simple simulation scenario has a relatively simple random effects structure (correlated random intercepts / slopes) on six dimensions. The idea behind the covariance matrix: 
+
+* Auto-covariance is random intercept and random slope with negative covariance $\mathbf A = \begin{pmatrix}
+    0.08 & -0.07 \\ 
+  -0.07 & 0.90 \\ 
+    \end{pmatrix}$
+* Auto-covariance is different between the markers: Larger auto-covariance for later markers, so multiply $\mathbf A$ by factors $1, 1.2, 1.4, 1.6, 1.8, 2)$
+* Cross-covariance is a matrix $\mathbf B = \begin{pmatrix}
+    0.03 & 0.03 \\ 
+  0.03 & 0.03 \\ 
+    \end{pmatrix}$ times a correlation function $f$ regarding the distance $x \in \{1, 2, 3, 4, 5\}$ between markers with $f(x) = \begin{cases}1 & x == 1\\ 0.75 & x == 2 \\ 0.5 & x == 3 \\ 0 & else\end{cases}$ 
+    
+This gives the following covariance matrix
+
+```{r cars}
+# Covariance matrix for the data generation
+auto <- matrix(c(0.08, -0.07, -0.07, 0.9), ncol = 2)
+cross <- matrix(rep(0.03, 4), ncol = 2)
+cor <- matrix(c(0, 1, 0.75, 0.5, 0, 0,
+                1, 0, 1, 0.75, 0.5, 0,
+                0.75, 1, 0, 1, 0.75, 0.5,
+                0.5, 0.75, 1, 0, 1, 0.75,
+                0, 0.5, 0.75, 1, 0, 1,
+                0, 0, 0.5, 0.75, 1, 0),
+              ncol = 6)
+cov <- kronecker(cor, cross) + kronecker(diag(c(1, 1.2, 1.4, 1.6, 1.8, 2)), 
+                                         auto)
+tril(cov)
+```
+
+With the constant and linear basis functions, the corresponding multivariate functional principal components can be computet. We keep $7$ MFPCs to account for more than $95\%$ of the variation.
+
+```{r}
+# Basis functions on each dimension
+seq1 <- seq(0, 1, by = 0.01)
+b_funs <- rep(list(funData(argvals = seq1,
+                           X = matrix(c(rep(1, length(seq1)), seq1),
+                                      byrow = TRUE, ncol = length(seq1)))), 6)
+plot(b_funs[[1]])
+
+# Compute the MPFCs for a given covariance matrix of the basis coefficients
+mfpca_tru <- MFPCA_cov(cov = cov, basis_funs = b_funs)
+
+# Use a cutoff of 95%
+cumsum(mfpca_tru$values) / sum(mfpca_tru$values)
+
+# First three and 4-7
+plot(extractObs(mfpca_tru$functions, 1:3), col = c("blue", "red", "green"))
+plot(extractObs(mfpca_tru$functions, 4:7), 
+     col = c("blue", "red", "green", "purple"))
+```
+
+### Description of the simulation set up
+
+The simulation is similar to Koehler et al. (2017), meaning censoring and longitudinal observations follow a similar scheme and the survival times are simulated also following Bender et al. (2005). Some of the specifications for this scenario are the following:
+
+* $150$ individuals
+* $6$ markers
+* Observation times on interval $[0, 1]$ where baseline measurement at $0$ are available for all individuals on all markers
+* Longitudinal measurements are available on a fixed grid of $101$ timepoints but only up to $75\%$ are retained with a maximum of $15$ observation per individual and marker
+* Baseline hazard follows a Weibull distribution $h(t) = 1.37 \cdot t^{0.37}$ but is scaled down by an intercept in the $\gamma$-predictor
+* Censoring is based on a uniform distribution $Unif(0, 1.75)$
+
+Especially the maximum number of longitudinal observation points reduces the computation time (from around $8$ to $2.5$ hours).
+
+The additive predictors are specified as follows
+\begin{align}
+\eta_{\lambda} &=  1.37 \cdot t^{0.37}
+\end{align}
+\begin{align}
+\eta_{\gamma i} &= -1.5 + 0.48*x_i
+\end{align}
+\begin{align}
+\eta_{\mu k i} &= 0.2\cdot t - 0.25 \cdot x_i - 0.05 \cdot t \cdot x_i +
+                           b_{k1i} + b_{k2i} \cdot t , \quad k = 1,..., 6
+\end{align}
+\begin{align}
+\eta_{\alpha k} = \begin{cases}
+1.5  & k = 1\\ 0.6  & k = 2 \\ 0.3  & k = 3 \\
+-0.3  & k = 4 \\ -0.6   & k = 5\\ -1.5  & k = 6
+\end{cases}
+\end{align}
+\begin{align}
+\eta_{\sigma} = log(0.06)
+\end{align}
+with $x$ a binary covariate. This means that the error variance is constant over all markers but the random effects vary.
+
+### Summary description of simulated data sets
+
+```{r, echo = FALSE}
+file_location <- paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-",
+                        "berlin.de,share=volkmana.hub/JMbamlss/simulation/scen",
+                        "_I_130922/data")
+files <- list.files(path = file_location, pattern = "Rdata")
+all_dat <- lapply(files, function (dat) {
+  load(paste0(file_location, "/", dat))
+  out <- d_rirs$data
+  rm(d_rirs)
+  out
+})
+all_dat_id <- lapply(files, function (dat) {
+  load(paste0(file_location, "/", dat))
+  out <- d_rirs$data_short
+  rm(d_rirs)
+  out
+})
+```
+
+For the 100 simulated data sets, we have a mean of about 9500 observation per data set.
+```{r, echo = FALSE}
+# Total
+n_obs <- sapply(all_dat, nrow)
+summary(n_obs)
+```
+
+Over all the simulated data sets, the mean individual has 63 observation points (total sum over all 6 dimensions).
+```{r, echo = FALSE}
+# Number of observations per subject over all data sets
+n_obs_id <- lapply(all_dat, function(x) {
+  table(x$id)
+})
+summary(do.call(c, n_obs_id))
+```
+
+The mean event rate of a simulated data set is about $43\%$.
+```{r, eval = FALSE, echo = FALSE}
+# Mean event rate
+summary(sapply(all_dat_id, function(x) {
+  mean(x$event[1:150])
+}))
+```
+
+The mean survival time over all indidviduals and all simulated data sets is about $0.5$.
+```{r, echo = FALSE}
+# Mean summary of survival times over all observations
+rowMeans(sapply(all_dat_id, function (x) {
+  summary(x$survtime[1:150])
+}))
+```
+
+For the individuals who experience an event, however, the mean survival time is at about $0.4$.
+```{r, echo = FALSE}
+# Mean summary of survival times of events
+rowMeans(sapply(all_dat_id, function (x) {
+  summary(x$survtime[1:150][x$event[1:150] == 1])
+}))
+```
+
+### Plots of a random simulated data set
+
+The following plots give an impression of the survival part of the simulated data. First, a Kaplan Meier plot stratified by the covariate $x$ and second, a plot of the individual survival times.
+
+```{r, echo = FALSE}
+file_location <- paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-",
+                        "berlin.de,share=volkmana.hub/JMbamlss/simulation/scen",
+                        "_I_130922/data")
+load(paste0(file_location, "/d131.Rdata"))
+
+plot(survfit(Surv(survtime, event) ~ x3, data = d_rirs$data_short[1:150, ]))
+ggplot(data = d_rirs$data_short %>% slice_head(n = 150),
+       aes(x = id, y = survtime, colour = as.factor(event))) +
+  geom_point() +
+  guides(colour =guide_legend(title = "Event"))
+
+```
+
+The following plot shows the generated longitudinal trajectories (with noise).
+```{r, echo = FALSE}
+ggplot(d_rirs$data, aes(x = obstime, y = y, color = id)) +
+  geom_line() +
+  facet_grid(~marker) +
+  theme(legend.position = "none")
+```
+
+
+The following plot shows the hypothetical longitudinal trajectories (without noise) of those individuals that experience an event.
+```{r, echo = FALSE}
+ggplot(d_rirs$data_hypo %>% filter(event == 1), aes(x = obstime, y = mu, color = id)) +
+  geom_line() +
+  facet_grid(~marker) +
+  theme(legend.position = "none")
+```
+

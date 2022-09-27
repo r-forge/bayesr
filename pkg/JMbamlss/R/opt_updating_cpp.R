@@ -133,8 +133,8 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)
   
-  delta <- solve(x_H, x_score)
-  b <- b + nu * delta
+  S <- bamlss:::matrix_inv(x_H, index = NULL)
+  b <- b + nu * S %*% x_score
   
   x$state$parameters[seq_len(b_p)] <- b
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
