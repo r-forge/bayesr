@@ -3770,20 +3770,47 @@ print.boost_summary <- function(x, summary = TRUE, plot = TRUE,
         }
         matplot(x$loglik, type = "l", lty = 1,
           xlab = "Iteration", ylab = "LogLik contribution", col = cols[as.factor(xn)],
-          lwd = args$lwd, axes = FALSE)
+          lwd = args$lwd, axes = FALSE, main = args$main)
         box()
         axis(2)
         at <- pretty(1:nrow(x$loglik))
         at[1L] <- 1
         axis(1, at = at)
-        abline(v = x$mstop, lwd = 3, col = "lightgray")
+
         cn <- colnames(x$loglik)
         if(!is.null(args$drop)) {
           for(dn in args$drop)
             cn <- gsub(dn, "", cn, fixed = TRUE)
         }
-        axis(4, at = x$loglik[nrow(x$loglik), ], labels = cn, las = 1)
-        axis(3, at = x$mstop, labels = paste("mstop =", x$mstop))
+        if(!is.null(args$name)) {
+          for(n in args$name)
+            cn <- gsub(n, "", cn, fixed = TRUE)
+        }
+
+        at <- x$loglik[nrow(x$loglik), ]
+
+        labs <- labs0 <- cn
+        plab <- at
+        o <- order(plab, decreasing = TRUE)
+        labs <- labs[o]
+        plab <- plab[o]
+        rplab <- diff(range(plab))
+        for(i in 1:(length(plab) - 1)) {
+          dp <- abs(plab[i] - plab[i + 1]) / rplab
+          if(dp <= 0.02) {
+            labs[i + 1] <- paste(c(labs[i], labs[i + 1]), collapse = ",")
+            labs[i] <- ""
+          }
+        }
+        labs <- labs[order(o)]
+        at <- at[labs != ""]
+        labs <- labs[labs != ""]
+        axis(4, at = at, labels = labs, las = 1)
+
+        if(!isFALSE(args$mstop)) {
+          abline(v = x$mstop, lwd = 3, col = "lightgray")
+          axis(3, at = x$mstop, labels = paste("mstop =", x$mstop))
+        }
       }
       if(w %in% c("aic", "bic", "user")) {
         if(!is.null(x$criterion)) {
