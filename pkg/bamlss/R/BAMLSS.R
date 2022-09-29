@@ -8239,7 +8239,7 @@ traceplot2 <- function(theta, n.plot=100, ylab = "", ...) {
     as.numeric(quantile(x[1:n], c(.025, .5, .975), na.rm = TRUE))
   }, vectorize.args = "n")
   n.rep <- length(theta)
-  plot(1:n.rep, theta, col = "lightgrey", xlab = "Iterations",
+  plot(1:n.rep, theta, col = "lightgrey", xlab = "Iteration",
     ylab = ylab, type = "l", ...)
   iter <- round(seq(1, n.rep, length = n.plot + 1)[-1])
   tq <- cuq(iter, theta)
@@ -8458,7 +8458,7 @@ plot.bamlss.results <- function(x, model = NULL, term = NULL,
             } else "Ordinary", "residuals")
           if(is.null(args$ylab)) args2$ylab <- "Density"
           if(is.null(args$main)) {
-            args2$main <- "Histogramm and density"
+            args2$main <- "Histogram and density"
             if(ny > 1)
               args2$main <- paste(names(res0)[j], args2$main, sep = ": ")
           }
@@ -10740,7 +10740,7 @@ plot.bamlss.residuals <- function(x, which = c("hist-resid", "qq-resid", "wp"), 
         if(is.null(args$ylab))
           args$ylab <- "Density"
         if(is.null(args$main)) 
-          args$main <- paste("Histogramm and density", if(!is.null(cn[j])) paste(":", cn[j]) else NULL)
+          args$main <- paste("Histogram and density", if(!is.null(cn[j])) paste(":", cn[j]) else NULL)
         ok <- try(do.call("hist", args))
         if(!inherits(ok, "try-error"))
           lines(rdens)

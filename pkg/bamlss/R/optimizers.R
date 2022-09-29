@@ -3789,6 +3789,13 @@ print.boost_summary <- function(x, summary = TRUE, plot = TRUE,
 
         at <- x$loglik[nrow(x$loglik), ]
 
+        if(!is.null(args$showzero)) {
+          if(!args$showzero) {
+            cn <- cn[at != 0]
+            at <- at[at != 0]
+          }
+        }
+
         labs <- labs0 <- cn
         plab <- at
         o <- order(plab, decreasing = TRUE)
@@ -3805,6 +3812,7 @@ print.boost_summary <- function(x, summary = TRUE, plot = TRUE,
         labs <- labs[order(o)]
         at <- at[labs != ""]
         labs <- labs[labs != ""]
+
         axis(4, at = at, labels = labs, las = 1)
 
         if(!isFALSE(args$mstop)) {
