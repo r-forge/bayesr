@@ -1027,13 +1027,18 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
       k <- k + 1
     }
     cat("\n")
-    if(!inherits(object, "random.effect"))
-      object$ff_mean <- rep(0, ncol(object[["X"]]))
+    object$cdrop <- NULL
     for(j in 1:ncol(object[["X"]])) {
       vj <- var(object[["X"]][, j], na.rm = TRUE)
       if(vj < 1e-15) {
-        stop("smooth constructor returns constants, maybe use s(..., bs='ps') instead!")
+        object$cdrop <- c(object$cdrop, j)
       }
+    }
+    if(!is.null(object$cdrop))
+      object[["X"]] <- object[["X"]][, -object$cdrop]
+    if(!inherits(object, "random.effect"))
+      object$ff_mean <- rep(0, ncol(object[["X"]]))
+    for(j in 1:ncol(object[["X"]])) {
       if(!inherits(object, "random.effect")) {
         object$ff_mean[j] <- mean(object[["X"]][, j], na.rm = TRUE)
         object[["X"]][, j] <- object[["X"]][, j] - object$ff_mean[j]
@@ -1078,6 +1083,8 @@ Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
   } else {
     X <- object$PredictMat(object, data)
   }
+  if(!is.null(object$cdrop))
+    X <- X[, -object$cdrop]
   if(!inherits(object, "random.effect")) {
     for(j in 1:ncol(X))
       X[, j] <- X[, j] - object$ff_mean[j]
