@@ -1091,8 +1091,10 @@ Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
   if(!is.null(object$cdrop))
     X <- X[, -object$cdrop]
   if(!inherits(object, "random.effect")) {
-    for(j in 1:ncol(X))
-      X[, j] <- X[, j] - object$ff_mean[j]
+    if(!is.null(object$ff_mean)) {
+      for(j in 1:ncol(X))
+        X[, j] <- X[, j] - object$ff_mean[j]
+    }
   }
   return(X)
 }
