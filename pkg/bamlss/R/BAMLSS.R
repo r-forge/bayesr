@@ -993,7 +993,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     nd <- as.data.frame(nd)
   }
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
-    knots = knots, absorb.cons = nrow(data) <= nthres)[[1L]]
+    knots = knots, absorb.cons = TRUE)[[1L]] ##nrow(data) <= nthres)[[1L]]
   rm(nd)
   nobs <- nrow(data)
   if(file.exists(paste0(xfile, ".rds"))) {
@@ -1034,8 +1034,9 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
         object$cdrop <- c(object$cdrop, j)
       }
     }
-    if(!is.null(object$cdrop))
+    if(!is.null(object$cdrop)) {
       object[["X"]] <- object[["X"]][, -object$cdrop]
+    }
     if(!inherits(object, "random.effect"))
       object$ff_mean <- rep(0, ncol(object[["X"]]))
     for(j in 1:ncol(object[["X"]])) {
@@ -1048,6 +1049,10 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     if(!is.null(object$ff_mean)) {
       saveRDS(object$ff_mean, file = paste0(xfile, "_cmean.rds"))
     }
+  }
+  if(!is.null(object$cdrop)) {
+    for(j in 1:length(object$S))
+      object$S[[j]] <- object$S[[j]][-object$cdrop, -object$cdrop]
   }
   if(!inherits(object, "nnet0.smooth") & FALSE) {
     csum <- 0
