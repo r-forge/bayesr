@@ -993,7 +993,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     nd <- as.data.frame(nd)
   }
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
-    knots = knots, absorb.cons = TRUE)[[1L]] ##nrow(data) <= nthres)[[1L]]
+    knots = knots, absorb.cons = FALSE)[[1L]] ##nrow(data) <= nthres)[[1L]]
   rm(nd)
   nobs <- nrow(data)
   if(file.exists(paste0(xfile, ".rds"))) {
@@ -1027,33 +1027,37 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
       k <- k + 1
     }
     cat("\n")
-    object$cdrop <- NULL
-    for(j in 1:ncol(object[["X"]])) {
-      vj <- var(object[["X"]][, j], na.rm = TRUE)
-      if(vj < 1e-15) {
-        object$cdrop <- c(object$cdrop, j)
-      }
-    }
-    if(!is.null(object$cdrop)) {
-      object[["X"]] <- object[["X"]][, -object$cdrop]
-    }
-    if(!inherits(object, "random.effect"))
-      object$ff_mean <- rep(0, ncol(object[["X"]]))
-    for(j in 1:ncol(object[["X"]])) {
-      if(!inherits(object, "random.effect")) {
-        object$ff_mean[j] <- mean(object[["X"]][, j], na.rm = TRUE)
-        object[["X"]][, j] <- object[["X"]][, j] - object$ff_mean[j]
-      }
-    }
+#    object$cdrop <- NULL
+#    for(j in 1:ncol(object[["X"]])) {
+#      vj <- var(object[["X"]][, j], na.rm = TRUE)
+#      if(vj < 1e-15) {
+#        object$cdrop <- c(object$cdrop, j)
+#      }
+#    }
+#    if(!is.null(object$cdrop)) {
+#      object[["X"]] <- object[["X"]][, -object$cdrop]
+#    }
+#    if(!inherits(object, "random.effect"))
+#      object$ff_mean <- rep(0, ncol(object[["X"]]))
+#    for(j in 1:ncol(object[["X"]])) {
+#      if(!inherits(object, "random.effect")) {
+#        object$ff_mean[j] <- mean(object[["X"]][, j], na.rm = TRUE)
+#        object[["X"]][, j] <- object[["X"]][, j] - object$ff_mean[j]
+#      }
+#    }
     saveRDS(object[["X"]], file = paste0(xfile, ".rds"))
-    if(!is.null(object$ff_mean)) {
-      saveRDS(object$ff_mean, file = paste0(xfile, "_cmean.rds"))
-    }
+#    if(!is.null(object$ff_mean)) {
+#      saveRDS(object$ff_mean, file = paste0(xfile, "_cmean.rds"))
+#    }
   }
-  if(!is.null(object$cdrop)) {
-    for(j in 1:length(object$S))
-      object$S[[j]] <- object$S[[j]][-object$cdrop, -object$cdrop]
-  }
+#  if(!is.null(object$cdrop)) {
+#    for(j in 1:length(object$S))
+#      object$S[[j]] <- object$S[[j]][-object$cdrop, -object$cdrop]
+#  }
+
+## f <- num ~ s(x1,k=40) + s(x2,k=40) + s(x3,k=40)
+## b <- bamlss(f, data = as.ffdf(d), optimizer = opt_bbfitp, slice = TRUE, batch_ids = lapply(1:500, function(i) sample(nrow(d), size = 500)), sampler = FALSE, aic = TRUE)
+
   if(!inherits(object, "nnet0.smooth") & FALSE) {
     csum <- 0
     for(ic in bamlss_chunk(object[["X"]])) {
@@ -1088,14 +1092,14 @@ Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
   } else {
     X <- object$PredictMat(object, data)
   }
-  if(!is.null(object$cdrop))
-    X <- X[, -object$cdrop]
-  if(!inherits(object, "random.effect")) {
-    if(!is.null(object$ff_mean)) {
-      for(j in 1:ncol(X))
-        X[, j] <- X[, j] - object$ff_mean[j]
-    }
-  }
+#  if(!is.null(object$cdrop))
+#    X <- X[, -object$cdrop]
+#  if(!inherits(object, "random.effect")) {
+#    if(!is.null(object$ff_mean)) {
+#      for(j in 1:ncol(X))
+#        X[, j] <- X[, j] - object$ff_mean[j]
+#    }
+#  }
   return(X)
 }
 
