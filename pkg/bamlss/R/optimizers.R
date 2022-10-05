@@ -3802,9 +3802,12 @@ print.boost_summary <- function(x, summary = TRUE, plot = TRUE,
         labs <- labs[o]
         plab <- plab[o]
         rplab <- diff(range(plab))
+        dthres <- args$dthres
+        if(is.null(dthres))
+          dthres <- 0.02
         for(i in 1:(length(plab) - 1)) {
           dp <- abs(plab[i] - plab[i + 1]) / rplab
-          if(dp <= 0.02) {
+          if(dp <= dthres) {
             labs[i + 1] <- paste(c(labs[i], labs[i + 1]), collapse = ",")
             labs[i] <- ""
           }
