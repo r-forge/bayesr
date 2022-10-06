@@ -2926,7 +2926,10 @@ bamlss.formula <- function(formula, family = NULL, specials = NULL, env = NULL, 
       }
     }
     if(any(j <- is.na(names(formula)))) {
-      formula <- formula[!j]
+      if(isFALSE(formula$cat))
+        formula <- formula[!j]
+      else
+        names(formula) <- paste0(names(formula)[1], 1:length(formula))
     }
     formula
   }
@@ -2969,7 +2972,6 @@ get_formula_envir <- function(formula)
 bamlss.formula.cat <- function(formula, family, data, reference)
 {
   env <- environment(formula)
-
   rn <- y <- NULL
   for(j in seq_along(formula)) {
     ft <- if(!inherits(formula[[j]]$formula, "formula")) {
