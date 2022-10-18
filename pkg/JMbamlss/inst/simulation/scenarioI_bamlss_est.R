@@ -63,7 +63,7 @@ parallel_bamlss_est <- function(i) {
   # Load the data
   load(paste0("simulation/", setting, "/data/d", i, ".Rdata"))
 
-  try({
+  try_obj <- try({
     
     # Estimate the model using estimated FPCs
     few_obs <- apply(table(d_rirs$data$id, d_rirs$data$marker), 1, 
@@ -103,10 +103,12 @@ parallel_bamlss_est <- function(i) {
                       burnin = 500, thin = 5)
     )
     attr(b_est, "comp_time") <- t_est
+    attr(b_est, "FPCs") <- mfpca_est
+    attr(b_est, "nfpc") <- nfpc
     save(b_est, file = paste0("simulation/", setting, "/bamlss_est/b", i, 
                               ".Rdata"))
-  })
-  NULL
+  }, silent = TRUE)
+  if(class(try_obj) == "try-error") try_obj else i
 }
 
 

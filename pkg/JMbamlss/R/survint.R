@@ -117,22 +117,30 @@
 
  
 ## New C version.
-survint_C <- function(pred = c("lambda", "gamma", "long"),
+survint_C <- function(pred = c("lambda", "gamma", "long", "fpc_re"),
   pre_fac, pre_vec = NULL, omega, int_fac = NULL,
   int_vec = NULL, weights, survtime)
 {
-  pred <- switch(pred,
-    "lambda" = 1L,
-    "gamma" = 2L,
-    "long" = 3L
-  )
   
   if (is.null(pre_vec)) pre_vec <- 0
   if (is.null(int_fac)) int_fac <- 0
   if (is.null(int_vec)) int_vec <- 0
-    
-  .Call("survint", pred, pre_fac, pre_vec, omega, int_fac, int_vec, weights, survtime)
+  
+  if (pred == "fpc_re") {
+    .Call("survint_re", pre_fac, omega, int_fac, int_vec, weights, 
+          survtime)
+  } else {
+    pred <- switch(pred,
+                   "lambda" = 1L,
+                   "gamma" = 2L,
+                   "long" = 3L
+    )
+    .Call("survint", pred, pre_fac, pre_vec, omega, int_fac, int_vec,
+          weights, survtime)
+  }
+  
 }
+
 
 if(FALSE) {
   setwd("~/svn/bayesr/pkg/JMbamlss/R")

@@ -63,39 +63,47 @@ parallel_bamlss_est <- function(i) {
   # Load the data
   load(paste0("simulation/", setting, "/data/d", i, ".Rdata"))
   
+  # Get the quantile-based knots for comparability
+  kn <- mgcv::smoothCon(mgcv::s(survtime, k = 20, bs = "ps"), 
+                        data = d_rirs$data)[[1]]$knots
+  
   # Estimate the model using JMbayes
   d_rirs_jmb <- d_rirs$data %>% 
     pivot_wider(names_from = marker, values_from = y)
-  CoxFit <- coxph(Surv(survtime, event) ~ x3, 
-                  data = d_rirs$data_short %>% filter(marker == "m1"))
-  lm1 <- lme(m1 ~ obstime * x3, random = ~ obstime | id, 
-             data = d_rirs_jmb, na.action = na.omit,
-             control = lmeControl(opt = "optim"))
-  lm2 <- lme(m2 ~ obstime * x3, random = ~ obstime | id, 
-             data = d_rirs_jmb, na.action = na.omit,
-             control = lmeControl(opt = "optim"))
-  lm3 <- lme(m3 ~ obstime * x3, random = ~ obstime | id, 
-             data = d_rirs_jmb, na.action = na.omit,
-             control = lmeControl(opt = "optim"))
-  lm4 <- lme(m4 ~ obstime * x3, random = ~ obstime | id, 
-             data = d_rirs_jmb, na.action = na.omit,
-             control = lmeControl(opt = "optim"))
-  lm5 <- lme(m5 ~ obstime * x3, random = ~ obstime | id, 
-             data = d_rirs_jmb, na.action = na.omit,
-             control = lmeControl(opt = "optim"))
-  lm6 <- lme(m6 ~ obstime * x3, random = ~ obstime | id, 
-             data = d_rirs_jmb, na.action = na.omit,
-             control = lmeControl(opt = "optim"))
-  
-  t_jm <- system.time(
-    jmb <- jm(CoxFit, list(lm1, lm2, lm3, lm4, lm5, lm6), time_var = "obstime",
-              n_iter = 5500L, n_burnin = 500L, n_thin = 5L, 
-              control = list(cores = 1, n_chains = 1))
-  )
-  attr(jmb, "comp_time") <- t_jm
-  save(jmb, file = paste0("simulation/", setting, "/jmb/jmb_", i, 
-                          ".Rdata"))
-  NULL
+  try_obj <- try({
+    CoxFit <- coxph(Surv(survtime, event) ~ x3, 
+                    data = d_rirs$data_short %>% filter(marker == "m1"))
+    lm1 <- lme(m1 ~ obstime * x3, random = ~ obstime | id, 
+               data = d_rirs_jmb, na.action = na.omit,
+               control = lmeControl(opt = "optim"))
+    lm2 <- lme(m2 ~ obstime * x3, random = ~ obstime | id, 
+               data = d_rirs_jmb, na.action = na.omit,
+               control = lmeControl(opt = "optim"))
+    lm3 <- lme(m3 ~ obstime * x3, random = ~ obstime | id, 
+               data = d_rirs_jmb, na.action = na.omit,
+               control = lmeControl(opt = "optim"))
+    lm4 <- lme(m4 ~ obstime * x3, random = ~ obstime | id, 
+               data = d_rirs_jmb, na.action = na.omit,
+               control = lmeControl(opt = "optim"))
+    lm5 <- lme(m5 ~ obstime * x3, random = ~ obstime | id, 
+               data = d_rirs_jmb, na.action = na.omit,
+               control = lmeControl(opt = "optim"))
+    lm6 <- lme(m6 ~ obstime * x3, random = ~ obstime | id, 
+               data = d_rirs_jmb, na.action = na.omit,
+               control = lmeControl(opt = "optim"))
+    
+    t_jm <- system.time(
+      jmb <- jm(CoxFit, list(lm1, lm2, lm3, lm4, lm5, lm6), time_var = "obstime",
+                n_iter = 5500L, n_burnin = 500L, n_thin = 5L, 
+                cores = 1, n_chains = 1, 
+                GK_k = 7, Bsplines_degree = 3, diff = 2, knots = list(kn),
+                save_random_effects = TRUE)
+    )
+    attr(jmb, "comp_time") <- t_jm
+    save(jmb, file = paste0("simulation/", setting, "/jmb/jmb_", i, 
+                            ".Rdata"))
+  }, silent = TRUE)
+  if (class(try_obj) == "try-error") try_obj else i
 }
 
 

@@ -83,7 +83,7 @@ b_funs <- rep(list(funData(argvals = seq1,
 mfpca_tru <- MFPCA_cov(cov = cov, basis_funs = b_funs)
 
 nfpc <- min(which(
-  cumsum(mfpca_est$values)/sum(mfpca_est$values) > 0.95))
+  cumsum(mfpca_tru$values)/sum(mfpca_tru$values) > 0.95))
 mfpca_tru_list <- lapply(seq_len(nfpc), function (i, mfpca = mfpca_tru) {
   list(functions = extractObs(mfpca$functions, i),
        values = mfpca$values[i])
@@ -111,7 +111,7 @@ parallel_bamlss_est <- function(i) {
   # Load the data
   load(paste0("simulation/", setting, "/data/d", i, ".Rdata"))
 
-  try({
+  try_obj <- try({
     
     # Estimate the model using tru FPCs
     d_rirs_tru <- attach_wfpc(mfpca_tru, d_rirs$data, n = nfpc)
@@ -121,10 +121,12 @@ parallel_bamlss_est <- function(i) {
                       burnin = 500, thin = 5)
     )
     attr(b_est, "comp_time") <- t_tru
+    attr(b_est, "FPCs") <- mfpca_tru
+    attr(b_est, "nfpc") <- nfpc
     save(b_est, file = paste0("simulation/", setting, "/bamlss_tru/b", i, 
                               ".Rdata"))
-  })
-  NULL
+  }, silent = TRUE)
+  if(class(try_obj) == "try-error") try_obj else i
 }
 
 
