@@ -1,0 +1,301 @@
+---
+title: "Compare Model Fits"
+author: "Alex"
+date: '2022-05-23'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+setwd("..")
+# Set Up R Session --------------------------------------------------------
+
+library(MFPCA)
+library(tidyverse)
+library(patchwork)
+library(Matrix)
+library(mvtnorm)
+library(survival)
+library(bamlss)
+
+
+# Data Generation
+source("R/simMultiJM.R")
+source("R/preprocessing.R")
+
+# Helperfunction PCRE
+source("R/eval_mfun.R")
+source("R/pcre_smooth.R")
+
+connection <- paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-ber",
+                     "lin.de,share=volkmana.hub/JMbamlss/rirs/")
+load(paste0(connection, "mod4.Rdata"))
+load(paste0(connection, "mod7.Rdata"))
+load(paste0(connection, "mod8.Rdata"))
+load(paste0(connection, "mod9.Rdata"))
+load(paste0(connection, "mod10.Rdata"))
+
+```
+
+## Compare different Model Fits
+
+```{r, echo = FALSE}
+# Generate data with independent random intercepts
+d_25 <- simMultiJM(nsub = 150, times = seq(0, 25, by = 0.25), 
+                   probmiss = 0.75, maxfac = 1.5,
+                   nmark = 2, param_assoc = TRUE, M = NULL, 
+                   FPC_bases = NULL, FPC_evals = NULL, mfpc_args = NULL,
+                   re_cov_mat = matrix(c(0.68, 0, 0, 0,
+                                         0, 0.28, 0, 0,
+                                         0, 0, 0.68, 0,
+                                         0, 0, 0, 0.28), ncol = 4), 
+                   ncovar = 2,
+                   lambda = function(t, x) {
+                     1.37 * t^(0.37)
+                   },
+                   gamma = function(x) {
+                     - 5.8 + 0.48*x[, 3]
+                   },
+                   alpha = list(function(t, x) {
+                     0.64 + 0*t
+                   }, function(t, x) {
+                     -0.64 + 0*t
+                   }),
+                   mu = list(function(t, x, r){
+                     2.13 + 0.24*t - 0.25*x[, 3] - 0.05*t*x[, 3] + 
+                       r[, 1] + r[, 2]*t
+                   }, function(t, x, r){
+                     2.13 + 0.24*t - 0.25*x[, 3] - 0.05*t*x[, 3] + 
+                       r[, 3] + r[, 4]*t
+                   }),
+                   sigma = function(t, x) {
+                     log(0.6) + 0*t
+                   }, 
+                   tmax = NULL, seed = 1808, 
+                   full = TRUE, file = NULL)
+d_1_obs <- d_25$data %>%
+  mutate(survtime = survtime / 25, obstime = obstime / 25)
+d_1_short <- d_25$data_short %>%
+  mutate(survtime = survtime / 25)
+d_1_full <- d_25$data_full %>%  
+  mutate(survtime = survtime / 25, obstime = obstime / 25)
+
+
+# MFPC Calculations -------------------------------------------------------
+
+# Use true structure
+seq1 <- seq(0, 1, by = 0.01)
+set.seed(1808)
+n <- 100000
+b <- mvtnorm::rmvnorm(n = n, mean = c(0,0,0,0), 
+                      sigma = diag(c(0.68, 0.28, 0.68, 0.28)))
+mfun1 <- multiFunData(
+  funData(argvals = seq1,
+          X = (b[, 1:2] %*% matrix(c(rep(1, length(seq1)), seq1),
+                                   byrow = TRUE, ncol = length(seq1)))),
+  funData(argvals = seq1,
+          X = (b[, 3:4] %*% matrix(c(rep(1, length(seq1)), seq1),
+                                   byrow = TRUE, ncol = length(seq1))))
+)
+mfpca_tru <- MFPCA(mFData = mfun1, M = 4,
+                   uniExpansions = list(list(type = "uFPCA", npc = 2),
+                                        list(type = "uFPCA", npc = 2)))
+
+# Estimate using data
+mfpca_es <- preproc_MFPCA(d_1_obs, uni_mean = "y ~ 1+obstime + x3 + obstime:x3",
+                          M = 4, npc = 2)
+
+
+# New data for prediction -------------------------------------------------
+
+ndat_tru <- attach_wfpc(mfpca_tru, d_1_full, eval_weight = FALSE)
+ndat_es <- attach_wfpc(mfpca_es, d_1_full, eval_weight = FALSE)
+
+ndat_tru$fit <- predict(b_pc4_s4_1, ndat_tru, model = "mu")
+ndat_tru$fit_RE <- predict(b_pc4_s4_1_RE, ndat_tru, model = "mu")
+ndat_es$fit <- predict(b_pc4_s4_1_es, ndat_es, model = "mu")
+d_1_full$fit_re1 <- predict(b_rirs_1_1, d_1_full, model = "mu")
+d_1_full$fit_re2 <- predict(b_rirs_1, d_1_full, model = "mu")
+
+
+
+set.seed(1808)
+ids <- d_1_short %>%
+  mutate(stime = cut(survtime, c(0, 0.3, 0.6, 1))) %>%
+  group_by(stime) %>%
+  sample_n(5) %>% 
+  ungroup() %>% 
+  select(id)
+id1 <- as.numeric(as.vector(ids[1:5, 1, drop = TRUE]))
+id2 <- as.numeric(as.vector(ids[6:10, 1, drop = TRUE]))
+id3 <- as.numeric(as.vector(ids[11:15, 1, drop = TRUE]))
+
+
+
+```
+
+The simulated and estimated functional principal component functions are the following functions.
+
+```{r, echo=FALSE}
+plot(mfpca_tru$functions)
+plot(mfpca_es$functions)
+```
+
+Plots for three different models (using the simulated FPC basis, using the estimated FPC basis, using RI+RS) for random observations with \$0.6 \<\$ survival \$ \leq 1\$ (the fit is the solid line, the dashed line is the underlying trajectory):
+
+```{r pressure, echo=FALSE, fig.width=12,fig.height=7}
+ggplot(data = ndat_tru %>% filter(id %in% id3), 
+               aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id3), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("True FPCs")
+ggplot(data = ndat_es %>% filter(id %in% id3), 
+               aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id3), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("Est FPCs")
+ggplot(data = d_1_full %>% filter(id %in% id3), 
+                  aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit_re1)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id3), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("RIRS (1 Term)")
+ggplot(data = d_1_full %>% filter(id %in% id3), 
+                  aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit_re2)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id3), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("RIRS (2 Term)")
+
+```
+
+For random observations with \$ 0.3 \< \$ survival \$ \leq 0.6\$
+
+```{r, echo=FALSE, fig.width=12,fig.height=7}
+ggplot(data = ndat_tru %>% filter(id %in% id2), 
+               aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id2), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("True FPCs")
+ggplot(data = ndat_es %>% filter(id %in% id2), 
+               aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id2), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("Est FPCs")
+ ggplot(data = d_1_full %>% filter(id %in% id2), 
+                  aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit_re1)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id2), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("True RIRS (1 Term)")
+ggplot(data = d_1_full %>% filter(id %in% id2), 
+                  aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit_re2)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id2), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("RIRS (2 Term)")
+```
+
+For random observations with \$ 0\<\$ survival \$ \leq 0.3\$
+
+```{r, echo=FALSE, fig.width=12,fig.height=7}
+ggplot(data = ndat_tru %>% filter(id %in% id1), 
+               aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id1), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("True FPCs")
+ggplot(data = ndat_es %>% filter(id %in% id1), 
+               aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id1), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("Est FPCs")
+ggplot(data = d_1_full %>% filter(id %in% id1), 
+                  aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit_re1)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id1), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("RIRS (1 Term)")
+ggplot(data = d_1_full %>% filter(id %in% id1), 
+                  aes(x = obstime, colour = id)) +
+  theme_bw(base_size = 15) +
+  geom_line(aes(y = fit_re2)) +
+  geom_line(aes(y = mu), linetype = "dashed") +
+  geom_point(data = d_1_obs %>% filter(id %in% id1), 
+             aes(y = y, shape = id), size = 2) +
+  theme(legend.position = "none") +
+  scale_y_continuous("Marker") +
+  scale_x_continuous("Time") +
+  facet_wrap(~marker, scales = "free") +
+  ggtitle("RIRS (2 Term)")
+```
