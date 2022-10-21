@@ -343,32 +343,32 @@ SEXP survint_re(SEXP pre_fac, SEXP omega,
 
   for(i = 0; i < p; i++) {
       
-    score_i_ptr[1] = 0.0;
-    hess_i_ptr[1] = 0.0;
+    score_i_ptr[0] = 0.0;
+    hess_i_ptr[0] = 0.0;
         
 
     for(j = 0; j < nw; j++) {
       tmp = weights_ptr[j] * omega_ptr[i * nw + j];
 
-      score_vec_i_ptr[1] = 0.0;
+      score_vec_i_ptr[0] = 0.0;
         
 
       for(ii = 0; ii < nmarker; ii++) {
-        score_vec_i_ptr[1] += int_fac_ptr[ii * p * nw + i * nw + j] *
+        score_vec_i_ptr[0] += int_fac_ptr[ii * p * nw + i * nw + j] *
           int_vec_ptr[ii * p * nw + i * nw + j + i * nr];      
       }
 
-      hess_vec_i_ptr[1] = score_vec_i_ptr[1] * score_vec_i_ptr[1];
+      hess_vec_i_ptr[0] = score_vec_i_ptr[0] * score_vec_i_ptr[0];
 
 
-      score_i_ptr[1] += tmp * score_vec_i_ptr[1];
-      hess_i_ptr[1] += tmp * hess_vec_i_ptr[1];
+      score_i_ptr[0] += tmp * score_vec_i_ptr[0];
+      hess_i_ptr[0] += tmp * hess_vec_i_ptr[0];
     }
 
     tmp = survtime_ptr[i] / 2.0 * pre_fac_ptr[i];
 
-    score_int_ptr[i] += tmp * score_i_ptr[1];
-    hess_int_ptr[i] += tmp * hess_i_ptr[1];
+    score_int_ptr[i] += tmp * score_i_ptr[0];
+    hess_int_ptr[i] += tmp * hess_i_ptr[0];
       
   }
 

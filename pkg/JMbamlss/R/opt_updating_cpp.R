@@ -117,18 +117,30 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
   b_p <- length(b)
   nmarker <- attr(y, "nmarker")
   
-  int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
-                      omega = exp(eta_timegrid),
-                      int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
-                      weights = attr(y, "gq_weights"),
-                      survtime = survtime)
+  if (any(class(x) == "unc_pcre.random.effect")) {
+    int_i <- survint_C(pred = "fpc_re", pre_fac = exp(eta$gamma),
+                       omega = exp(eta_timegrid),
+                       int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                       weights = attr(y, "gq_weights"),
+                       survtime = survtime)
+    x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
+      diag(int_i$hess_int)
+  } else {
+    int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
+                       omega = exp(eta_timegrid),
+                       int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                       weights = attr(y, "gq_weights"),
+                       survtime = survtime)
+    x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
+      matrix(int_i$hess_int, ncol = b_p)
+  }
+  
   
   delta <- rep(attr(y, "status"), nmarker)
   x_score <- drop(
     crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
       t(delta * x$XT) %*% eta$alpha) - int_i$score_int
-  x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
-    matrix(int_i$hess_int, ncol = b_p)
+
   
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H + x$hess(score = NULL, x$state$parameters, full = FALSE)

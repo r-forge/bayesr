@@ -96,14 +96,21 @@ f_est <- list(
 
 # Model fit
 t_est <- system.time(
-  b_est <- bamlss(f_est, family = mjm_bamlss, data = p_long, 
-                  timevar = "obstime", maxit = 15, sampler = FALSE,
-                  verbose= TRUE)
+  b_est <- bamlss(f_est, family = mjm_bamlss, data = p_long,
+                  timevar = "obstime", maxit = 15,
+                  sampler = FALSE, verbose = TRUE)
 )
+# No difference in time if verbose = FALSE
+# t_est_noverb <- system.time(
+#   b_est <- bamlss(f_est, family = mjm_bamlss, data = p_long,
+#                   timevar = "obstime", maxit = 15,
+#                   sampler = FALSE, verbose = FALSE)
+# )
+# 
 
 source("R/opt_updating_cpp_new.R")
 t_new <- system.time(
-  b_new <- bamlss(f_est, family = mjm_bamlss, data = p_long, 
-                  timevar = "obstime", maxit = 15, sampler = FALSE,
-                  verbose= TRUE)
+  b_new <- bamlss(f_est, family = mjm_bamlss, data = p_long,
+                  timevar = "obstime", maxit = 15,
+                  sampler = FALSE, verbose = TRUE)
 )

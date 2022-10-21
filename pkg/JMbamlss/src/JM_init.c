@@ -4,11 +4,11 @@
 
 #define USE_FC_LEN_T
 
-SEXP survint(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP survint_re(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP)
+SEXP survint(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP survint_re(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static R_CallMethodDef callMethods[] = {
-  {"survint", (DL_FUNC) &survint, 5},
+  {"survint", (DL_FUNC) &survint, 8},
   {"survint_re", (DL_FUNC) &survint, 6},
   {NULL, NULL, 0}
 };
