@@ -4,7 +4,8 @@
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
                      nu_sampler = 1, prop_pred = NULL, verbose = FALSE,
-                     prop_list = NULL, ...)
+                     prop_list = NULL,# prop_update = NULL, 
+                     ...)
 {
 ########## REMOVE prop_pred
   # Set starting values for the sampling
@@ -131,6 +132,8 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   if (burnin > n.iter) burnin <- floor(n.iter * 0.1)
   if (thin < 1) thin <- 1
   iterthin <- as.integer(seq(burnin, n.iter, by = thin))
+  # if (is.null(prop_update)) pu <- 1 else pu <- prop_update
+  # prop_up_list <- list()
   
   ## Samples.
   samps <- list()
@@ -189,7 +192,10 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                verbose_sampler = verbose, 
                                prop = if(!is.null(prop_list)) {
                                  prop_list[[iter]][[nx_iter]][[j_iter]]
-                               } else NULL)
+                               } else NULL
+                               # , prop_dens = if ((iter - 1) %% pu == 0) {
+                               #    NULL } else { prop_up_list[[i]][[j]] }
+                               )
         
         # If accepted, set current state to proposed state
         accepted <- if(!is.null(prop_list)) {
@@ -236,6 +242,9 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
         #                       "tau2"), 
         #       "tau2")
         # }
+        
+        # # Save the current proposal density information
+        # prop_up_list[[i]][[j]] <- p_state$prop_dens
         
         ## Save the samples and acceptance.
         if(save) {

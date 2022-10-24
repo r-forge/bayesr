@@ -43,7 +43,8 @@ compile_alex(location)
 sourceCpp("MatrixProd.cpp")
 
 
-
+################################ ATTENTION
+# DIFFERENT SCALA OF THE MARKERS IS NOT YET TAKEN INTO ACCOUNT
 
 # Cox model for the composite event death or transplantation
 pbc2$event <- as.numeric(pbc2$status != 'alive')

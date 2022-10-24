@@ -56,11 +56,12 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     # FPCA for each marker
     if (method == "fpca.sc") {
       FPCA <- lapply(lY, function(y) {
-        refund::fpca.sc(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc)
+        refund::fpca.sc(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc,
+                        var = TRUE)
       })
     } else {
       FPCA <- lapply(lY, function(y) {
-        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc)
+        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc, var = TRUE)
       })
     }
     
@@ -145,6 +146,8 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
   
 
   MFPCA <- MFPCA(mFData = mFData, M = M, uniExpansions = uniExpansions)
+  attr(MFPCA, "sigma2") <- lapply(FPCA, "[[", "sigma2")
+  MFPCA
 }
 
 
