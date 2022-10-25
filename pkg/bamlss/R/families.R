@@ -4431,8 +4431,34 @@ tF <- function(x, ...)
     rval$variance <- function(par, ...) { par[[2L]] }
   }
 
+  rval$keras <- keras_loss(rval$family)
+
   class(rval) <- "family.bamlss"
   rval
+}
+
+keras_loss <- function(family)
+{
+  rval <- NULL
+
+  if(family == "NO") {
+    rval <- list(
+      "nloglik" = function(y_true, y_pred) {
+        K = keras::backend()
+
+        mu = y_pred[, 1]
+        sigma = K$exp(y_pred[,2])
+        sigma2 = K$pow(sigma, 2)
+
+        ll = -0.5 * K$log(6.28318530717959 * sigma2) - 0.5 * K$pow((y_true[,1] - mu), 2) / sigma2
+        ll = K$sum(ll)
+
+        return(-1 * ll)
+      }
+    )
+  }
+
+  return(rval)
 }
 
 

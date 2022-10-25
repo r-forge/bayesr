@@ -4662,7 +4662,7 @@ dl.bamlss <- function(object,
   object$elapsed <- elapsed
   object$history <- history
 
-  class(object) <- "dl.bamlss"
+  class(object) <- c("dl.bamlss", "bamlss.frame")
 
   return(object)
 }
