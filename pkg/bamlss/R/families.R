@@ -4456,7 +4456,7 @@ keras_loss <- function(family)
     )
   }
 
-  if(family == "GU"} {
+  if(family == "GU") {
     rval <- list(
       "nloglik" = function(y_true, y_pred) {
         K = keras::backend()
