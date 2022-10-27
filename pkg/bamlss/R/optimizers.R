@@ -4563,6 +4563,9 @@ dl.bamlss <- function(object,
 
   family <- family(object)
 
+  if(is.null(family$keras))
+    family$keras <- keras_loss(family$family)
+
   if(is.null(family$keras$nloglik))
     stop("no keras negative loglik() function is specified!")
 
