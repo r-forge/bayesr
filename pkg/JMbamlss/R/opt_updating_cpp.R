@@ -139,7 +139,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
   delta <- rep(attr(y, "status"), nmarker)
   x_score <- drop(
     crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-      t(delta * x$XT) %*% eta$alpha) - int_i$score_int
+      crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
 
   
   x_score <- x_score + x$grad(score = NULL, x$state$parameters, full = FALSE)

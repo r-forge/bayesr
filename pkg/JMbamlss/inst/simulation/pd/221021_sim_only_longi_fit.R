@@ -1,6 +1,6 @@
 
 # Specify location
-location <- "workstation"
+location <- "server_linux"
 if(location %in% c("server_linux", "server_windows")){
   .libPaths(if (location == "server_linux") {
     c("~/H:/volkmana.hub/R4_linux_b", "~/H:/volkmana.hub/R4_linux")
@@ -34,6 +34,7 @@ source("R/MJM_predict.R")
 source("R/survint.R")
 source("R/fpca.R")
 source("R/compile.R")
+source("R/mfpca_sim.R")
 compile_alex(location)
 sourceCpp("MatrixProd.cpp")
 
@@ -71,10 +72,73 @@ f_long <- list(
 
 # Model fit
 t_est <- system.time(
-  b_est <- bamlss(f_long, data = d_rirs_est,  maxit = 1500, n.iter = 5500,
+  b_est <- bamlss(f_long, data = d_rirs_est, maxit = 1500, n.iter = 5500,
                   burnin = 500, thin = 5)
 )
 attr(b_est, "comp_time") <- t_est
 attr(b_est, "FPCs") <- mfpca_est
 attr(b_est, "nfpc") <- nfpc
-save(b_est, file = "simulation/scen_I_110_bamlss_long.Rdata")
+save(b_est, file = paste0("simulation/scen_I_110_bamlss_long.Rdata"))
+
+
+
+# True FPCs ---------------------------------------------------------------
+
+
+# Covariance matrix for the data generation
+auto <- matrix(c(0.08, -0.07, -0.07, 0.9), ncol = 2)
+cross <- matrix(rep(0.03, 4), ncol = 2)
+cor <- matrix(c(0, 1, 0.75, 0.5, 0, 0,
+                1, 0, 1, 0.75, 0.5, 0,
+                0.75, 1, 0, 1, 0.75, 0.5,
+                0.5, 0.75, 1, 0, 1, 0.75,
+                0, 0.5, 0.75, 1, 0, 1,
+                0, 0, 0.5, 0.75, 1, 0),
+              ncol = 6)
+cov <- kronecker(cor, cross) + kronecker(diag(c(1, 1.2, 1.4, 1.6, 1.8, 2)), 
+                                         auto)
+
+# Basis functions on each dimension
+seq1 <- seq(0, 1, by = 0.01)
+b_funs <- rep(list(funData(argvals = seq1,
+                           X = matrix(c(rep(1, length(seq1)), seq1),
+                                      byrow = TRUE, ncol = length(seq1)))), 6)
+
+
+# Prepare the model using the true FPCs -----------------------------------
+
+# Load the data
+load("simulation/scen_I_130922/data/d110.Rdata")
+
+
+# Prepare objects for the model on different data sets
+mfpca_tru <- MFPCA_cov(cov = cov, basis_funs = b_funs)
+mfpca_tru_list <- lapply(seq_along(mfpca_tru$values), 
+                         function (i, mfpca = mfpca_tru) {
+  list(functions = extractObs(mfpca$functions, i),
+       values = mfpca$values[i])
+})
+
+# Prepare objects for model fit
+d_rirs_tru <- attach_wfpc(mfpca_tru, d_rirs$data, n = length(mfpca_tru$values))
+f_long_tru <- list(
+  as.formula(paste0(
+    "y ~ -1 + marker + obstime:marker + x3:marker + obstime:x3:marker +",
+    paste0(lapply(seq_along(mfpca_tru$values), function(x) {
+      paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
+             "mfpca_tru_list[[", x, "]]))")
+    }), collapse = " + "))),
+  sigma ~ -1 + marker
+)
+
+
+# Model fit
+t_est <- system.time(
+  b_est <- bamlss(f_long_tru, data = d_rirs_tru, maxit = 1500, n.iter = 5500,
+                  burnin = 500, thin = 5)
+)
+attr(b_est, "comp_time") <- t_est
+attr(b_est, "FPCs") <- mfpca_est
+attr(b_est, "nfpc") <- 12
+save(b_est, file = paste0("simulation/scen_I_110_bamlss_long_tru1.Rdata"))
+

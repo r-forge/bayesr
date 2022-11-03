@@ -30,6 +30,11 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
   # Get marker variable (fixed for now) - for MJM_predict()
   marker_name <- "marker"
   
+  # Get ordering of the design matrix by id for PCRE crossproduct
+  # and the number of observations per individual
+  crossprod_info <- list(order(object$model.frame[, idvar]),
+                         as.integer(table(object$model.frame[, idvar])))
+  
   # Function to transform intervals to [0, 1] for GQ integration
   create_grid <- function(time) {
     time / 2 * gq$nodes + time / 2
@@ -141,7 +146,8 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
               sm_time_transform_mjm_pcre(
                 object$x[[i]]$smooth.construct[[j]],
                 object$model.frame[, unique_term, drop = FALSE], 
-                grid, yname, timevar_mu, take_last, nmarker = nmarker)
+                grid, yname, timevar_mu, take_last, nmarker = nmarker,
+                cp_info = crossprod_info)
           } else {
             unique_term <- unique(c(xterm, yname, by, 
                                     if(i == "mu") timevar_mu else timevar,
@@ -318,8 +324,7 @@ sm_time_transform_mjm <- function(x, data, grid, yname, timevar, take, y) {
 # PCRE Transformer Function -----------------------------------------------
 
 sm_time_transform_mjm_pcre <- function(x, data, grid, yname, timevar, take,
-                                       nmarker) {
-  
+                                       nmarker, cp_info) {
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
   X <- NULL
@@ -349,6 +354,7 @@ sm_time_transform_mjm_pcre <- function(x, data, grid, yname, timevar, take,
   x$timevar <- timevar
   x$Xgrid <- PredictMat(x, X, n = nmarker*nrow(X))
   x$XT <- PredictMat(x, data, n = nmarker*nrow(data))
+  x$cp_info <- cp_info
   
   x
 }

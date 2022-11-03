@@ -72,7 +72,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                 weights = gq_weights, survtime = survtime)
              x_score <- drop(
                crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-                 t(delta * x$XT) %*% eta$alpha) - int_i$score_int
+                 crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
              x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
                if (pred_l == "long" ) {
                  matrix(int_i$hess_int, ncol = length(b_old))
@@ -256,7 +256,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                 weights = gq_weights, survtime = survtime)
              x_score <- drop(
                crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-                 t(delta * x$XT) %*% eta$alpha) - int_i$score_int
+                 crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
              x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
                if (pred_l == "long" ) {
                  matrix(int_i$hess_int, ncol = length(b_old))

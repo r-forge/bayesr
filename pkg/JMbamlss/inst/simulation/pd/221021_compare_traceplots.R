@@ -1,7 +1,7 @@
 library(bamlss)
 
 load(paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-berlin.de,", 
-            "share=volkmana.hub/JMbamlss/simulation/scen_I_051022/bamlss_tru",
+            "share=volkmana.hub/JMbamlss/simulation/scen_I_130922/bamlss_tru",
             "/b110.Rdata"))
 
 
@@ -27,7 +27,11 @@ load(paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-berlin.de,",
 JMbayes2:::traceplot(jmb, parm = "betas", smooth = TRUE)
 str(jmb$mcmc)
 coda:::traceplot(jmb$mcmc$betas1, smooth = TRUE)
-
+b_mcmc <- as.mcmc(matrix(jmb$mcmc$b[[1]], nrow = 1000, ncol = 150*12,
+                         byrow = TRUE))
+coda:::traceplot(b_mcmc, smooth = TRUE, ask = TRUE)
+coda:::autocorr.plot(b_mcmc, lag.max = 20, ask = TRUE)
+coda:::autocorr.plot(jmb$mcmc$betas1, lag.max = 20, ask = TRUE)
 
 coda:::traceplot(sam[, which(colnames(sam) == 
                                "mu.p.model.matrix.markerm6:obstime:x3")],
@@ -37,4 +41,4 @@ coda:::traceplot(sam[, which(colnames(sam) ==
 load(paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-berlin.de,",
             "share=volkmana.hub/JMbamlss/simulation/", 
             "scen_I_110_bamlss_long.Rdata"))
-plot(b_est, which = "samples", model = "mu", ask = FALSE)
+plot(b_est, which = "samples", model = "mu", ask = TRUE)

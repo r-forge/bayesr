@@ -274,7 +274,7 @@ SEXP survint(SEXP pred, SEXP pre_fac, SEXP pre_vec, SEXP omega,
   return rval;
 }
 
-/* (2) Suvival integral function for FPC-Random Effects */
+/* (3) Suvival integral function for FPC-Random Effects */
 SEXP survint_re(SEXP pre_fac, SEXP omega,
   SEXP int_fac, SEXP int_vec, SEXP weights, SEXP survtime)
 {
@@ -394,3 +394,118 @@ SEXP survint_re(SEXP pre_fac, SEXP omega,
   return rval;
 }
 
+
+/* (4) Crossproduct for Psi-Matrix in Hesse Calculation */
+SEXP psi_mat_multiplication(SEXP X, SEXP ni_obs, SEXP diags)
+{
+  int nProtected = 0;
+  int n = nrows(X);
+  int p = ncols(X);
+  int *ni_obs_ptr = INTEGER(ni_obs);
+  double *X_ptr = REAL(X);
+  double *diags_ptr = REAL(diags);
+
+  SEXP out;
+  PROTECT(out = allocVector(REALSXP, p));
+  ++nProtected;
+
+  SEXP out_i;
+  PROTECT(out_i = allocVector(REALSXP, 1));
+  ++nProtected;
+
+  SEXP col_it;
+  PROTECT(col_it = allocVector(INTSXP, 1));
+  ++nProtected;
+
+
+  // Iterators.
+  int i, j;
+
+  // Pointers.
+  double *out_ptr = REAL(out);
+  double *out_i_ptr = REAL(out_i);
+  int *col_it_ptr = INTEGER(col_it);
+
+  // initialize column iteration
+  col_it_ptr[0] = 0;
+  
+  // Initialize output and sum over non-zero elements.
+  for(i = 0; i < p; i++){
+    
+    out_i_ptr[0] = 0.0;
+    int n_i = ni_obs_ptr[i];
+    for(j = 0; j < n_i; j++){
+    	
+	out_i_ptr[0] += X_ptr[i*n + col_it_ptr[0] + j] * X_ptr[i*n + col_it_ptr[0] + j] * diags_ptr[col_it_ptr[0] + j];
+	    
+    }
+    
+    out_ptr[i] = out_i_ptr[0];
+    col_it_ptr[0] += n_i;
+    
+  }
+
+  /* Output. */
+
+  UNPROTECT(nProtected);
+
+  return out;
+}
+
+
+/* (5) Crossproduct for Psi-Matrix in Score Calculation */
+SEXP psi_vec_multiplication(SEXP X, SEXP ni_obs, SEXP y)
+{
+  int nProtected = 0;
+  int n = nrows(X);
+  int p = ncols(X);
+  int *ni_obs_ptr = INTEGER(ni_obs);
+  double *X_ptr = REAL(X);
+  double *y_ptr = REAL(y);
+
+  SEXP out;
+  PROTECT(out = allocVector(REALSXP, p));
+  ++nProtected;
+
+  SEXP out_i;
+  PROTECT(out_i = allocVector(REALSXP, 1));
+  ++nProtected;
+
+  SEXP col_it;
+  PROTECT(col_it = allocVector(INTSXP, 1));
+  ++nProtected;
+
+
+  // Iterators.
+  int i, j;
+
+  // Pointers.
+  double *out_ptr = REAL(out);
+  double *out_i_ptr = REAL(out_i);
+  int *col_it_ptr = INTEGER(col_it);
+
+  // initialize column iteration
+  col_it_ptr[0] = 0;
+  
+  // Initialize output and sum over non-zero elements.
+  for(i = 0; i < p; i++){
+    
+    out_i_ptr[0] = 0.0;
+    int n_i = ni_obs_ptr[i];
+    for(j = 0; j < n_i; j++){
+    	
+	out_i_ptr[0] += X_ptr[i*n + col_it_ptr[0] + j] * y_ptr[col_it_ptr[0] + j];
+	    
+    }
+    
+    out_ptr[i] = out_i_ptr[0];
+    col_it_ptr[0] += n_i;
+    
+  }
+
+  /* Output. */
+
+  UNPROTECT(nProtected);
+
+  return out;
+}

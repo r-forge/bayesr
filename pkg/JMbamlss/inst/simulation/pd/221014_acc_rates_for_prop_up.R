@@ -25,3 +25,5 @@ b_two <- b_est
 acc_two <- samples(b_two)[, grep(".alpha", colnames(samples(b_two)), 
                                  fixed = TRUE)]
 summary(acc_two)
+
+xtable::xtable(tail(acc_two))
