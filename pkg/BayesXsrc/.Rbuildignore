@@ -1,5 +1,6 @@
 README.txt
 bootstrap-devel.sh
+bootstrap-devel-git.R
 bootstrap-release-2.1.sh
 bootstrap-release-3.0.sh
 bootstrap-release-3.0.3.sh
