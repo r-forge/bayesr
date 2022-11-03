@@ -1,21 +1,3 @@
-REPOS=http://svn.gwdg.de/svn/bayesx/trunk
-USER=guest
-PASSWD=guest
-DIRS="adaptiv alex andrea bib dag graph leyre mcmc psplines samson structadd"
-FILES="export_type.h main.cpp values.h"
-mkdir -p src/bayesxsrc
-cd src/bayesxsrc
-for i in $DIRS ; do
-  svn checkout --username "${USER}" --password "${PASSWD}" $REPOS/$i $i
-done
-for i in $FILES ; do
-  svn export --username "${USER}" --password "${PASSWD}" $REPOS/$i $i
-done
-cd ..
-cp dev-Makefile Makefile
-cp dev-Makefile.win Makefile.win
-cp dev-Makefile.inner.win Makefile.inner.win
-
 dir.create("src/bayesxsrc")
 dirs <- c("adaptiv", "alex", "andrea", "bib", "dag",
   "graph", "leyre", "mcmc", "psplines", "samson", "structadd")
@@ -32,4 +14,7 @@ for(d in dirs) {
 for(f in files) {
   file.copy(file.path("bayesx", f), file.path(owd, "src", "bayesxsrc", f), overwrite = TRUE, recursive = TRUE)
 }
-
+setwd(owd)
+file.copy(file.path("src", "dev-Makefile"), file.path("src", "Makefile"))
+file.copy(file.path("src", "dev-Makefile.win"), file.path("src", "Makefile.win"))
+file.copy(file.path("src", "dev-Makefile.inner.win"), file.path("src", "Makefile.inner.win"))
