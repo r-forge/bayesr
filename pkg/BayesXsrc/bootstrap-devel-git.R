@@ -9,10 +9,10 @@ owd <- getwd()
 setwd(tdir)
 system("git clone https://gitlab.gwdg.de/bayesx/bayesx.git")
 for(d in dirs) {
-  file.copy(file.path("bayesx", d), file.path(owd, "src", "bayesxsrc", d), overwrite = TRUE, recursive = TRUE)
+  file.copy(file.path("bayesx", d), file.path(owd, "src", "bayesxsrc"), overwrite = TRUE, recursive = TRUE)
 }
 for(f in files) {
-  file.copy(file.path("bayesx", f), file.path(owd, "src", "bayesxsrc", f), overwrite = TRUE, recursive = TRUE)
+  file.copy(file.path("bayesx", f), file.path(owd, "src", "bayesxsrc"), overwrite = TRUE, recursive = TRUE)
 }
 setwd(owd)
 file.copy(file.path("src", "dev-Makefile"), file.path("src", "Makefile"))
