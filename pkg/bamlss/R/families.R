@@ -236,6 +236,23 @@ beta_bamlss <- function(...)
        b <- a * (1 - mu) / mu
        dbeta(y, shape1 = a, shape2 = b, log = log)
     },
+    "keras" = list(
+      "nloglik" = function(y_true, y_pred) {
+        K = keras::backend()
+        tfm = tensorflow::tf$math
+
+        mu = tfm$sigmoid(y_pred[, 1])
+        s2 = tfm$sigmoid(y_pred[,2])
+
+        ll = -1 * tfm$lgamma(mu * (1 - s2)/s2) - tfm$lgamma(((1 - mu)*(1 - s2)) / s2) +
+          tfm$lgamma((1 - s2) / s2) + mu * (1 - s2) / s2 * K$log(y_true[,1]) +
+          (1 - mu) * (1 - s2)/s2 * K$log(1 - y_true[,1]) - K$log(y_true[,1]) - K$log(1 - y_true[,1])
+
+        ll = K$sum(ll)
+
+        return(-1 * ll)
+      }
+    ),
     "p" = function(y, par, ...) {
        mu <- par$mu
        sigma2 <- par$sigma2
@@ -2335,6 +2352,20 @@ weibull_bamlss <- function(...)
         k <- 1.283 / var(log(y))
         rep(k, length(y))
       }
+    ),
+    "keras" = list(
+      "nloglik" = function(y_true, y_pred) {
+        K = keras::backend()
+
+        a = K$exp(y_pred[, 1])
+        sigma = K$exp(y_pred[,2])
+
+        ll = (a - 1) * (log(a / sigma) + log(y_true[, 1] / sigma)) - (y_true[, 1] / sigma)^a
+
+        ll = K$sum(ll)
+
+        return(-1 * ll)
+      }
     )
   )
 
@@ -2509,11 +2540,16 @@ gamma_bamlss <- function(...)
     "keras" = list(
       "nloglik" = function(y_true, y_pred) {
         K = keras::backend()
+        tfm = tensorflow::tf$math
 
         mu = K$exp(y_pred[, 1])
         sigma = K$exp(y_pred[,2])
 
-        stop("not working yet!")
+        ll = sigma*y_pred[,2]-sigma*y_pred[,1]-tfm$lgamma(sigma)+(sigma-1)*K$log(y_true[,1])-sigma/mu*y_true[,1]
+
+        ll = K$sum(ll)
+
+        return(-1 * ll)
       }
     ),
     "score" = list(
@@ -4439,7 +4475,7 @@ keras_loss <- function(family)
 {
   rval <- NULL
 
-  if(family == "NO") {
+  if(family[1L] == "NO") {
     rval <- list(
       "nloglik" = function(y_true, y_pred) {
         K = keras::backend()
@@ -4456,7 +4492,7 @@ keras_loss <- function(family)
     )
   }
 
-  if(family == "GU") {
+  if(family[1L] == "GU") {
     rval <- list(
       "nloglik" = function(y_true, y_pred) {
         K = keras::backend()
@@ -4464,7 +4500,7 @@ keras_loss <- function(family)
         mu = y_pred[, 1]
         sigma = K$exp(y_pred[,2])
 
-        ll = -1 * y_pred[, 2] + ((y_true[,1] - mu)/sigma) - K$exp((y_true[,1] - mu)/sigma)
+        ll = -1 * K$log(sigma) + ((y_true[,1] - mu)/sigma) - K$exp((y_true[,1] - mu)/sigma)
         ll = K$sum(ll)
 
         return(-1 * ll)
