@@ -2360,8 +2360,8 @@ weibull_bamlss <- function(...)
         a = K$exp(y_pred[, 1])
         sigma = K$exp(y_pred[,2])
 
-        ll = (a/sigma)*(y_true[, 1]/sigma)^(a-1)*K$exp(-1 * ((y_true[,1]/sigma)^a))
-        ll = K$sum(K$log(ll))
+        ll = y_pred[, 1] - y_pred[, 2] + (a-1) * (K$log(y_true[,1]) - y_pred[, 2]) - (y_true[,1]/sigma)^a
+        ll = K$sum(ll)
 
         return(-1 * ll)
       }
