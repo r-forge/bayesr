@@ -1,6 +1,7 @@
 
 # Custom Function to Use MFPCA --------------------------------------------
 
+#' @export
 Predict.matrix.pcre2.random.effect <- function(object, data)
 {
   if(is.null(object$xt$mfpc))
@@ -44,7 +45,7 @@ Predict.matrix.pcre2.random.effect <- function(object, data)
 #'  \code{\link[mgcv]{smooth.construct}}
 #' @param data  see \code{\link[mgcv]{smooth.construct}}
 #' @param knots see \code{\link[mgcv]{smooth.construct}}
-#' @method smooth.construct pcre.smooth.spec
+#' @method smooth.construct unc_pcre.smooth.spec
 #' @return An object of class \code{"random.effect"}. See 
 #' \code{\link[mgcv]{smooth.construct}}
 #'  for the elements that this object will contain.

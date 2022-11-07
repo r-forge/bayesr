@@ -58,7 +58,7 @@ p_long <- pbc2 %>%
 which_mis <- p_long %>%
   filter(marker == "serChol") %>%
   group_by(id) %>%
-  summarise(n()) %>%
+  summarise(dplyr::n()) %>%
   select(id) %>%
   unlist()
 p_long <- p_long %>%
@@ -98,7 +98,7 @@ f_est <- list(
 t_est <- system.time(
   b_est <- bamlss(f_est, family = mjm_bamlss, data = p_long,
                   timevar = "obstime", maxit = 15,
-                  sampler = FALSE, verbose = TRUE)
+                  n.iter = 15, verbose = TRUE)
 )
 # No difference in time if verbose = FALSE
 # t_est_noverb <- system.time(

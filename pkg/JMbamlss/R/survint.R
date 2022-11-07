@@ -117,6 +117,7 @@
 
  
 ## New C version.
+#' @useDynLib JMbamlss
 survint_C <- function(pred = c("lambda", "gamma", "long", "fpc_re"),
   pre_fac, pre_vec = NULL, omega, int_fac = NULL,
   int_vec = NULL, weights, survtime)

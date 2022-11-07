@@ -117,3 +117,24 @@ m_o <- microbenchmark(
   "R Loop" = psi_mat_crossprod(X = X, ni_obs = ni_obs, diags = diags)
 )
 m_o
+
+
+# New version ---------------------------------------------------
+source("R/psi_matrix_multiplication.R")
+source("R/mcmc_proposing.R")
+source("R/opt_updating.R")
+load(paste0(results_wd, "profile_mcmc2.Rdata"))
+
+l <- lineprof(propose_mjm(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
+                          eta_timegrid_alpha, eta_timegrid_mu, eta_timegrid_long,
+                          eta_timegrid_lambda, survtime, logLik_old, nsubj, 
+                          gq_weights, status, nmarker, nu, verbose_sampler,
+                          prop))
+
+shine(l)
+
+aha <- propose_mjm(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
+                   eta_timegrid_alpha, eta_timegrid_mu, eta_timegrid_long,
+                   eta_timegrid_lambda, survtime, logLik_old, nsubj, 
+                   gq_weights, status, nmarker, nu, verbose_sampler,
+                   prop)

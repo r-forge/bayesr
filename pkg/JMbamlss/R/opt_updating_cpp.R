@@ -110,7 +110,7 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_mu,
 # Updating mu predictor ---------------------------------------------------
 
 
-update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha, 
+update_mjm_mu_old <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha, 
                           survtime, ...) {
   
   b <- bamlss::get.state(x, "b")

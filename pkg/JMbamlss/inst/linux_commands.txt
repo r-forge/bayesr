@@ -1,0 +1,5 @@
+svn checkout svn://scm.r-forge.r-project.org/svnroot/bayesr/pkg/bamlss
+
+R CMD REMOVE bamlss
+R CMD build --no-build-vignettes bamlss
+R CMD INSTALL bamlss_1-1.8.tar.gz

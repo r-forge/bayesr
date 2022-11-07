@@ -48,6 +48,7 @@ compile_alex <- function(location = c("workstation", "laptop", "server_linux",
   cf <- grep(".c", dir(dir), value = TRUE, fixed = TRUE)
   cf <- cf[!grepl(".c~", cf, fixed = TRUE)]
   cf <- cf[!grepl("init.c", cf, fixed = TRUE)]
+  cf <- cf[!grepl(".cpp", cf, fixed = TRUE)]
   for(j in cf) {
     file.copy(file.path(dir, j), file.path(tdir, j))
     system(paste("R CMD SHLIB", j))
