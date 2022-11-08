@@ -139,7 +139,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
     x_score <- drop(
       crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
         crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
-    x_H <- eigenMapMatMult(t(x$X * (1 / exp(eta$sigma)^2)), x$X) +
+    x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
       matrix(int_i$hess_int, ncol = b_p)
   }
 

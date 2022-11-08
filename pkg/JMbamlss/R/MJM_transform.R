@@ -56,6 +56,12 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
     stop("the time variable is not specified, needed for mu!")
   timevar <- yname
   
+  if (!identical(seq_len(nrow(object$model.frame)),
+      order(object$model.frame[, marker_name], 
+            object$model.frame[, idvar], 
+            object$model.frame[, timevar_mu]))) {
+    stop("Order the data by marker-id-obstime!")
+  }
   
   # Longitudinal variables
   nmarker <- 1

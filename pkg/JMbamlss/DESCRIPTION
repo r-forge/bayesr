@@ -17,4 +17,8 @@ LinkingTo:
 Imports: 
     Rcpp,
     sparseFLMM,
-    refund
+    refund,
+    MFPCA
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

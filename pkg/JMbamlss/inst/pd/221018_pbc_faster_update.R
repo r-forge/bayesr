@@ -17,30 +17,9 @@ if(location %in% c("server_linux", "server_windows")){
 # Always
 library(survival)
 library(JMbayes2)
-library(bamlss)
-library(MFPCA)
+devtools::load_all()
 library(tidyverse)
-library(parallel)
-library(Rcpp)
-library(Matrix)
-library(sparseFLMM)
-source("R/preprocessing.R")
-source("R/simMultiJM.R")
-source("R/eval_mfun.R")
-source("R/pcre_smooth.R")
-source("R/mjm_bamlss.R")
-source("R/MJM_transform.R")
-source("R/MJM_opt.R")
-source("R/opt_updating_cpp.R")
-source("R/MJM_mcmc.R")
-source("R/mcmc_proposing_cpp.R")
-source("R/MJM_predict.R")
-source("R/survint.R")
-source("R/fpca.R")
-source("R/mfpca_sim.R")
-source("R/compile.R")
-compile_alex(location)
-sourceCpp("MatrixProd.cpp")
+
 
 # Cox model for the composite event death or transplantation
 pbc2$event <- as.numeric(pbc2$status != 'alive')
@@ -51,6 +30,7 @@ p_long <- pbc2 %>%
                values_to = "y") %>%
   mutate(survtime = years, obstime = year, marker = factor(marker)) %>%
   select(id, survtime, event, sex, age, marker, obstime, y) %>%
+  arrange(marker, id, obstime) %>%
   na.omit() %>%
   as.data.frame()
 
