@@ -114,11 +114,11 @@ void pmat_int(SEXP mat)
   Rprintf("\n");
 }
 
-void merr()
-{
-  char *m = "stopped";
-  error(m);
-}
+/*void merr()*/
+/*{*/
+/*  char *m = "stopped";*/
+/*  error(m);*/
+/*}*/
 
 
 /* (2) Main IWLS functions. */
