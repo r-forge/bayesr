@@ -124,10 +124,9 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_alpha,
                        int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
                        weights = attr(y, "gq_weights"),
                        survtime = survtime)
-    x_score <- drop(crossprod(delta * x$XT, eta$alpha)) +
-      psi_mat_crossprod(Psi = x,
-                        y = (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2) -
-      int_i$score_int
+    x_score <- drop(
+      crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
+        crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
     x_H <- diag(psi_mat_crossprod(Psi = x, R = 1 / exp(eta$sigma)^2) + 
                   int_i$hess_int)
   } else {

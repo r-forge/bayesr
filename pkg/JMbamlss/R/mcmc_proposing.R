@@ -71,10 +71,9 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                 int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
                                 weights = gq_weights, survtime = survtime)
              if (pred_l == "fpc_re") {
-               x_score <- drop(crossprod(delta * x$XT, eta$alpha)) +
-                 psi_mat_crossprod(Psi = x,y = (y[[1]][, "obs"] - eta$mu) / 
-                                     exp(eta$sigma)^2) -
-                 int_i$score_int
+               x_score <- drop(
+                 crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2) + 
+                   crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
                x_H <- diag(psi_mat_crossprod(Psi = x, 
                                              R = 1 / exp(eta$sigma)^2) + 
                              int_i$hess_int)
@@ -261,10 +260,9 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                 int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
                                 weights = gq_weights, survtime = survtime)
              if (pred_l == "fpc_re") {
-               x_score <- drop(crossprod(delta * x$XT, eta$alpha)) +
-                 psi_mat_crossprod(Psi = x,y = (y[[1]][, "obs"] - eta$mu) / 
-                                     exp(eta$sigma)^2) -
-                 int_i$score_int
+               x_score <- drop(
+                 crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2) + 
+                   crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
                x_H <- diag(psi_mat_crossprod(Psi = x, 
                                              R = 1 / exp(eta$sigma)^2) + 
                              int_i$hess_int)
