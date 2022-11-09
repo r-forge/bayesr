@@ -17,7 +17,7 @@ write.gra(map, file, replace = FALSE)
   \item{replace}{Should an existing file be overwritten with the new version?}
 }
 
-\references{BayesX Reference Manual. Available from \url{http://www.bayesx.org}}
+\references{BayesX Reference Manual. Available from \url{https://www.uni-goettingen.de/de/bayesx/550513.html}}
 
 \author{Thomas Kneib, Felix Heinzl}
 

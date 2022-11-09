@@ -19,7 +19,7 @@ bnd2gra(map)
 Returns an adjacency matrix that represents the neighborhood structure of the map object in graph format.
 }
 
-\references{BayesX Reference Manual. Available from \url{http://www.bayesx.org}}
+\references{BayesX Reference Manual. Available from \url{https://www.uni-goettingen.de/de/bayesx/550513.html}}
 
 \author{Felix Heinzl, Thomas Kneib}
 

@@ -24,7 +24,7 @@ read.bnd(file, sorted=FALSE)
   \item{class}{Indicates whether the map is stored in boundary format (\code{bnd}) or graph format (\code{gra}). Maps returned by \code{read.bnd} are of class \code{bnd}}
 }
 
-\references{BayesX Reference Manual. Available from \url{http://www.bayesx.org/}}
+\references{BayesX Reference Manual. Available from \url{https://www.uni-goettingen.de/de/bayesx/550513.html}}
 
 \author{Daniel Sabanes Bove, Felix Heinzl, Thomas Kneib, Andreas Brezger}
 

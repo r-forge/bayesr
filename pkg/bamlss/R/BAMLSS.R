@@ -921,6 +921,31 @@ ffappend <- function(x, y, adjustvmode=TRUE, ...){
    x
 }
 
+
+ffbase_checkRange <- function(range, x)
+{
+  if(is.null(range)) {
+    return(bit::ri(1, length(x)))
+  }
+  range
+}
+
+ffbase_min.ff <- function(x, ..., na.rm = FALSE, range = NULL)
+{
+  r <- ffbase_checkRange(range, x)
+  min(..., sapply(bit::chunk(x, from = min(r), to = max(r)), function(i) {
+    min(x[i], na.rm = na.rm)
+  }))
+}
+
+ffbase_max.ff <- function(x, ..., na.rm = FALSE, range = NULL) 
+{
+  r <- ffbase_checkRange(range, x)
+  max(..., sapply(bit::chunk(x, from = min(r), to = max(r)), function(i) {
+    max(x[i], na.rm = na.rm)
+  }))
+}
+
 smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = NULL, ...)
 {
   object$xt$center <- TRUE
@@ -978,8 +1003,8 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          } else {
 #            nd[[j]] <- sample(rep(xq, length.out = 1000L))
 #          }
-          xmin <- ffbase::min.ff(data[[j]])
-          xmax <- ffbase::max.ff(data[[j]])
+          xmin <- ffbase_min.ff(data[[j]])
+          xmax <- ffbase_max.ff(data[[j]])
           nd[[j]] <- seq(xmin, xmax, length = 1000L)
 
 #          ux <- unique_ff(data[[j]])

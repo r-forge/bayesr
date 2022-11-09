@@ -24,7 +24,7 @@ Returns an adjacency matrix that represents the neighborhood structure defined i
   \item{class}{Indicates whether the map is stored in boundary format (\code{bnd}) or graph format (\code{gra}). Maps returned by \code{read.gra} are of class \code{gra}}
 }
 
-\references{BayesX Reference Manual. Available from \url{http://www.bayesx.org/}}
+\references{BayesX Reference Manual. Available from \url{https://www.uni-goettingen.de/de/bayesx/550513.html}}
 
 \author{Thomas Kneib, Felix Heinzl}
 
