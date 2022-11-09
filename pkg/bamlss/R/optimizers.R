@@ -4722,6 +4722,7 @@ predict.dl.bamlss <- function(object, newdata, model = NULL,
     X <- X[[1L]]
 
   pred <- as.data.frame(predict(object$dnn, X))
+
   colnames(pred) <- nx
 
   if(!is.null(model)) {

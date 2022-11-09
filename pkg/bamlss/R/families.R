@@ -2357,10 +2357,11 @@ weibull_bamlss <- function(...)
       "nloglik" = function(y_true, y_pred) {
         K = keras::backend()
 
-        a = K$exp(y_pred[, 1])
-        sigma = K$exp(y_pred[,2])
+        alpha = K$exp(y_pred[,1])
+        lambda = K$exp(y_pred[,2])
 
-        ll = y_pred[, 1] - y_pred[, 2] + (a-1) * (K$log(y_true[,1]) - y_pred[, 2]) - K$pow(y_true[,1]/(sigma+1e-7), a)
+        ll = K$log(alpha) + (alpha - 1) * K$log(y_true[,1]) + alpha * K$log(lambda) - (K$pow(lambda * y_true[,1], alpha))
+
         ll = K$sum(ll)
 
         return(-1 * ll)
