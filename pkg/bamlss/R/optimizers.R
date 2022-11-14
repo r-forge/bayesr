@@ -4630,15 +4630,22 @@ dl.bamlss <- function(object,
   )
 
   names(X) <- NULL
-  if(length(X) > 1) {
-    Y <- matrix(y, ncol = 1)
-    for(j in 1:(length(nx) - 1))
-      Y <- cbind(Y, 1)
+  if(is.null(dim(y))) {
+    if(length(X) > 1) {
+      Y <- matrix(y, ncol = 1)
+      for(j in 1:(length(nx) - 1))
+        Y <- cbind(Y, 1)
+    } else {
+      Y <- matrix(y, ncol = 1)
+    }
+    if(length(X) < 2)
+      X <- X[[1L]]
   } else {
-    Y <- matrix(y, ncol = 1)
+    nc <- ncol(y)
+    Y <- y
+    for(j in 1:(length(nx) - nc))
+      Y <- cbind(Y, 1)
   }
-  if(length(X) < 2)
-    X <- X[[1L]]
 
   ptm <- proc.time()
 
@@ -4676,6 +4683,23 @@ fitted.dl.bamlss <- function(object, ...) { object$fitted.values }
 family.dl.bamlss <- function(object) { object$family }
 residuals.dl.bamlss <- function(object, ...) { residuals.bamlss(object, ...) }
 plot.dl.bamlss <- function(x, ...) { plot(x$history, ...) }
+
+logLik.dl.bamlss <- function(object, ...)
+{
+  nd <- list(...)$newdata
+  rn <- response_name(object)
+  if(!is.null(nd)) {
+    y <- eval(parse(text = rn), envir = nd)
+  } else {
+    nd <- model.frame(object)
+    y <- nd[[rn]]
+  }
+  par <- predict(object, newdata = nd, type = "parameter")
+  ll <- sum(family(object)$d(y, par, log = TRUE), na.rm = TRUE)
+  attr(ll, "df") <- NA
+  class(ll) <- "logLik"
+  return(ll)
+}
 
 
 ## Predict function.

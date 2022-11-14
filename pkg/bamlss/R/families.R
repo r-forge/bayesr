@@ -2373,6 +2373,60 @@ weibull_bamlss <- function(...)
   rval
 }
 
+cweibull_bamlss <- function(...)
+{
+  links <- c(mu = "log", sigma = "log")
+
+  rval <- list(
+    "family" = "weibull",
+    "names" = c("mu", "sigma"),
+    "links" = parse.links(links, c(mu = "log", sigma = "log"), ...),
+    "d" = function(y, par, log = FALSE) {
+      mu2 <- par$mu/gamma((1/par$sigma) + 1)
+      i <- y[, "status"] == 1
+      d <- rep(0, length(i))
+      d[i] <- dweibull(y[i, 1], scale = mu2[i], shape = par$sigma[i], log = TRUE)
+      d[!i] <- log(1 - pweibull(y[!i, 1], scale = mu2[!i], shape = par$sigma[!i]))
+      if(!log)
+       d <- exp(d)
+      return(d)
+    },
+    "p" = function(y, par, ...) {
+      mu2 <- par$mu/gamma((1/par$sigma) + 1)
+      i <- y[, "status"] == 1
+      p <- rep(0, length(i))
+      p <- pweibull(y[, 1], scale = mu2, shape = par$sigma)
+      p[!i] <- runif(sum(!i), p[!i], 1)
+      return(p)
+    },
+    "keras" = list(
+      "nloglik" = function(y_true, y_pred) {
+        K = keras::backend()
+        tfm = tensorflow::tf$math
+
+        delta = y_true[,2]
+        y <- y_true[,1]
+
+        mu = K$exp(y_pred[,1])
+        sigma = K$exp(y_pred[,2])
+        mu2 = mu / (K$exp(tfm$lgamma((1 / sigma) + 1)) + 1e-08)
+
+        lld = K$log(mu2) + (mu2 - 1) * K$log(y) + mu2 * K$log(sigma) - ((sigma * y)^(mu2))
+        llp = K$log(1 - K$exp(-1 * ((y / (sigma + 1e-08))^(mu2))))
+
+        ll = delta * lld + (1 - delta) * llp
+
+        ll = K$sum(ll)
+
+        return(-1 * ll)
+      }
+    )
+  )
+
+  class(rval) <- "family.bamlss"
+  rval
+}
+
 
 dw_bamlss <- function(...)
 {
