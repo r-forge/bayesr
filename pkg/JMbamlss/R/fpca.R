@@ -163,7 +163,6 @@
 ##' @importFrom Matrix nearPD Matrix t as.matrix
 ##' @importFrom mgcv gam predict.gam
 ##' @importFrom gamm4 gamm4
-##' @importFrom sparseFLMM smooth.construct.symm.smooth.spec
 fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
                  random.int = FALSE, nbasis = 10, pve = 0.99, npc = NULL, 
                  var = FALSE, simul = FALSE, sim.alpha = 0.95, 

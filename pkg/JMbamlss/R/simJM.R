@@ -1,13 +1,12 @@
 
-# New Simulation Function Based On FPCs -----------------------------------
-
-# Extend the structure given by simJM function in bamlss
-# Add arguments
-# efun_type = "Poly", character string specifying the type of eigenfcts (eFun)
-# ignoreDeg = NULL, vector of numerics specifying the ignored degrees (eFun)
-# eval_type = "linear", character string specifying the type of eigenvals (eVal)
-# eval_scale = 1, numeric to scale the eigenvalues
-
+#' New Simulation Function Based On FPCs
+#' 
+#' Extend the structure given by simJM function in bamlss
+#' Add arguments
+#' efun_type = "Poly", character string specifying the type of eigenfcts (eFun)
+#' ignoreDeg = NULL, vector of numerics specifying the ignored degrees (eFun)
+#' eval_type = "linear", character string specifying the type of eigenvals (eVal)
+#' eval_scale = 1, numeric to scale the eigenvalues
 simJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
                   long_setting = "functional", 
                   alpha_setting = if(nonlinear) "linear" else "nonlinear", 

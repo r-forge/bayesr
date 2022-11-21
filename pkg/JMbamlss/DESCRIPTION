@@ -20,5 +20,6 @@ Imports:
     refund,
     MFPCA
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    splines
 Config/testthat/edition: 3

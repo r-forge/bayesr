@@ -1,10 +1,9 @@
 
 
-# New Simulation Function For Multivariate JMs Based On FPCs --------------
-
-
-# Adapt the structure given by simJM function in bamlss
-
+#' New Simulation Function For Multivariate JMs Based On FPCs
+#' 
+#' Adapt the structure given by simJM function in bamlss.
+#' 
 #' @param nsub Number of subjects.
 #' @param times Vector of time points.
 #' @param probmiss Probability of missingness.

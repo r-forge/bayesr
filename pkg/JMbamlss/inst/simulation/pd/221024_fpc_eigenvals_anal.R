@@ -28,11 +28,7 @@ library(parallel)
 library(Rcpp)
 library(Matrix)
 library(sparseFLMM)
-source("R/sim_helperfun.R")
-source("R/preprocessing.R")
-source("R/eval_mfun.R")
-source("R/pcre_smooth.R")
-source("R/fpca.R")
+devtools::load_all()
 
 
 load(paste0(results_wd, "scen_I_130922/bamlss_est/b102.Rdata"))
