@@ -123,7 +123,11 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
         which(lapply(mark@argvals, length) < npc)
       })
       rem <- Reduce(union, rem)
-      take <- seq_len(nObs(m_irregFunData[[1]]))[-rem]
+      take <- if (length(rem) == 0) {
+        seq_len(nObs(m_irregFunData[[1]]))
+      } else {
+        seq_len(nObs(m_irregFunData[[1]]))[-rem]
+      }
       m_irregFunData <- lapply(m_irregFunData, function (mark) {
         extractObs(mark, obs = take)
       })
