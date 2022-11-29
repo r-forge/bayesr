@@ -8,5 +8,6 @@
 
 library(testthat)
 library(JMbamlss)
+library(tidyverse)
 
 test_check("JMbamlss")

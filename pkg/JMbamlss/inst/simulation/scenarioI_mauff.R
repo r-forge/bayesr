@@ -120,4 +120,4 @@ parallel_bamlss_est <- function(i) {
 # Simulation --------------------------------------------------------------
 
 cat(paste("Parallelization:", start, "-", stop, "on", number_cores, "cores.\n"))
-mclapply(start:stop, parallel_bamlss_est, mc.cores = number_cores)
+simulation <- mclapply(start:stop, parallel_bamlss_est, mc.cores = number_cores)

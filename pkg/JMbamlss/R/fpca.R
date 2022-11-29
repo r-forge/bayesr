@@ -30,6 +30,10 @@
 ##' the FPC decomposition.
 ##' @param argvals the argument values of the function evaluations in \code{Y},
 #'  defaults to a equidistant grid from 0 to 1.
+#'  @param argvals_obs Should the timepoints of the original observations be 
+#'    used to evaluate the FPCs. Defaults to FALSE. 
+#'  @param argvals_pred Vector of timepoints on which to evaluate the FPCs.
+#'   Defaults to a sequence from 0 to 1.
 ##' @param random.int If \code{TRUE}, the mean is estimated by
 ##' \code{\link[gamm4]{gamm4}} with random intercepts. If \code{FALSE} (the
 ##' default), the mean is estimated by \code{\link[mgcv]{gam}} treating all the
@@ -81,7 +85,7 @@
 ##' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, Sonja Greven
 ##' \email{sonja.greven@@stat.uni-muenchen.de}, Lan Huo
 ##' \email{Lan.Huo@@nyumc.org}, Lei Huang \email{huangracer@@gmail.com}, and
-##' Philip Reiss \email{phil.reiss@@nyumc.org}, Alexander Volkmann´
+##' Philip Reiss \email{phil.reiss@@nyumc.org}, Alexander Volkmann
 ##' @references Cederbaum, J. Scheipl, F. and Greven, S. (2018). Fast symmetric 
 ##' additive covariance smoothing. \emph{Computational Statistics & Data 
 ##' Analysis}, 120, 25--41.
@@ -164,6 +168,7 @@
 ##' @importFrom mgcv gam predict.gam
 ##' @importFrom gamm4 gamm4
 fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
+                 argvals_obs = FALSE, argvals_pred = seq(0, 1, by = 0.01),
                  random.int = FALSE, nbasis = 10, pve = 0.99, npc = NULL, 
                  var = FALSE, simul = FALSE, sim.alpha = 0.95, 
                  useSymm = FALSE, makePD = FALSE, center = TRUE, 
@@ -179,6 +184,11 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
     stopifnot(is.null(argvals))
     Y = refund:::irreg2mat(ydata)
     argvals = sort(unique(ydata$.index))
+    if (!argvals_obs) {
+      argvals_pred <- sort(unique(argvals_pred))
+    } else {
+      argvals_pred <- argvals
+    }
   }
   
   if (is.null(Y.pred))
@@ -187,8 +197,14 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
   I = NROW(Y)
   I.pred = NROW(Y.pred)
   
-  if (is.null(argvals))
+  if (is.null(argvals)) {
     argvals = seq(0, 1, length = D)
+    if (!argvals_obs) {
+      argvals_pred <- argvals
+    } 
+  }
+  
+  D_pred <- length(argvals_pred)
   
   d.vec = rep(argvals, each = I)
   id = rep(1:I, rep(D, I))
@@ -201,6 +217,7 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
       rm(ri_data)
     } else gam0 = gam(as.vector(Y) ~ s(d.vec, k = nbasis))
     mu = predict(gam0, newdata = data.frame(d.vec = argvals))
+    muhat <- predict(gam0, newdata = data.frame(d.vec = argvals_pred))
     Y.tilde = Y - matrix(mu, I, D, byrow = TRUE)
   } else {
     Y.tilde = Y
@@ -252,7 +269,7 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
   } else if (cov.est.method == 1) {
     # smooth y(s1)y(s2) values to obtain covariance estimate
     row.vec = col.vec = G.0.vec = c()
-    cov.sum = cov.count = cov.mean = matrix(0, D, D)
+    cov.sum = cov.count = cov.mean = matrix(0, D_pred, D_pred)
     for (i in 1:I) {
       obs.points = which(!is.na(Y[i, ]))
       temp = tcrossprod(Y.tilde[i, obs.points])
@@ -266,13 +283,13 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
       cov.sum[obs.points, obs.points] = cov.sum[obs.points, obs.points] +
         tcrossprod(Y.tilde[i, obs.points])
     }
-    row.vec.pred = rep(argvals, each = D)
-    col.vec.pred = rep(argvals, D)
+    row.vec.pred = rep(argvals_pred, each = D_pred)
+    col.vec.pred = rep(argvals_pred, D_pred)
     npc.0 = matrix(predict(bam(G.0.vec ~ s(row.vec, col.vec, k = nbasis,
-                                           bs = "symm")), 
-                           method = "fREML",
+                                           bs = "symm"), method = "fREML"),
                            newdata = data.frame(row.vec = row.vec.pred,
-                                                col.vec = col.vec.pred)), D, D)
+                                                col.vec = col.vec.pred)),
+                   D_pred, D_pred)
     npc.0 = (npc.0 + t(npc.0))/2
     G.0 = ifelse(cov.count == 0, NA, cov.sum/cov.count)
     diag.G0 = diag(G.0)
@@ -287,7 +304,7 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
   }
   ### numerical integration for calculation of eigenvalues (see Ramsay & 
   ### Silverman, Chapter 8)
-  w <- refund:::quadWeights(argvals, method = integration)
+  w <- refund:::quadWeights(argvals_pred, method = integration)
   Wsqrt <- diag(sqrt(w))
   Winvsqrt <- diag(1/(sqrt(w)))
   V <- Wsqrt %*% npc.0 %*% Wsqrt
@@ -298,17 +315,17 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
                npc)
   efunctions = matrix(Winvsqrt %*% 
                         eigen(V, symmetric = TRUE)$vectors[, seq(len = npc)],
-                      nrow = D, ncol = npc)
+                      nrow = D_pred, ncol = npc)
   evalues = eigen(V, symmetric = TRUE, only.values = TRUE)$values[1:npc]  
   # use correct matrix for eigenvalue problem
   cov.hat = efunctions %*% tcrossprod(diag(evalues, nrow = npc, ncol = npc),
                                       efunctions)
   ### numerical integration for estimation of sigma2
-  T.len <- argvals[D] - argvals[1]  
+  T.len <- argvals_pred[D_pred] - argvals[1]  
   # total interval length
   T1.min <- min(which(argvals >= argvals[1] + 0.25 * T.len))  
   # left bound of narrower interval T1
-  T1.max <- max(which(argvals <= argvals[D] - 0.25 * T.len)) 
+  T1.max <- max(which(argvals <= argvals_pred[D_pred] - 0.25 * T.len)) 
   # right bound of narrower interval T1
   DIAG = (diag.G0 - diag(cov.hat))[T1.min:T1.max]  
   # function values
@@ -319,13 +336,13 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
   D.inv = diag(1/evalues, nrow = npc, ncol = npc)
   Z = efunctions
   Y.tilde = Y.pred - matrix(mu, I.pred, D, byrow = TRUE)
-  Yhat = matrix(0, nrow = I.pred, ncol = D)
+  Yhat = matrix(0, nrow = I.pred, ncol = D_pred)
   rownames(Yhat) = rownames(Y.pred)
-  colnames(Yhat) = colnames(Y.pred)
+  colnames(Yhat) = argvals_pred
   scores = matrix(NA, nrow = I.pred, ncol = npc)
   VarMats = vector("list", I.pred)
-  for (i in 1:I.pred) VarMats[[i]] = matrix(NA, nrow = D, ncol = D)
-  diag.var = matrix(NA, nrow = I.pred, ncol = D)
+  for (i in 1:I.pred) VarMats[[i]] = matrix(NA, nrow = D_pred, ncol = D_pred)
+  diag.var = matrix(NA, nrow = I.pred, ncol = D_pred)
   crit.val = rep(0, I.pred)
   for (i.subj in 1:I.pred) {
     obs.points = which(!is.na(Y.pred[i.subj, ]))
@@ -335,7 +352,7 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
     Zcur = matrix(Z[obs.points, ], nrow = length(obs.points), ncol = dim(Z)[2])
     ZtZ_sD.inv = solve(crossprod(Zcur) + sigma2 * D.inv)
     scores[i.subj, ] = ZtZ_sD.inv %*% t(Zcur) %*% (Y.tilde[i.subj, obs.points])
-    Yhat[i.subj, ] = t(as.matrix(mu)) + scores[i.subj, ] %*% t(efunctions)
+    Yhat[i.subj, ] = t(as.matrix(muhat)) + scores[i.subj, ] %*% t(efunctions)
     if (var) {
       VarMats[[i.subj]] = sigma2 * Z %*% ZtZ_sD.inv %*% t(Z)
       diag.var[i.subj, ] = diag(VarMats[[i.subj]])
@@ -348,8 +365,10 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
     }
   }
   
-  ret.objects = c("Yhat", "Y", "scores", "mu", "efunctions", "evalues", "npc",
-                  "argvals")
+  ret.objects = c("Yhat", "Y", "scores", 
+                  if(argvals_obs) "mu" else "muhat",
+                  "efunctions", "evalues", "npc",
+                  if(argvals_obs) "argvals" else "argvals_pred")
   if (var) {
     ret.objects = c(ret.objects, "sigma2", "diag.var", "VarMats")
     if (simul)

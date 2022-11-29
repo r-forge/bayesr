@@ -14,11 +14,19 @@
 #' @param uni_mean String to crate a formula for the univariate addtive models.
 #' @param time String giving the name of the longitudinal time variable.
 #' @param id String giving the name of the identifier.
+#' @param marker String giving the name of the longitudinal marker variable.
 #' @param M Number of mFPCs to compute in the MFPCA. If not supplied, it
 #'  defaults to the maximum number of computable mFPCs.
+#' @param remove_obs Minimal number of observations per individual and marker to
+#'  be included in the FPC estimation. Defaults to NULL (all observations). Not
+#'  removing observations can lead to problems if the univariate variance 
+#'  estimate is negative and has to be truncated, then the scores for IDs with
+#'  few observations cannot be estimated.
 #' @param method Which package to use for the univariate FPCA. Either function
 #'  adapted function 'fpca', 'FPCA' from package \code{fdapace}, 'fpca.sc' from
 #'  package \code{refund}, or function 'PACE' from package \code{MFPCA}.
+#' @param var_names Vector of variable names corresponding to ID and MARKER. 
+#'  Needed to remove observations.
 #' @param nbasis Number of B-spline basis functions for mean estimate and
 #'  bivariate smoothing of covariance surface for methods fpca.sc, PACE.
 #' @param npc Number of univariate principal components to use in fpca.sc, PACE.
@@ -26,7 +34,8 @@
 #' @param pve_uni Proportion of univariate variance explained for method 
 #'  fpca.sc,PACE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
-                           time = "obstime", id = "id", M = NULL, 
+                           time = "obstime", id = "id", marker = "marker",
+                           M = NULL, remove_obs = NULL, 
                            method = c("fpca", "fpca.sc", "FPCA", "PACE"), 
                            nbasis = 10, npc = NULL,
                            fve_uni = 0.99, pve_uni = 0.99) {
@@ -34,7 +43,33 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
   require(MFPCA)
   method <- match.arg(method)
   
+  if (!is.null(remove_obs)) {
+    few_obs <- apply(table(data[, id], data[, marker]), 1,
+                     function (x) any(x < remove_obs))
+    data <- droplevels(data[data[, id] %in% paste(which(!few_obs)), ])
+    
+  }
+  
   marker_dat <- split(data, data$marker)
+  
+  # Check whether enough observations are available on each marker to be able
+  # to estimate the same full interval on all markers
+  maxtime <- sapply(marker_dat, function(x) max(x[, time]))
+  if (length(unique(maxtime)) > 1) {
+    if (method != "fpca") {
+      stop("Estimation of MFPCA for different univariate time intervals ",
+           "has only been tested for method 'fpca'. Note that the design ",
+           "matrices constructed in the joint model will not be correct.")
+    } else {
+      warning("Estimation of univariate FPCAs has to extrapolate for ",
+              paste(paste0("marker", which(maxtime != max(maxtime))),
+                    sep = ", "),
+              " from ", 
+              paste(maxtime[which(maxtime != max(maxtime))], sep = ","), 
+              " to ", max(maxtime), ". Please check if appropriate.")
+    }
+  }
+  argvals_pred <- seq(0, max(maxtime), length.out = 101)
   
   uni_mean <- as.formula(uni_mean)
   
@@ -61,7 +96,8 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
       })
     } else {
       FPCA <- lapply(lY, function(y) {
-        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc, var = TRUE)
+        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc, var = TRUE,
+             argvals_pred = argvals_pred)
       })
     }
     
@@ -203,9 +239,10 @@ create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1),
 }
 
 
-#------------------------------------------------------------------------------#
-# Attach Weighted Functional Principal Components to the Data
-#------------------------------------------------------------------------------#
+
+# Attach Weighted Functional Principal Components to the Data -----------
+
+
 #' Attach Weighted Functional Principal Components to the Data
 #' 
 #' @param mfpc MFPCA object from which to extract the weighted FPCS.
