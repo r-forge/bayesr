@@ -33,12 +33,15 @@
 #' @param fve_uni Fraction of univariate variance explained for method FPCA.
 #' @param pve_uni Proportion of univariate variance explained for method 
 #'  fpca.sc,PACE.
+#' @param save_uniFPCA TRUE to attach list of univariate FPCAs as attribute to
+#'  output. Defaults to FALSE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
                            time = "obstime", id = "id", marker = "marker",
                            M = NULL, remove_obs = NULL, 
                            method = c("fpca", "fpca.sc", "FPCA", "PACE"), 
                            nbasis = 10, npc = NULL,
-                           fve_uni = 0.99, pve_uni = 0.99) {
+                           fve_uni = 0.99, pve_uni = 0.99,
+                           save_uniFPCA = FALSE) {
   require(bamlss)
   require(MFPCA)
   method <- match.arg(method)
@@ -187,6 +190,9 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
 
   MFPCA <- MFPCA(mFData = mFData, M = M, uniExpansions = uniExpansions)
   attr(MFPCA, "sigma2") <- lapply(FPCA, "[[", "sigma2")
+  if (save_uniFPCA) {
+    attr(MFPCA, "uniFPCA") <- FPCA
+  }
   MFPCA
 }
 
