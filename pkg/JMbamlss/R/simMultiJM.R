@@ -310,7 +310,7 @@ simMultiJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
     time <- rep(NA, nsub)
     Hazard <- function(hazard, time, x, r) {
       integrate(hazard, 0, time, x = x, r = r, 
-                subdivisions = subdivisions)$value
+                subdivisions = subdivisions, stop.on.error = FALSE)$value
     }
     InvHazard <- function(Hazard, hazard, x, r, tmin, tmax) {
       negLogU <- -log(runif(1, 0, 1))

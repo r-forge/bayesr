@@ -81,7 +81,6 @@ high_sc <- lapply(mfpc_est2, function(it) {
   obs <- which(apply(it$scores, 1, function (sc) any(abs(sc) > cut_off)))
   if (length(obs)) {
     FPCA <- attr(it, "uniFPCA")
-    # Sollte man für jedes obs getrennt machen!
     do.call(rbind, lapply(obs, function(id) {
       sc_obs <- sapply(FPCA, function (m) {
         m$scores[id, ]
@@ -126,6 +125,53 @@ ggplot(na.omit(high_sc), aes(x = as.factor(n_obs), y = log(abs(score)))) +
   labs(x = "Number of Longitudinal Observations",
        y = "Log(abs(Univariate Score))")
 
+
+# Latest longitudinal observations for high-score observations
+cut_off <- 6
+high_sc <- lapply(mfpc_est2, function(it) {
+  obs <- which(apply(it$scores, 1, function (sc) any(abs(sc) > cut_off)))
+  if (length(obs)) {
+    FPCA <- attr(it, "uniFPCA")
+    do.call(rbind, lapply(obs, function(id) {
+      sc_obs <- sapply(FPCA, function (m) {
+        m$scores[id, ]
+      })
+      m_obs <- which(apply(sc_obs, 2, function(v) any(abs(v) > cut_off)))
+      if (length(m_obs)) {
+        m_fpc <- sapply(m_obs, function (m) {
+          paste0("fpc", which(abs(FPCA[[m]]$scores[id, ]) > cut_off))
+        })
+        m_sco <- sapply(m_obs, function (m) {
+          FPCA[[m]]$scores[id, which(abs(FPCA[[m]]$scores[id, ]) > cut_off)]
+        })
+        m_max <- sapply(m_obs, function (m) {
+          max(as.numeric(colnames(FPCA[[m]]$Y)[!is.na(FPCA[[m]]$Y[id, ])]))
+        })
+        if (is.list(m_fpc)) {
+          m_max <- rep(m_max, sapply(m_fpc, length))
+          m_fpc <- unlist(m_fpc)
+          m_sco <- unlist(m_sco)
+        }
+        data.frame(id = id, marker = names(m_max), m_max = as.vector(m_max), 
+                   fpc = as.vector(m_fpc), score = as.vector(m_sco))
+      } else {
+        data.frame(id = id, marker = NA, m_max = NA, 
+                   fpc = NA, score = NA)
+      }
+    }))
+  } else {
+    data.frame(id = NA, marker = NA, m_max = NA, 
+               fpc = NA, score = NA)
+  }
+})
+high_sc <- do.call(rbind, Map(cbind, it = seq_along(high_sc), high_sc))
+high_sc <- high_sc[!is.na(high_sc$id), ]
+ggplot(high_sc, aes(x = m_max, y = log(abs(score)))) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "Maximal Timepoint on Respective Marker",
+       y = "log(|score|)") +
+  ggtitle("Maximal Timepoint of Observations with Multivariate Scores > 6")
 
 
 # Look at Specific Iteration with 2 high Scores ---------------------------
@@ -173,6 +219,7 @@ ggplot(dat %>% filter(idcol == FALSE),
   labs(x = "Time", y = "Centered Obs", color = element_blank()) +
   scale_color_manual(labels = c("Rest", "ID27"), values = c("grey", "red"))
 
+w <- which(abs(m$scores[, 1] > 10) & abs(m$scores[, 2]) > 10)
 
 # Remove all observations with less than 3 observations -------------------
 
