@@ -60,6 +60,7 @@ parallel_bamlss_est <- function(i) {
            id = factor(id),
            Time = ifelse(Time/(max(year)) > 1, max(year), Time/(max(year))),
            year = year/max(year)) %>%
+    arrange(marker, id, year) %>%
     as.data.frame()
   
   try_obj <- try({
@@ -100,13 +101,10 @@ parallel_bamlss_est <- function(i) {
     })
     
     # Prepare objects for model fit
-    d_rirs_est <- d_rirs %>% 
-      arrange(marker, id, year) %>%
-      JMbamlss:::attach_wfpc(mfpca_est, ., n = nfpc,
-                                         obstime = "year") #%>%
-      arrange(marker, id, year)
+    d_rirs_est <- JMbamlss:::attach_wfpc(mfpca_est, d_rirs, n = nfpc,
+                                         obstime = "year")
     f_est <- list(
-      Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 5, bs = "ps"),
+      Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
       gamma ~ 1 + group,
       as.formula(paste0(
         "mu ~ -1 + marker + year:marker +",
