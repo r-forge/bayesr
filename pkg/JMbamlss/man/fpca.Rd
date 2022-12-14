@@ -9,6 +9,8 @@ fpca(
   ydata = NULL,
   Y.pred = NULL,
   argvals = NULL,
+  argvals_obs = FALSE,
+  argvals_pred = seq(0, 1, by = 0.01),
   random.int = FALSE,
   nbasis = 10,
   pve = 0.99,
@@ -32,7 +34,11 @@ irregularly observed functions. See Details.}
 the FPC decomposition.}
 
 \item{argvals}{the argument values of the function evaluations in \code{Y},
-defaults to a equidistant grid from 0 to 1.}
+defaults to a equidistant grid from 0 to 1.
+@param argvals_obs Should the timepoints of the original observations be 
+  used to evaluate the FPCs. Defaults to FALSE. 
+@param argvals_pred Vector of timepoints on which to evaluate the FPCs.
+ Defaults to a sequence from 0 to 1.}
 
 \item{random.int}{If \code{TRUE}, the mean is estimated by
 \code{\link[gamm4]{gamm4}} with random intercepts. If \code{FALSE} (the
@@ -205,5 +211,5 @@ Association}, 100, 577--590.
 Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}, Sonja Greven
 \email{sonja.greven@stat.uni-muenchen.de}, Lan Huo
 \email{Lan.Huo@nyumc.org}, Lei Huang \email{huangracer@gmail.com}, and
-Philip Reiss \email{phil.reiss@nyumc.org}, Alexander Volkmann´
+Philip Reiss \email{phil.reiss@nyumc.org}, Alexander Volkmann
 }

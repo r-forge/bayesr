@@ -263,7 +263,7 @@ attach_wfpc <- function(mfpca, data, n = NULL, obstime = "obstime", marker = "ma
                         eval_weight = FALSE){
   
   # Is the data sorted by marker
-  if (all(order(data[[marker]]) != seq_len(nrow(data)))) message("ORDER!")
+  if (all(order(data[[marker]]) == seq_len(nrow(data)))) message("ORDER!")
   
   wfpc <- NULL
   

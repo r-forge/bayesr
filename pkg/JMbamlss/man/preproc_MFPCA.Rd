@@ -9,12 +9,15 @@ preproc_MFPCA(
   uni_mean = "y ~ s(obstime) + s(x2)",
   time = "obstime",
   id = "id",
+  marker = "marker",
   M = NULL,
+  remove_obs = NULL,
   method = c("fpca", "fpca.sc", "FPCA", "PACE"),
   nbasis = 10,
   npc = NULL,
   fve_uni = 0.99,
-  pve_uni = 0.99
+  pve_uni = 0.99,
+  save_uniFPCA = FALSE
 )
 }
 \arguments{
@@ -26,8 +29,16 @@ preproc_MFPCA(
 
 \item{id}{String giving the name of the identifier.}
 
+\item{marker}{String giving the name of the longitudinal marker variable.}
+
 \item{M}{Number of mFPCs to compute in the MFPCA. If not supplied, it
 defaults to the maximum number of computable mFPCs.}
+
+\item{remove_obs}{Minimal number of observations per individual and marker to
+be included in the FPC estimation. Defaults to NULL (all observations). Not
+removing observations can lead to problems if the univariate variance 
+estimate is negative and has to be truncated, then the scores for IDs with
+few observations cannot be estimated.}
 
 \item{method}{Which package to use for the univariate FPCA. Either function
 adapted function 'fpca', 'FPCA' from package \code{fdapace}, 'fpca.sc' from
@@ -42,6 +53,12 @@ bivariate smoothing of covariance surface for methods fpca.sc, PACE.}
 
 \item{pve_uni}{Proportion of univariate variance explained for method 
 fpca.sc,PACE.}
+
+\item{save_uniFPCA}{TRUE to attach list of univariate FPCAs as attribute to
+output. Defaults to FALSE.}
+
+\item{var_names}{Vector of variable names corresponding to ID and MARKER. 
+Needed to remove observations.}
 }
 \description{
 This function takes the data und uses the residuals of marker-specific

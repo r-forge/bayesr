@@ -40,9 +40,9 @@ library(JMbamlss)
 start <- 100
 stop <- 199
 number_cores <- 2
-setting <- "scen_II_221209"
-dat_setting <- "scen_II_221209"
-model_type <- "A"
+setting <- "scen_II_221209/"
+dat_setting <- "scen_II_221209/"
+model_type <- "A/"
 Sys.time()
 sessionInfo()
 
@@ -53,7 +53,7 @@ parallel_bamlss_est <- function(i) {
   set.seed(i)
   
   # Load the data
-  load(paste0("simulation/", dat_setting, "/data/d", i, ".Rdata"))
+  load(paste0(results_wd, dat_setting, "data/d", i, ".Rdata"))
   
   try_obj <- try({
     
@@ -116,7 +116,7 @@ parallel_bamlss_est <- function(i) {
     attr(b_est, "comp_time") <- t_est
     attr(b_est, "FPCs") <- mfpca_est
     attr(b_est, "nfpc") <- nfpc
-    save(b_est, file = paste0(results_wd, setting, model_type, "/b", i, 
+    save(b_est, file = paste0(results_wd, setting, model_type, "b", i, 
                               ".Rdata"))
   }, silent = TRUE)
   if(class(try_obj) == "try-error") try_obj else i
