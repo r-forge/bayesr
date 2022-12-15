@@ -169,4 +169,21 @@ jmb_df_est <- function(i, df = c(3, 4, 5)) {
 
 
 data_sim <- simulate_data(start:stop)
-mod_stats <- lapply(start:stop, jmb_df_est, df = c(3, 4))
+mod_stats <- lapply(start:stop, jmb_df_est)
+
+sapply(mod_stats, function(it) {
+  sapply(it, function(df) {
+    if (class(df) == "try-error") NA else df$conditional$WAIC
+  })
+})
+
+for (i in 1:10) {
+  if (class(mod_stats[[i]][[2]]) == "try-error") cat(mod_stats[[i]][[2]], "\n")
+  else cat("Successful", "\n")
+}
+
+
+for (i in 1:10) {
+  if (class(mod_stats[[i]][[3]]) == "try-error") cat(mod_stats[[i]][[3]], "\n")
+  else cat("Successful", "\n")
+}
