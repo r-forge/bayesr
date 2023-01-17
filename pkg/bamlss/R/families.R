@@ -3974,7 +3974,7 @@ hurdleNB_bamlss <- function(...)
 }
 
 ztnbinom_bamlss <- function(...) {
-### Zero-truncated neg bin
+### Zero-truncated negative binomial
 ### Author: Thorsten Simon
 ### Date:   2018 Nov
   rval <- list(
@@ -3992,6 +3992,9 @@ ztnbinom_bamlss <- function(...) {
     "d" = function(y, par, log = FALSE) {
         rval <- stats::dnbinom(y, mu = par$mu, size = par$theta, log = TRUE) -
                 stats::pnbinom(0, mu = par$mu, size = par$theta, lower.tail = FALSE, log.p = TRUE)
+        rval[y < 1] <- -Inf
+        rval[par$mu <= 0] <- -Inf
+        rval[(par$mu <= 0) & (y == 1)] <- 0
         if(log) rval else exp(rval)
     },
     "p" = function(y, par, ...) {
