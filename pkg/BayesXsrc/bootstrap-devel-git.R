@@ -7,7 +7,7 @@ tdir <- tempfile()
 dir.create(tdir)
 owd <- getwd()
 setwd(tdir)
-system("git clone https://gitlab.gwdg.de/bayesx/bayesx.git")
+system("git clone git@gitlab.gwdg.de:bayesx/bayesx.git")
 for(d in dirs) {
   file.copy(file.path("bayesx", d), file.path(owd, "src", "bayesxsrc"), overwrite = TRUE, recursive = TRUE)
 }
