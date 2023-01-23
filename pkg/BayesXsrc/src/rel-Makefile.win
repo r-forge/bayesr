@@ -145,6 +145,9 @@ OBJS = \
 	bayesxsrc/adaptiv/fullcond_adaptiv.o\
 	bayesxsrc/alex/mixture.o
 
+CXX = CXX14
+CXXFLAGS = CXX14FLAGS
+
 # LDFLAGS  += -lreadline -lcurses
 LDFLAGS  += -static-libgcc
 CPPFLAGS +=  -Ibayesxsrc/. -I"bayesxsrc/bib"  -I"bayesxsrc/alex"  -I"bayesxsrc/adaptiv"  -I"bayesxsrc/andrea"  -I"bayesxsrc/dag"  -I"bayesxsrc/graph"  -I"bayesxsrc/mcmc"  -I"bayesxsrc/psplines"  -I"bayesxsrc/samson"  -I"bayesxsrc/leyre"  -I"bayesxsrc/structadd"
