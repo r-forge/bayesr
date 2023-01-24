@@ -4,6 +4,11 @@
 
 include $(R_HOME)/etc${R_ARCH}/Makeconf
 
+CXX14=g++
+CXX14FLAGS=-O3 -march=native -Wno-ignored-attributes
+CXX = CXX14
+CXXFLAGS = CXX14FLAGS
+
 all: BayesX
 
 ANDREA_OBJS = \
@@ -144,9 +149,6 @@ OBJS = \
        	bayesxsrc/samson/multgaussian.o\
 	bayesxsrc/adaptiv/fullcond_adaptiv.o\
 	bayesxsrc/alex/mixture.o
-
-CXX = CXX14
-CXXFLAGS = CXX14FLAGS
 
 # LDFLAGS  += -lreadline -lcurses
 LDFLAGS  += -static-libgcc

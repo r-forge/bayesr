@@ -2,6 +2,11 @@
 # Hybrid GNU/BSD makefile for R package 'bayesxsrc'
 # author: Daniel Adler <dadler@uni-goettingen.de>
 
+CXX14=g++
+CXX14FLAGS=-O3 -march=native -Wno-ignored-attributes
+CXX = CXX14
+CXXFLAGS = CXX14FLAGS
+
 all: BayesX
 
 ANDREA_OBJS = \
@@ -142,9 +147,6 @@ OBJS = \
        	bayesxsrc/samson/multgaussian.o\
 	bayesxsrc/adaptiv/fullcond_adaptiv.o\
 	bayesxsrc/alex/mixture.o
-
-CXX = CXX14
-CXXFLAGS = CXX14FLAGS
 
 LDFLAGS  += `gsl-config --libs`
 CPPFLAGS +=  -Ibayesxsrc/. -I"bayesxsrc/bib"  -I"bayesxsrc/alex"  -I"bayesxsrc/adaptiv"  -I"bayesxsrc/andrea"  -I"bayesxsrc/dag"  -I"bayesxsrc/graph"  -I"bayesxsrc/mcmc"  -I"bayesxsrc/psplines"  -I"bayesxsrc/samson"  -I"bayesxsrc/leyre"  -I"bayesxsrc/structadd"  `gsl-config --cflags`
