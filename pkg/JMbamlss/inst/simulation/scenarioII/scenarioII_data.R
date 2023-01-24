@@ -32,14 +32,13 @@ library(parallel)
 library(Rcpp)
 library(Matrix)
 library(sparseFLMM)
-#library(JMbamlss)
-devtools::load_all()
+library(JMbamlss)
 
 # Setting for the simulation
 start <- 100
 stop <- 199
 number_cores <- 5
-setting <- "scen_II_221209"
+setting <- "scen_II_230117" # 221209: all data sets are the same
 dir.create(paste0(results_wd, setting, "/data"), showWarnings = FALSE)
 Sys.time()
 sessionInfo()
@@ -79,7 +78,7 @@ m2 <- funData(argvals = argvals,
                          nrow = 3, byrow = TRUE))
 
 # True multivariate covariance structure
-m <- MFPCA_cov(cov = cov, basis_funs = list(m1, m2))
+m <- JMbamlss:::MFPCA_cov(cov = cov, basis_funs = list(m1, m2))
 
 
 # Simulation function -----------------------------------------------------
@@ -87,36 +86,36 @@ m <- MFPCA_cov(cov = cov, basis_funs = list(m1, m2))
 parallel_data <- function(i) {
   set.seed(i)
   # Simulate the data
-  d_rirs <- simMultiJM(nsub = n, times = seq(0, 1, by = 0.01), 
-                       max_obs = 15, probmiss = 0.75, maxfac = 3,
-                       nmark = 2, long_assoc = "FPC", M = 6, 
-                       FPC_bases = m$functions, FPC_evals = m$values, 
-                       #mfpc_args = NULL, re_cov_mat = NULL,
-                       ncovar = 2,
-                       lambda = function(t, x) {
-                         1.65 * t^(0.65)
-                       },
-                       gamma = function(x) {
-                         -3 + 0.3*x[, 3]
-                       },
-                       alpha = list(function(t, x) {
-                         1.1 + 0*t
-                       }, function(t, x) {
-                         1.1 + 0*t
-                       }),
-                       mu = list(function(t, x, r){
-                         0 + 1*t + 0.3*x[, 3] + 0.3*t*x[, 3]
-                       }, function(t, x, r){
-                         0 + 1*t + 0.3*x[, 3] + 0.3*t*x[, 3]
-                       }),
-                       sigma = function(t, x) {
-                         log(0.06) + 0*t
-                       }, 
-                       tmax = NULL, seed = 1008, 
-                       full = TRUE, file = NULL)
+  d_sim <- JMbamlss:::simMultiJM(nsub = n, times = seq(0, 1, by = 0.01), 
+                                 max_obs = 15, probmiss = 0.75, maxfac = 3,
+                                 nmark = 2, long_assoc = "FPC", M = 6, 
+                                 FPC_bases = m$functions, FPC_evals = m$values, 
+                                 #mfpc_args = NULL, re_cov_mat = NULL,
+                                 ncovar = 2,
+                                 lambda = function(t, x) {
+                                   1.65 * t^(0.65)
+                                 },
+                                 gamma = function(x) {
+                                   -3 + 0.3*x[, 3]
+                                 },
+                                 alpha = list(function(t, x) {
+                                   1.1 + 0*t
+                                 }, function(t, x) {
+                                   1.1 + 0*t
+                                 }),
+                                 mu = list(function(t, x, r){
+                                   0 + 1*t + 0.3*x[, 3] + 0.3*t*x[, 3]
+                                 }, function(t, x, r){
+                                   0 + 1*t + 0.3*x[, 3] + 0.3*t*x[, 3]
+                                 }),
+                                 sigma = function(t, x) {
+                                   log(0.06) + 0*t
+                                 }, 
+                                 tmax = NULL, seed = NULL, 
+                                 full = TRUE, file = NULL)
   
   
-  save(d_rirs, file = paste0(results_wd, setting, "/data/d", i, ".Rdata"))
+  saveRDS(d_sim, file = paste0(results_wd, setting, "/data/d", i, ".rds"))
   NULL
 }
 

@@ -43,7 +43,7 @@ j100 <- JMbamlss:::sim_jmb_predict_i("jmb100.Rdata",
                                      "A_jmb/", "data/")
 j100b <- JMbamlss:::sim_jmb_predict_i("jmb100.Rdata", 
                                      paste0(server_wd, "scen_II_221209/"),
-                                     "B_jmb/", "data/")
+                                     "B_jmb/", "data/", rds = FALSE)
 load(paste0(server_wd, "scen_II_221209/data/d100.Rdata"))
 load(paste0(server_wd, "scen_II_221209/A/b100.Rdata"))
 
@@ -263,6 +263,9 @@ m100c <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata",
 m100d <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
                                          paste0(server_wd, "scen_II_221209/"),
                                          "D/", "data/")
+m100e <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "E/", "data/", rds = FALSE)
 load(paste0(server_wd, "scen_II_221209/A/b100.Rdata"))
 b_est_A <- b_est
 load(paste0(server_wd, "scen_II_221209/B/b100.Rdata"))
@@ -279,19 +282,160 @@ mean_t_dat <- d_rirs$data_full %>%
   cbind(m100c$predictions$mu_long %>% mutate(Bam99 = Mean) %>% select(Bam99)) %>%
   cbind(m100d$predictions$mu_long %>% mutate(Bam1 = Mean) %>% select(Bam1)) %>%
   cbind(j100b$predictions$mu_long %>% mutate(JMB = Mean) %>% select(JMB)) %>%
+  cbind(m100e$predictions$mu_long %>% mutate(BamT = Mean) %>% select(BamT)) %>%
   mutate(Mu = mu)
 
 ggplot(mean_t_dat %>% filter(id %in% ids) %>%
-         pivot_longer(5:10) %>%
+         pivot_longer(5:11) %>%
          mutate(name = factor(name, 
-                              levels = c("Mu", "Bam95", "Bam975", "Bam99", 
-                                         "Bam1", "JMB"))),
+                              levels = c("Mu", "BamT", "Bam95", "Bam975",
+                                         "Bam99", "Bam1", "JMB"))),
        aes(x = obstime, y = value, linetype = name, color = name)) +
   facet_grid(id~marker, scales = "free_y")+
   theme_bw() +
   geom_line() +
   scale_x_continuous(limits = c(0, 1)) +
-  scale_color_manual(values = c("black", "red", "orange", "purple", "blue", "green")) +
+  scale_color_manual(values = c("black", "red", "yellow", "orange", "purple",
+                                "blue", "green")) +
   labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL) +
   ggtitle("Simulation Scenario II: Results for Mu",
           "Random Longitudinal Trajectories and Fits")
+
+
+# Better Fit for Different Estimates --------------------------------------
+
+m100f <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "F/", "data/", rds = FALSE)
+m100i <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "I/", "data/")
+mean_t_dat <- d_rirs$data_full %>%
+  select(id, marker, obstime, mu) %>%
+  cbind(m100d$predictions$mu_long %>% mutate(Bam4 = Mean) %>% select(Bam4)) %>%
+  cbind(j100b$predictions$mu_long %>% mutate(JMB = Mean) %>% select(JMB)) %>%
+  cbind(m100e$predictions$mu_long %>% mutate(BamT = Mean) %>% select(BamT)) %>%
+  cbind(m100f$predictions$mu_long %>% mutate(Bam10 = Mean) %>% select(Bam10)) %>%
+  cbind(m100i$predictions$mu_long %>% mutate(Bam20 = Mean) %>% select(Bam20)) %>%
+  mutate(Mu = mu)
+
+ggplot(mean_t_dat %>% filter(id %in% ids) %>%
+         pivot_longer(5:10) %>%
+         mutate(name = factor(name, 
+                              levels = c("Mu", "BamT", "Bam4", "Bam10", "Bam20",
+                                         "JMB"))),
+       aes(x = obstime, y = value, linetype = name, color = name)) +
+  facet_grid(id~marker, scales = "free_y")+
+  theme_bw() +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_color_manual(values = c("black", "red", "blue", "darkgreen", "purple",
+                                "green")) +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL) +
+  ggtitle("Simulation Scenario II: Results for Mu",
+          "Random Longitudinal Trajectories and Fits")
+
+
+
+# Worse Fit for Other RE Spaces -------------------------------------------
+
+m100g <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "G/", "data/")
+m100h <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "H/", "data/")
+
+mean_t_dat <- d_rirs$data_full %>%
+  select(id, marker, obstime, mu) %>%
+  cbind(j100b$predictions$mu_long %>% mutate(JMB = Mean) %>% select(JMB)) %>%
+  cbind(m100e$predictions$mu_long %>% mutate(BamT = Mean) %>% select(BamT)) %>%
+  cbind(m100g$predictions$mu_long %>% mutate(BamAdd = Mean) %>% select(BamAdd)) %>%
+  cbind(m100h$predictions$mu_long %>% mutate(BamRot = Mean) %>% select(BamRot)) %>%
+  mutate(Mu = mu)
+
+ggplot(mean_t_dat %>% filter(id %in% ids) %>%
+         pivot_longer(5:9) %>%
+         mutate(name = factor(name, 
+                              levels = c("Mu", "BamT", "BamAdd", "BamRot", "JMB"))),
+       aes(x = obstime, y = value, linetype = name, color = name)) +
+  facet_grid(id~marker, scales = "free_y")+
+  theme_bw() +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_color_manual(values = c("black", "red", "blue", "purple", "green")) +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL) +
+  ggtitle("Simulation Scenario II: Results for Mu",
+          "Random Longitudinal Trajectories and Fits")
+
+
+
+# Better Fit for more Univariate FPCs? ------------------------------------
+
+
+m100j <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "J/", "data/", rds = FALSE)
+m100k <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "K/", "data/", rds = FALSE)
+
+mean_t_dat <- d_rirs$data_full %>%
+  select(id, marker, obstime, mu) %>%
+  cbind(j100b$predictions$mu_long %>% mutate(JMB = Mean) %>% select(JMB)) %>%
+  cbind(m100e$predictions$mu_long %>% mutate(BamT = Mean) %>% select(BamT)) %>%
+  cbind(m100j$predictions$mu_long %>% mutate(Bam4 = Mean) %>% select(Bam4)) %>%
+  cbind(m100f$predictions$mu_long %>% mutate(Bam3 = Mean) %>% select(Bam3)) %>%
+  cbind(m100k$predictions$mu_long %>% mutate(Bam5 = Mean) %>% select(Bam5)) %>%
+  mutate(Mu = mu)
+
+ggplot(mean_t_dat %>% filter(id %in% ids) %>%
+         pivot_longer(5:10) %>%
+         mutate(name = factor(name, 
+                              levels = c("Mu", "BamT", "Bam3", "Bam4", "Bam5",
+                                         "JMB"))),
+       aes(x = obstime, y = value, linetype = name, color = name)) +
+  facet_grid(id~marker, scales = "free_y")+
+  theme_bw() +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_color_manual(values = c("black", "red", "blue", "purple", "orange",
+                                "green")) +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL) +
+  ggtitle("Simulation Scenario II: Results for Mu",
+          "Random Longitudinal Trajectories and Fits")
+
+
+# Better Fit on Different Data Set? ---------------------------------------
+
+
+m163f <- JMbamlss:::sim_bamlss_predict_i("b163.rds", 
+                                         paste0(server_wd, "scen_II_230117/"),
+                                         "F/", "data/")
+j163 <- JMbamlss:::sim_jmb_predict_i("jmb163.rds", 
+                                     paste0(server_wd, "scen_II_230117/"),
+                                     "JMB/", "data/")
+m163e <- JMbamlss:::sim_bamlss_predict_i("b163.rds", 
+                                         paste0(server_wd, "scen_II_230117/"),
+                                         "E/", "data/")
+
+d_sim <- readRDS(file.path(server_wd, "scen_II_230117", "data", "d163.Rds"))
+mean_t_dat <- d_sim$data_full %>%
+  select(id, marker, obstime, mu) %>%
+  cbind(j163$predictions$mu_long %>% mutate(JMB = Mean) %>% select(JMB)) %>%
+  cbind(m163e$predictions$mu_long %>% mutate(BamT = Mean) %>% select(BamT)) %>%
+  cbind(m163f$predictions$mu_long %>% mutate(Bam3 = Mean) %>% select(Bam3)) %>%
+  mutate(Mu = mu)
+ggplot(mean_t_dat %>% filter(id %in% ids) %>%
+         pivot_longer(5:8) %>%
+         mutate(name = factor(name, 
+                              levels = c("Mu", "BamT", "Bam3", "JMB"))),
+       aes(x = obstime, y = value, linetype = name, color = name)) +
+  facet_grid(id~marker, scales = "free_y")+
+  theme_bw() +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_color_manual(values = c("black", "red", "blue", "green")) +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL) +
+  ggtitle("Simulation Scenario II: Results for Mu",
+          "Random Longitudinal Trajectories and Fits on Simulation Run 64")

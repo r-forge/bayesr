@@ -17,7 +17,8 @@ preproc_MFPCA(
   npc = NULL,
   fve_uni = 0.99,
   pve_uni = 0.99,
-  save_uniFPCA = FALSE
+  save_uniFPCA = FALSE,
+  save_uniGAM = FALSE
 )
 }
 \arguments{
@@ -56,6 +57,9 @@ fpca.sc,PACE.}
 
 \item{save_uniFPCA}{TRUE to attach list of univariate FPCAs as attribute to
 output. Defaults to FALSE.}
+
+\item{save_uniGAM}{TRUE to attach list of univariate additive models used to
+calculate the residuals. Defaults to FALSE.}
 
 \item{var_names}{Vector of variable names corresponding to ID and MARKER. 
 Needed to remove observations.}

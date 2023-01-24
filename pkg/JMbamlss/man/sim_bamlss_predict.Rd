@@ -4,25 +4,16 @@
 \alias{sim_bamlss_predict}
 \title{Simulation Helper Function - Predict the Results for bamlss-Models}
 \usage{
-sim_bamlss_predict(
-  i,
-  results_wd,
-  m_setting = "/scen_I_130922/",
-  d_setting = "/scen_I_130922/",
-  folder = "bamlss_est/"
-)
+sim_bamlss_predict(m, wd, model_wd, data_wd)
 }
 \arguments{
-\item{results_wd}{Path to simulations folder.}
-
-\item{m_setting}{Simulation setting folder where the models are saved.}
-
-\item{d_setting}{Simulation data folder.}
-
-\item{folder}{Model folder where the models are saved (for different
-specifications).}
-
 \item{m}{Vector containing all the file names of the models.}
+
+\item{wd}{Path to simulations folder.}
+
+\item{model_wd}{Simulation setting folder where the models are saved.}
+
+\item{data_wd}{Simulation data folder.}
 }
 \description{
 This function takes all the models listed in a folder and predicts the fit.

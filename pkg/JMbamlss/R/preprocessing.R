@@ -29,19 +29,32 @@
 #'  Needed to remove observations.
 #' @param nbasis Number of B-spline basis functions for mean estimate and
 #'  bivariate smoothing of covariance surface for methods fpca.sc, PACE.
+#' @param nbasis number of B-spline basis functions for mean estimate for 
+#'  methods fpca, fpca.sc, PACE. For fpca.sc, PACE also bivariate smoothing of
+#'  covariance estimate. 
+#' @param nbasis_cov Number of basis functions used for the bivariate
+#'  smoothing of the covariance surface for method fpca.
+#' @param bs_cov Type of spline for the bivariate smoothing of the covariance
+#'  surface for method fpca. Default is symmetric fast covariance smoothing 
+#'  proposed by Cederbaum.
 #' @param npc Number of univariate principal components to use in fpca.sc, PACE.
 #' @param fve_uni Fraction of univariate variance explained for method FPCA.
 #' @param pve_uni Proportion of univariate variance explained for method 
 #'  fpca.sc,PACE.
+#' @param fit MFPCA argument to return a truncated KL fit to the data. Defaults
+#'  to FALSE.
 #' @param save_uniFPCA TRUE to attach list of univariate FPCAs as attribute to
 #'  output. Defaults to FALSE.
+#' @param save_uniGAM TRUE to attach list of univariate additive models used to
+#'  calculate the residuals. Defaults to FALSE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
                            time = "obstime", id = "id", marker = "marker",
                            M = NULL, remove_obs = NULL, 
                            method = c("fpca", "fpca.sc", "FPCA", "PACE"), 
-                           nbasis = 10, npc = NULL,
-                           fve_uni = 0.99, pve_uni = 0.99,
-                           save_uniFPCA = FALSE) {
+                           nbasis = 10, nbasis_cov = nbasis, bs_cov = "symm",
+                           npc = NULL, fve_uni = 0.99, pve_uni = 0.99, 
+                           fit = FALSE,
+                           save_uniFPCA = FALSE, save_uniGAM = FALSE) {
   require(bamlss)
   require(MFPCA)
   method <- match.arg(method)
@@ -76,10 +89,13 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
   
   uni_mean <- as.formula(uni_mean)
   
-  marker_dat <- lapply(marker_dat, function (mark) {
-    mark$res <- bam(formula = uni_mean, data = mark)$residuals
-    mark
+  marker_mod <- lapply(marker_dat, function (mark) {
+    bam(formula = uni_mean, data = mark)
   })
+  marker_dat <- mapply(function (mark, mod) {
+    mark$res <- mod$residuals
+    mark
+  }, mark = marker_dat, mod = marker_mod, SIMPLIFY = FALSE)
   
   if (method == "fpca.sc" | method == "fpca") {
     require(refund)
@@ -99,7 +115,8 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
       })
     } else {
       FPCA <- lapply(lY, function(y) {
-        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, npc = npc, var = TRUE,
+        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, nbasis_cov = nbasis_cov,
+             bs_cov = bs_cov, npc = npc, var = TRUE,
              argvals_pred = argvals_pred)
       })
     }
@@ -188,10 +205,17 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
   }
   
 
-  MFPCA <- MFPCA(mFData = mFData, M = M, uniExpansions = uniExpansions)
+  MFPCA <- MFPCA(mFData = mFData, M = M, uniExpansions = uniExpansions,
+                 fit = fit)
   attr(MFPCA, "sigma2") <- lapply(FPCA, "[[", "sigma2")
   if (save_uniFPCA) {
     attr(MFPCA, "uniFPCA") <- FPCA
+  }
+  if (save_uniGAM) {
+    attr(MFPCA, "uniGAM") <- marker_mod
+  }
+  if (fit) {
+    attr(MFPCA, "mFData") <- mFData
   }
   MFPCA
 }
@@ -259,6 +283,8 @@ create_true_MFPCA <- function (M, nmarker, argvals = seq(0, 120, 1),
 #'  evaluate.
 #' @param marker Name of the marker variable in the data set which separates the
 #'  data.
+#' @param eval_weight Weight the FPC by the square root of its eigenvalue (then
+#'  variance comparable throughout all FPCs). Defaults to FALSE.
 attach_wfpc <- function(mfpca, data, n = NULL, obstime = "obstime", marker = "marker",
                         eval_weight = FALSE){
   

@@ -7,10 +7,12 @@
 #' @param model_wd Simulation setting folder where the models are saved.
 #' @param data_wd Simulation data folder.
 #' @param name Name for description of the simulation setting.
-sim_jmbamlss_eval <- function(wd, model_wd, data_wd, name) {
+#' @param rds Objects are saved as .rds files (for backwards compatibility when
+#'   .Rdata files were used). Defaults to TRUE.
+sim_jmbamlss_eval <- function(wd, model_wd, data_wd, name, rds = TRUE) {
   
   models <- list.files(path = paste0(wd, model_wd))
-  list_to_compare <- sim_bamlss_predict(models, wd, model_wd, data_wd)
+  list_to_compare <- sim_bamlss_predict(models, wd, model_wd, data_wd, rds)
   
   it_list <- sim_results(lapply(list_to_compare, "[[", "predictions"),
                          lapply(list_to_compare, "[[", "simulations"),
@@ -28,10 +30,12 @@ sim_jmbamlss_eval <- function(wd, model_wd, data_wd, name) {
 #' @param model_wd Simulation setting folder where the models are saved.
 #' @param data_wd Simulation data folder.
 #' @param name Name for description of the simulation setting.
-sim_jmbayes_eval <- function(wd, model_wd, data_wd, name) {
+#' @param rds Objects are saved as .rds files (for backwards compatibility when
+#'   .Rdata files were used). Defaults to TRUE.
+sim_jmbayes_eval <- function(wd, model_wd, data_wd, name, rds = TRUE) {
   
   models <- list.files(path = paste0(wd, model_wd))
-  list_to_compare <- sim_jmb_predict(models, wd, model_wd, data_wd)
+  list_to_compare <- sim_jmb_predict(models, wd, model_wd, data_wd, rds)
   
   it_list <- sim_results(lapply(list_to_compare, "[[", "predictions"),
                          lapply(list_to_compare, "[[", "simulations"),
@@ -132,12 +136,17 @@ sim_results <- function(result_list, dat_list, name) {
 }
 
 
-sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd) {
+sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
   
   
   # Load the data set and extract information about it
-  load(paste0(wd, model_wd, m))
-  load(paste0(wd, data_wd, "d", substr(m, 2, 4), ".Rdata"))
+  if (rds) {
+    b_est <- readRDS(paste0(wd, model_wd, m))
+    d_rirs <- readRDS(paste0(wd, data_wd, "d", substr(m, 2, 4), ".rds"))
+  } else {
+    load(paste0(wd, model_wd, m))
+    load(paste0(wd, data_wd, "d", substr(m, 2, 4), ".Rdata"))
+  }
   nodupl_ids <- which(!duplicated(b_est$model.frame[, c("id", "obstime")]))
   marks <- which(!duplicated(b_est$model.frame$marker))
   
@@ -184,15 +193,23 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd) {
 #' @param wd Path to simulations folder.
 #' @param model_wd Simulation setting folder where the models are saved.
 #' @param data_wd Simulation data folder.
+#' @param rds Objects are saved as .rds files (for backwards compatibility when
+#'   .Rdata files were used). Defaults to TRUE.
 sim_bamlss_predict <- Vectorize(sim_bamlss_predict_i, vectorize.args = "m", 
                                 SIMPLIFY = FALSE)
 
 
-sim_jmb_predict_i <- function(m, wd, model_wd, data_wd) {
+sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
   
   # Load the fitted model and the original data
-  load(paste0(wd, model_wd, m))
-  load(paste0(wd, data_wd, "d", substr(m, 4, 6), ".Rdata"))
+  if (rds) {
+    jmb <- readRDS(paste0(wd, model_wd, m))
+    d_rirs <- readRDS(paste0(wd, data_wd, "d", substr(m, 4, 6), ".rds"))
+  } else {
+    load(paste0(wd, model_wd, m))
+    load(paste0(wd, data_wd, "d", substr(m, 4, 6), ".Rdata"))
+  }
+
   nodupl_ids <- which(!duplicated(d_rirs$data[, c("id", "obstime")]))
   n_dim <- length(levels(d_rirs$data$marker))
   marks <- which(!duplicated(d_rirs$data$marker))
@@ -283,5 +300,7 @@ sim_jmb_predict_i <- function(m, wd, model_wd, data_wd) {
 #' @param wd Path to simulations folder.
 #' @param model_wd Simulation setting folder where the models are saved.
 #' @param data_wd Simulation data folder.
+#' @param rds Objects are saved as .rds files (for backwards compatibility when
+#'   .Rdata files were used). Defaults to TRUE.
 sim_jmb_predict <- Vectorize(sim_jmb_predict_i, vectorize.args = "m", 
                                 SIMPLIFY = FALSE)

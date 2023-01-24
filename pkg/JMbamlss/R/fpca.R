@@ -39,7 +39,12 @@
 ##' default), the mean is estimated by \code{\link[mgcv]{gam}} treating all the
 ##' data as independent.
 ##' @param nbasis number of B-spline basis functions used for estimation of the
-##' mean function and bivariate smoothing of the covariance surface.
+##' mean function.
+##' @param nbasis_cov number of basis functions used for the bivariate
+##' smoothing of the covariance surface.
+##' @param bs_cov type of spline for the bivariate smoothing of the covariance
+##' surface. Default is symmetric fast covariance smoothing proposed by 
+##' Cederbaum.
 ##' @param pve proportion of variance explained: used to choose the number of
 ##' principal components.
 ##' @param npc prespecified value for the number of principal components (if
@@ -60,8 +65,7 @@
 ##' your favorite mean function estimate.
 ##' @param cov.est.method covariance estimation method. If set to \code{1} 
 ##' (the default), a one-step method that applies a bivariate smooth to the 
-##' \eqn{y(s_1)y(s_2)} values. This can be very slow but the fast covariance
-##' estimation method from Cederbaum is used. If set to \code{2}, a two-step
+##' \eqn{y(s_1)y(s_2)} values. This can be very slow. If set to \code{2}, a two-step
 ##' method that obtains a naive covariance estimate which is then smoothed.
 ##' @param integration quadrature method for numerical integration; only
 ##' \code{'trapezoidal'} is currently supported.
@@ -169,7 +173,8 @@
 ##' @importFrom gamm4 gamm4
 fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
                  argvals_obs = FALSE, argvals_pred = seq(0, 1, by = 0.01),
-                 random.int = FALSE, nbasis = 10, pve = 0.99, npc = NULL, 
+                 random.int = FALSE, nbasis = 10, nbasis_cov = nbasis, 
+                 bs_cov = "symm", pve = 0.99, npc = NULL, 
                  var = FALSE, simul = FALSE, sim.alpha = 0.95, 
                  useSymm = FALSE, makePD = FALSE, center = TRUE, 
                  cov.est.method = 1, integration = "trapezoidal") {
@@ -285,8 +290,8 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
     }
     row.vec.pred = rep(argvals_pred, each = D_pred)
     col.vec.pred = rep(argvals_pred, D_pred)
-    npc.0 = matrix(predict(bam(G.0.vec ~ s(row.vec, col.vec, k = nbasis,
-                                           bs = "symm"), method = "fREML"),
+    npc.0 = matrix(predict(bam(G.0.vec ~ s(row.vec, col.vec, k = nbasis_cov,
+                                           bs = bs_cov), method = "fREML"),
                            newdata = data.frame(row.vec = row.vec.pred,
                                                 col.vec = col.vec.pred)),
                    D_pred, D_pred)

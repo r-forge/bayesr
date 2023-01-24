@@ -25,6 +25,9 @@ evaluate.}
 \item{marker}{Name of the marker variable in the data set which separates the
 data.}
 
+\item{eval_weight}{Weight the FPC by the square root of its eigenvalue (then
+variance comparable throughout all FPCs). Defaults to FALSE.}
+
 \item{mfpc}{MFPCA object from which to extract the weighted FPCS.}
 }
 \description{
