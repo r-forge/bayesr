@@ -15,6 +15,6 @@ for(f in files) {
   file.copy(file.path("bayesx", f), file.path(owd, "src", "bayesxsrc"), overwrite = TRUE, recursive = TRUE)
 }
 setwd(owd)
-file.copy(file.path("src", "dev-Makefile"), file.path("src", "Makefile"))
-file.copy(file.path("src", "dev-Makefile.win"), file.path("src", "Makefile.win"))
-file.copy(file.path("src", "dev-Makefile.inner.win"), file.path("src", "Makefile.inner.win"))
+file.copy(file.path("src", "dev-Makefile"), file.path("src", "Makefile"), overwrite = TRUE)
+file.copy(file.path("src", "dev-Makefile.win"), file.path("src", "Makefile.win"), overwrite = TRUE)
+file.copy(file.path("src", "dev-Makefile.inner.win"), file.path("src", "Makefile.inner.win"), overwrite = TRUE)
