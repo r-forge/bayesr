@@ -4,9 +4,6 @@
 
 include $(R_HOME)/etc${R_ARCH}/Makeconf
 
-CXX = `"$(R_HOME)/bin/R" CMD config CXX14`
-CXXFLAGS = `"$(R_HOME)/bin/R" CMD config CXX14FLAGS`
-
 all: BayesX
 
 ANDREA_OBJS = \
