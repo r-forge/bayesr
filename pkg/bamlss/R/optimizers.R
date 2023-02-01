@@ -4617,8 +4617,13 @@ dl.bamlss <- function(object,
     }
 
     opts <- paste(opts, collapse = " ")
+
+print(opts)
+
     eval(parse(text = opts))
   }
+
+stop()
 
   final_output <- keras::layer_concatenate(outputs)
 
