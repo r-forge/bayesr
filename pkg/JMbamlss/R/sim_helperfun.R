@@ -12,6 +12,14 @@
 sim_jmbamlss_eval <- function(wd, model_wd, data_wd, name, rds = TRUE) {
   
   models <- list.files(path = paste0(wd, model_wd))
+  if (rds) {
+    models <- models[grep("\\.rds", models)]
+  } else {
+    rmv <- grep("\\.rds", models)
+    if(length(rmv) > 0) {
+      models <- models[-grep("\\.rds", models)]
+    }
+  }
   list_to_compare <- sim_bamlss_predict(models, wd, model_wd, data_wd, rds)
   
   it_list <- sim_results(lapply(list_to_compare, "[[", "predictions"),
@@ -35,6 +43,11 @@ sim_jmbamlss_eval <- function(wd, model_wd, data_wd, name, rds = TRUE) {
 sim_jmbayes_eval <- function(wd, model_wd, data_wd, name, rds = TRUE) {
   
   models <- list.files(path = paste0(wd, model_wd))
+  if (rds) {
+    models <- models[grep("\\.rds", models)]
+  } else {
+    models <- models[-grep("\\.rds", models)]
+  }
   list_to_compare <- sim_jmb_predict(models, wd, model_wd, data_wd, rds)
   
   it_list <- sim_results(lapply(list_to_compare, "[[", "predictions"),

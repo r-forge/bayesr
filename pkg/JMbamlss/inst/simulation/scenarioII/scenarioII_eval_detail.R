@@ -439,3 +439,40 @@ ggplot(mean_t_dat %>% filter(id %in% ids) %>%
   labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL) +
   ggtitle("Simulation Scenario II: Results for Mu",
           "Random Longitudinal Trajectories and Fits on Simulation Run 64")
+
+
+
+# How much depends on the MCMC seed? --------------------------------------
+
+scenII_old_F <- JMbamlss:::sim_jmbamlss_eval(
+  wd = paste0(server_wd, "../../JMbamlss/simulation/scen_II_221209/"),
+  model_wd = "F/", data_wd = "data/", name = "F", rds = FALSE)
+saveRDS(scenII_old_F, file = paste0(server_wd, "scen_II_221209/res_F.rds"))
+
+res_F <- readRDS(paste0(server_wd, "scen_II_221209/res_F.rds"))
+ggplot(data = res_F %>% filter(predictor != "mu_long", type == "MSE"),
+       aes(y = value, x = predictor)) +
+  geom_boxplot() +
+  ggtitle("MSE: All Predictors",
+          "Models Differ Only in MCMC Seed") +
+  ylab("Emp. MSE") +
+  theme_bw()
+
+
+# How much depends on the FPC Basis? --------------------------------------
+
+scenII_old_L <- JMbamlss:::sim_jmbamlss_eval(
+  wd = paste0(server_wd, "../../JMbamlss/simulation/scen_II_221209/"),
+  model_wd = "L/", data_wd = "data/", name = "L", rds = FALSE)
+saveRDS(scenII_old_F, file = paste0(server_wd, "scen_II_221209/res_L.rds"))
+
+
+
+# Compare model fit for different basis functions -------------------------
+
+m100 <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                        paste0(server_wd, "scen_II_221209/"),
+                                        "F/", "data/", rds = FALSE)
+m100l <- JMbamlss:::sim_bamlss_predict_i("b100.Rdata", 
+                                         paste0(server_wd, "scen_II_221209/"),
+                                         "L/", "data/", rds = FALSE)
