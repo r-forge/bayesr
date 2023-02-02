@@ -6,6 +6,9 @@
 # usual include statement sicne ${R_HOME} may contain spaces.
 #
 
+CXX = `"$(R_HOME)/bin/R" CMD config CXX14`
+CXXFLAGS = `"$(R_HOME)/bin/R" CMD config CXX14FLAGS`
+
 INNERMAKEFILE=dev-Makefile.inner.win
 
 all:

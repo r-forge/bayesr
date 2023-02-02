@@ -2,6 +2,9 @@
 # Hybrid GNU/BSD makefile for R package 'bayesxsrc'
 # author: Daniel Adler <dadler@uni-goettingen.de>
 
+CXX = `"$(R_HOME)/bin/R" CMD config CXX14`
+CXXFLAGS = `"$(R_HOME)/bin/R" CMD config CXX14FLAGS`
+
 all: BayesX
 
 ANDREA_OBJS = \
