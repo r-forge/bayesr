@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -134,8 +134,10 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>A Lego Toolbox for Flexible Bayesian Regression (and Beyond)</h1>
-                        <h4 data-toc-skip class="author">Nikolaus Umlauf, Nadja Klein, Achim Zeileis, Thorsten Simon</h4>
+      <h1 data-toc-skip>A Lego Toolbox for Flexible Bayesian Regression
+(and Beyond)</h1>
+                        <h4 data-toc-skip class="author">Nikolaus
+Umlauf, Nadja Klein, Achim Zeileis, Thorsten Simon</h4>
             
       
       
@@ -148,49 +150,87 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The R package <em>bamlss</em> provides a modular computational framework for flexible Bayesian regression models (and beyond). The implementation follows the conceptional framework presented in <span class="citation">Umlauf, Klein, and Zeileis (2018)</span> and provides a modular “Lego toolbox” for setting up regression models. In this setting not only the response distribution or the regression terms are “Lego bricks” but also the estimation algorithm or the MCMC sampler.</p>
+<p>The R package <em>bamlss</em> provides a modular computational
+framework for flexible Bayesian regression models (and beyond). The
+implementation follows the conceptional framework presented in <span class="citation">Umlauf, Klein, and Zeileis (2018)</span> and provides a
+modular “Lego toolbox” for setting up regression models. In this setting
+not only the response distribution or the regression terms are “Lego
+bricks” but also the estimation algorithm or the MCMC sampler.</p>
 <p>The highlights of the package are:</p>
 <ul>
 <li>The usual R “look &amp; feel” for regression modeling.</li>
-<li>Estimation of classic (GAM-type) regression models (Bayesian or frequentist).</li>
-<li>Estimation of flexible (GAMLSS-type) distributional regression models.</li>
+<li>Estimation of classic (GAM-type) regression models (Bayesian or
+frequentist).</li>
+<li>Estimation of flexible (GAMLSS-type) distributional regression
+models.</li>
 <li>An extensible “plug &amp; play” approach for regression terms.</li>
 <li>Modular combinations of fitting algorithms and samplers.</li>
 </ul>
-<p>Especially the last item is notable because the models in <em>bamlss</em> are not limited to a specific estimation algorithm but different engines can be plugged in without necessitating changes in other aspects of the model specification.</p>
-<p>More detailed overviews and examples are provided in the articles:</p>
+<p>Especially the last item is notable because the models in
+<em>bamlss</em> are not limited to a specific estimation algorithm but
+different engines can be plugged in without necessitating changes in
+other aspects of the model specification.</p>
+<p>More detailed overviews and examples are provided in the
+articles:</p>
 <ul>
-<li><a href="http://www.bamlss.org/articles/terms.html" class="external-link">Available Model Terms</a></li>
-<li><a href="http://www.bamlss.org/articles/families.html" class="external-link">BAMLSS Families</a></li>
-<li><a href="http://www.bamlss.org/articles/bf.html" class="external-link">BAMLSS Model Frame</a></li>
-<li><a href="http://www.bamlss.org/articles/engines.html" class="external-link">Estimation Engines</a></li>
-<li><p><a href="http://www.bamlss.org/articles/distregvis.html" class="external-link">Visualization with distreg.vis</a></p></li>
-<li><a href="http://www.bamlss.org/articles/jm.html" class="external-link">Bayesian Joint Models for Longitudinal and Survival Data</a></li>
-<li><a href="http://www.bamlss.org/articles/multinomial.html" class="external-link">Bayesian Multinomial Regression</a></li>
-<li><a href="http://www.bamlss.org/articles/bivnorm.html" class="external-link">Bivariate Gaussian models for wind vectors</a></li>
-<li><a href="http://www.bamlss.org/articles/cox.html" class="external-link">Complex Space-Time Interactions in a Cox Model</a></li>
-<li><a href="http://www.bamlss.org/articles/glm.html" class="external-link">Generalized Linear Models (+)</a></li>
-<li><a href="http://www.bamlss.org/articles/lasso.html" class="external-link">LASSO-Type Penalization in the Framework of Generalized Additive Models for Location, Scale and Shape</a></li>
-<li><a href="http://www.bamlss.org/articles/rent.html" class="external-link">Munich Rent Model</a></li>
-<li><a href="http://www.bamlss.org/articles/zn.html" class="external-link">Spatial Location-Scale Model</a></li>
-<li><a href="http://www.bamlss.org/articles/fatalities.html" class="external-link">Fatalities Model for Austria</a></li>
-<li><p><a href="http://www.bamlss.org/articles/mvnorm.html" class="external-link">Multivariate Normal Model</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/terms.html" class="external-link">Available
+Model Terms</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/families.html" class="external-link">BAMLSS
+Families</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/bf.html" class="external-link">BAMLSS Model
+Frame</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/engines.html" class="external-link">Estimation
+Engines</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/distregvis.html" class="external-link">Visualization with
+distreg.vis</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/jm.html" class="external-link">Bayesian Joint
+Models for Longitudinal and Survival Data</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/multinomial.html" class="external-link">Bayesian
+Multinomial Regression</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/bivnorm.html" class="external-link">Bivariate
+Gaussian models for wind vectors</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/cox.html" class="external-link">Complex
+Space-Time Interactions in a Cox Model</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/glm.html" class="external-link">Generalized
+Linear Models (+)</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/lasso.html" class="external-link">LASSO-Type
+Penalization in the Framework of Generalized Additive Models for
+Location, Scale and Shape</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/rent.html" class="external-link">Munich Rent
+Model</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/zn.html" class="external-link">Spatial
+Location-Scale Model</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/fatalities.html" class="external-link">Fatalities Model
+for Austria</a></p></li>
+<li><p><a href="http://www.bamlss.org/articles/mvnorm.html" class="external-link">Multivariate
+Normal Model</a></p></li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The stable release version of <em>bamlss</em> is hosted on the Comprehensive R Archive Network (CRAN) at <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a> and can be installed via</p>
+<p>The stable release version of <em>bamlss</em> is hosted on the
+Comprehensive R Archive Network (CRAN) at <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a> and can be
+installed via</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bamlss"</span><span class="op">)</span></code></pre></div>
-<p>The development version of <em>bamlss</em> is hosted on R-Forge at <a href="https://R-Forge.R-project.org/projects/bayesr/" class="external-link uri">https://R-Forge.R-project.org/projects/bayesr/</a> in a Subversion (SVN) repository. It can be installed via</p>
+<p>The development version of <em>bamlss</em> is hosted on R-Forge at <a href="https://R-Forge.R-project.org/projects/bayesr/" class="external-link uri">https://R-Forge.R-project.org/projects/bayesr/</a> in a
+Subversion (SVN) repository. It can be installed via</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bamlss"</span>, repos <span class="op">=</span> <span class="st">"http://R-Forge.R-project.org"</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="basic-bayesian-regression">Basic Bayesian regression<a class="anchor" aria-label="anchor" href="#basic-bayesian-regression"></a>
 </h2>
-<p>This section gives a first quick overview of the functionality of the package and demonstrates that the usual “look &amp; feel” when using well-established model fitting functions like <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> is an elementary part of <em>bamlss</em>, i.e., first steps and basic handling of the package should be relatively simple. We illustrate the first steps with <em>bamlss</em> using a data set taken from the <em>Regression Book</em> <span class="citation">(Fahrmeir et al. 2013)</span> which is about prices of used VW Golf cars. The data is loaded with</p>
+<p>This section gives a first quick overview of the functionality of the
+package and demonstrates that the usual “look &amp; feel” when using
+well-established model fitting functions like <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> is an
+elementary part of <em>bamlss</em>, i.e., first steps and basic handling
+of the package should be relatively simple. We illustrate the first
+steps with <em>bamlss</em> using a data set taken from the
+<em>Regression Book</em> <span class="citation">(Fahrmeir et al.
+2013)</span> which is about prices of used VW Golf cars. The data is
+loaded with</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Golf"</span>, package <span class="op">=</span> <span class="st">"bamlss"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Golf</span><span class="op">)</span></code></pre></div>
@@ -201,17 +241,33 @@
 <span class="co">## 4  4.80 104        54  25 yes     yes</span>
 <span class="co">## 5  6.20  86        57  23  no      no</span>
 <span class="co">## 6  5.90  74        57  25 yes      no</span></code></pre>
-<p>In this example the aim is to model the <code>price</code> in 1000 Euro. Using <em>bamlss</em> a first Bayesian linear model could be set up by first specifying a model formula</p>
+<p>In this example the aim is to model the <code>price</code> in 1000
+Euro. Using <em>bamlss</em> a first Bayesian linear model could be set
+up by first specifying a model formula</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">price</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">kilometer</span> <span class="op">+</span> <span class="va">tia</span> <span class="op">+</span> <span class="va">abs</span> <span class="op">+</span> <span class="va">sunroof</span></code></pre></div>
-<p>afterwards the fully Bayesian model using MCMC simulation is estimated by</p>
+<p>afterwards the fully Bayesian model using MCMC simulation is
+estimated by</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.bamlss.org/" class="external-link">"bamlss"</a></span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">111</span><span class="op">)</span>
 
 <span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="va">Golf</span><span class="op">)</span></code></pre></div>
-<p>Note that the default number of iterations for the MCMC sampler is 1200, the burnin-phase is 200 and thinning is 1 (see the manual of the default MCMC sampler <code><a href="http://www.bamlss.org/reference/GMCMC.html" class="external-link">sam_GMCMC()</a></code>). The reason is that during the modeling process, users usually want to obtain first results rather quickly. Afterwards, if a final model is estimated the number of iterations of the sampler is usually set much higher to get close to i.i.d. samples from the posterior distribution. To obtain reasonable starting values for the MCMC sampler we run a backfitting algorithm that optimizes the posterior mode. The <em>bamlss</em> package uses its own family objects, which can be specified as characters using the <code><a href="http://www.bamlss.org/reference/bamlss.html" class="external-link">bamlss()</a></code> wrapper, in this case <code>family = "gaussian"</code> (see also <a href="http://www.bamlss.org/articles/families.html" class="external-link">BAMLSS Families</a>). In addition, the package also supports all families provided from the <a href="https://cran.r-project.org/package=gamlss.dist" title="CRAN gamlss.dist" class="external-link"><em>gamlss</em> families</a>.</p>
+<p>Note that the default number of iterations for the MCMC sampler is
+1200, the burnin-phase is 200 and thinning is 1 (see the manual of the
+default MCMC sampler <code><a href="http://www.bamlss.org/reference/GMCMC.html" class="external-link">sam_GMCMC()</a></code>).
+The reason is that during the modeling process, users usually want to
+obtain first results rather quickly. Afterwards, if a final model is
+estimated the number of iterations of the sampler is usually set much
+higher to get close to i.i.d. samples from the posterior distribution.
+To obtain reasonable starting values for the MCMC sampler we run a
+backfitting algorithm that optimizes the posterior mode. The
+<em>bamlss</em> package uses its own family objects, which can be
+specified as characters using the <code><a href="http://www.bamlss.org/reference/bamlss.html" class="external-link">bamlss()</a></code>
+wrapper, in this case <code>family = "gaussian"</code> (see also <a href="http://www.bamlss.org/articles/families.html" class="external-link">BAMLSS
+Families</a>). In addition, the package also supports all families
+provided from the <a href="https://cran.r-project.org/package=gamlss.dist" title="CRAN gamlss.dist" class="external-link"><em>gamlss</em> families</a>.</p>
 <p>The model summary gives</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></code></pre></div>
@@ -254,16 +310,25 @@
 <span class="co">## Sampler summary:</span>
 <span class="co">## -</span>
 <span class="co">## DIC = 408.9675 logLik = -201.0372 pd = 6.8932</span>
-<span class="co">## runtime = 1.629</span>
+<span class="co">## runtime = 1.762</span>
 <span class="co">## ---</span>
 <span class="co">## Optimizer summary:</span>
 <span class="co">## -</span>
 <span class="co">## AICc = 409.6319 edf = 7 logLik = -197.4745</span>
-<span class="co">## logPost = -252.2614 nobs = 172 runtime = 0.021</span></code></pre>
-<p>indicating high acceptance rates as reported by the <code>alpha</code> parameter in the linear model output, which is a sign of good mixing of the MCMC chains. The mixing can also be inspected graphically by</p>
+<span class="co">## logPost = -252.2614 nobs = 172 runtime = 0.02</span></code></pre>
+<p>indicating high acceptance rates as reported by the
+<code>alpha</code> parameter in the linear model output, which is a sign
+of good mixing of the MCMC chains. The mixing can also be inspected
+graphically by</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></code></pre></div>
-<p><img src="bamlss_files/figure-html/unnamed-chunk-6-1.png" width="864" style="display: block; margin: auto;"> Note, for convenience we only show the traceplots of the intercepts. Considering significance of the estimated effects, only variables <code>tia</code> and <code>sunroof</code> seem to have no effect on <code>price</code> since the credible intervals of estimated parameters contain zero. This information can also be extracted using the implemented <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> method.</p>
+<p><img src="bamlss_files/figure-html/unnamed-chunk-6-1.png" width="864" style="display: block; margin: auto;">
+Note, for convenience we only show the traceplots of the intercepts.
+Considering significance of the estimated effects, only variables
+<code>tia</code> and <code>sunroof</code> seem to have no effect on
+<code>price</code> since the credible intervals of estimated parameters
+contain zero. This information can also be extracted using the
+implemented <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> method.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">b1</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##                          2.5%        97.5%</span>
@@ -274,14 +339,16 @@
 <span class="co">## mu.absyes         -0.49204765 -0.003060006</span>
 <span class="co">## mu.sunroofyes     -0.30087769  0.238144948</span>
 <span class="co">## sigma.(Intercept) -0.34791813 -0.127380063</span></code></pre>
-<p>Since the prices cannot be negative, a possible consideration is to use a logarithmic transformation of the response <code>price</code></p>
+<p>Since the prices cannot be negative, a possible consideration is to
+use a logarithmic transformation of the response <code>price</code></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">111</span><span class="op">)</span>
 
 <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">kilometer</span> <span class="op">+</span> <span class="va">tia</span> <span class="op">+</span> <span class="va">abs</span> <span class="op">+</span> <span class="va">sunroof</span>
 
 <span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="va">Golf</span><span class="op">)</span></code></pre></div>
-<p>and compare the models using the <code><a href="http://www.bamlss.org/reference/predict.bamlss.html" class="external-link">predict()</a></code> method</p>
+<p>and compare the models using the <code><a href="http://www.bamlss.org/reference/predict.bamlss.html" class="external-link">predict()</a></code>
+method</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b1</span>, model <span class="op">=</span> <span class="st">"mu"</span><span class="op">)</span>
 <span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b2</span>, model <span class="op">=</span> <span class="st">"mu"</span><span class="op">)</span>
@@ -291,22 +358,35 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">Golf</span><span class="op">$</span><span class="va">price</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] 0.5410859</span></code></pre>
-<p>indicating that the transformation seems to improve the model fit.</p>
-<p>Instead of using linear effects, another option would be to use polynomial regression for covariates <code>age</code>, <code>kilometer</code> and <code>tia</code>. A polynomial model using polynomials of order 3 is estimated with</p>
+<p>indicating that the transformation seems to improve the model
+fit.</p>
+<p>Instead of using linear effects, another option would be to use
+polynomial regression for covariates <code>age</code>,
+<code>kilometer</code> and <code>tia</code>. A polynomial model using
+polynomials of order 3 is estimated with</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">222</span><span class="op">)</span>
 
 <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">age</span>, <span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">kilometer</span>, <span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">tia</span>, <span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="va">abs</span> <span class="op">+</span> <span class="va">sunroof</span>
 
 <span class="va">b3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="va">Golf</span><span class="op">)</span></code></pre></div>
-<p>Comparing the models using the <code><a href="http://www.bamlss.org/reference/DIC.html" class="external-link">DIC()</a></code> function</p>
+<p>Comparing the models using the <code><a href="http://www.bamlss.org/reference/DIC.html" class="external-link">DIC()</a></code>
+function</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/DIC.html">DIC</a></span><span class="op">(</span><span class="va">b2</span>, <span class="va">b3</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##          DIC        pd</span>
 <span class="co">## b2 -15.19596  6.893153</span>
 <span class="co">## b3 -10.78925 13.186991</span></code></pre>
-<p>suggests that the polynomial model is slightly better. The effects can be inspected graphically, to better understand their influence on <code>price</code>. Using the polynomial model, graphical inspections can be done using the <code><a href="http://www.bamlss.org/reference/predict.bamlss.html" class="external-link">predict()</a></code> method.</p>
-<p>One major difference compared to other regression model implementations is that predictions can be made for single variables, only, where the user does not have to create a new data frame containing all variables. For example, posterior mean estimates and 95% credible intervals for variable <code>age</code> can be obtained by</p>
+<p>suggests that the polynomial model is slightly better. The effects
+can be inspected graphically, to better understand their influence on
+<code>price</code>. Using the polynomial model, graphical inspections
+can be done using the <code><a href="http://www.bamlss.org/reference/predict.bamlss.html" class="external-link">predict()</a></code>
+method.</p>
+<p>One major difference compared to other regression model
+implementations is that predictions can be made for single variables,
+only, where the user does not have to create a new data frame containing
+all variables. For example, posterior mean estimates and 95% credible
+intervals for variable <code>age</code> can be obtained by</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"age"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">Golf</span><span class="op">$</span><span class="va">age</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Golf</span><span class="op">$</span><span class="va">age</span><span class="op">)</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 
@@ -321,7 +401,8 @@
 <span class="co">## 4 67.33333 0.3172396 0.4568109  0.5950657</span>
 <span class="co">## 5 68.11111 0.3201536 0.4471811  0.5742218</span>
 <span class="co">## 6 68.88889 0.3202023 0.4374406  0.5555146</span></code></pre>
-<p>Note that the prediction does not include the model intercept. Similarly for variables <code>kilometer</code> and <code>tia</code></p>
+<p>Note that the prediction does not include the model intercept.
+Similarly for variables <code>kilometer</code> and <code>tia</code></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nd</span><span class="op">$</span><span class="va">kilometer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">Golf</span><span class="op">$</span><span class="va">kilometer</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Golf</span><span class="op">$</span><span class="va">kilometer</span><span class="op">)</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
 <span class="va">nd</span><span class="op">$</span><span class="va">tia</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">Golf</span><span class="op">$</span><span class="va">tia</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Golf</span><span class="op">$</span><span class="va">tia</span><span class="op">)</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
@@ -330,7 +411,13 @@
   FUN <span class="op">=</span> <span class="va">c95</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">nd</span><span class="op">$</span><span class="va">ptia</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b3</span>, newdata <span class="op">=</span> <span class="va">nd</span>, model <span class="op">=</span> <span class="st">"mu"</span>, term <span class="op">=</span> <span class="st">"tia"</span>,
   FUN <span class="op">=</span> <span class="va">c95</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p>Here, we need to specify for which <code>model</code> predictions should be calculated, and if predictions only for variable <code>age</code> are created, argument <code>term</code> needs also be specified. Argument <code>FUN</code> can be any function that should be applied on the samples of the linear predictor. For more examples see the documentation of the <code><a href="http://www.bamlss.org/reference/predict.bamlss.html" class="external-link">predict.bamlss()</a></code> method.</p>
+<p>Here, we need to specify for which <code>model</code> predictions
+should be calculated, and if predictions only for variable
+<code>age</code> are created, argument <code>term</code> needs also be
+specified. Argument <code>FUN</code> can be any function that should be
+applied on the samples of the linear predictor. For more examples see
+the documentation of the <code><a href="http://www.bamlss.org/reference/predict.bamlss.html" class="external-link">predict.bamlss()</a></code>
+method.</p>
 <p>Then, the estimated effects can be visualized with</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>
@@ -338,12 +425,23 @@
 <span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">page</span> <span class="op">~</span> <span class="va">age</span>, data <span class="op">=</span> <span class="va">nd</span>, ylim <span class="op">=</span> <span class="va">ylim</span><span class="op">)</span>
 <span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">pkilometer</span> <span class="op">~</span> <span class="va">kilometer</span>, data <span class="op">=</span> <span class="va">nd</span>, ylim <span class="op">=</span> <span class="va">ylim</span><span class="op">)</span>
 <span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">ptia</span> <span class="op">~</span> <span class="va">tia</span>, data <span class="op">=</span> <span class="va">nd</span>, ylim <span class="op">=</span> <span class="va">ylim</span><span class="op">)</span></code></pre></div>
-<p><img src="bamlss_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;"> The figure clearly shows the negative effect on the logarithmic <code>price</code> for variable <code>age</code> and <code>kilometer</code>. The effect of <code>tia</code> is not significant according the 95% credible intervals, since the interval always contains the zero horizontal line.</p>
+<p><img src="bamlss_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;">
+The figure clearly shows the negative effect on the logarithmic
+<code>price</code> for variable <code>age</code> and
+<code>kilometer</code>. The effect of <code>tia</code> is not
+significant according the 95% credible intervals, since the interval
+always contains the zero horizontal line.</p>
 </div>
 <div class="section level2">
 <h2 id="location-scale-model">Location-scale model<a class="anchor" aria-label="anchor" href="#location-scale-model"></a>
 </h2>
-<p>As a second startup on how to use <em>bamlss</em> for full distributional regression, we illustrate the basic steps on a small textbook example using the well-known simulated motorcycle accident data <span class="citation">(Silverman 1985)</span>. The data contain measurements of the head acceleration (in <span class="math inline">\(g\)</span>, variable <code>accel</code>) in a simulated motorcycle accident, recorded in milliseconds after impact (variable <code>times</code>).</p>
+<p>As a second startup on how to use <em>bamlss</em> for full
+distributional regression, we illustrate the basic steps on a small
+textbook example using the well-known simulated motorcycle accident data
+<span class="citation">(Silverman 1985)</span>. The data contain
+measurements of the head acceleration (in <span class="math inline">\(g\)</span>, variable <code>accel</code>) in a
+simulated motorcycle accident, recorded in milliseconds after impact
+(variable <code>times</code>).</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"mcycle"</span>, package <span class="op">=</span> <span class="st">"MASS"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mcycle</span><span class="op">)</span></code></pre></div>
@@ -355,19 +453,38 @@
 <span class="co">## 5   4.0  -2.7</span>
 <span class="co">## 6   6.2  -2.7</span></code></pre>
 <p>To estimate a Gaussian location-scale model with <span class="math display">\[
-\texttt{accel} \sim \mathcal{N}(\mu = f(\texttt{times}), \log(\sigma) = f(\texttt{times}))
+\texttt{accel} \sim \mathcal{N}(\mu = f(\texttt{times}), \log(\sigma) =
+f(\texttt{times}))
 \]</span> we use the following model formula</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">accel</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">times</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>, <span class="va">sigma</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">times</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>where <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> is the smooth term constructor from the <em>mgcv</em> <span class="citation">(Wood 2020)</span>. Note, that formulae are provided as <code>list</code>s of formulae, i.e., each list entry represents one parameter of the response distribution. Also note that all smooth terms, i.e., <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti()</a></code>, etc., are supported by <em>bamlss</em>. This way, it is also possible to incorporate user defined model terms. A fully Bayesian model is the estimated with</p>
+<p>where <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> is the smooth term constructor from the
+<em>mgcv</em> <span class="citation">(Wood 2020)</span>. Note, that
+formulae are provided as <code>list</code>s of formulae, i.e., each list
+entry represents one parameter of the response distribution. Also note
+that all smooth terms, i.e., <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">te()</a></code>, <code><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti()</a></code>, etc.,
+are supported by <em>bamlss</em>. This way, it is also possible to
+incorporate user defined model terms. A fully Bayesian model is the
+estimated with</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
 <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">mcycle</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></code></pre></div>
-<p>using the default of 1200 iterations of the MCMC sampler to obtain first results quickly (see the documentation <code><a href="http://www.bamlss.org/reference/GMCMC.html" class="external-link">sam_GMCMC()</a></code> for further details on tuning parameters). Note that per default <code><a href="http://www.bamlss.org/reference/bamlss.html" class="external-link">bamlss()</a></code> uses a backfitting algorithm to compute posterior mode estimates, afterwards these estimates are used as starting values for the MCMC chains. The returned object is of class <code>"bamlss"</code> for which generic extractor functions like <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, etc., are provided. For example, the estimated effects for distribution parameters <code>mu</code> and <code>sigma</code> can be visualized by</p>
+<p>using the default of 1200 iterations of the MCMC sampler to obtain
+first results quickly (see the documentation <code><a href="http://www.bamlss.org/reference/GMCMC.html" class="external-link">sam_GMCMC()</a></code>
+for further details on tuning parameters). Note that per default
+<code><a href="http://www.bamlss.org/reference/bamlss.html" class="external-link">bamlss()</a></code>
+uses a backfitting algorithm to compute posterior mode estimates,
+afterwards these estimates are used as starting values for the MCMC
+chains. The returned object is of class <code>"bamlss"</code> for which
+generic extractor functions like <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>,
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, etc., are provided. For
+example, the estimated effects for distribution parameters
+<code>mu</code> and <code>sigma</code> can be visualized by</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mu"</span>, <span class="st">"sigma"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="bamlss_files/figure-html/unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;"> The model summary gives</p>
+<p><img src="bamlss_files/figure-html/unnamed-chunk-20-1.png" width="80%" style="display: block; margin: auto;">
+The model summary gives</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## </span>
@@ -391,7 +508,7 @@
 <span class="co">## -</span>
 <span class="co">## Smooth terms:</span>
 <span class="co">##                     Mean      2.5%       50%     97.5% parameters</span>
-<span class="co">## s(times).tau21 425657.47 175634.81 372121.15 914429.32   209325.2</span>
+<span class="co">## s(times).tau21 425657.47 175634.81 372121.15 914429.32   209325.1</span>
 <span class="co">## s(times).alpha      1.00      1.00      1.00      1.00         NA</span>
 <span class="co">## s(times).edf       14.24     12.64     14.22     15.97       13.6</span>
 <span class="co">## ---</span>
@@ -416,26 +533,55 @@
 <span class="co">## Sampler summary:</span>
 <span class="co">## -</span>
 <span class="co">## DIC = 1115.068 logLik = -545.2265 pd = 24.6149</span>
-<span class="co">## runtime = 4.177</span>
+<span class="co">## runtime = 12.524</span>
 <span class="co">## ---</span>
 <span class="co">## Optimizer summary:</span>
 <span class="co">## -</span>
 <span class="co">## AICc = 1123.881 edf = 24.2718 logLik = -531.975</span>
-<span class="co">## logPost = -747.4106 nobs = 133 runtime = 0.604</span></code></pre>
-<p>showing, e.g., the acceptance probabilities of the MCMC chains (<code>alpha</code>), the estimated degrees of freedom of the optimizer and the successive sampler (<code>edf</code>), the final AIC and DIC as well as parametric model coefficients (in this case only the intercepts). As mentioned in the first example, using MCMC involves convergence checks of the sampled parameters. The easiest diagnostics are traceplots</p>
+<span class="co">## logPost = -747.4106 nobs = 133 runtime = 1.32</span></code></pre>
+<p>showing, e.g., the acceptance probabilities of the MCMC chains
+(<code>alpha</code>), the estimated degrees of freedom of the optimizer
+and the successive sampler (<code>edf</code>), the final AIC and DIC as
+well as parametric model coefficients (in this case only the
+intercepts). As mentioned in the first example, using MCMC involves
+convergence checks of the sampled parameters. The easiest diagnostics
+are traceplots</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></code></pre></div>
-<p><img src="bamlss_files/figure-html/unnamed-chunk-23-1.png" width="864" style="display: block; margin: auto;"> Note again that this call would show all traceplots, for convenience we only show the plots for the intercepts. In this case, the traceplots do not indicate convergence of the Markov chains for parameter <code>"mu"</code>. To fix this, the number of iterations can be increased and also the burnin and thinning parameters can be adapted (see <code><a href="http://www.bamlss.org/reference/GMCMC.html" class="external-link">sam_GMCMC()</a></code>). Further inspections are the maximum autocorrelation of all parameters, using <code><a href="http://www.bamlss.org/reference/plot.bamlss.html" class="external-link">plot.bamlss()</a></code> setting argument <code>which = "max-acf"</code>, besides other convergence diagnostics, e.g., diagnostics that are part of the <em>coda</em> package <span class="citation">(Plummer et al. 2006)</span>.</p>
-<p>Inspecting randomized quantile residuals <span class="citation">(Dunn and Smyth 1996)</span> is useful for judging how well the model fits to the data</p>
+<p><img src="bamlss_files/figure-html/unnamed-chunk-23-1.png" width="864" style="display: block; margin: auto;">
+Note again that this call would show all traceplots, for convenience we
+only show the plots for the intercepts. In this case, the traceplots do
+not indicate convergence of the Markov chains for parameter
+<code>"mu"</code>. To fix this, the number of iterations can be
+increased and also the burnin and thinning parameters can be adapted
+(see <code><a href="http://www.bamlss.org/reference/GMCMC.html" class="external-link">sam_GMCMC()</a></code>).
+Further inspections are the maximum autocorrelation of all parameters,
+using <code><a href="http://www.bamlss.org/reference/plot.bamlss.html" class="external-link">plot.bamlss()</a></code>
+setting argument <code>which = "max-acf"</code>, besides other
+convergence diagnostics, e.g., diagnostics that are part of the
+<em>coda</em> package <span class="citation">(Plummer et al.
+2006)</span>.</p>
+<p>Inspecting randomized quantile residuals <span class="citation">(Dunn
+and Smyth 1996)</span> is useful for judging how well the model fits to
+the data</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hist-resid"</span>, <span class="st">"qq-resid"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="bamlss_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;"> Randomized quantile residuals are the default method in <em>bamlss</em>, which are computed using the CDF function of the corresponding family object.</p>
-<p>The posterior mean including 95% credible intervals for new data based on MCMC samples for parameter <span class="math inline">\(\mu\)</span> can be computed by</p>
+<p><img src="bamlss_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;">
+Randomized quantile residuals are the default method in <em>bamlss</em>,
+which are computed using the CDF function of the corresponding family
+object.</p>
+<p>The posterior mean including 95% credible intervals for new data
+based on MCMC samples for parameter <span class="math inline">\(\mu\)</span> can be computed by</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"times"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">2.4</span>, <span class="fl">57.6</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 <span class="va">nd</span><span class="op">$</span><span class="va">ptimes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, model <span class="op">=</span> <span class="st">"mu"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span>
 <span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">ptimes</span> <span class="op">~</span> <span class="va">times</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></code></pre></div>
-<p><img src="bamlss_files/figure-html/unnamed-chunk-27-1.png" width="50%" style="display: block; margin: auto;"> and as above in the first example, argument <code>FUN</code> can be any function, e.g., the <code><a href="https://rdrr.io/r/base/identity.html" class="external-link">identity()</a></code> function could be used to calculate other statistics of the distribution, e.g., plot the estimated densities for each iteration of the MCMC sampler for <code>times = 10</code> and <code>times = 40</code>:</p>
+<p><img src="bamlss_files/figure-html/unnamed-chunk-27-1.png" width="50%" style="display: block; margin: auto;">
+and as above in the first example, argument <code>FUN</code> can be any
+function, e.g., the <code><a href="https://rdrr.io/r/base/identity.html" class="external-link">identity()</a></code> function could be used to
+calculate other statistics of the distribution, e.g., plot the estimated
+densities for each iteration of the MCMC sampler for
+<code>times = 10</code> and <code>times = 40</code>:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Predict for the two scenarios.</span>
 <span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"times"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span>
@@ -472,32 +618,51 @@
 <p><img src="bamlss_files/figure-html/unnamed-chunk-28-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2 unnumbered">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references">
-<div id="ref-bamlss:Dunn+Gordon:1996">
-<p>Dunn, Peter K., and Gordon K. Smyth. 1996. “Randomized Quantile Residuals.” <em>Journal of Computational and Graphical Statistics</em> 5 (3). American Statistical Association, Institute of Mathematical Statistics,; Interface Foundation of America: 236–44.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:Dunn+Gordon:1996" class="csl-entry">
+Dunn, Peter K., and Gordon K. Smyth. 1996. <span>“Randomized Quantile
+Residuals.”</span> <em>Journal of Computational and Graphical
+Statistics</em> 5 (3): 236–44.
 </div>
-<div id="ref-bamlss:Fahrmeir+Kneib+Lang+Marx:2013">
-<p>Fahrmeir, Ludwig, Thomas Kneib, Stefan Lang, and Brian Marx. 2013. <em>Regression – Models, Methods and Applications</em>. Berlin: Springer-Verlag.</p>
+<div id="ref-bamlss:Fahrmeir+Kneib+Lang+Marx:2013" class="csl-entry">
+Fahrmeir, Ludwig, Thomas Kneib, Stefan Lang, and Brian Marx. 2013.
+<em>Regression – Models, Methods and Applications</em>. Berlin:
+Springer-Verlag.
 </div>
-<div id="ref-bamlss:Plummer+Best+Cowles+Vines:2006">
-<p>Plummer, Martyn, Nicky Best, Kate Cowles, and Karen Vines. 2006. “coda: Convergence Diagnosis and Output Analysis for MCMC.” <em>R News</em> 6 (1): 7–11. <a href="https://doi.org/10.18637/jss.v021.i11" class="external-link uri">https://doi.org/10.18637/jss.v021.i11</a>.</p>
+<div id="ref-bamlss:Plummer+Best+Cowles+Vines:2006" class="csl-entry">
+Plummer, Martyn, Nicky Best, Kate Cowles, and Karen Vines. 2006.
+<span>“<span class="nocase">coda</span>: Convergence Diagnosis and
+Output Analysis for <span>MCMC</span>.”</span> <em>R News</em> 6 (1):
+7–11. <a href="https://doi.org/10.18637/jss.v021.i11" class="external-link">https://doi.org/10.18637/jss.v021.i11</a>.
 </div>
-<div id="ref-bamlss:Silverman:1985">
-<p>Silverman, B. W. 1985. “Some Aspects of the Spline Smoothing Approach to Non-Parametric Regression Curve Fitting.” <em>Journal of the Royal Statistical Society. Series B (Methodological)</em> 47 (1). [Royal Statistical Society, Wiley]: 1–52.</p>
+<div id="ref-bamlss:Silverman:1985" class="csl-entry">
+Silverman, B. W. 1985. <span>“Some Aspects of the Spline Smoothing
+Approach to Non-Parametric Regression Curve Fitting.”</span> <em>Journal
+of the Royal Statistical Society. Series B (Methodological)</em> 47 (1):
+1–52.
 </div>
-<div id="ref-bamlss:Umlauf+Klein+Zeileis:2017">
-<p>Umlauf, Nikolaus, Nadja Klein, and Achim Zeileis. 2018. “BAMLSS: Bayesian Additive Models for Location, Scale and Shape (and Beyond).” <em>Journal of Computational and Graphical Statistics</em> 27 (3): 612–27. <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link uri">https://doi.org/10.1080/10618600.2017.1407325</a>.</p>
+<div id="ref-bamlss:Umlauf+Klein+Zeileis:2017" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, and Achim Zeileis. 2018.
+<span>“<span>BAMLSS</span>: <span>B</span>ayesian Additive Models for
+Location, Scale and Shape (and Beyond).”</span> <em>Journal of
+Computational and Graphical Statistics</em> 27 (3): 612–27. <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link">https://doi.org/10.1080/10618600.2017.1407325</a>.
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021a. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="ref-bamlss:Umlauf+bamlss:2021" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021b.
+<span>“<span class="nocase">bamlss</span>: <span>B</span>ayesian
+Additive Models for Location Scale and Shape (and Beyond).”</span>
+<em>Journal of Statistical Software</em> 100 (4): 1–53. <a href="https://doi.org/10.18637/jss.v100.i04" class="external-link">https://doi.org/10.18637/jss.v100.i04</a>.
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2021">
-<p>———. 2021b. “bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond).” <em>Journal of Statistical Software</em> 100 (4): 1–53. <a href="https://doi.org/10.18637/jss.v100.i04" class="external-link uri">https://doi.org/10.18637/jss.v100.i04</a>.</p>
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+———. 2021a. <em><span class="nocase">bamlss</span>:
+<span>B</span>ayesian Additive Models for Location Scale and Shape (and
+Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
-<div id="ref-bamlss:Wood:2018">
-<p>Wood, S. N. 2020. <em>mgcv: GAMs with Gcv/Aic/Reml Smoothness Estimation and Gamms by Pql</em>. <a href="https://CRAN.R-project.org/package=mgcv" class="external-link uri">https://CRAN.R-project.org/package=mgcv</a>.</p>
+<div id="ref-bamlss:Wood:2018" class="csl-entry">
+Wood, S. N. 2020. <em><span class="nocase">mgcv</span>: GAMs with
+GCV/AIC/REML Smoothness Estimation and GAMMs by PQL</em>. <a href="https://CRAN.R-project.org/package=mgcv" class="external-link">https://CRAN.R-project.org/package=mgcv</a>.
 </div>
 </div>
 </div>
@@ -520,7 +685,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -144,7 +144,10 @@
 
     
     
-<p>The family <code>mvnorm_bamlss</code> implements the multivariate normal distribution that can be used for estimation with <code>bamlss</code>. To illustrate the usage we simulate data from a trivariate normal.</p>
+<p>The family <code>mvnorm_bamlss</code> implements the multivariate
+normal distribution that can be used for estimation with
+<code>bamlss</code>. To illustrate the usage we simulate data from a
+trivariate normal.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.bamlss.org/" class="external-link">"bamlss"</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://mvtnorm.R-forge.R-project.org" class="external-link">"mvtnorm"</a></span><span class="op">)</span>
@@ -216,11 +219,16 @@
   <span class="va">rho13</span> <span class="op">~</span> <span class="fl">1</span>,
   <span class="va">rho23</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
-<p>Note that the numbering of the correlation parameters is somewhat untrivial, but it corresponds to the position of the correlation matrix. The model can be estimated using the usual specifications, but the dimension of the multivariate normal distribution must be specified directly in the family.</p>
+<p>Note that the numbering of the correlation parameters is somewhat
+untrivial, but it corresponds to the position of the correlation matrix.
+The model can be estimated using the usual specifications, but the
+dimension of the multivariate normal distribution must be specified
+directly in the family.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="fu"><a href="../reference/family.bamlss.html">mvnorm_bamlss</a></span><span class="op">(</span>k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>After the MCMC algorithm is completed, all summary and extraction functions can be used as usual.</p>
+<p>After the MCMC algorithm is completed, all summary and extraction
+functions can be used as usual.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## </span>
@@ -395,9 +403,11 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p><img src="mvnorm_files/figure-html/unnamed-chunk-7-1.png" width="90%" style="display: block; margin: auto;"></p>
-<div id="refs" class="references">
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
+<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
+Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
 </div>
   </div>
@@ -417,7 +427,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

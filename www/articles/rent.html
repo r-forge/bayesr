@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -144,14 +144,21 @@
 
     
     
-<p>In this example we analyze rent index data from Munich, Germany. The data is provided in the supplemental materials of the Regression book <span class="citation">(Fahrmeir et al. 2013)</span> and can be loaded into R with</p>
+<p>In this example we analyze rent index data from Munich, Germany. The
+data is provided in the supplemental materials of the Regression book
+<span class="citation">(Fahrmeir et al. 2013)</span> and can be loaded
+into R with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">file_url</span> <span class="op">&lt;-</span> <span class="st">"http://www.bamlss.org/misc/rent99.raw"</span>
 <span class="va">rent99</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="va">file_url</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p>The aim of this analysis is to find a model explaining the rent or rent per square meter of an apartment. We first assume a linear relationship with homoscedastic Gaussian errors:</p>
+<p>The aim of this analysis is to find a model explaining the rent or
+rent per square meter of an apartment. We first assume a linear
+relationship with homoscedastic Gaussian errors:</p>
 <p><span class="math display">\[
-\texttt{rent} = \mu = \beta_0 + \beta_1 \cdot \texttt{area} + \beta_2 \cdot \texttt{yearc},
-\]</span> i.e., <span class="math inline">\(\texttt{rent} \sim N(\mu, \sigma^2)\)</span>. The model can be estimated with:</p>
+\texttt{rent} = \mu = \beta_0 + \beta_1 \cdot \texttt{area} + \beta_2
+\cdot \texttt{yearc},
+\]</span> i.e., <span class="math inline">\(\texttt{rent} \sim N(\mu,
+\sigma^2)\)</span>. The model can be estimated with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Model formula.</span>
 <span class="va">f1</span> <span class="op">&lt;-</span> <span class="va">rent</span> <span class="op">~</span> <span class="va">area</span> <span class="op">+</span> <span class="va">yearc</span>
@@ -159,7 +166,11 @@
 <span class="co">## Estimate model.</span>
 <span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f1</span>, data <span class="op">=</span> <span class="va">rent99</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>,
   n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
-<p>This first starts a backfitting algorithm to find posterior mode estimates and afterwards the MCMC simulation is started using the parameters from the backfitting step as starting values. Note that we use 12000 iterations with a burnin of 2000 and only keep every 10th sample of the MCMC simulation. The model summary gives</p>
+<p>This first starts a backfitting algorithm to find posterior mode
+estimates and afterwards the MCMC simulation is started using the
+parameters from the backfitting step as starting values. Note that we
+use 12000 iterations with a burnin of 2000 and only keep every 10th
+sample of the MCMC simulation. The model summary gives</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## </span>
@@ -205,18 +216,31 @@
 <span class="co">## -</span>
 <span class="co">## AICc = 39608.2 edf = 4 logLik = -19800.1</span>
 <span class="co">## logPost = -19842.81 nobs = 3082 runtime = 0.016</span></code></pre>
-<p>However, the assumption of homoscedastic errors is not appropriate in this case.</p>
+<p>However, the assumption of homoscedastic errors is not appropriate in
+this case.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rent</span> <span class="op">~</span> <span class="va">area</span>, data <span class="op">=</span> <span class="va">rent99</span>, pch <span class="op">=</span> <span class="fl">16</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/rgb.html" class="external-link">rgb</a></span><span class="op">(</span><span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="rent_files/figure-html/unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;"> As can be seen in this scatter plot, the data is heteroscedastic and the exact model might not even be linear. This is also indicated in the quantile residual plots.</p>
+<p><img src="rent_files/figure-html/unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;">
+As can be seen in this scatter plot, the data is heteroscedastic and the
+exact model might not even be linear. This is also indicated in the
+quantile residual plots.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hist-resid"</span>, <span class="st">"qq-resid"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="rent_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"> The residuals seem to be a bit skew and for the lower and higher values of <code>rent</code>, the model fit is not satisfactorily according the Q-Q plot.</p>
-<p>A non-parametric model can be useful here. Therefore, we estimate a more flexible model with <span class="math display">\[
+<p><img src="rent_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;">
+The residuals seem to be a bit skew and for the lower and higher values
+of <code>rent</code>, the model fit is not satisfactorily according the
+Q-Q plot.</p>
+<p>A non-parametric model can be useful here. Therefore, we estimate a
+more flexible model with <span class="math display">\[
 \mu = \beta_0 + f_1(\texttt{area}) + f_2(\texttt{yearc})
 \]</span> and <span class="math display">\[
 \sigma = \exp\{\alpha_0 + g_1(\texttt{area}) + g_2(\texttt{yearc})\}
-\]</span> where functions <span class="math inline">\(f_1( \cdot ), f_2( \cdot ), g_1( \cdot ), g_2( \cdot )\)</span> are modeled using regression splines. The exponential function assures that the we estimate a positive standard deviation. This way, we allow for covariates and loose the hard assumptions of a constant standard deviation.</p>
+\]</span> where functions <span class="math inline">\(f_1( \cdot ), f_2(
+\cdot ), g_1( \cdot ), g_2( \cdot )\)</span> are modeled using
+regression splines. The exponential function assures that the we
+estimate a positive standard deviation. This way, we allow for
+covariates and loose the hard assumptions of a constant standard
+deviation.</p>
 <p>The model is estimated with:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## List of formulae to estimate</span>
@@ -289,20 +313,35 @@
 <span class="co">## -</span>
 <span class="co">## AICc = 38637.94 edf = 25.8059 logLik = -19292.94</span>
 <span class="co">## logPost = -19511.55 nobs = 3082 runtime = 0.838</span></code></pre>
-<p>The summary statistics indicate that the more flexible model is more appropriate since the DIC of model <code>b2</code> is much lower than the DIC of model <code>b1</code>.</p>
+<p>The summary statistics indicate that the more flexible model is more
+appropriate since the DIC of model <code>b2</code> is much lower than
+the DIC of model <code>b1</code>.</p>
 <p>The estimated effects are visualized with</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p><img src="rent_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;"> By looking at the effect plots, we can conclude that in the case of the variable <code>area</code> an assumption of linear dependency might be justified, where in the case of <code>yearc</code> this is not so clear. Moreover, our estimated <code>sigma</code> is for neither of the variables constant.</p>
+<p><img src="rent_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;">
+By looking at the effect plots, we can conclude that in the case of the
+variable <code>area</code> an assumption of linear dependency might be
+justified, where in the case of <code>yearc</code> this is not so clear.
+Moreover, our estimated <code>sigma</code> is for neither of the
+variables constant.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hist-resid"</span>, <span class="st">"qq-resid"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="rent_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;"> The quantile residual plots indicate a quite good model fit already, however, the assumption of Gaussian errors could be refined as rents can only be positive. Hence, distributions accounting for this fact should be exploited further, e.g., the Gamma distribution.</p>
-<div id="refs" class="references">
-<div id="ref-bamlss:Fahrmeir+Kneib+Lang+Marx:2013">
-<p>Fahrmeir, Ludwig, Thomas Kneib, Stefan Lang, and Brian Marx. 2013. <em>Regression – Models, Methods and Applications</em>. Berlin: Springer-Verlag.</p>
+<p><img src="rent_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;">
+The quantile residual plots indicate a quite good model fit already,
+however, the assumption of Gaussian errors could be refined as rents can
+only be positive. Hence, distributions accounting for this fact should
+be exploited further, e.g., the Gamma distribution.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:Fahrmeir+Kneib+Lang+Marx:2013" class="csl-entry">
+Fahrmeir, Ludwig, Thomas Kneib, Stefan Lang, and Brian Marx. 2013.
+<em>Regression – Models, Methods and Applications</em>. Berlin:
+Springer-Verlag.
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
+<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
+Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
 </div>
   </div>
@@ -322,7 +361,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

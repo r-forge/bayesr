@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -134,7 +134,8 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Complex Space-Time Interactions in a Cox Model</h1>
+      <h1 data-toc-skip>Complex Space-Time Interactions in a Cox
+Model</h1>
             
       
       
@@ -147,30 +148,64 @@
 <div class="section level2">
 <h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
 </h2>
-<p>In the article <strong>BAMLSS: Bayesian Additive Models for Location, Scale, and Shape (and Beyond)</strong> <span class="citation">(Umlauf, Klein, and Zeileis 2018)</span> an example based on the article of <span class="citation">Taylor (2017)</span> is used to illustrate the BAMLSS framework with complex space-time interactions in a Cox model.</p>
-<p>The example uses data from the <em>London Fire Brigade</em> (LFB, <a href="http://www.london-fire.gov.uk/" class="external-link uri">http://www.london-fire.gov.uk/</a>), which is one of largest fire brigades in the world. Each year, the LFB is called thousands of times, in most cases due to dwelling fires. To prevent further damage or fatal casualties, a short arrival time is important, i.e., the time it takes until a fire engine arrives at the scene after an emergency call has been received. The aim of this analysis is to explore the drivers of arrival times.</p>
+<p>In the article <strong>BAMLSS: Bayesian Additive Models for Location,
+Scale, and Shape (and Beyond)</strong> <span class="citation">(Umlauf,
+Klein, and Zeileis 2018)</span> an example based on the article of <span class="citation">Taylor (2017)</span> is used to illustrate the BAMLSS
+framework with complex space-time interactions in a Cox model.</p>
+<p>The example uses data from the <em>London Fire Brigade</em> (LFB, <a href="http://www.london-fire.gov.uk/" class="external-link">http://www.london-fire.gov.uk/</a>),
+which is one of largest fire brigades in the world. Each year, the LFB
+is called thousands of times, in most cases due to dwelling fires. To
+prevent further damage or fatal casualties, a short arrival time is
+important, i.e., the time it takes until a fire engine arrives at the
+scene after an emergency call has been received. The aim of this
+analysis is to explore the drivers of arrival times.</p>
 </div>
 <div class="section level2">
 <h2 id="model">Model<a class="anchor" aria-label="anchor" href="#model"></a>
 </h2>
-<p>The response times are analyzed within a survival context where the hazard of an event (fire engine arriving) at time <span class="math inline">\(t\)</span> follows a relative risk model of the form <span class="math display">\[
-\lambda(t) = \exp\left(\eta(t)\right) =  \exp\left( \eta_{\lambda}(t) + \eta_{\gamma} \right),
-\]</span> i.e., a model for the instantaneous arrival rate conditional on the engine not having arrived before time <span class="math inline">\(t\)</span>. Here, the hazard function is assumed to depend on a time-varying predictor <span class="math inline">\(\eta_{\lambda}(t)\)</span> and a time-constant predictor <span class="math inline">\(\eta_{\gamma}\)</span>.</p>
+<p>The response times are analyzed within a survival context where the
+hazard of an event (fire engine arriving) at time <span class="math inline">\(t\)</span> follows a relative risk model of the
+form <span class="math display">\[
+\lambda(t) = \exp\left(\eta(t)\right) =  \exp\left( \eta_{\lambda}(t) +
+\eta_{\gamma} \right),
+\]</span> i.e., a model for the instantaneous arrival rate conditional
+on the engine not having arrived before time <span class="math inline">\(t\)</span>. Here, the hazard function is assumed
+to depend on a time-varying predictor <span class="math inline">\(\eta_{\lambda}(t)\)</span> and a time-constant
+predictor <span class="math inline">\(\eta_{\gamma}\)</span>.</p>
 <p>We set up a model with the time-constant predictor <span class="math display">\[
-\eta_{\gamma} = \beta_0 + f_1(\texttt{fsintens}) + f_2(\texttt{daytime}) +
-  f_3(\texttt{lon}, \texttt{lat}) + f_4(\texttt{daytime}, \texttt{lon}, \texttt{lat}),
-\]</span> where <span class="math inline">\(\beta_0\)</span> is an intercept and function <span class="math inline">\(f_1( \cdot )\)</span> is the effect of fire station intensity (<code>fsintens</code>, computed with a kernel density estimate of all fire stations in London). The other variables represent: The time of the day (<code>daytime</code>), exact spatial coordinates of the fire (<code>lon</code> and <code>lat</code>). Here function <span class="math inline">\(f_4( \cdot )\)</span> is a three-dimensional interaction effect.</p>
+\eta_{\gamma} = \beta_0 + f_1(\texttt{fsintens}) + f_2(\texttt{daytime})
++
+  f_3(\texttt{lon}, \texttt{lat}) + f_4(\texttt{daytime}, \texttt{lon},
+\texttt{lat}),
+\]</span> where <span class="math inline">\(\beta_0\)</span> is an
+intercept and function <span class="math inline">\(f_1( \cdot )\)</span>
+is the effect of fire station intensity (<code>fsintens</code>, computed
+with a kernel density estimate of all fire stations in London). The
+other variables represent: The time of the day (<code>daytime</code>),
+exact spatial coordinates of the fire (<code>lon</code> and
+<code>lat</code>). Here function <span class="math inline">\(f_4( \cdot
+)\)</span> is a three-dimensional interaction effect.</p>
 <p>The time-varying additive predictor has the following form <span class="math display">\[
-\eta_{\lambda}(\texttt{arrivaltime}) = f_0(\texttt{arrivaltime}) + f_1(\texttt{arrivaltime}, \texttt{lon}, \texttt{lat}),
-\]</span> where <span class="math inline">\(f_0( \cdot )\)</span> is the baseline hazard for variable <code>arrivaltime</code>, the waiting time until the first fire engine arrives after the received emergency call.</p>
-<p>The probability that the engine will arrive on the scene after time <span class="math inline">\(t\)</span> is described by the survival function <span class="math display">\[\begin{equation} \label{eqn:surv}
-S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du \right),
+\eta_{\lambda}(\texttt{arrivaltime}) = f_0(\texttt{arrivaltime}) +
+f_1(\texttt{arrivaltime}, \texttt{lon}, \texttt{lat}),
+\]</span> where <span class="math inline">\(f_0( \cdot )\)</span> is the
+baseline hazard for variable <code>arrivaltime</code>, the waiting time
+until the first fire engine arrives after the received emergency
+call.</p>
+<p>The probability that the engine will arrive on the scene after time
+<span class="math inline">\(t\)</span> is described by the survival
+function <span class="math display">\[\begin{equation} \label{eqn:surv}
+S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du
+\right),
 \end{equation}\]</span> which is of prime interest in this analysis.</p>
 </div>
 <div class="section level2">
 <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h2>
-<p>The data is freely available from the London DataStore (<a href="http://data.london.gov.uk/" class="external-link uri">http://data.london.gov.uk/</a>) under the UK Open Government Licence (OGL v2). It can be downloaded from <a href="http://data.london.gov.uk/dataset/london-fire-brigade-incident-records" class="external-link uri">http://data.london.gov.uk/dataset/london-fire-brigade-incident-records</a> which also contains previous years. The preprocessed data is part of the <em>bamlss</em> package and can be loaded with</p>
+<p>The data is freely available from the London DataStore (<a href="http://data.london.gov.uk/" class="external-link">http://data.london.gov.uk/</a>) under
+the UK Open Government Licence (OGL v2). It can be downloaded from <a href="http://data.london.gov.uk/dataset/london-fire-brigade-incident-records" class="external-link">http://data.london.gov.uk/dataset/london-fire-brigade-incident-records</a>
+which also contains previous years. The preprocessed data is part of the
+<em>bamlss</em> package and can be loaded with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">LondonFire</span>, package <span class="op">=</span> <span class="st">"bamlss"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">LondonFire</span><span class="op">)</span></code></pre></div>
@@ -181,7 +216,9 @@ S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du \right),
 <span class="co">## 12282  (-0.2448571, 51.45319)    5.800000 1.9297222  300.6900</span>
 <span class="co">## 12283  (-0.1874054, 51.48648)    5.133333 1.9308333 1195.7156</span>
 <span class="co">## 12284  (-0.2893525, 51.61031)    4.966667 3.5480556  319.6787</span></code></pre>
-<p>and is stored as a <code>"SpatialPointsDataFrame"</code>. Therefore, the spatial distribution of fires in London along with boundary polygons and station locations can be plotted instantly with:</p>
+<p>and is stored as a <code>"SpatialPointsDataFrame"</code>. Therefore,
+the spatial distribution of fires in London along with boundary polygons
+and station locations can be plotted instantly with:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/edzer/sp/" class="external-link">"sp"</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>
@@ -194,21 +231,39 @@ S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du \right),
 <div class="section level2">
 <h2 id="estimation">Estimation<a class="anchor" aria-label="anchor" href="#estimation"></a>
 </h2>
-<p>The Cox model is implemented in the <code><a href="../reference/family.bamlss.html">cox_bamlss()</a></code> family and uses a special optimizer function <code><a href="../reference/cox.mode.html">cox_mode()</a></code> and sampling engine <code><a href="../reference/cox.mcmc.html">cox_mcmc()</a></code>. Note that the optimizer and sampler function do not need to be called explicitly within the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper call, because the <code><a href="../reference/family.bamlss.html">cox_bamlss()</a></code> family specifies this already in its return value, such that internally function <code><a href="../reference/bamlss.html">bamlss()</a></code> nows to only use the estimation engines that are supplied by the family.</p>
+<p>The Cox model is implemented in the <code><a href="../reference/family.bamlss.html">cox_bamlss()</a></code> family
+and uses a special optimizer function <code><a href="../reference/cox.mode.html">cox_mode()</a></code> and
+sampling engine <code><a href="../reference/cox.mcmc.html">cox_mcmc()</a></code>. Note that the optimizer and
+sampler function do not need to be called explicitly within the
+<code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper call, because the
+<code><a href="../reference/family.bamlss.html">cox_bamlss()</a></code> family specifies this already in its return
+value, such that internally function <code><a href="../reference/bamlss.html">bamlss()</a></code> nows to only
+use the estimation engines that are supplied by the family.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fam</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/family.bamlss.html">cox_bamlss</a></span><span class="op">(</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fam</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] "family"    "names"     "links"     "transform" "optimizer" "sampler"  </span>
 <span class="co">## [7] "predict"</span></code></pre>
-<p>There is also an additional transformer function, which is needed for computing the (numerical) integrals that are part of the log-likelihood. Predictions are also based on integrals, therefore the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function is also part of this family object and will be used by <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code> instead of the default methods.</p>
-<p>The model formula has two parts, the time-dependent for <span class="math inline">\(\eta_{\lambda}\)</span> and the time-constant part for <span class="math inline">\(\eta_{\gamma}\)</span> and can be set up with</p>
+<p>There is also an additional transformer function, which is needed for
+computing the (numerical) integrals that are part of the log-likelihood.
+Predictions are also based on integrals, therefore the
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function is also part of this family object and
+will be used by <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code> instead of the default
+methods.</p>
+<p>The model formula has two parts, the time-dependent for <span class="math inline">\(\eta_{\lambda}\)</span> and the time-constant part
+for <span class="math inline">\(\eta_{\gamma}\)</span> and can be set up
+with</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">arrivaltime</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti</a></span><span class="op">(</span><span class="va">arrivaltime</span>,k<span class="op">=</span><span class="fl">20</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti</a></span><span class="op">(</span><span class="va">arrivaltime</span>,<span class="va">lon</span>,<span class="va">lat</span>,d<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">30</span><span class="op">)</span><span class="op">)</span>,
   <span class="va">gamma</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">fsintens</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti</a></span><span class="op">(</span><span class="va">daytime</span>,bs<span class="op">=</span><span class="st">"cc"</span>,k<span class="op">=</span><span class="fl">30</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti</a></span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span>,k<span class="op">=</span><span class="fl">80</span>,d<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/te.html" class="external-link">ti</a></span><span class="op">(</span><span class="va">daytime</span>,<span class="va">lon</span>,<span class="va">lat</span>,bs<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cc"</span>,<span class="st">"cr"</span><span class="op">)</span>,d<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">30</span><span class="op">)</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
-<p>Note that the <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code> function from the <em>survival</em> package <span class="citation">(Therneau 2019)</span> is used to set up the formula for <span class="math inline">\(\eta_{\lambda}\)</span>. Also note that the arrival times are not censored in this application. The model is estimated with</p>
+<p>Note that the <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code> function from the <em>survival</em>
+package <span class="citation">(Therneau 2019)</span> is used to set up
+the formula for <span class="math inline">\(\eta_{\lambda}\)</span>.
+Also note that the arrival times are not censored in this application.
+The model is estimated with</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Set the seed for reproducibility.</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">222</span><span class="op">)</span>
@@ -217,11 +272,18 @@ S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du \right),
 <span class="va">firemodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">LondonFire</span>, family <span class="op">=</span> <span class="st">"cox"</span>,
   subdivisions <span class="op">=</span> <span class="fl">25</span>, maxit <span class="op">=</span> <span class="fl">1000</span>,
   n.iter <span class="op">=</span> <span class="fl">6000</span>, burnin <span class="op">=</span> <span class="fl">3000</span>, thin <span class="op">=</span> <span class="fl">20</span>, cores <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></code></pre></div>
-<p>Note, due to the complexity of the model and model terms estimation takes quite long. On a Linux system with 8 Intel i7-2600 3.40GHz processors estimation takes approximately 1.2 days.</p>
-<p>Good practice after fitting the model is to do some convergence checks of the MCMC chains, e.g., by looking at traceplots</p>
+<p>Note, due to the complexity of the model and model terms estimation
+takes quite long. On a Linux system with 8 Intel i7-2600 3.40GHz
+processors estimation takes approximately 1.2 days.</p>
+<p>Good practice after fitting the model is to do some convergence
+checks of the MCMC chains, e.g., by looking at traceplots</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">firemodel</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></code></pre></div>
-<p><img src="cox_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"> Note, for convenience we only show the traceplot of the intercept term of predictor <span class="math inline">\(\eta_{\gamma}\)</span>. The traceplot indicates convergence of the MCMC chains and have close to i.i.d. behavior. The model summary gives</p>
+<p><img src="cox_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;">
+Note, for convenience we only show the traceplot of the intercept term
+of predictor <span class="math inline">\(\eta_{\gamma}\)</span>. The
+traceplot indicates convergence of the MCMC chains and have close to
+i.i.d. behavior. The model summary gives</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">firemodel</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## </span>
@@ -296,16 +358,28 @@ S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du \right),
 <span class="co">## AICc = 22607.29 edf = 122.0436 logLik = -11178.97</span>
 <span class="co">## logPost = -8898.27 time = 14443.76</span>
 <span class="co">## ---</span></code></pre>
-<p>and indicates that the three-dimensional effects in <code>lambda</code> and <code>gamma</code> have an effect on the response times. The estimated effects can be plotted with</p>
+<p>and indicates that the three-dimensional effects in
+<code>lambda</code> and <code>gamma</code> have an effect on the
+response times. The estimated effects can be plotted with</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.5</span>, <span class="fl">4</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">firemodel</span>, scale <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<p><img src="cox_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"> The upper left plot shows the estimated baseline hazard effect. The upper right plot the time-constant effect of fire station intensity. The lower left plot the estimated effect of the time of the day and the lower right plot the estimated time-constant spatial effect.</p>
+<p><img src="cox_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;">
+The upper left plot shows the estimated baseline hazard effect. The
+upper right plot the time-constant effect of fire station intensity. The
+lower left plot the estimated effect of the time of the day and the
+lower right plot the estimated time-constant spatial effect.</p>
 </div>
 <div class="section level2">
 <h2 id="prediction">Prediction<a class="anchor" aria-label="anchor" href="#prediction"></a>
 </h2>
-<p>Predictions in for an estimated Cox model are based on the custom predict function <code><a href="../reference/cox.predict.html">cox_predict()</a></code>. Here, predicted probabilities are based on numerical integration, therefore, the user can specify the subdivisions that are used in the integration routine. For example, let’s pick a sample location within the boundaries of London and predict the corresponding probability that the fire engine arrives at 15pm within 0 to 20 minutes.</p>
+<p>Predictions in for an estimated Cox model are based on the custom
+predict function <code><a href="../reference/cox.predict.html">cox_predict()</a></code>. Here, predicted
+probabilities are based on numerical integration, therefore, the user
+can specify the subdivisions that are used in the integration routine.
+For example, let’s pick a sample location within the boundaries of
+London and predict the corresponding probability that the fire engine
+arrives at 15pm within 0 to 20 minutes.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Extract the 150th sample.</span>
 <span class="va">i</span> <span class="op">&lt;-</span> <span class="fl">150</span>
@@ -329,20 +403,28 @@ S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du \right),
 <p><img src="cox_files/figure-html/unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2 unnumbered">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references">
-<div id="ref-bamlss:Taylor:2015">
-<p>Taylor, Benjamin M. 2017. “Spatial Modelling of Emergency Service Response Times.” <em>Journal of the Royal Statistical Society A</em>. <a href="https://doi.org/10.1111/rssa.12192" class="external-link uri">https://doi.org/10.1111/rssa.12192</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:Taylor:2015" class="csl-entry">
+Taylor, Benjamin M. 2017. <span>“Spatial Modelling of Emergency Service
+Response Times.”</span> <em>Journal of the Royal Statistical Society
+A</em>. <a href="https://doi.org/10.1111/rssa.12192" class="external-link">https://doi.org/10.1111/rssa.12192</a>.
 </div>
-<div id="ref-bamlss:Therneau:2016">
-<p>Therneau, T. M. 2019. <em>survival: A Package for Survival Analysis in S</em>. <a href="https://CRAN.R-project.org/package=survival" class="external-link uri">https://CRAN.R-project.org/package=survival</a>.</p>
+<div id="ref-bamlss:Therneau:2016" class="csl-entry">
+Therneau, T. M. 2019. <em><span class="nocase">survival</span>: A
+Package for Survival Analysis in s</em>. <a href="https://CRAN.R-project.org/package=survival" class="external-link">https://CRAN.R-project.org/package=survival</a>.
 </div>
-<div id="ref-bamlss:Umlauf+Klein+Zeileis:2017">
-<p>Umlauf, Nikolaus, Nadja Klein, and Achim Zeileis. 2018. “BAMLSS: Bayesian Additive Models for Location, Scale and Shape (and Beyond).” <em>Journal of Computational and Graphical Statistics</em> 27 (3): 612–27. <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link uri">https://doi.org/10.1080/10618600.2017.1407325</a>.</p>
+<div id="ref-bamlss:Umlauf+Klein+Zeileis:2017" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, and Achim Zeileis. 2018.
+<span>“<span>BAMLSS</span>: <span>B</span>ayesian Additive Models for
+Location, Scale and Shape (and Beyond).”</span> <em>Journal of
+Computational and Graphical Statistics</em> 27 (3): 612–27. <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link">https://doi.org/10.1080/10618600.2017.1407325</a>.
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
+<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
+Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
 </div>
 </div>
@@ -365,7 +447,7 @@ S(t) = \mathrm{Prob}(T &gt; t) = \exp \, \left( -\int_0^t \lambda(u)du \right),
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -178,8 +178,8 @@
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Extract smoothing variances.</span></span>
 <span class="r-in"><span class="fu">get.state</span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"te(lon,lat)"</span><span class="op">]</span><span class="op">]</span>, <span class="st">"tau2"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     tau21     tau22 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.0475982 0.1000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      tau21      tau22 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.03996638 0.10000000 </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## More examples.</span></span>
 <span class="r-in"><span class="va">state</span> <span class="op">&lt;-</span> <span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"te(lon,lat)"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">state</span></span>
@@ -189,8 +189,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> b21 b22 b23 b24 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   0   0   0   0 </span>
 <span class="r-in"><span class="fu">get.par</span><span class="op">(</span><span class="va">state</span><span class="op">$</span><span class="va">parameters</span>, <span class="st">"tau2"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     tau21     tau22 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.0475982 0.1000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      tau21      tau22 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.03996638 0.10000000 </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">state</span><span class="op">$</span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu">set.par</span><span class="op">(</span><span class="va">state</span><span class="op">$</span><span class="va">parameters</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span><span class="op">)</span>, <span class="st">"tau2"</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu">get.par</span><span class="op">(</span><span class="va">state</span><span class="op">$</span><span class="va">parameters</span>, <span class="st">"tau2"</span><span class="op">)</span></span>
@@ -220,7 +220,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

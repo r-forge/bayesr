@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -188,12 +188,11 @@
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## First, find starting values with optimizer.</span></span>
 <span class="r-in"><span class="va">o</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu"><a href="bfit.html">opt_bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 258.2817 logPost -119.943 logLik -122.265 edf 6.7683 eps 1.1731 iteration   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 257.9515 logPost -119.641 logLik -121.862 edf 6.9996 eps 0.0160 iteration   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 257.9901 logPost -119.640 logLik -121.841 edf 7.0389 eps 0.0014 iteration   3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 257.9911 logPost -119.640 logLik -121.840 edf 7.0400 eps 0.0000 iteration   4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 257.9911 logPost -119.640 logLik -121.840 edf 7.0400 eps 0.0000 iteration   4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.05sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.2256 logPost -164.909 logLik -167.291 edf 6.7157 eps 1.9793 iteration   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.1098 logPost -164.851 logLik -167.233 edf 6.7157 eps 0.0049 iteration   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.1097 logPost -164.851 logLik -167.233 edf 6.7157 eps 0.0000 iteration   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.1097 logPost -164.851 logLik -167.233 edf 6.7157 eps 0.0000 iteration   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.11sec</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Sample.</span></span>
 <span class="r-in"><span class="va">samps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu">sam_MVNORM</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="va">o</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span><span class="op">)</span></span>
@@ -217,7 +216,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

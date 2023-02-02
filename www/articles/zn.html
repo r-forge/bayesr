@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -144,7 +144,8 @@
 
     
     
-<p>This example is taken from the <em>R2BayesX</em> package <span class="citation">(Umlauf et al. 2015)</span> and is about undernutrition of new born children in Zambia. The data is loaded with</p>
+<p>This example is taken from the <em>R2BayesX</em> package <span class="citation">(Umlauf et al. 2015)</span> and is about undernutrition
+of new born children in Zambia. The data is loaded with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ZambiaNutrition"</span>, package <span class="op">=</span> <span class="st">"R2BayesX"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">)</span></code></pre></div>
@@ -155,9 +156,15 @@
 <span class="co">## 1896  0.0067044 18.66       46       12         yes         no   yes   male</span>
 <span class="co">## 1897  1.8765000 24.00       28       12         yes    primary   yes female</span>
 <span class="co">## 1898  0.1009190 24.22        9       12         yes    primary   yes   male</span></code></pre>
-<p>Here, the primary interest is to model the dependence of <code>stunting</code> of newborn children, with an age ranging from 0 to 5 years, on covariates such as the body mass index of the mother, the age of the child and others. Moreover, we apply a full distributional regression model with <span class="math display">\[
-\texttt{stunting} \sim \mathcal{N}(\mu = \eta_{\mu}, \log(\sigma) = \eta_{\sigma})),
-\]</span> where the predictors <span class="math inline">\(\eta_{\mu}\)</span> and <span class="math inline">\(\eta_{\sigma}\)</span> are specified by the following formula</p>
+<p>Here, the primary interest is to model the dependence of
+<code>stunting</code> of newborn children, with an age ranging from 0 to
+5 years, on covariates such as the body mass index of the mother, the
+age of the child and others. Moreover, we apply a full distributional
+regression model with <span class="math display">\[
+\texttt{stunting} \sim \mathcal{N}(\mu = \eta_{\mu}, \log(\sigma) =
+\eta_{\sigma})),
+\]</span> where the predictors <span class="math inline">\(\eta_{\mu}\)</span> and <span class="math inline">\(\eta_{\sigma}\)</span> are specified by the
+following formula</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
   <span class="va">stunting</span> <span class="op">~</span> <span class="va">memployment</span> <span class="op">+</span> <span class="va">urban</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">meducation</span> <span class="op">+</span>
@@ -167,10 +174,16 @@
     <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">mbmi</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">agechild</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"mrf"</span>, xt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"penalty"</span> <span class="op">=</span> <span class="va">K</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
-<p>Note that for setting up the Markov random field smooth term a penalty matrix <code>K</code> needs to be provided. The penalty matrix forces penalization for neighboring regions of the districts in Zambia. To compute the <code>K</code> matrix, we need the spatial information about the regions in Zambia, which is shipped as a <code>"bnd"</code> object in the <em>R2BayesX</em> package and can be loaded with</p>
+<p>Note that for setting up the Markov random field smooth term a
+penalty matrix <code>K</code> needs to be provided. The penalty matrix
+forces penalization for neighboring regions of the districts in Zambia.
+To compute the <code>K</code> matrix, we need the spatial information
+about the regions in Zambia, which is shipped as a <code>"bnd"</code>
+object in the <em>R2BayesX</em> package and can be loaded with</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ZambiaBnd"</span>, package <span class="op">=</span> <span class="st">"R2BayesX"</span><span class="op">)</span></code></pre></div>
-<p>The <code>K</code> matrix can then be computed using function <code><a href="../reference/neighbormatrix.html">neighbormatrix()</a></code></p>
+<p>The <code>K</code> matrix can then be computed using function
+<code><a href="../reference/neighbormatrix.html">neighbormatrix()</a></code></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">K</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/neighbormatrix.html">neighbormatrix</a></span><span class="op">(</span><span class="va">ZambiaBnd</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span></code></pre></div>
@@ -214,8 +227,12 @@
 <p>and the estimated univariate effects are plotted with</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<p><img src="zn_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"> The plot indicates that only the effect of variable <code>mbmi</code> on the standard deviation is not significant according the 95% credible intervals and basically follows the zero horizontal line.</p>
-<p>To visualize the structured and unstructured spatial effects we predict using the district information</p>
+<p><img src="zn_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;">
+The plot indicates that only the effect of variable <code>mbmi</code> on
+the standard deviation is not significant according the 95% credible
+intervals and basically follows the zero horizontal line.</p>
+<p>To visualize the structured and unstructured spatial effects we
+predict using the district information</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## First, note that we have the structured id = 'mrf1' and unstructured</span>
 <span class="co">## spatial effect id = 're2', also indicated in the model summary</span>
@@ -313,7 +330,8 @@
 
 <span class="co">## And the unstructured spatial effect.</span>
 <span class="va">p_unstr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"s(district,id='re2')"</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p>Now, to visualize the effects we plot all maps using the same range for the color legends</p>
+<p>Now, to visualize the effects we plot all maps using the same range
+for the color legends</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">r_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p_str</span><span class="op">$</span><span class="va">mu</span>, <span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span>
 <span class="va">r_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_mu</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_mu</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
@@ -333,7 +351,9 @@
   shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"Random effect"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>
 <span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_sigma</span>,
   shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"Random effect"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></code></pre></div>
-<p><img src="zn_files/figure-html/unnamed-chunk-11-1.png" width="60%" style="display: block; margin: auto;"> The maps clearly show that the unstructured spatial effect seems to very small, if existent at all when looking the 95% credible intervals:</p>
+<p><img src="zn_files/figure-html/unnamed-chunk-11-1.png" width="60%" style="display: block; margin: auto;">
+The maps clearly show that the unstructured spatial effect seems to very
+small, if existent at all when looking the 95% credible intervals:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Again predict, but now additionally compute 95% credible intervals</span>
 <span class="co">## using function c95().</span>
@@ -347,14 +367,19 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">[[</span><span class="st">"2.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">[[</span><span class="st">"97.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] TRUE</span></code></pre>
 <div class="section level2 unnumbered">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references">
-<div id="ref-bamlss:Umlauf+Adler+Kneib+Lang+Zeileis:2014">
-<p>Umlauf, Nikolaus, Daniel Adler, Thomas Kneib, Stefan Lang, and Achim Zeileis. 2015. “Structured Additive Regression Models: An R Interface to BayesX.” <em>Journal of Statistical Software</em> 63 (1): 1–46. <a href="https://doi.org/10.18637/jss.v063.i21" class="external-link uri">https://doi.org/10.18637/jss.v063.i21</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:Umlauf+Adler+Kneib+Lang+Zeileis:2014" class="csl-entry">
+Umlauf, Nikolaus, Daniel Adler, Thomas Kneib, Stefan Lang, and Achim
+Zeileis. 2015. <span>“Structured Additive Regression Models: An r
+Interface to <span>BayesX</span>.”</span> <em>Journal of Statistical
+Software</em> 63 (1): 1–46. <a href="https://doi.org/10.18637/jss.v063.i21" class="external-link">https://doi.org/10.18637/jss.v063.i21</a>.
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
+<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
+Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
 </div>
 </div>
@@ -377,7 +402,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

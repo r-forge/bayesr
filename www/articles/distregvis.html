@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -147,12 +147,18 @@
 <div class="section level2">
 <h2 id="r-package-distreg-vis">R package distreg.vis<a class="anchor" aria-label="anchor" href="#r-package-distreg-vis"></a>
 </h2>
-<p>The <a href="https://github.com/Stan125/distreg.vis" class="external-link"><em>distreg.vis</em></a> <span class="citation">(Stadlmann 2019)</span> package for R allows us to interactively explore the predicted response distribution using different covariate scenarios.</p>
+<p>The <a href="https://github.com/Stan125/distreg.vis" class="external-link"><em>distreg.vis</em></a>
+<span class="citation">(Stadlmann 2019)</span> package for R allows us
+to interactively explore the predicted response distribution using
+different covariate scenarios.</p>
 </div>
 <div class="section level2">
 <h2 id="example-islrwage-dataset">Example: ISLR::Wage dataset<a class="anchor" aria-label="anchor" href="#example-islrwage-dataset"></a>
 </h2>
-<p>As a short introduction to distributional regression, we are going to take a look at a dataset on the wage of 3000 male workers in the Mid-Atlantic Region of the US. The dataset is contained in the <a href="https://cran.r-project.org/package=ISLR" class="external-link"><em>ISLR</em></a> <span class="citation">(James et al. 2017)</span> package for R. We may output the first 6 rows of the dataset with the following R command:</p>
+<p>As a short introduction to distributional regression, we are going to
+take a look at a dataset on the wage of 3000 male workers in the
+Mid-Atlantic Region of the US. The dataset is contained in the <a href="https://cran.r-project.org/package=ISLR" class="external-link"><em>ISLR</em></a> <span class="citation">(James et al. 2017)</span> package for R. We may output
+the first 6 rows of the dataset with the following R command:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">ISLR</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/ISLR/man/Wage.html" class="external-link">Wage</a></span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##        year age           maritl     race       education             region</span>
@@ -169,7 +175,13 @@
 <span class="co">## 155159 2. Information 2. &gt;=Very Good     1. Yes 5.041393 154.68529</span>
 <span class="co">## 11443  2. Information      1. &lt;=Good     1. Yes 4.318063  75.04315</span>
 <span class="co">## 376662 2. Information 2. &gt;=Very Good     1. Yes 4.845098 127.11574</span></code></pre>
-<p>The variable names and factor labels are mostly self-explanatory, but we can look up the details by running <code><a href="https://rdrr.io/pkg/ISLR/man/Wage.html" class="external-link">?ISLR::Wage</a></code>. Our goal is to link wage to a number of relevant explanatory variables. One main driver of wage should be education, so let us start by descriptively investigating the relationship between these two variables. This R code plots the distribution of wage across the different education levels:</p>
+<p>The variable names and factor labels are mostly self-explanatory, but
+we can look up the details by running <code><a href="https://rdrr.io/pkg/ISLR/man/Wage.html" class="external-link">?ISLR::Wage</a></code>. Our goal
+is to link wage to a number of relevant explanatory variables. One main
+driver of wage should be education, so let us start by descriptively
+investigating the relationship between these two variables. This R code
+plots the distribution of wage across the different education
+levels:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span>
 
@@ -178,14 +190,30 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Wages by education level"</span><span class="op">)</span></code></pre></div>
 <p><img src="distregvis_files/figure-html/unnamed-chunk-2-1.png" width="816" style="display: block; margin: auto;"></p>
-<p>The graph shows that education does have a big influence on wage. A higher education level shifts the wage distribution to the right, but it also increases the variance and changes the shape of the distribution. One striking feature of the empirical wage distribution is its bump between 250 and 300. There is no explanation for this bump in the dataset or its help page, so we have to assume it is a anomaly of the sample.</p>
+<p>The graph shows that education does have a big influence on wage. A
+higher education level shifts the wage distribution to the right, but it
+also increases the variance and changes the shape of the distribution.
+One striking feature of the empirical wage distribution is its bump
+between 250 and 300. There is no explanation for this bump in the
+dataset or its help page, so we have to assume it is a anomaly of the
+sample.</p>
 </div>
 <div class="section level2">
 <h2 id="setting-up-an-appropriate-model">Setting up an appropriate model<a class="anchor" aria-label="anchor" href="#setting-up-an-appropriate-model"></a>
 </h2>
-<p>When modeling wage, we need to take into account its special characteristics as a random variable: It is positive (or non-negative, but our dataset does not contain any zeros) and its distribution is right-skewed. These characteristics make distributional regression an appropriate tool for the task at hand.</p>
-<p>Based on the characteristics of wage, we choose the <a href="https://en.wikipedia.org/wiki/Log-normal_distribution" class="external-link">log-normal distribution</a> for our model. The log-normal distribution has positive support, it is right-skewed, and it has a location parameter <span class="math inline">\(\mu\)</span> and a scale parameter <span class="math inline">\(\sigma\)</span>. The idea of distributional regression is to link all parameters of the response distribution to explanatory variables. In our case, these will be education, age, race, and year.</p>
-<p>The following R code specifies and estimates our model using the <code>LOGNO</code> family of the <em>gamlss</em> package <span class="citation">(<span class="citeproc-not-found" data-reference-id="bamlss:Stasinopoulos+Rigby:2018"><strong>???</strong></span>)</span>:</p>
+<p>When modeling wage, we need to take into account its special
+characteristics as a random variable: It is positive (or non-negative,
+but our dataset does not contain any zeros) and its distribution is
+right-skewed. These characteristics make distributional regression an
+appropriate tool for the task at hand.</p>
+<p>Based on the characteristics of wage, we choose the <a href="https://en.wikipedia.org/wiki/Log-normal_distribution" class="external-link">log-normal
+distribution</a> for our model. The log-normal distribution has positive
+support, it is right-skewed, and it has a location parameter <span class="math inline">\(\mu\)</span> and a scale parameter <span class="math inline">\(\sigma\)</span>. The idea of distributional
+regression is to link all parameters of the response distribution to
+explanatory variables. In our case, these will be education, age, race,
+and year.</p>
+<p>The following R code specifies and estimates our model using the
+<code>LOGNO</code> family of the <em>gamlss</em> package <span class="citation">(<strong>bamlss:Stasinopoulos+Rigby:2018?</strong>)</span>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.bamlss.org/" class="external-link">"bamlss"</a></span><span class="op">)</span>
 
@@ -271,29 +299,44 @@
 <span class="co">## -</span>
 <span class="co">## AICc = 29013.48 edf = 30.5912 logLik = -14475.82</span>
 <span class="co">## logPost = -14637.55 nobs = 3000 runtime = 0.654</span></code></pre>
-<p>The output is similar to the summary of a linear model. For each parameter of the response distribution, we get a regression table with slope coefficients, etc. Unfortunately, the coefficients are hard to interpret because they are related to different aspects of the response distribution. Moreover, the scale parameter <span class="math inline">\(\sigma\)</span> is transformed with a log-link.</p>
+<p>The output is similar to the summary of a linear model. For each
+parameter of the response distribution, we get a regression table with
+slope coefficients, etc. Unfortunately, the coefficients are hard to
+interpret because they are related to different aspects of the response
+distribution. Moreover, the scale parameter <span class="math inline">\(\sigma\)</span> is transformed with a
+log-link.</p>
 </div>
 <div class="section level2">
 <h2 id="explore-the-model-with-distreg-vis">Explore the model with <em>distreg.vis</em><a class="anchor" aria-label="anchor" href="#explore-the-model-with-distreg-vis"></a>
 </h2>
-<p>One way to understand the meaning of the coefficients is to define different “covariate scenarios” and take a look at the corresponding predicted response distributions. The <a href="https://github.com/Stan125/distreg.vis" class="external-link"><em>distreg.vis</em></a> <span class="citation">(Stadlmann 2019)</span> package for R allows us to do so interactively:</p>
-<p><a target="_blank" class="external-link btn btn-primary" href="http://141.5.104.49:3838/distreg_app/" role="button">Explore the model with distreg.vis</a></p>
+<p>One way to understand the meaning of the coefficients is to define
+different “covariate scenarios” and take a look at the corresponding
+predicted response distributions. The <a href="https://github.com/Stan125/distreg.vis" class="external-link"><em>distreg.vis</em></a>
+<span class="citation">(Stadlmann 2019)</span> package for R allows us
+to do so interactively:</p>
+<p><a target="_blank" class="external-link btn btn-primary" href="http://141.5.104.49:3838/distreg_app/" role="button">Explore
+the model with distreg.vis</a></p>
 <p>The corresponding R code that starts the app locally is:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">distreg.vis</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/distreg.vis/man/vis.html" class="external-link">vis</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2 unnumbered">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references">
-<div id="ref-bamlss:ISLR">
-<p>James, Gareth, Daniela Witten, Trevor Hastie, and Rob Tibshirani. 2017. <em>ISLR: Data for an Introduction to Statistical Learning with Applications in R</em>. <a href="https://CRAN.R-project.org/package=ISLR" class="external-link uri">https://CRAN.R-project.org/package=ISLR</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:ISLR" class="csl-entry">
+James, Gareth, Daniela Witten, Trevor Hastie, and Rob Tibshirani. 2017.
+<em>ISLR: Data for an Introduction to Statistical Learning with
+Applications in r</em>. <a href="https://CRAN.R-project.org/package=ISLR" class="external-link">https://CRAN.R-project.org/package=ISLR</a>.
 </div>
-<div id="ref-bamlss:distreg.vis">
-<p>Stadlmann, Stanislaus. 2019. <em>Distreg.vis: Framework for the Visualization of Distributional Regression Models</em>. <a href="https://CRAN.R-project.org/package=distreg.vis" class="external-link uri">https://CRAN.R-project.org/package=distreg.vis</a>.</p>
+<div id="ref-bamlss:distreg.vis" class="csl-entry">
+Stadlmann, Stanislaus. 2019. <em>Distreg.vis: Framework for the
+Visualization of Distributional Regression Models</em>. <a href="https://CRAN.R-project.org/package=distreg.vis" class="external-link">https://CRAN.R-project.org/package=distreg.vis</a>.
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
+<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
+Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
 </div>
 </div>
@@ -316,7 +359,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

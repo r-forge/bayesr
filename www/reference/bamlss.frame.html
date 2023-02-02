@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -336,10 +336,10 @@
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   cat.none cat.medium cat.high cat.low</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        1          0        0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        0          0        0       1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        0          0        1       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        0          1        0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        1          0        0       0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4        0          1        0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        0          0        1       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        0          0        0       1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6        0          1        0       0</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## 0/1 responses.</span></span>
@@ -360,7 +360,19 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ family </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ terms </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ x </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ pi </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ catnone </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ formula </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ fake.formula </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ terms </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ model.matrix </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ smooth.construct </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ catlow </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ formula </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ fake.formula </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ terms </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ model.matrix </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ smooth.construct </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ catmedium </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ formula </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ fake.formula </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ terms </span>
@@ -368,6 +380,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ smooth.construct </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ y </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ catnone </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ catlow </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ catmedium </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ delete </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Hierarchical structures.</span></span>
@@ -475,7 +489,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

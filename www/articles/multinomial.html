@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -144,7 +144,10 @@
 
     
     
-<p>This vignette is based on <span class="citation">Yee (2010)</span>. The data is about the marital status of white male in New Zealand in the early 1990s. The aim of this analysis is to explore how the marital status varies with age. The data can be loaded with</p>
+<p>This vignette is based on <span class="citation">Yee (2010)</span>.
+The data is about the marital status of white male in New Zealand in the
+early 1990s. The aim of this analysis is to explore how the marital
+status varies with age. The data can be loaded with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"marital.nz"</span>, package <span class="op">=</span> <span class="st">"VGAM"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">marital.nz</span><span class="op">)</span></code></pre></div>
@@ -159,7 +162,10 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">marital.nz</span><span class="op">$</span><span class="va">mstatus</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] "Divorced/Separated" "Married/Partnered"  "Single"            </span>
 <span class="co">## [4] "Widowed"</span></code></pre>
-<p>The response <code>mstatus</code> has 4 levels. We use a multinomial logit model to estimate the age effect, therefore, one category needs to be specified as a reference category. The model can be estimated with</p>
+<p>The response <code>mstatus</code> has 4 levels. We use a multinomial
+logit model to estimate the age effect, therefore, one category needs to
+be specified as a reference category. The model can be estimated
+with</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Model formula, each category may</span>
 <span class="co">## have different model terms.</span>
@@ -249,18 +255,25 @@
 <span class="co">## -</span>
 <span class="co">## AICc = 6545.377 edf = 12.6029 logLik = -3260.057</span>
 <span class="co">## logPost = -3282.814 nobs = 6053 runtime = 4.771</span></code></pre>
-<p>and suggests reasonable acceptance rates. However, for a final model run it is recommend to increase the number of iteration, the burn-in phase as well as the thinning parameter of the sampling engine function <code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>. The estimated effects can be plotted with</p>
+<p>and suggests reasonable acceptance rates. However, for a final model
+run it is recommend to increase the number of iteration, the burn-in
+phase as well as the thinning parameter of the sampling engine function
+<code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>. The estimated effects can be plotted with</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.1</span>, <span class="fl">4.1</span>, <span class="fl">0.1</span>, <span class="fl">1.1</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<p><img src="multinomial_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;"> To calculate estimated age dependent probabilities for each category, we use the <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code> method.</p>
+<p><img src="multinomial_files/figure-html/unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;">
+To calculate estimated age dependent probabilities for each category, we
+use the <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code> method.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Create a data frame for prediction.</span>
 <span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"age"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">90</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Predict for the three levels.</span>
 <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span><span class="op">)</span></code></pre></div>
-<p>Now, note that the specification of the predictors in the <code><a href="../reference/family.bamlss.html">multinomial_bamlss()</a></code> family is based on a logarithmic link, therefore, to compute the probabilities we run the following code:</p>
+<p>Now, note that the specification of the predictors in the
+<code><a href="../reference/family.bamlss.html">multinomial_bamlss()</a></code> family is based on a logarithmic link,
+therefore, to compute the probabilities we run the following code:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span><span class="op">)</span>
@@ -275,14 +288,18 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="fu"><a href="https://colorspace.R-Forge.R-project.org/reference/rainbow_hcl.html" class="external-link">rainbow_hcl</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="multinomial_files/figure-html/unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="section level2 unnumbered">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references">
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
+<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
+Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
-<div id="ref-bamlss:Yee:2009">
-<p>Yee, Thomas W. 2010. “The VGAM Package for Categorical Data Analysis.” <em>Journal of Statistical Software</em> 32 (10): 1–34. <a href="https://doi.org/10.18637/jss.v032.i10" class="external-link uri">https://doi.org/10.18637/jss.v032.i10</a>.</p>
+<div id="ref-bamlss:Yee:2009" class="csl-entry">
+Yee, Thomas W. 2010. <span>“The <span>VGAM</span> Package for
+Categorical Data Analysis.”</span> <em>Journal of Statistical
+Software</em> 32 (10): 1–34. <a href="https://doi.org/10.18637/jss.v032.i10" class="external-link">https://doi.org/10.18637/jss.v032.i10</a>.
 </div>
 </div>
 </div>
@@ -305,7 +322,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

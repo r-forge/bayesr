@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
       </span>
     </div>
 
@@ -147,41 +147,108 @@
 <div class="section level2">
 <h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
 </h2>
-<p>For the estimation of model parameters the <em>bamlss</em> package provides a flexible infrastructure that allows the user to exchange both, optimization functions for posterior mode estimation (penalized likelihood) and sampling functions for full Bayesian Inference. This goes beyond the common modeling infrastructures that usually allow to create new family objects, only, and can be too restrictive for a couple of applications. Within the unified modeling approach in <em>bamlss</em> it is relatively straightforward to develop new estimation functions (algorithms), e.g., for implementing new models or for efficiency reasons. Such estimation functions could also interface to other software (see, e.g., the <code><a href="../reference/JAGS.html">sam_JAGS()</a></code> sampling function). In the following, the basic requirements for optimizer and sampling functions are described in detail.</p>
+<p>For the estimation of model parameters the <em>bamlss</em> package
+provides a flexible infrastructure that allows the user to exchange
+both, optimization functions for posterior mode estimation (penalized
+likelihood) and sampling functions for full Bayesian Inference. This
+goes beyond the common modeling infrastructures that usually allow to
+create new family objects, only, and can be too restrictive for a couple
+of applications. Within the unified modeling approach in <em>bamlss</em>
+it is relatively straightforward to develop new estimation functions
+(algorithms), e.g., for implementing new models or for efficiency
+reasons. Such estimation functions could also interface to other
+software (see, e.g., the <code><a href="../reference/JAGS.html">sam_JAGS()</a></code> sampling function). In
+the following, the basic requirements for optimizer and sampling
+functions are described in detail.</p>
 </div>
 <div class="section level2">
 <h2 id="the-basic-setup">The basic setup<a class="anchor" aria-label="anchor" href="#the-basic-setup"></a>
 </h2>
-<p>Estimation engines in <em>bamlss</em> are usually based on the model frame setup function <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>, i.e., the functions all have a <code>x</code> argument, which contains all the necessary model and penalty matrices, and a <code>y</code> argument, which is the response (univariate or multivariate). In addition, an estimation engine usually has a <code>family</code> argument, which specifies the model to be estimated. However, this is not a mandatory argument, i.e., one could write an estimation function that is designed for one specific problem, only.</p>
-<p>The modeling setup is best explained by looking at the main estimation engines provided by <em>bamlss</em>. The default optimizer using the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function is <code><a href="../reference/bfit.html">opt_bfit()</a></code>, which is a backfitting routine. The most important arguments are</p>
+<p>Estimation engines in <em>bamlss</em> are usually based on the model
+frame setup function <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>, i.e., the functions
+all have a <code>x</code> argument, which contains all the necessary
+model and penalty matrices, and a <code>y</code> argument, which is the
+response (univariate or multivariate). In addition, an estimation engine
+usually has a <code>family</code> argument, which specifies the model to
+be estimated. However, this is not a mandatory argument, i.e., one could
+write an estimation function that is designed for one specific problem,
+only.</p>
+<p>The modeling setup is best explained by looking at the main
+estimation engines provided by <em>bamlss</em>. The default optimizer
+using the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function is
+<code><a href="../reference/bfit.html">opt_bfit()</a></code>, which is a backfitting routine. The most
+important arguments are</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/bfit.html">opt_bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
-<p>The default sampling engine in <em>bamlss</em> is <code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>, again the most important arguments are</p>
+<p>The default sampling engine in <em>bamlss</em> is
+<code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>, again the most important arguments are</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/GMCMC.html">sam_GMCMC</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
-<p>So basically, the arguments of the optimizer and the sampling function are the same, the main difference is the return value. In <em>bamlss</em> optimizer functions usually return a vector of estimated regression coefficients (parameters), while sampling functions return a matrix of parameter samples of class <code>"mcmc"</code> or <code>"mcmc.list"</code> (for details see the documentation of the <em>coda</em> package). Also note that there is naming convention, optimizer functions start with prefix <code>opt_*</code> and sampler functions with <code>sam_*</code>.</p>
-<p>Internally, what the optimizer or sampling function is actually processing is not important for the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function as long as a vector or matrix of parameters is returned. For optimizer functions the return value needs to be named list with an element <code>"parameters"</code>, the vector (also a matrix, e.g., for <code><a href="../reference/lasso.html">opt_lasso()</a></code> and <code><a href="../reference/boost.html">opt_boost()</a></code> optimizers) of estimated parameters. The most important requirement to make use of all extractor functions like <code><a href="../reference/summary.bamlss.html">summary.bamlss()</a></code>, <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code>, <code><a href="../reference/plot.bamlss.html">plot.bamlss()</a></code>, <code><a href="../reference/residuals.bamlss.html">residuals.bamlss()</a></code>, etc., is to follow the naming convention of the returned estimates. The parameter names are based on the names of the distribution parameters as specified in the family object. For example, the family object <code><a href="../reference/family.bamlss.html">gaussian_bamlss()</a></code> has parameter names <code>"mu"</code> and <code>"sigma"</code></p>
+<p>So basically, the arguments of the optimizer and the sampling
+function are the same, the main difference is the return value. In
+<em>bamlss</em> optimizer functions usually return a vector of estimated
+regression coefficients (parameters), while sampling functions return a
+matrix of parameter samples of class <code>"mcmc"</code> or
+<code>"mcmc.list"</code> (for details see the documentation of the
+<em>coda</em> package). Also note that there is naming convention,
+optimizer functions start with prefix <code>opt_*</code> and sampler
+functions with <code>sam_*</code>.</p>
+<p>Internally, what the optimizer or sampling function is actually
+processing is not important for the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper
+function as long as a vector or matrix of parameters is returned. For
+optimizer functions the return value needs to be named list with an
+element <code>"parameters"</code>, the vector (also a matrix, e.g., for
+<code><a href="../reference/lasso.html">opt_lasso()</a></code> and <code><a href="../reference/boost.html">opt_boost()</a></code> optimizers) of
+estimated parameters. The most important requirement to make use of all
+extractor functions like <code><a href="../reference/summary.bamlss.html">summary.bamlss()</a></code>,
+<code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code>, <code><a href="../reference/plot.bamlss.html">plot.bamlss()</a></code>,
+<code><a href="../reference/residuals.bamlss.html">residuals.bamlss()</a></code>, etc., is to follow the naming
+convention of the returned estimates. The parameter names are based on
+the names of the distribution parameters as specified in the family
+object. For example, the family object <code><a href="../reference/family.bamlss.html">gaussian_bamlss()</a></code>
+has parameter names <code>"mu"</code> and <code>"sigma"</code></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/family.bamlss.html">gaussian_bamlss</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">names</span></code></pre></div>
 <pre><code><span class="co">## [1] "mu"    "sigma"</span></code></pre>
-<p>Then, each distributional parameter can be modeled by parametric (linear) and nonlinear smooth effect terms. The parametric part is indicated with <code>"p"</code> and the smooth part with <code>"s"</code>. The names of the parametric coefficients are the names of the corresponding model matrices as returned from <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>. E.g., if two linear effects, “<code>x1</code>” and <code>"x2"</code>, enter the model for distributional parameter <code>"mu"</code>, then the final names are <code>"mu.p.x1"</code> and <code>"mu.p.x2"</code>. Similarly for the smooth parts, if we model a variable <code>"x3"</code> using a regression spline as provided by the <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> function of the <em>mgcv</em> package, the name is based on the names that are used by <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code> for the <code><a href="../reference/smooth.construct.html">smooth.construct()</a></code> object. In this case the parameter names start with <code>"mu.s.s(x3)"</code>. If this smooth term has 10 regression coefficients, then the final name must be</p>
+<p>Then, each distributional parameter can be modeled by parametric
+(linear) and nonlinear smooth effect terms. The parametric part is
+indicated with <code>"p"</code> and the smooth part with
+<code>"s"</code>. The names of the parametric coefficients are the names
+of the corresponding model matrices as returned from
+<code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>. E.g., if two linear effects,
+“<code>x1</code>” and <code>"x2"</code>, enter the model for
+distributional parameter <code>"mu"</code>, then the final names are
+<code>"mu.p.x1"</code> and <code>"mu.p.x2"</code>. Similarly for the
+smooth parts, if we model a variable <code>"x3"</code> using a
+regression spline as provided by the <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> function of the
+<em>mgcv</em> package, the name is based on the names that are used by
+<code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code> for the <code><a href="../reference/smooth.construct.html">smooth.construct()</a></code>
+object. In this case the parameter names start with
+<code>"mu.s.s(x3)"</code>. If this smooth term has 10 regression
+coefficients, then the final name must be</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"mu.s.s(x3)"</span>, <span class="st">".b"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##  [1] "mu.s.s(x3).b1"  "mu.s.s(x3).b2"  "mu.s.s(x3).b3"  "mu.s.s(x3).b4" </span>
 <span class="co">##  [5] "mu.s.s(x3).b5"  "mu.s.s(x3).b6"  "mu.s.s(x3).b7"  "mu.s.s(x3).b8" </span>
 <span class="co">##  [9] "mu.s.s(x3).b9"  "mu.s.s(x3).b10"</span></code></pre>
-<p>i.e., all smooth term parameters are named with “b” and a numerated.</p>
+<p>i.e., all smooth term parameters are named with “b” and a
+numerated.</p>
 </div>
 <div class="section level2">
 <h2 id="model-fitting-engines-for-linear-regression">Model fitting engines for linear regression<a class="anchor" aria-label="anchor" href="#model-fitting-engines-for-linear-regression"></a>
 </h2>
-<p>In the following, to explain the setup and the naming convention of estimation engines in more detail, we implement</p>
+<p>In the following, to explain the setup and the naming convention of
+estimation engines in more detail, we implement</p>
 <ul>
-<li>a new family object for simple linear models <span class="math inline">\(y = x^{\top}\boldsymbol{\beta} + \varepsilon\)</span> with <span class="math inline">\(\varepsilon \sim N(0, \sigma^2)\)</span>,</li>
-<li>and set up an optimizer function based on the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> function,</li>
+<li>a new family object for simple linear models <span class="math inline">\(y = x^{\top}\boldsymbol{\beta} +
+\varepsilon\)</span> with <span class="math inline">\(\varepsilon \sim
+N(0, \sigma^2)\)</span>,</li>
+<li>and set up an optimizer function based on the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>
+function,</li>
 <li>and additionally a MCMC sampling function.</li>
 </ul>
-<p>For illustration, the family object is kept very simple, we only model the mean function in terms of covariates.</p>
+<p>For illustration, the family object is kept very simple, we only
+model the mean function in terms of covariates.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">lm_bamlss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
@@ -200,7 +267,9 @@
   <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"family.bamlss"</span>
   <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>Now, for setting up the estimation functions we first simulate some data using the <code><a href="../reference/GAMart.html">GAMart()</a></code> function, afterwards the necessary <code>"bamlss.frame"</code> can be created with</p>
+<p>Now, for setting up the estimation functions we first simulate some
+data using the <code><a href="../reference/GAMart.html">GAMart()</a></code> function, afterwards the necessary
+<code>"bamlss.frame"</code> can be created with</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Simulate some data.</span>
 <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span>
@@ -226,7 +295,11 @@
 <span class="co">##   ..$ y </span>
 <span class="co">##   .. ..$ num </span>
 <span class="co">##   ..$ delete</span></code></pre>
-<p>As noted above, the object is a named list with elements <code>"x"</code> and <code>"y"</code>, which will be passed to the estimation functions. For the moment, since we only implement a linear model, we need to work with the linear model matrix that is part of the <code>bf</code> object.</p>
+<p>As noted above, the object is a named list with elements
+<code>"x"</code> and <code>"y"</code>, which will be passed to the
+estimation functions. For the moment, since we only implement a linear
+model, we need to work with the linear model matrix that is part of the
+<code>bf</code> object.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">model.matrix</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##   (Intercept)        x1         x2</span>
@@ -277,7 +350,9 @@
 
   <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">rval</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>This optimizer function can already be used with the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function and all extractor functions are readily available.</p>
+<p>This optimizer function can already be used with the
+<code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function and all extractor functions are
+readily available.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Model formula with polynomial model terms.</span>
 <span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">x2</span>, <span class="fl">5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">x3</span>, <span class="fl">5</span><span class="op">)</span>
@@ -326,27 +401,44 @@
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p</span> <span class="op">~</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></code></pre></div>
 <p><img src="engines_files/figure-html/unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;"></p>
-<p>The next step is to setup a full Bayesian MCMC sampling function. Fortunately, if we assume multivariate normal priors for the regression coefficients and an inverse Gamma prior for the variance, a Gibbs sampler with multivariate normal and inverse Gamma full conditionals can be created. The MCMC algorithm consecutively samples for <span class="math inline">\(t = 1, \ldots, T\)</span> from the full conditionals <span class="math display">\[
-\boldsymbol{\beta}^{(t)} | \cdot \sim N\left(\boldsymbol{\mu}_{\boldsymbol{\beta}}^{(t - 1)}, 
+<p>The next step is to setup a full Bayesian MCMC sampling function.
+Fortunately, if we assume multivariate normal priors for the regression
+coefficients and an inverse Gamma prior for the variance, a Gibbs
+sampler with multivariate normal and inverse Gamma full conditionals can
+be created. The MCMC algorithm consecutively samples for <span class="math inline">\(t = 1, \ldots, T\)</span> from the full
+conditionals <span class="math display">\[
+\boldsymbol{\beta}^{(t)} | \cdot \sim
+N\left(\boldsymbol{\mu}_{\boldsymbol{\beta}}^{(t - 1)},
   \boldsymbol{\Sigma}_{\boldsymbol{\beta}}^{(t - 1)}\right)
-\]</span> and <span class="math display">\[ 
-{\sigma^2}^{(t)} | \cdot \sim IG\left({a^{\prime}}^{(t - 1)}, {b^{\prime}}^{(t - 1)}\right),
-\]</span> where <span class="math inline">\(IG( \cdot )\)</span> is the inverse Gamma distribution for sampling the variance parameter. The covariance matrix for <span class="math inline">\(\boldsymbol{\beta}\)</span> is given by <span class="math display">\[
-\boldsymbol{\Sigma}_{\boldsymbol{\beta}} = \left(\frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{X} +
+\]</span> and <span class="math display">\[
+{\sigma^2}^{(t)} | \cdot \sim IG\left({a^{\prime}}^{(t - 1)},
+{b^{\prime}}^{(t - 1)}\right),
+\]</span> where <span class="math inline">\(IG( \cdot )\)</span> is the
+inverse Gamma distribution for sampling the variance parameter. The
+covariance matrix for <span class="math inline">\(\boldsymbol{\beta}\)</span> is given by <span class="math display">\[
+\boldsymbol{\Sigma}_{\boldsymbol{\beta}} =
+\left(\frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{X} +
   \frac{1}{\sigma^2}\mathbf{M}^{-1}\right)^{-1}
 \]</span> and the mean <span class="math display">\[
-\boldsymbol{\mu}_{\boldsymbol{\beta}} = \boldsymbol{\Sigma}_{\boldsymbol{\beta}}
+\boldsymbol{\mu}_{\boldsymbol{\beta}} =
+\boldsymbol{\Sigma}_{\boldsymbol{\beta}}
   \left(\frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{y} +
   \frac{1}{\sigma^2}\mathbf{M}^{-1}\mathbf{m}\right),
-\]</span> where <span class="math inline">\(\mathbf{m}\)</span> is the prior mean and <span class="math inline">\(\mathbf{M}\)</span> the prior covariance matrix. Similarly, for <span class="math inline">\(\sigma^2\)</span> paramaters <span class="math inline">\(a^{\prime}\)</span> and <span class="math inline">\(b^{\prime}\)</span> are computed by <span class="math display">\[
+\]</span> where <span class="math inline">\(\mathbf{m}\)</span> is the
+prior mean and <span class="math inline">\(\mathbf{M}\)</span> the prior
+covariance matrix. Similarly, for <span class="math inline">\(\sigma^2\)</span> paramaters <span class="math inline">\(a^{\prime}\)</span> and <span class="math inline">\(b^{\prime}\)</span> are computed by <span class="math display">\[
 a^{\prime} = a + \frac{n}{2} + \frac{p}{2}
 \]</span> and <span class="math display">\[
 b^{\prime} = b + \frac{1}{2}(\mathbf{y} -
-  \mathbf{X}\boldsymbol{\beta})^\top(\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) +
-  \frac{1}{2} (\boldsymbol{\beta} - \mathbf{m})^\top \mathbf{M}^{-1}(\boldsymbol{\beta}
+  \mathbf{X}\boldsymbol{\beta})^\top(\mathbf{y} -
+\mathbf{X}\boldsymbol{\beta}) +
+  \frac{1}{2} (\boldsymbol{\beta} - \mathbf{m})^\top
+\mathbf{M}^{-1}(\boldsymbol{\beta}
   - \mathbf{m}),
-\]</span> where <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are usually set small, e.g., with <span class="math inline">\(a = 1\)</span> and <span class="math inline">\(b = 0.0001\)</span>, such that the prior is flat and uninformative.</p>
-<p>We can implement the MCMC algorithm in the following sampling function</p>
+\]</span> where <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are usually set small, e.g., with <span class="math inline">\(a = 1\)</span> and <span class="math inline">\(b =
+0.0001\)</span>, such that the prior is flat and uninformative.</p>
+<p>We can implement the MCMC algorithm in the following sampling
+function</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sam_LM</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">start</span> <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">n.iter</span> <span class="op">=</span> <span class="fl">12000</span>, <span class="va">burnin</span> <span class="op">=</span> <span class="fl">2000</span>, <span class="va">thin</span> <span class="op">=</span> <span class="fl">10</span>,
@@ -443,7 +535,8 @@ b^{\prime} = b + \frac{1}{2}(\mathbf{y} -
 
   <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>The new estimation function can be directly used with the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper.</p>
+<p>The new estimation function can be directly used with the
+<code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"lm"</span>, optimizer <span class="op">=</span> <span class="va">opt_LM</span>, sampler <span class="op">=</span> <span class="va">sam_LM</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## iteration: 1000 </span>
@@ -474,22 +567,22 @@ b^{\prime} = b + \frac{1}{2}(\mathbf{y} -
 <span class="co">## -</span>
 <span class="co">## Parametric coefficients:</span>
 <span class="co">##                  Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## (Intercept)   0.34266  0.25210  0.34404  0.43398      0.344</span>
-<span class="co">## x1           -0.67663 -0.83607 -0.67868 -0.51842     -0.677</span>
-<span class="co">## poly(x2, 5)1 -1.16063 -2.14553 -1.15465 -0.18250     -1.138</span>
-<span class="co">## poly(x2, 5)2  2.57868  1.62209  2.53665  3.59880      2.575</span>
-<span class="co">## poly(x2, 5)3  0.96045 -0.03651  0.93142  2.04981      0.966</span>
-<span class="co">## poly(x2, 5)4 -1.53098 -2.51014 -1.53724 -0.56032     -1.504</span>
-<span class="co">## poly(x2, 5)5  1.22170  0.16292  1.21515  2.25903      1.201</span>
-<span class="co">## poly(x3, 5)1 -0.22651 -1.23437 -0.23804  0.81036     -0.214</span>
-<span class="co">## poly(x3, 5)2  4.44452  3.47117  4.44133  5.36844      4.446</span>
-<span class="co">## poly(x3, 5)3  0.18622 -0.80221  0.15864  1.20329      0.200</span>
-<span class="co">## poly(x3, 5)4 -0.05343 -1.07788 -0.04423  0.91396     -0.052</span>
-<span class="co">## poly(x3, 5)5 -0.62407 -1.57591 -0.61765  0.29915     -0.627</span>
+<span class="co">## (Intercept)   0.34252  0.25527  0.34282  0.43611      0.344</span>
+<span class="co">## x1           -0.67672 -0.83802 -0.67751 -0.51890     -0.677</span>
+<span class="co">## poly(x2, 5)1 -1.14643 -2.11933 -1.14154 -0.19307     -1.138</span>
+<span class="co">## poly(x2, 5)2  2.57407  1.63995  2.57167  3.60904      2.575</span>
+<span class="co">## poly(x2, 5)3  0.95966  0.01826  0.93844  1.95831      0.966</span>
+<span class="co">## poly(x2, 5)4 -1.51688 -2.49769 -1.51497 -0.53558     -1.504</span>
+<span class="co">## poly(x2, 5)5  1.20293  0.14707  1.22189  2.21376      1.201</span>
+<span class="co">## poly(x3, 5)1 -0.23606 -1.25027 -0.23667  0.70896     -0.214</span>
+<span class="co">## poly(x3, 5)2  4.46278  3.45564  4.46599  5.44358      4.446</span>
+<span class="co">## poly(x3, 5)3  0.18477 -0.90909  0.18850  1.21970      0.200</span>
+<span class="co">## poly(x3, 5)4 -0.06372 -1.09129 -0.06167  0.91668     -0.052</span>
+<span class="co">## poly(x3, 5)5 -0.62116 -1.64493 -0.61147  0.32856     -0.627</span>
 <span class="co">## ---</span>
 <span class="co">## Sampler summary:</span>
 <span class="co">## -</span>
-<span class="co">## DIC = 105.5531 pd = 48.6458 runtime = 2.242</span>
+<span class="co">## DIC = 105.5625 pd = 48.6553 runtime = 2.71</span>
 <span class="co">## ---</span>
 <span class="co">## Optimizer summary:</span>
 <span class="co">## -</span>
@@ -509,11 +602,13 @@ b^{\prime} = b + \frac{1}{2}(\mathbf{y} -
 <p><img src="engines_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2 unnumbered">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references">
-<div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link uri">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
+Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
+<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
+Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
 </div>
 </div>
 </div>
@@ -536,7 +631,7 @@ b^{\prime} = b + \frac{1}{2}(\mathbf{y} -
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
