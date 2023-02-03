@@ -2,8 +2,10 @@
 # Hybrid GNU/BSD makefile for R package 'bayesxsrc'
 # author: Daniel Adler <dadler@uni-goettingen.de>
 
-CXX = `"$(R_HOME)/bin/R" CMD config CXX14`
-CXXFLAGS = `"$(R_HOME)/bin/R" CMD config CXX14FLAGS`
+CXX14 = `"${R_HOME}/bin/R" CMD config CXX14`
+CXX14STD = `"${R_HOME}/bin/R" CMD config CXX14STD`
+CXX = ${CXX14} ${CXX14STD}
+CXXFLAGS = `"${R_HOME}/bin/R" CMD config CXX14FLAGS`
 
 all: BayesX
 
@@ -160,7 +162,7 @@ CPPFLAGS += -D__BUILDING_GNU -DTEMPL_INCL_DEF -DNO_TEMPLATE_FRIENDS -DINCLUDE_RE
 # CXXFLAGS += -O3 -ansi
 
 BayesX: ${OBJS}
-	${CXX} ${OBJS} ${LDFLAGS} ${TARGET_ARCH} -o BayesX
+	${CXX} ${CXXFLAGS} ${OBJS} ${LDFLAGS} ${TARGET_ARCH} -o BayesX
 
 clean:
 	rm -f ${OBJS}
