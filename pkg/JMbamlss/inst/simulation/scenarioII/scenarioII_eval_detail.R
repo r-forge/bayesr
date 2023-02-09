@@ -444,6 +444,7 @@ ggplot(mean_t_dat %>% filter(id %in% ids) %>%
 
 # How much depends on the MCMC seed? --------------------------------------
 
+# Not reliable as F was incorrectly estimated
 scenII_old_F <- JMbamlss:::sim_jmbamlss_eval(
   wd = paste0(server_wd, "../../JMbamlss/simulation/scen_II_221209/"),
   model_wd = "F/", data_wd = "data/", name = "F", rds = FALSE)
@@ -457,6 +458,22 @@ ggplot(data = res_F %>% filter(predictor != "mu_long", type == "MSE"),
           "Models Differ Only in MCMC Seed") +
   ylab("Emp. MSE") +
   theme_bw()
+
+# Use fit from true basis functions
+scenII_old_E <- JMbamlss:::sim_jmbamlss_eval(
+  wd = paste0(server_wd, "../../JMbamlss/simulation/scen_II_221209/"),
+  model_wd = "E/", data_wd = "data/", name = "E", rds = FALSE)
+saveRDS(scenII_old_E, file = paste0(server_wd, "scen_II_221209/res_E.rds"))
+
+res_E <- readRDS(paste0(server_wd, "scen_II_221209/res_E.rds"))
+ggplot(data = res_E %>% filter(predictor != "mu_long", type == "MSE"),
+       aes(y = value, x = predictor)) +
+  geom_boxplot() +
+  ggtitle("MSE: All Predictors",
+          "Models Differ Only in MCMC Seed") +
+  ylab("Emp. MSE") +
+  theme_bw()
+
 
 
 # How much depends on the FPC Basis? --------------------------------------

@@ -171,6 +171,36 @@ ggplot(dat_Lobs %>% arrange(desc(it), src),
   ggtitle("Different Fits based on Different Seeds and FPCs")
 
 
+# Different Fits with Different Seeds For TRUE FPCs -------------------
+
+
+fit_E <- sim_predict_longobs(obs = ids,
+                             list.files(paste0(server_wd, "scen_II_221209/E/")), 
+                             wd = paste0(server_wd, "scen_II_221209/"),
+                             model_wd = "E/", data_wd = "data/", rds = FALSE)
+
+dat_E <- do.call(rbind, Map(cbind, it = seq_along(fit_E), 
+                            lapply(fit_E, function(x) {
+                              x$predictions$mu_long[, c("id", "marker",
+                                                        "obstime", "Mean")]
+                            })))
+
+dat_E <- rbind(dat_E, fit_E[[1]]$simulations$mu_long %>%
+                 mutate(Mean = mu, mu = NULL, it = 0)) %>%
+  mutate(src = factor(ifelse(it == 0, "TRUE", "EST")))
+
+
+ggplot(dat_E, aes(x = obstime, y = Mean, group = it, color = src, 
+                  alpha = src)) + 
+  geom_line() +
+  facet_grid(id ~ marker) +
+  scale_alpha_manual(values = c(0.6, 1)) +
+  theme_bw() +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), alpha = NULL, color = NULL) +
+  ggtitle("Different Fits based on Different Seeds")
+
+
+
 # Look at one model -------------------------------------------------------
 
 dat_Lobs %>% filter(marker == "m1", id == "113", Mean < 0) %>% head()

@@ -318,12 +318,16 @@ ggplot(data = dat_med, aes(x = angles, y = obs_med)) +
 
 # Use MSE from MJM Simulation to Find Best Criterion ----------------------
 
+# Not reliable as F contains incorrect model fits
 mjm_fits <- JMbamlss:::sim_jmbamlss_eval(
   wd = paste0(results_wd, "../../JMbamlss/simulation/scen_II_230117/"),
   model_wd = "F/", data_wd = "data/", name = "JM", rds = TRUE)
 saveRDS(mjm_fits, 
         file = paste0(results_wd, "../../JMbamlss/simulation/scen_II_230117/",
                       "simscenII_F.rds"))
+
+# Instead use ...
+# readRDS()
 
 mu_mse <- mjm_fits %>% 
   filter(type == "MSE", predictor == "mu") %>%
