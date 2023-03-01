@@ -49,11 +49,6 @@
 ##' principal components.
 ##' @param npc prespecified value for the number of principal components (if
 ##' given, this overrides \code{pve}).
-##' @param var \code{TRUE} or \code{FALSE} indicating whether model-based
-##' estimates for the variance of FPCA expansions should be computed.
-##' @param simul logical: should critical values be estimated for simultaneous
-##' confidence intervals?
-##' @param sim.alpha 1 - coverage probability of the simultaneous intervals.
 ##' @param useSymm logical, indicating whether to smooth only the upper
 ##' triangular part of the naive covariance (when \code{cov.est.method==2}).
 ##' This can save computation time for large data sets, and allows for
@@ -175,7 +170,6 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
                  argvals_obs = FALSE, argvals_pred = seq(0, 1, by = 0.01),
                  random.int = FALSE, nbasis = 10, nbasis_cov = nbasis, 
                  bs_cov = "symm", pve = 0.99, npc = NULL, 
-                 var = FALSE, simul = FALSE, sim.alpha = 0.95, 
                  useSymm = FALSE, makePD = FALSE, center = TRUE, 
                  cov.est.method = 1, integration = "trapezoidal") {
   
@@ -310,18 +304,20 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
   ### numerical integration for calculation of eigenvalues (see Ramsay & 
   ### Silverman, Chapter 8)
   w <- refund:::quadWeights(argvals_pred, method = integration)
-  Wsqrt <- diag(sqrt(w))
-  Winvsqrt <- diag(1/(sqrt(w)))
-  V <- Wsqrt %*% npc.0 %*% Wsqrt
-  evalues = eigen(V, symmetric = TRUE, only.values = TRUE)$values
+  # Wsqrt <- diag(sqrt(w))
+  # Winvsqrt <- diag(1/(sqrt(w)))
+  V <- t(sqrt(w)*t(sqrt(w)*npc.0)) 
+    # Wsqrt %*% npc.0 %*% Wsqrt
+  eigenV <- eigen(V, symmetric = TRUE)
+  evalues = eigenV$values
   ###
   evalues = replace(evalues, which(evalues <= 0), 0)
   npc = ifelse(is.null(npc), min(which(cumsum(evalues)/sum(evalues) > pve)), 
                npc)
-  efunctions = matrix(Winvsqrt %*% 
-                        eigen(V, symmetric = TRUE)$vectors[, seq(len = npc)],
+  efunctions = matrix(1/sqrt(w)*
+                        eigenV$vectors[, seq(len = npc)],
                       nrow = D_pred, ncol = npc)
-  evalues = eigen(V, symmetric = TRUE, only.values = TRUE)$values[1:npc]  
+  evalues = eigenV$values[1:npc]  
   # use correct matrix for eigenvalue problem
   cov.hat = efunctions %*% tcrossprod(diag(evalues, nrow = npc, ncol = npc),
                                       efunctions)
@@ -345,8 +341,8 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
   rownames(Yhat) = rownames(Y.pred)
   colnames(Yhat) = argvals_pred
   scores = matrix(NA, nrow = I.pred, ncol = npc)
-  VarMats = vector("list", I.pred)
-  for (i in 1:I.pred) VarMats[[i]] = matrix(NA, nrow = D_pred, ncol = D_pred)
+  #VarMats = vector("list", I.pred)
+  #for (i in 1:I.pred) VarMats[[i]] = matrix(NA, nrow = D_pred, ncol = D_pred)
   diag.var = matrix(NA, nrow = I.pred, ncol = D_pred)
   crit.val = rep(0, I.pred)
   for (i.subj in 1:I.pred) {
@@ -358,27 +354,24 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
     ZtZ_sD.inv = solve(crossprod(Zcur) + sigma2 * D.inv)
     scores[i.subj, ] = ZtZ_sD.inv %*% t(Zcur) %*% (Y.tilde[i.subj, obs.points])
     Yhat[i.subj, ] = t(as.matrix(muhat)) + scores[i.subj, ] %*% t(efunctions)
-    if (var) {
-      VarMats[[i.subj]] = sigma2 * Z %*% ZtZ_sD.inv %*% t(Z)
-      diag.var[i.subj, ] = diag(VarMats[[i.subj]])
-      if (simul & sigma2 != 0) {
-        norm.samp = mvrnorm(2500, mu = rep(0, D), Sigma = VarMats[[i.subj]])/
-          matrix(sqrt(diag(VarMats[[i.subj]])), nrow = 2500, ncol = D, 
-                 byrow = TRUE)
-        crit.val[i.subj] = quantile(apply(abs(norm.samp), 1, max), sim.alpha)
-      }
-    }
+    # if (var) {
+    #   VarMats[[i.subj]] = sigma2 * Z %*% ZtZ_sD.inv %*% t(Z)
+    #   diag.var[i.subj, ] = diag(VarMats[[i.subj]])
+    #   if (simul & sigma2 != 0) {
+    #     norm.samp = mvrnorm(2500, mu = rep(0, D), Sigma = VarMats[[i.subj]])/
+    #       matrix(sqrt(diag(VarMats[[i.subj]])), nrow = 2500, ncol = D, 
+    #              byrow = TRUE)
+    #     crit.val[i.subj] = quantile(apply(abs(norm.samp), 1, max), sim.alpha)
+    #   }
+    # }
   }
   
   ret.objects = c("Yhat", "Y", "scores", 
                   if(argvals_obs) "mu" else "muhat",
                   "efunctions", "evalues", "npc",
-                  if(argvals_obs) "argvals" else "argvals_pred")
-  if (var) {
-    ret.objects = c(ret.objects, "sigma2", "diag.var", "VarMats")
-    if (simul)
-      ret.objects = c(ret.objects, "crit.val")
-  }
+                  if(argvals_obs) "argvals" else "argvals_pred",
+                  "sigma2")
+
   ret = lapply(1:length(ret.objects), function(u) get(ret.objects[u]))
   names(ret) = ret.objects
   class(ret) = "fpca"

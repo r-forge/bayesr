@@ -122,6 +122,24 @@ ggplot(mean_dat %>% filter(id %in% ids, name %in% c("mu", "CenFPC1", "CenFPC95",
   ggtitle("Simulation Scenario II: Results for Mu",
           "Random Longitudinal Trajectories and Fits on Simulation Run 1")
 
+# For Finland
+ggplot(mean_dat %>% filter(id %in% c(56, 147), 
+                           name %in% c("mu", "CenFPC1", "JMB")) %>%
+         mutate(name = factor(name, labels = c("Truth", "Proposed",
+                                               "Other")),
+                marker = factor(marker, labels = c("Exposure 1", "Exposure 2")),
+                id = factor(id, labels = c("Subject 56", "Subject 147"))),
+       aes(x = obstime, y = value, color = name)) +
+  facet_grid(id ~ marker, scales = "free_y")+
+  theme_bw() +
+  geom_point(aes(y = y), color = "grey") +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_color_manual(values = c("black", "blue", "red")) +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL,
+       x = "Time") +
+  ggtitle("Examples of Model Fits to Simulated Data")
+# save as (3x9inch pdf)
 
 
 

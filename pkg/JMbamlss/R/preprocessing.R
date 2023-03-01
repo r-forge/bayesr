@@ -17,6 +17,8 @@
 #' @param marker String giving the name of the longitudinal marker variable.
 #' @param M Number of mFPCs to compute in the MFPCA. If not supplied, it
 #'  defaults to the maximum number of computable mFPCs.
+#' @param weights TRUE if inverse sum of univariate eigenvals should be used as
+#'  weights in the scalar product of the MFPCA. Defaults to FALSE (weights 1).
 #' @param remove_obs Minimal number of observations per individual and marker to
 #'  be included in the FPC estimation. Defaults to NULL (all observations). Not
 #'  removing observations can lead to problems if the univariate variance 
@@ -27,9 +29,7 @@
 #'  package \code{refund}, or function 'PACE' from package \code{MFPCA}.
 #' @param var_names Vector of variable names corresponding to ID and MARKER. 
 #'  Needed to remove observations.
-#' @param nbasis Number of B-spline basis functions for mean estimate and
-#'  bivariate smoothing of covariance surface for methods fpca.sc, PACE.
-#' @param nbasis number of B-spline basis functions for mean estimate for 
+#' @param nbasis Number of B-spline basis functions for mean estimate for 
 #'  methods fpca, fpca.sc, PACE. For fpca.sc, PACE also bivariate smoothing of
 #'  covariance estimate. 
 #' @param nbasis_cov Number of basis functions used for the bivariate
@@ -49,7 +49,7 @@
 #'  calculate the residuals. Defaults to FALSE.
 preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)", 
                            time = "obstime", id = "id", marker = "marker",
-                           M = NULL, remove_obs = NULL, 
+                           M = NULL, weights = FALSE, remove_obs = NULL, 
                            method = c("fpca", "fpca.sc", "FPCA", "PACE"), 
                            nbasis = 10, nbasis_cov = nbasis, bs_cov = "symm",
                            npc = NULL, fve_uni = 0.99, pve_uni = 0.99, 
@@ -85,7 +85,9 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
               " to ", max(maxtime), ". Please check if appropriate.")
     }
   }
-  argvals_pred <- seq(0, max(maxtime), length.out = 101)
+  argvals_pred <- lapply(marker_dat, function (x) {
+    sort(unique(c(x[, time], max(maxtime))))
+  })
   
   uni_mean <- as.formula(uni_mean)
   
@@ -114,11 +116,14 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
                         var = TRUE)
       })
     } else {
-      FPCA <- lapply(lY, function(y) {
-        fpca(ydata = y, pve = pve_uni, nbasis = nbasis, nbasis_cov = nbasis_cov,
-             bs_cov = bs_cov, npc = npc, var = TRUE,
-             argvals_pred = argvals_pred)
-      })
+      # For loop as it is more memory efficient
+      FPCA <- list()
+      for (m in seq_along(marker_dat)) {
+        FPCA[[m]] <- fpca(ydata = lY[[m]], pve = pve_uni, nbasis = nbasis, 
+                          nbasis_cov = nbasis_cov,
+                          bs_cov = bs_cov, npc = npc,
+                          argvals_pred = argvals_pred[[m]])
+      }
     }
     
     # Construct multivariate FunData and estimated FPCs
@@ -132,6 +137,9 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     if (is.null(M)) {
       M <- sum(sapply(FPCA, "[[", "npc"))
     }
+    
+    # Extract weights
+    weight_vec <- 1/colSums(sapply(FPCA, "[[", "evalues"))
     
     
   } else if (method == "FPCA") {
@@ -163,6 +171,9 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     if (is.null(M)) {
       M <- sum(sapply(FPCA, "[[", "selectK"))
     }
+    
+    # Extract weights
+    weight_vec <- 1/colSums(sapply(FPCA, "[[", "lambda"))
     
   } else if (method == "PACE") {
     
@@ -202,11 +213,17 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     if (is.null(M)) {
       M <- sum(sapply(FPCA, "[[", "npc"))
     }
+    
+    # Extract weights
+    weight_vec <- 1/colSums(sapply(FPCA, "[[", "values"))
   }
   
+  if (!weights) {
+    weight_vec <- rep(1, length(mFData))
+  }
 
   MFPCA <- MFPCA(mFData = mFData, M = M, uniExpansions = uniExpansions,
-                 fit = fit)
+                 weights = weight_vec, fit = fit)
   attr(MFPCA, "sigma2") <- lapply(FPCA, "[[", "sigma2")
   if (save_uniFPCA) {
     attr(MFPCA, "uniFPCA") <- FPCA

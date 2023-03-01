@@ -34,6 +34,7 @@ library(JMbamlss)
 
 i <- 1
 set.seed(i)
+setting <- "scen_mauff/"
 
 
 # Load the data
