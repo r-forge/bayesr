@@ -289,7 +289,7 @@ fpca <- function(Y = NULL, ydata = NULL, Y.pred = NULL, argvals = NULL,
                            newdata = data.frame(row.vec = row.vec.pred,
                                                 col.vec = col.vec.pred)),
                    D_pred, D_pred)
-    npc.0 = (npc.0 + t(npc.0))/2
+    #npc.0 = (npc.0 + t(npc.0))/2
     G.0 = ifelse(cov.count == 0, NA, cov.sum/cov.count)
     diag.G0 = diag(G.0)
   }
