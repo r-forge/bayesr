@@ -43,6 +43,8 @@
 #'  fpca.sc,PACE.
 #' @param fit MFPCA argument to return a truncated KL fit to the data. Defaults
 #'  to FALSE.
+#' @param max_time If supplied, forces the evaluation of the MFPCs up to maxtime.
+#'  Only implemented for method = 'fpca'.
 #' @param save_uniFPCA TRUE to attach list of univariate FPCAs as attribute to
 #'  output. Defaults to FALSE.
 #' @param save_uniGAM TRUE to attach list of univariate additive models used to
@@ -53,7 +55,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
                            method = c("fpca", "fpca.sc", "FPCA", "PACE"), 
                            nbasis = 10, nbasis_cov = nbasis, bs_cov = "symm",
                            npc = NULL, fve_uni = 0.99, pve_uni = 0.99, 
-                           fit = FALSE,
+                           fit = FALSE, max_time = NULL,
                            save_uniFPCA = FALSE, save_uniGAM = FALSE) {
   require(bamlss)
   require(MFPCA)
@@ -68,9 +70,14 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
   
   marker_dat <- split(data, data$marker)
   
+  
   # Check whether enough observations are available on each marker to be able
   # to estimate the same full interval on all markers
   maxtime <- sapply(marker_dat, function(x) max(x[, time]))
+  if (!is.null(max_time)) {
+    maxtime <- c(maxtime, max_time)
+  }
+  
   if (length(unique(maxtime)) > 1) {
     if (method != "fpca") {
       stop("Estimation of MFPCA for different univariate time intervals ",
@@ -116,6 +123,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
                         var = TRUE)
       })
     } else {
+      require(sparseFLMM)
       # For loop as it is more memory efficient
       FPCA <- list()
       for (m in seq_along(marker_dat)) {
@@ -139,7 +147,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     }
     
     # Extract weights
-    weight_vec <- 1/colSums(sapply(FPCA, "[[", "evalues"))
+    weight_vec <- 1/sapply(lapply(FPCA, "[[", "evalues"), sum)
     
     
   } else if (method == "FPCA") {
@@ -173,7 +181,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     }
     
     # Extract weights
-    weight_vec <- 1/colSums(sapply(FPCA, "[[", "lambda"))
+    weight_vec <- 1/sapply(lapply(FPCA, "[[", "lambda"), sum)
     
   } else if (method == "PACE") {
     
@@ -215,7 +223,7 @@ preproc_MFPCA <- function (data, uni_mean = "y ~ s(obstime) + s(x2)",
     }
     
     # Extract weights
-    weight_vec <- 1/colSums(sapply(FPCA, "[[", "values"))
+    weight_vec <- 1/sapply(lapply(FPCA, "[[", "values"), sum)
   }
   
   if (!weights) {

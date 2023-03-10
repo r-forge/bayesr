@@ -106,9 +106,127 @@ b_uni_fre <- bamlss(f_uni_fre, family = "jm", data = dat_uni,
                     timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
                     burnin = 1000, thin = 3, verbose = TRUE)
 
+# Univariate model with new data set
+d_rirs <- readRDS(paste0(server_wd, setting, "/data/data", i, ".rds"))
+f_uni <- list(
+  Surv2(Time1cens, event, obs = y) ~ -1 + s(Time1cens, k = 20, bs = "ps"),
+  gamma ~ 1 + group,
+  mu ~  year1cens + s(id, bs = "re") + s(year1cens, id, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1,
+  dalpha ~ -1
+)
+b_uni <- bamlss(f_uni, family = "jm", data = d_rirs %>% filter(marker == "m1"),
+                timevar = "year1cens", idvar = "id", maxit = 1500, n.iter = 900,
+                burnin = 1000, thin = 3, verbose = TRUE)
 
-# -------------- DOES NOT WORK --------------------------------------------
 
+f_mjm <- list(
+  Surv2(Time1cens, event, obs = y) ~ -1 + s(Time1cens, k = 20, bs = "ps"),
+  gamma ~ 1 + group,
+  mu ~ year1cens + s(id, bs = "re") + s(id, year1cens, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1
+)
+b_mjm <- bamlss(f_mjm, family = JMbamlss:::mjm_bamlss,
+                data = d_rirs %>% filter(marker == "m1"),
+                timevar = "year1cens", maxit = 1, sampler = FALSE,
+                burnin = 1000, thin = 3, verbose = TRUE, uni = TRUE)
+b_MJM <- bamlss(f_mjm, family = JMbamlss:::mjm_bamlss, start = ps,
+                data = d_rirs %>% filter(marker == "m1"),
+                timevar = "year1cens", maxit = 600, sampler = FALSE,
+                burnin = 1000, thin = 3, verbose = TRUE, uni = TRUE)
+
+
+# Use True MFPC Basis -----------------------------------------------------
+f_uni <- list(
+  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
+  gamma ~ 1 + group,
+  mu ~  year + s(id, bs = "re") + s(year, id, bs = "re"),
+  sigma ~ 1,
+  alpha ~ 1,
+  dalpha ~ -1
+)
+
+
+
+
+# JMbamlss with Weighted MFPCA --------------------------------------------
+
+d_rirs <- readRDS(paste0(server_wd, setting, "/data/data", i, ".rds"))
+
+
+# Estimate the model using estimated FPCs
+few_obs <- apply(table(d_rirs$id, d_rirs$marker), 1, 
+                 function (x) any(x < 2))
+long_obs <- d_rirs %>%
+  group_by(id, marker) %>%
+  summarize(maxobs = max(year), .groups = "drop_last") %>%
+  ungroup(marker) %>%
+  summarize(minmaxobs = min(maxobs), .groups = "drop_last") %>%
+  ungroup() %>%
+  filter(minmaxobs > 0.1) %>%
+  select(id) %>%
+  unlist() %>%
+  paste()
+take <- intersect(long_obs, paste(which(!few_obs)))
+
+mfpca_est <- JMbamlss:::preproc_MFPCA(d_rirs %>%
+                                        filter(id %in% take) %>% 
+                                        droplevels(), 
+                                      time = "year1cens", weights = TRUE,
+                                      uni_mean = "y ~ 1 + year1cens",
+                                      npc = 2, nbasis = 4)
+vals <- which(mfpca_est$values > 0)
+
+uni_norms <- lapply(mfpca_est$functions, norm)
+nfpc <- length(vals)
+# nfpc <- max(sapply(uni_norms, function (n) {
+#   min(which(
+#     cumsum(mfpca_est$values[vals]*n)/sum(mfpca_est$values[vals]*n) > 0.9
+#   ))
+# }))
+mfpca_est_list <- lapply(vals[seq_len(nfpc)], 
+                         function (i, mfpca = mfpca_est) {
+                           list(functions = extractObs(mfpca$functions, i),
+                                values = mfpca$values[i])
+                         })
+
+# Prepare objects for model fit
+d_rirs_est <- JMbamlss:::attach_wfpc(mfpca_est, d_rirs, n = nfpc,
+                                     obstime = "year1cens")
+f_est <- list(
+  Surv2(Time1cens, event, obs = y) ~ -1 + s(Time1cens, k = 10, bs = "ps"),
+  gamma ~ 1 + group,
+  as.formula(paste0(
+    "mu ~ -1 + marker + year1cens:marker +",
+    paste0(lapply(seq_len(nfpc), function(x) {
+      paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
+             "mfpca_est_list[[", x, "]]))")
+    }), collapse = " + "))),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+
+# Model fit
+#t_est <- system.time(
+set.seed(1415)
+b_est <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = d_rirs_est, 
+                timevar = "year1cens", maxit = 0, sampler = FALSE,
+                burnin = 1000, thin = 3, verbose = FALSE)
+ps <- parameters(b_est)
+taus <- grep("tau21", names(ps))
+ps[taus] <- ps[taus] /27^2
+  b_est <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = d_rirs_est, 
+                  timevar = "year1cens", maxit = 1500, n.iter = 900,
+                  burnin = 1000, thin = 3, start = ps,  verbose = TRUE)
+#)
+attr(b_est, "comp_time") <- t_est
+attr(b_est, "FPCs") <- mfpca_est
+attr(b_est, "nfpc") <- nfpc
+
+
+# -------------- FOLLOWING DOES NOT WORK ----------------------------------
 # JMbamlss Model ----------------------------------------------------------
 
 d_rirs <- pivot_longer(dat, y1:y6, names_to = "marker", values_to = "y") %>%

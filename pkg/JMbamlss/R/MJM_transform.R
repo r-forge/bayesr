@@ -2,7 +2,7 @@
 # MJM_transform -----------------------------------------------------------
 
 MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
-                          idvar = NULL, ...) {
+                          idvar = NULL, uni = FALSE, ...) {
   
   
   # Gaussian Quadrature
@@ -29,6 +29,9 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
   
   # Get marker variable (fixed for now) - for MJM_predict()
   marker_name <- "marker"
+  if(uni == TRUE) {
+    object$model.frame[, marker_name] <- factor(1)
+  }
   
   # Get ordering of the design matrix by id for PCRE crossproduct
   # and the number of observations per individual

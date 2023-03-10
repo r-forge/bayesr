@@ -53,15 +53,8 @@ parallel_bamlss_est <- function(i) {
   set.seed(i)
   
   # Load the data
-  load(paste0(server_wd, setting, "/data/data", i, ".Rdata"))
+  d_rirs <- readRDS(paste0(server_wd, setting, "/data/data", i, ".rds"))
   
-  d_rirs <- pivot_longer(dat, y1:y6, names_to = "marker", values_to = "y") %>%
-    mutate(marker = factor(marker, labels = paste0("m", 1:6)),
-           id = factor(id),
-           Time = ifelse(Time/(max(year)) > 1, max(year), Time/(max(year))),
-           year = year/max(year)) %>%
-    arrange(marker, id, year) %>%
-    as.data.frame()
   
   try_obj <- try({
     
@@ -83,7 +76,7 @@ parallel_bamlss_est <- function(i) {
     mfpca_est <- JMbamlss:::preproc_MFPCA(d_rirs %>%
                                  filter(id %in% take) %>% 
                                  droplevels(), 
-                                 time = "year", method = "PACE",
+                                 time = "year1", weights = TRUE,
                                uni_mean = "y ~ 1 + year + group + year:group",
                                npc = 2, nbasis = 4)
     vals <- which(mfpca_est$values > 0)
