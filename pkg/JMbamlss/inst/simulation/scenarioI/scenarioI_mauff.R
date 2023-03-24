@@ -76,8 +76,8 @@ parallel_bamlss_est <- function(i) {
     mfpca_est <- JMbamlss:::preproc_MFPCA(d_rirs %>%
                                  filter(id %in% take) %>% 
                                  droplevels(), 
-                                 time = "year1", weights = TRUE,
-                               uni_mean = "y ~ 1 + year + group + year:group",
+                                 time = "year", weights = TRUE,
+                               uni_mean = "y ~ 1 + year",
                                npc = 2, nbasis = 4)
     vals <- which(mfpca_est$values > 0)
     
@@ -113,7 +113,7 @@ parallel_bamlss_est <- function(i) {
     t_est <- system.time(
       b_est <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = d_rirs_est, 
                       timevar = "year", maxit = 1500, n.iter = 900,
-                      burnin = 1000, thin = 3, verbose = TRUE)
+                      burnin = 1000, thin = 3, verbose = TRUE, nu = 1)
     )
     attr(b_est, "comp_time") <- t_est
     attr(b_est, "FPCs") <- mfpca_est

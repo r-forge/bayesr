@@ -90,6 +90,67 @@ f_uni <- list(
 b_uni <- bamlss(f_uni, family = "jm", data = dat_uni,
                 timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
                 burnin = 1000, thin = 3, verbose = TRUE)
+summary(b_uni$samples[[1]][,grep("\\.alpha", colnames(b_uni$samples[[1]]))])
+
+# Now for other markers
+b_uni2 <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                   filter(marker == "m2"),
+                 timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
+                 burnin = 1000, thin = 3, verbose = TRUE) 
+summary(b_uni2$samples[[1]][,grep("\\.alpha", colnames(b_uni2$samples[[1]]))])
+#
+b_uni3 <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                   filter(marker == "m3"),
+                 timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
+                 burnin = 1000, thin = 3, verbose = TRUE) 
+summary(b_uni3$samples[[1]][,grep("\\.alpha", colnames(b_uni3$samples[[1]]))])
+#
+b_uni4 <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                   filter(marker == "m4"),
+                 timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
+                 burnin = 1000, thin = 3, verbose = TRUE) 
+summary(b_uni4$samples[[1]][,grep("\\.alpha", colnames(b_uni4$samples[[1]]))])
+#
+b_uni5 <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                   filter(marker == "m5"),
+                 timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
+                 burnin = 1000, thin = 3, verbose = TRUE) 
+summary(b_uni5$samples[[1]][,grep("\\.alpha", colnames(b_uni5$samples[[1]]))])
+#
+b_uni6 <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                   filter(marker == "m6"),
+                 timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
+                 burnin = 1000, thin = 3, verbose = TRUE) 
+summary(b_uni6$samples[[1]][,grep("\\.alpha", colnames(b_uni6$samples[[1]]))])
+# Models 4 and 5 do not converge
+# Models 3 - 6 have very low alpha probabilities
+
+b_uni4_1 <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                     filter(marker == "m4"),
+                   timevar = "year", idvar = "id", maxit = 5000, n.iter = 5000,
+                   burnin = 1000, thin = 5, verbose = TRUE) 
+summary(b_uni4_1$samples[[1]][,grep("\\.alpha", 
+                                    colnames(b_uni4_1$samples[[1]]))])
+# converged at iteration 1988
+# Sigma alpha probability is still 0
+
+
+# Update Step-Width
+b_uni3_nu <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                      filter(marker == "m3"),
+                    timevar = "year", idvar = "id", maxit = 1500, n.iter = 900,
+                    burnin = 1000, thin = 3, verbose = TRUE, update.nu = TRUE) 
+summary(b_uni3_nu$samples[[1]][,grep("\\.alpha",
+                                     colnames(b_uni3_nu$samples[[1]]))])
+b_uni3_hi <- bamlss(f_uni, family = "jm", data = helpdat %>%
+                      filter(marker == "m3"),
+                    timevar = "year", idvar = "id", maxit = 1500, n.iter = 15000,
+                    burnin = 5000, thin = 20, verbose = TRUE) 
+summary(b_uni3_hi$samples[[1]][,grep("\\.alpha", 
+                                     colnames(b_uni3_hi$samples[[1]]))])
+
+
+# Model with functional RE ------------------------------------------------
 
 
 f_uni_fre <- list(

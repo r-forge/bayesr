@@ -4,7 +4,8 @@
 
 MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
-                    verbose = FALSE, ...) {
+                    verbose = FALSE, update_nu = FALSE, update_tau = FALSE,
+                    ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -19,6 +20,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   nmarker <- attr(y, "nmarker")
   marker <- attr(y, "marker")
   logLik <- NULL
+  edf <- 0
   
 
   ## Set alpha/mu/sigma intercept starting value.
@@ -36,6 +38,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       eta_grid_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
       x$alpha$smooth.construct[[j]]$state$fitted_timegrid <- eta_grid_sj
       eta_timegrid_alpha <- eta_timegrid_alpha + eta_grid_sj
+      edf <- edf + x$alpha$smooth.construct[[j]]$state$edf
     }
   } 
   eta_timegrid_mu <- 0
@@ -62,6 +65,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       x$mu$smooth.construct[[j]]$state$fitted_T <- eta_T_sj
       eta_timegrid_mu <- eta_timegrid_mu + eta_grid_sj
       eta_T_mu <- eta_T_mu + eta_T_sj
+      edf <- edf + x$mu$smooth.construct[[j]]$state$edf
     }
   }
   
@@ -72,6 +76,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       eta_sj <- drop(x$lambda$smooth.construct[[j]]$Xgrid %*% b)
       x$lambda$smooth.construct[[j]]$state$fitted_timegrid <- eta_sj
       eta_timegrid_lambda <- eta_timegrid_lambda + eta_sj
+      edf <- edf + x$lambda$smooth.construct[[j]]$state$edf
     }
   }
   
@@ -84,12 +89,41 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     x$sigma$smooth.construct$model.matrix$state$fitted.values <-
       x$sigma$smooth.construct$model.matrix$X %*% 
       x$sigma$smooth.construct$model.matrix$state$parameters
+    edf <- edf + x$sigma$smooth.construct$model.matrix$state$edf
+  }
+  
+  if (length(x$gamma$smooth.construct)) {
+    for (j in names(x$gamma$smooth.construct)) {
+      edf <- edf + x$gamma$smooth.construct[[j]]$state$edf
+    } 
   }
   
   eta <- bamlss:::get.eta(x, expand = FALSE)
   eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu,
                                       nrow = nsubj*n_w, ncol = nmarker))
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
+  
+  
+  ## Extract current value of the log-posterior.
+  # Define here so data is available in the function environment
+  # Used for updating nu / verbose 
+  get_LogLik <- function(eta_timegrid, eta_T_mu, eta) {
+    
+    eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
+                                 ncol = nmarker))
+    eta_T <- eta$lambda + eta$gamma + eta_T_long
+    sum_Lambda <- drop(
+      crossprod(survtime/2 * exp(eta$gamma), 
+                colSums(gq_weights*matrix(exp(eta_timegrid), 
+                                          ncol = nsubj, 
+                                          nrow = length(gq_weights)))))
+    logLik <- drop(crossprod(status, eta_T)) - sum_Lambda +
+      sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
+                log = TRUE))
+    
+    return(logLik)
+
+  }
   
   # For algorithm
   eps0 <- eps0_surv <- eps0_long <- eps + 1
@@ -112,7 +146,10 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     for(j in names(x$lambda$smooth.construct)) {
       state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu,
                                  eta = eta, eta_timegrid = eta_timegrid,
-                                 survtime = survtime, ...)
+                                 eta_T_mu = eta_T_mu,
+                                 survtime = survtime, update_nu = update_nu,
+                                 get_LogLik = get_LogLik,
+                                 update_tau = update_tau, edf = edf, ...)
       eta_timegrid_lambda <- eta_timegrid_lambda -
         x$lambda$smooth.construct[[j]]$state$fitted_timegrid +
         state$fitted_timegrid
@@ -128,7 +165,10 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       for(j in seq_along(x$gamma$smooth.construct)) {
         state <- update_mjm_gamma(x$gamma$smooth.construct[[j]], y = y, nu = nu,
                                   eta = eta, eta_timegrid = eta_timegrid,
-                                  survtime = survtime, ...)
+                                  eta_T_mu = eta_T_mu,
+                                  survtime = survtime, update_nu = update_nu,
+                                  get_LogLik = get_LogLik,
+                                  update_tau = update_tau, edf = edf, ...)
         eta$gamma <- eta$gamma - fitted(x$gamma$smooth.construct[[j]]$state) +
           fitted(state)
         x$gamma$smooth.construct[[j]]$state <- state
@@ -149,9 +189,13 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
             state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, 
                                       nu = nu,
                                       eta = eta, eta_timegrid = eta_timegrid,
+                                      eta_timegrid_lambda = eta_timegrid_lambda,
                                       eta_timegrid_mu = eta_timegrid_mu,
+                                      eta_timegrid_alpha = eta_timegrid_alpha,
                                       eta_T_mu = eta_T_mu, survtime = survtime, 
-                                      ...)
+                                      update_nu = update_nu,
+                                      get_LogLik = get_LogLik,
+                                      update_tau = update_tau, edf = edf, ...)
             eta$alpha <- eta$alpha -
               drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
               fitted(state)
@@ -173,11 +217,14 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
         for(j in seq_along(x$mu$smooth.construct)) {
           state <- update_mjm_mu(x$mu$smooth.construct[[j]], y = y, nu = nu,
                                  eta = eta, eta_timegrid = eta_timegrid,
+                                 eta_timegrid_lambda = eta_timegrid_lambda,
+                                 eta_timegrid_mu = eta_timegrid_mu,
                                  eta_timegrid_alpha = eta_timegrid_alpha,
-                                 survtime = survtime, ...)
+                                 eta_T_mu = eta_T_mu, survtime = survtime,
+                                 get_LogLik = get_LogLik, update_nu = update_nu,
+                                 update_tau = update_tau, edf = edf, ...)
           eta$mu <- eta$mu -
             drop(fitted(x$mu$smooth.construct[[j]]$state)) +
-            fitted(state)
           eta_timegrid_mu <- eta_timegrid_mu -
             x$mu$smooth.construct[[j]]$state$fitted_timegrid +
             state$fitted_timegrid
@@ -198,7 +245,10 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
           state <- update_mjm_sigma(x$sigma$smooth.construct[[j]], y = y, 
                                     nu = nu, eta = eta, 
                                     eta_timegrid = eta_timegrid,
-                                    survtime = survtime, ...)
+                                    eta_T_mu = eta_T_mu,
+                                    get_LogLik = get_LogLik,
+                                    survtime = survtime, update_nu = update_nu,
+                                    update_tau = update_tau, edf = edf, ...)
           eta$sigma <- eta$sigma -
             drop(fitted(x$sigma$smooth.construct[[j]]$state)) +
             fitted(state)
@@ -213,23 +263,15 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       # Was passiert, wenn es keine longitudinale Beobachtung gibt für den Event-
       # Zeitpunkt? Hier bräuchte man eigentlich alpha und mu als nsubj*nmarker
       # Vektor.
-      eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
-                                   ncol = nmarker))
-      eta_T <- eta$lambda + eta$gamma + eta_T_long
-      sum_Lambda <- drop(crossprod(survtime/2 * exp(eta$gamma), 
-        colSums(gq_weights*matrix(exp(eta_timegrid), ncol = nsubj, 
-                                  nrow = length(gq_weights)))))
-      logLik <- drop(crossprod(status, eta_T)) - sum_Lambda +
-        sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
-                  log = TRUE))
+      
+      logLik <- get_LogLik(eta_timegrid = eta_timegrid,
+                           eta_T_mu = eta_T_mu,
+                           eta = eta)
+      
       cat("It ", iter,", LogLik ", logLik, ", Post", 
           as.numeric(logLik + bamlss:::get.log.prior(x)), "\n")
     }
-
     
-    # Eigentlich sollte hier doch auch über die Log-Posterior das Max gebildet
-    # werden? Die Score und Hesse-Funktionen beziehen nämlich schon die Prioris
-    # mit ein
     
     # Stopping criterion
     iter <- iter + 1
@@ -257,28 +299,10 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   }
   
   # Log-Posterior ausrechnen und ausgeben
-  # get_logPost Funktion aus JM als Vorlage
-  ## return(list("parameters" = par, "fitted.values" = eta))
-  
-  # max_y <- max(y[[1]][, 1])
-  # pred_data <- data.frame(seq(0, max_y, length.out = 100))
-  # colnames(pred_data) <- x$lambda$smooth.construct[[1]]$term
-  # k <- x$lambda$smooth.construct[[1]]$bs.dim
-  # b_it <- x$lambda$smooth.construct[[1]]$state$parameters[-k]
-  # pred_mat <- PredictMat(x$lambda$smooth.construct[[1]], pred_data)
-  # plot(pred_data[, 1], pred_mat%*%b_it)
-  
-  #assign("it_param", it_param, envir = .GlobalEnv)
   if (is.null(logLik)) {
-    eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
-                                 ncol = nmarker))
-    eta_T <- eta$lambda + eta$gamma + eta_T_long
-    sum_Lambda <- drop(crossprod(survtime/2 * exp(eta$gamma), 
-      colSums(gq_weights*matrix(exp(eta_timegrid), ncol = nsubj, 
-                                nrow = length(gq_weights)))))
-    logLik <- drop(crossprod(status, eta_T)) - sum_Lambda +
-      sum(dnorm(y[[1]][, "obs"], mean = eta$mu, sd = exp(eta$sigma),
-                log = TRUE))
+    logLik <- get_LogLik(eta_timegrid = eta_timegrid,
+                         eta_T_mu = eta_T_mu,
+                         eta = eta)
   }
   logPost <- as.numeric(logLik + bamlss:::get.log.prior(x))
   return(list("fitted.values" = eta, "parameters" = bamlss:::get.all.par(x),
