@@ -224,7 +224,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
                                  get_LogLik = get_LogLik, update_nu = update_nu,
                                  update_tau = update_tau, edf = edf, ...)
           eta$mu <- eta$mu -
-            drop(fitted(x$mu$smooth.construct[[j]]$state)) +
+            drop(fitted(x$mu$smooth.construct[[j]]$state)) + fitted(state)
           eta_timegrid_mu <- eta_timegrid_mu -
             x$mu$smooth.construct[[j]]$state$fitted_timegrid +
             state$fitted_timegrid
