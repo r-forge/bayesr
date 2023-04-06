@@ -257,7 +257,7 @@ ggplot(data = data.frame(t(sigma)) %>%
   geom_vline(xintercept = 57, linetype = "dotted") +
   theme_bw() +
   theme(legend.position = "None") +
-  labs(x = "Iteration", y =  "Estimate") +b_est$model.stats$updates$lambda
+  labs(x = "Iteration", y =  "Estimate") +
   ggtitle("Sigma Parameters")
 
 
@@ -739,3 +739,27 @@ upper <- as.data.frame(upper)
 upper_cor <- as.data.frame(upper_cor)
 print(xtable(upper), include.rownames = FALSE, include.colnames = FALSE)
 print(xtable(upper_cor), include.rownames = FALSE, include.colnames = FALSE)
+
+
+
+# Multivariate Failure Model ----------------------------------------------
+
+# Model is from scenarioI_mauff_nu.R on sunflower
+# i <- 2
+# nfpc <- 12
+# b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru,
+#                 timevar = "year", maxit = 1480, par_trace = TRUE,
+#                 sampler = FALSE, update_nu = TRUE, verbose = TRUE)
+b_est <- readRDS(paste0(server_wd, "scen_mauff/bamlss_tru_nu/b_2_full_fail.Rds"))
+alpha <- sapply(b_est$model.stats$optimizer$par_trace, 
+                function(x) x$alpha$p)
+ggplot(data = data.frame(t(alpha)) %>%
+         mutate(it = 1:1480) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 31, linetype = "dotted") +
+  theme_bw() +
+  theme(legend.position = "None") +
+  labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Alpha Parameters")

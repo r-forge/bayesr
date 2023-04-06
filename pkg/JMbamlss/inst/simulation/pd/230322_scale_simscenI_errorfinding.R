@@ -639,8 +639,25 @@ ggplot(d_rirs$data,
           "Simulated Data Set 1")
 
 # Estimate the model using JMbamlss
+nfpc <- 6
 mfpca_tru <- JMbamlss:::MFPCA_cov(cov = cov, basis_funs = b_funs)
 d_rirs_tru <- JMbamlss:::attach_wfpc(mfpca_tru, d_rirs$data, n = nfpc)
+f_tru <- list(
+  Surv2(survtime, event, obs = y) ~ -1 + s(survtime, k = 20, bs = "ps"),
+  gamma ~ 1 + x3,
+  as.formula(paste0(
+    "mu ~ -1 + marker + obstime:marker + x3:marker + obstime:x3:marker +",
+    paste0(lapply(seq_len(nfpc), function(x) {
+      paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
+             "mfpca_tru_list[[", x, "]]))")
+    }), collapse = " + "))),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+mfpca_tru_list <- lapply(seq_len(nfpc), function (i, mfpca = mfpca_tru) {
+  list(functions = extractObs(mfpca$functions, i),
+       values = mfpca$values[i])
+})
 set.seed(1)
 # Fails after iteration 236
 b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
@@ -664,6 +681,72 @@ ggplot(data = data.frame(t(alpha)) %>%
   labs(x = "Iteration", y =  "Estimate") +
   ggtitle("Alpha Parameters for Original Cov + Mauff Error Var")
 
+
+# Now update nu
+set.seed(1)
+b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
+                timevar = "obstime", maxit = 1500, verbose = TRUE,
+                update_nu = TRUE)
+summary(b_est$samples[[1]][, grep("accepted", colnames(b_est$samples[[1]]))])
+# works
+
+# Increase number of observations
+set.seed(1)
+d_rirs <- JMbamlss:::simMultiJM(nsub = 400, times = seq(0, 1, by = 0.01), 
+                                max_obs = 15, probmiss = 0.75, maxfac = 1.75,
+                                nmark = 6, long_assoc = "param", M = NULL, 
+                                FPC_bases = NULL, FPC_evals = NULL, 
+                                mfpc_args = NULL,
+                                re_cov_mat = cov,
+                                ncovar = 2,
+                                lambda = function(t, x) {
+                                  1.37 * t^(0.37)
+                                },
+                                gamma = function(x) {
+                                  -1.5 + 0.48*x[, 3]
+                                },
+                                alpha = list(function(t, x) {
+                                  1.5 + 0*t
+                                }, function(t, x) {
+                                  0.6 + 0*t
+                                }, function(t, x) {
+                                  0.3 + 0*t
+                                }, function(t, x) {
+                                  -0.3 + 0*t
+                                }, function(t, x) {
+                                  -0.6 + 0*t
+                                }, function(t, x) {
+                                  -1.5 + 0*t
+                                }),
+                                mu = list(function(t, x, r){
+                                  0 + 0.2*t - 0.25*x[, 3] - 0.05*t*x[, 3] +
+                                    r[, 1] + r[, 2]*t
+                                }, function(t, x, r){
+                                  0 + 0.2*t - 0.25*x[, 3] - 0.05*t*x[, 3] +
+                                    r[, 3] + r[, 4]*t
+                                }, function(t, x, r){
+                                  0 + 0.2*t - 0.25*x[, 3] - 0.05*t*x[, 3] +
+                                    r[, 5] + r[, 6]*t
+                                }, function(t, x, r){
+                                  0 + 0.2*t - 0.25*x[, 3] - 0.05*t*x[, 3] +
+                                    r[, 7] + r[, 8]*t
+                                }, function(t, x, r){
+                                  0 + 0.2*t - 0.25*x[, 3] - 0.05*t*x[, 3] +
+                                    r[, 9] + r[, 10]*t
+                                }, function(t, x, r){
+                                  0 + 0.2*t - 0.25*x[, 3] - 0.05*t*x[, 3] +
+                                    r[, 11] + r[, 12]*t
+                                }),
+                                sigma = function(t, x) {
+                                  log(0.94) + 0*t
+                                }, 
+                                tmax = NULL, seed = NULL, 
+                                full = TRUE, file = NULL)
+d_rirs_tru <- JMbamlss:::attach_wfpc(mfpca_tru, d_rirs$data, n = nfpc)
+set.seed(1)
+b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
+                timevar = "obstime", maxit = 1500, verbose = TRUE,
+                update_nu = TRUE)
 
 
 # Increase Error Variance to 0.4 ------------------------------------------

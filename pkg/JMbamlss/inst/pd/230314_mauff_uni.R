@@ -148,10 +148,10 @@ f_fri <- list(
 )
 
 set.seed(i)
-# b_fri5 <- bamlss(f_fri, family = "jm", data = simdat %>%
-#                    filter(marker == "m5"),
-#                  timevar = "year", idvar = "id", maxit = 1500, n.iter = 5500,
-#                  burnin = 500, thin = 5, verbose = TRUE)
+b_fri5 <- bamlss(f_fri, family = "jm", data = simdat %>%
+                   filter(marker == "m5"),
+                 timevar = "year", idvar = "id", maxit = 1500, n.iter = 5500,
+                 burnin = 500, thin = 5, verbose = TRUE)
 # Takes too long to calculate!
 #save(b_fri5, file = paste0(server_wd, setting, "/uni/uni_fri", i, ".Rdata"))
 

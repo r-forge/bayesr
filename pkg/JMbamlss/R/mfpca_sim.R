@@ -4,7 +4,11 @@
 #' @param cov Covariance matrix of the basis functions coefficients.
 #' @param basis_funs List with basis functions on each dimension. The basis
 #'  functions are funData objects
-MFPCA_cov <- function (cov, basis_funs) {
+#' @param scores Matrix (n rows, B columns) containing the basis functions 
+#'  coefficients. Defaults to NULL which does not calculate the multivariate 
+#'  scores.
+#' @param weights Vector of weights, defaults to 1 for each element
+MFPCA_cov <- function (cov, basis_funs, scores = NULL, weights = NULL) {
   
   # Information about the objects
   p <- length(basis_funs)
@@ -13,28 +17,33 @@ MFPCA_cov <- function (cov, basis_funs) {
   argvals_list <- lapply(basis_funs, function(x) {
     argvals(x)[[1]]
   })
+  if (is.null(weights)) {
+    weights <- rep(1, p)
+  }
+  allWeights <- rep(sqrt(weights), npc)
   
   # Construct matrix of basis function integrals
   B_block <- Matrix::bdiag(lapply(basis_funs, function (x){
     MFPCA:::calcBasisIntegrals(x@X, dimSupp = 1, x@argvals)
   }))
+  # Construct weighted coefficient block matrix
+  Qw <- cov * outer(allWeights, allWeights, "*")
   
   # Eigendecomposition
-  eig <- eigen(B_block %*% cov)
+  eig <- eigen(B_block %*% Qw)
   values <- Re(eig$values)
   vectors <- Re(eig$vectors)
   
-  # Components of estimation formula
   # before the sums
-  normFactors <- 1/sqrt(diag(t(vectors) %*% cov %*% vectors))
+  normFactors <- 1/sqrt(diag(t(vectors) %*% Qw %*% vectors))
   # after the sums
-  blockWeights <- cov %*% vectors
+  blockWeights <- Qw %*% vectors
   
   # Calculation of MFPCs
   eFunctions <- multiFunData(
     foreach:::'%do%'(foreach::foreach(j = seq_len(p)), {
       MFPCA:::univExpansion(type = "given",
-                            scores = 1/sqrt(values) * normFactors * 
+                            scores = 1/sqrt(weights[j] * values) * normFactors * 
                               t(blockWeights[npcCum[j] + seq_len(npc[j]), , 
                                              drop = FALSE]),
                             argvals = argvals_list[j],
@@ -42,8 +51,15 @@ MFPCA_cov <- function (cov, basis_funs) {
                             params = NULL)
   }))
   
+  # Calculate the multivariate scores
+  if (!is.null(scores)) {
+    m_scores <- as.matrix((scores * sqrt(allWeights)) %*% vectors %*% 
+                            diag(sqrt(values) * normFactors))
+  }
+  
   out <- list("values" = values,
               "functions" = eFunctions,
+              "scores" = if (is.null(scores)) NULL else m_scores,
               "vectors" = vectors,
               "normFactors" = normFactors)
 }

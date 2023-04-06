@@ -3,7 +3,7 @@
 
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
-                     nu_sampler = 1, prop_pred = NULL, verbose = FALSE,
+                     nu_sampler = 1, verbose = FALSE,
                      prop_list = NULL,# prop_update = NULL, 
                      ...)
 {
@@ -19,7 +19,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   }
   
   # Names of parameters/predictors and other attributes
-  nx <- if (is.null(prop_pred)) names(x) else prop_pred
+  nx <- names(x)
   nmarker <- attr(y, "nmarker")
   take_last <- attr(y, "take_last")
   survtime <- y[[1]][, "time"][take_last]
@@ -233,15 +233,6 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
           logLik_old <- p_state$logLik
           x[[i]]$smooth.construct[[j]]$state <- p_state$xstate
         } 
-        #### SOLLTEN NICHT DIE VARIANZ-PARAMETER IMMER UPGEDATED WERDEN?
-        #else {
-        #   x[[i]]$smooth.construct[[j]]$state$parameters <- 
-        #     bamlss::set.par(
-        #       x[[i]]$smooth.construct[[j]]$state$parameters, 
-        #       bamlss::get.par(x[[i]]$smooth.construct[[j]]$state$parameters, 
-        #                       "tau2"), 
-        #       "tau2")
-        # }
         
         # # Save the current proposal density information
         # prop_up_list[[i]][[j]] <- p_state$prop_dens
@@ -299,9 +290,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                  "DIC" = rep(DIC, length.out = nrow(samps)),
                  "pd" = rep(pd, length.out = nrow(samps))
   )
-  if (is.null(prop_pred)) {
-    samps[is.na(samps)] <- 0
-  }
+  samps[is.na(samps)] <- 0
   
   
   return(as.mcmc(samps))

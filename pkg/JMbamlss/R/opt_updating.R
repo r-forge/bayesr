@@ -470,7 +470,11 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_lambda,
                                           ncol = nmarker))
       eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
       eta_T_mu <- eta_T_mu - x$state$fitted_T + fitted_T
-      edf1 <- bamlss:::sum_diag(x_H0 %*% Sigma)
+      edf1 <- if (any(class(x) == "unc_pcre.random.effect")) {
+        sum(diag(x_H0) * diag(Sigma))
+      } else {
+        bamlss:::sum_diag(x_H0 %*% Sigma)
+      }
       edf <- edf0 + edf1
       logLik <- get_LogLik(eta_timegrid, eta_T_mu, eta)
       ic <- bamlss:::get.ic2(logLik, edf, n = length(eta$mu), type = "AICc")
