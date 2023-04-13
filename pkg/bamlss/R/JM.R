@@ -2768,7 +2768,7 @@ propose_jm_mu_Matrix <- function(x, y,
   
   
   ## Save edf.
-  x$state$edf <- sum_diag((-1 * int$hess) %*% Sigma2)
+  x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma2)
   
   ## Sample variance parameter.
   if(!x$fixed & is.null(x$sp) & length(x$S)) {
@@ -2789,6 +2789,17 @@ propose_jm_mu_Matrix <- function(x, y,
   
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
+
+#cat("\n-----------\n")
+#cat("pibetaprop", pibetaprop, "\n")
+#cat("qbeta", qbeta, "\n")
+#cat("p2", p2, "\n")
+#cat("pibeta", pibeta, "\n")
+#cat("qbetaprop", qbetaprop, "\n")
+#cat("p1", p1, "\n")
+#cat("alpha", exp(x$state$alpha), "\n")
+#cat("edf", x$state$edf, "\n")
+#print(x$label)
   
   return(x$state)
 }
