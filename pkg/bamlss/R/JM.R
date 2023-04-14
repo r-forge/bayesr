@@ -2786,6 +2786,8 @@ propose_jm_mu_Matrix <- function(x, y,
       }
     }
   }
+
+
   
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
