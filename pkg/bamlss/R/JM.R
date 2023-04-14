@@ -3473,15 +3473,17 @@ simJM <- function(nsub = 300, times = seq(0, 120, 1), probmiss = 0.75,
       }    
     }
     # Kronecker Product penalty from marginal
-    Pi <- l[1] * kronecker(diag(nsub), diag(long_df)) 
-    Pt <- l[2] * kronecker(diag(nsub), crossprod(makeDiffOp(pen[1], long_df)))
-    P <- .1*diag(nsub*long_df) + Pt + Pi
+    Pi <- l[1] * diag(long_df)
+    Pt <- l[2] * crossprod(makeDiffOp(pen[1], long_df))
+    P <- .1*diag(long_df) + Pt + Pi
     
-    coef <- matrix(rmvnorm(nsub*long_df, sigma = solve(P), method="chol"), ncol = long_df, nrow = nsub)
+    coef <- mvtnorm::rmvnorm(nsub, sigma = solve(P), method = "chol")
     colnames(coef) <- paste0("b", 1:long_df)
-    bt <- bs(times, df = long_df, intercept = FALSE)
-    b_set <- list(knots = attr(bt, "knots"), Boundary.knots = attr(bt, "Boundary.knots"),
-                  degree = attr(bt, "degree"), intercept = attr(bt, "intercept"))
+    bt <- splines::bs(times, df = long_df, intercept = FALSE)
+    b_set <- list(knots = attr(bt, "knots"),
+                  Boundary.knots = attr(bt, "Boundary.knots"),
+                  degree = attr(bt, "degree"), 
+                  intercept = attr(bt, "intercept"))
     return(list(coef, b_set))
   }
   
