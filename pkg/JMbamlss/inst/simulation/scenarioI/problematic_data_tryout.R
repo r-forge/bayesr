@@ -260,9 +260,31 @@ acc(b_nbhn)
 # Save IWLS Info ----------------------------------------------------------
 
 set.seed(1)
-b_iwls <- bamlss(f_uni, family = "jm", data = simdat %>%
-                   filter(marker == "m6", id %in% 1:350) %>% as.data.frame(),
-                 timevar = "year", idvar = "id", optimizer = FALSE,
-                 start = parameters(b_uni6), verbose = TRUE, n.iter = 10,
-                 burnin = 0, thin = 1, save_iwls = TRUE, nu_sam = 1) 
-acc(b_iwls)
+b_iwls6 <- bamlss(f_uni, family = "jm", data = simdat %>%
+                    filter(marker == "m6", id %in% 1:350) %>% as.data.frame(),
+                  timevar = "year", idvar = "id", optimizer = FALSE,
+                  start = parameters(b_uni6), verbose = TRUE, save_iwls = TRUE)
+IWLS_m6 <- IWLS
+acc(b_iwls6)
+IWLS_m6
+
+mu_ri_compare6 <- sapply(IWLS_m6, function(it) {
+  eq <- all.equal(it$mu[[1]]$mu0, it$mu[[1]]$mu1)
+  if (is.logical(eq)) eq else FALSE
+})
+
+mu_rs_compare6 <- sapply(IWLS_m6, function(it) {
+  eq <- all.equal(it$mu[[2]]$mu0, it$mu[[2]]$mu1, tolerance = 1e-14)
+  if (is.logical(eq)) eq else FALSE
+})
+
+sigma_ri_compare6 <- sapply(IWLS_m6, function(it) {
+  eq <- all.equal(it$mu[[1]]$xhess0 + it$mu[[1]]$phess0, 
+                  it$mu[[1]]$xhess1 + it$mu[[1]]$phess1)
+  if (is.logical(eq)) eq else FALSE
+})
+sigma_rs_compare6 <- sapply(IWLS_m6, function(it) {
+  eq <- all.equal(it$mu[[2]]$xhess0 + it$mu[[2]]$phess0, 
+                  it$mu[[2]]$xhess1 + it$mu[[2]]$phess1)
+  if (is.logical(eq)) eq else FALSE
+})
