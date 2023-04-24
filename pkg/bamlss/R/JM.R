@@ -1334,7 +1334,7 @@ update_jm_mu <- function(x, y, eta, eta_timegrid,
     }
     
     assign("ic00_val", objfun1(get.state(x, "tau2")), envir = env)
-    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"), maxit = 1)
+    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"))
     
     if(!is.null(env$state))
       return(env$state)
@@ -1472,7 +1472,7 @@ update_jm_mu_Matrix <- function(x, y, eta, eta_timegrid,
     }
     
     assign("ic00_val", objfun1(get.state(x, "tau2")), envir = env)
-    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"), maxit = 1)
+    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"))
     
     if(!is.null(env$state))
       return(env$state)
@@ -1594,7 +1594,7 @@ update_jm_sigma <- function(x, y, eta, eta_timegrid,
     }
     
     assign("ic00_val", objfun1(get.state(x, "tau2")), envir = env)
-    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"), maxit = 1)
+    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"))
     
     if(!is.null(env$state))
       return(env$state)
@@ -2627,6 +2627,24 @@ propose_jm_mu_Matrix <- function(x, y,
   int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1)], 1, sum))
   pibeta <- sum((eta_timegrid[,ncol(eta_timegrid)] + eta$gamma) * status, na.rm = TRUE) -
     exp(eta$gamma) %*% int0 + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
+
+  ## Sample smoothing variance.
+  if(!x$fixed & is.null(x$sp) & length(x$S)) {
+    if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
+      g <- get.par(x$state$parameters, "b")
+      a <- x$rank / 2 + x$a
+      b <- drop(0.5 * crossprod(g, x$S[[1]]) %*% g + x$b)
+      tau2 <- 1 / rgamma(1, a, b)
+      x$state$parameters <- set.par(x$state$parameters, tau2, "tau2")
+    } else {
+      i <- grep("tau2", names(x$state$parameters))
+      for(j in i) {
+        x$state$parameters <- uni.slice(x$state$parameters, x, NULL, NULL,
+                                        NULL, id = "mu", j, logPost = uni.slice_tau2_logPost, lower = 0, ll = pibeta)
+      }
+    }
+  }
+
   p1 <- x$prior(x$state$parameters)
   
   ## Compute gradient and hessian integrals.
@@ -2769,26 +2787,7 @@ propose_jm_mu_Matrix <- function(x, y,
   
   ## Save edf.
   x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma2)
-  
-  ## Sample variance parameter.
-  if(!x$fixed & is.null(x$sp) & length(x$S)) {
-    if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
-      g <- get.par(x$state$parameters, "b")
-      a <- x$rank / 2 + x$a
-      b <- drop(0.5 * crossprod(g, x$S[[1]]) %*% g + x$b)
-      tau2 <- 1 / rgamma(1, a, b)
-      x$state$parameters <- set.par(x$state$parameters, tau2, "tau2")
-    } else {
-      i <- grep("tau2", names(x$state$parameters))
-      for(j in i) {
-        x$state$parameters <- uni.slice(x$state$parameters, x, NULL, NULL,
-                                        NULL, id = "mu", j, logPost = uni.slice_tau2_logPost, lower = 0, ll = 0)
-      }
-    }
-  }
 
-
-  
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
 
@@ -4801,7 +4800,7 @@ update_jm_mu_nonlin <- function(x, y, eta, eta_timegrid,
       return(ic)
     }
     assign("ic00_val", objfun1(get.state(x, "tau2")), envir = env)
-    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"), maxit = 1)
+    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"))
 
     if(!is.null(env$state))
       return(env$state)
@@ -5034,7 +5033,7 @@ update_jm_mu_nonlin_Matrix <- function(x, y, eta, eta_timegrid,
     }
     
     assign("ic00_val", objfun1(get.state(x, "tau2")), envir = env)
-    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"), maxit = 1)
+    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"))
     if(!is.null(env$state))
       return(env$state)
     

@@ -2438,6 +2438,11 @@ opt_boost <- boost <- function(x, y, family, weights = NULL, offset = NULL,
   
   if(is.null(attr(x, "bamlss.engine.setup")))
     x <- bamlss.engine.setup(x, df = NULL, nodf = TRUE, ...)
+
+  start <- list(...)$start
+print(start)
+  if(!is.null(start))
+    x <- set.starting.values(x, start)
   
   np <- length(nx)
   nobs <- nrow(y)
