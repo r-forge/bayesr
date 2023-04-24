@@ -14,19 +14,24 @@ library(funData)
 f_uni <- list(
   Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
   gamma ~ 1 + group,
-  mu ~  year + s(id, bs = "re") + s(year, id, bs = "re"),
+  mu ~  ti(year,bs="ps") + ti(id, bs = "re") + ti(year, id, bs = "re"),
   sigma ~ 1,
   alpha ~ 1,
   dalpha ~ -1
 )
 
-set.seed(1)
-b_uni1 <- bamlss(f_uni, family = "jm", data = simdat %>%
+d <- simdat %>%
                    filter(marker == "m1") %>% droplevels() %>%
-                   mutate(y = y + sqrt(.Machine$double.eps)) %>%
-                   as.data.frame(),
-                 timevar = "year", idvar = "id", maxit = 1500, update.nu = TRUE,
-                 n.iter = 5496, burnin = 500, thin = 5, verbose = TRUE)
+                   as.data.frame()
+
+d$year[abs(d$year) < 0.0001] <- 0.0001
+d$Time[abs(d$Time) < 0.0001] <- 0.0001
+
+set.seed(1)
+
+b_uni1 <- bamlss(f_uni, family = "jm", data = d,
+                 timevar = "year", idvar = "id", verbose = TRUE, update.nu = FALSE, maxit = 20, criterion = "BIC")
+
 saveRDS(b_uni1, file = paste0(results_wd, "scen_mauff/uni/bamlss_uni1.Rds"))
 b_uni1 <- readRDS(paste0(results_wd, "scen_mauff/uni/bamlss_uni1.Rds"))
 
