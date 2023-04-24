@@ -262,7 +262,8 @@ b_mul <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = simdat_tru,
                 sampler = FALSE, par_trace = TRUE)
 saveRDS(b_mul, file = paste0(server_wd, "scen_mauff/mul/bamlss_mul_",
                              "nonuup.Rds"))
-
+b_mul <- readRDS(paste0(server_wd, "scen_mauff/mul/bamlss_mul_",
+                        "nonuup.Rds"))
 
 # Multivariate JMbayes2 ---------------------------------------------------
 

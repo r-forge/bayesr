@@ -88,7 +88,7 @@ ggplot(data = data.frame(t(lambda)) %>%
   theme_bw() +
   theme(legend.position = "None") +
   labs(x = "Iteration", y =  "Estimate") +
-  ggtitle("Lambda Parameters")
+  ggtitle("Lambda Parameters (Full Model)")
 
 ggplot(data = data.frame(t(gamma)) %>%
          mutate(it = 1:493) %>%
@@ -123,7 +123,7 @@ ggplot(data = data.frame(t(mus1)) %>%
   theme_bw() +
   theme(legend.position = "None") +
   labs(x = "Iteration", y =  "Estimate") +
-  ggtitle("Mu Random Intercept Parameters")
+  ggtitle("Mu FPRE 1 Parameters")
 
 ggplot(data = data.frame(t(mus2)) %>%
          select(-tau21, -edf) %>%
@@ -134,7 +134,7 @@ ggplot(data = data.frame(t(mus2)) %>%
   theme_bw() +
   theme(legend.position = "None") +
   labs(x = "Iteration", y =  "Estimate") +
-  ggtitle("Mu Random Slope Parameters")
+  ggtitle("Mu FPCRE 2 Parameters")
 
 ggplot(data = data.frame(t(mup)) %>%
          mutate(it = 1:493) %>%
@@ -242,7 +242,7 @@ ggplot(data = data.frame(t(mus1)) %>%
   theme_bw() +
   theme(legend.position = "None") +
   labs(x = "Iteration", y =  "Estimate") +
-  ggtitle("Mu Random Intercept Parameters")
+  ggtitle("Mu FPCRE1 Parameters")
 
 ggplot(data = data.frame(t(mus2)) %>%
          select(-tau21, -edf) %>%
@@ -253,7 +253,7 @@ ggplot(data = data.frame(t(mus2)) %>%
   theme_bw() +
   theme(legend.position = "None") +
   labs(x = "Iteration", y =  "Estimate") +
-  ggtitle("Mu Random Slope Parameters")
+  ggtitle("Mu FPCRE2 Parameters")
 
 ggplot(data = data.frame(t(mup)) %>%
          mutate(it = 1:448) %>%
@@ -276,5 +276,165 @@ ggplot(data = data.frame(t(sigma)) %>%
   theme_bw() +
   theme(legend.position = "None") +
   labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Sigma Parameters")
+
+
+
+# Small Data Example ------------------------------------------------------
+
+# For faster problems, do not optimize nu
+set.seed(1)
+b_mulsho <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = simdat_tru %>%
+                     filter(id %in% 1:150) %>% droplevels() %>% 
+                     mutate(year = year + sqrt(.Machine$double.eps)) %>%
+                     as.data.frame(),
+                   timevar = "year", maxit = 513, verbose  = TRUE, 
+                   sampler = FALSE, par_trace = TRUE)
+
+# Traceplots
+lambda <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+                 function(x) x$lambda$s[[1]])
+gamma <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+                function(x) x$gamma$p)
+alpha <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+                function(x) x$alpha$p)
+mus1 <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+               function(x) x$mu$s[[1]])
+mus2 <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+               function(x) x$mu$s[[2]])
+mus3 <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+               function(x) x$mu$s[[3]])
+mup <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+              function(x) x$mu$p)
+sigma <- sapply(b_mulsho$model.stats$optimizer$par_trace, 
+                function(x) x$sigma$p)
+
+
+ggplot(data = data.frame(t(lambda)) %>%
+         select(-tau21, -edf) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  theme(legend.position = "None") +
+  labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Lambda Parameters (Short Model)")
+
+ggplot(data = data.frame(t(gamma)) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = -5.8, linetype = "dotted", color = "#00BFC4") +
+  geom_hline(yintercept = 0.5, linetype = "dotted", color = "#F8766D") +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  theme(legend.position = "None") +
+  labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Gamma Parameters")
+
+ggplot(data = data.frame(t(alpha)) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = 0.1, linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = -0.6, linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = -0.1, linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = -1.41, linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = -1.81, linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = 0.75, linetype = "dotted", color = "#F8766D") +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  theme(legend.position = "None") +
+  labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Alpha Parameters") +
+  ylim(c(-10,10))
+
+ggplot(data = data.frame(t(mus1)) %>%
+         select(-tau21, -edf) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  theme(legend.position = "None") +
+  labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Mu Random Intercept Parameters")
+
+ggplot(data = data.frame(t(mus2)) %>%
+         select(-tau21, -edf) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  theme(legend.position = "None") +
+  labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Mu FPCRE2 Parameters")
+
+ggplot(data = data.frame(t(mus3)) %>%
+         select(-tau21, -edf) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  theme(legend.position = "None") +
+  labs(x = "Iteration", y =  "Estimate") +
+  ggtitle("Mu FPCRE3 Parameters")
+
+ggplot(data = data.frame(t(mup)[, 1:6]) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = 4.93, linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = 3.58, linetype = "dotted", color = "#B79F00") +
+  geom_hline(yintercept = 1.46, linetype = "dotted", color = "#00BA38") +
+  geom_hline(yintercept = 1.78, linetype = "dotted", color = "#00BFC4") +
+  geom_hline(yintercept = 0.31, linetype = "dotted", color = "#619CFF") +
+  geom_hline(yintercept = 1.71, linetype = "dotted", color = "#F564E3") +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = "") +
+  ggtitle("Mu Intercept Parameters")
+
+ggplot(data = data.frame(t(mup)[, 7:12]) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = 0.4, linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = 1, linetype = "dotted", color = "#B79F00") +
+  geom_hline(yintercept = -0.7, linetype = "dotted", color = "#00BA38") +
+  geom_hline(yintercept = 0.5, linetype = "dotted", color = "#00BFC4") +
+  geom_hline(yintercept = -1.2, linetype = "dotted", color = "#619CFF") +
+  geom_hline(yintercept = -0.3, linetype = "dotted", color = "#F564E3") +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = "") +
+  ggtitle("Mu Slope Parameters")
+
+
+ggplot(data = data.frame(t(sigma)) %>%
+         mutate(it = 1:513) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = log(0.86), linetype = "dotted", color = "#F8766D") +
+  geom_hline(yintercept = log(0.39), linetype = "dotted", color = "#B79F00") +
+  geom_hline(yintercept = log(0.94), linetype = "dotted", color = "#00BA38") +
+  geom_hline(yintercept = log(0.4), linetype = "dotted", color = "#00BFC4") +
+  geom_hline(yintercept = log(0.36), linetype = "dotted", color = "#619CFF") +
+  geom_hline(yintercept = log(0.57), linetype = "dotted", color = "#F564E3") +
+  geom_vline(xintercept = 264, linetype  = "dotted") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = "") +
   ggtitle("Sigma Parameters")
 
