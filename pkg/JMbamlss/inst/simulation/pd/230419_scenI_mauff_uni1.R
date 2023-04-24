@@ -14,7 +14,7 @@ library(funData)
 f_uni <- list(
   Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
   gamma ~ 1 + group,
-  mu ~  ti(year,bs="ps") + ti(id, bs = "re") + ti(year, id, bs = "re"),
+  mu ~  s(year,bs="ps") + s(id, bs = "re") + s(year, id, bs = "re"),
   sigma ~ 1,
   alpha ~ 1,
   dalpha ~ -1
