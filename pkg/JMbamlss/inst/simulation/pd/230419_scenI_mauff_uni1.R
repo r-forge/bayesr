@@ -11,15 +11,6 @@ library(funData)
 
 # Univariate Joint Model --------------------------------------------------
 
-f_uni <- list(
-  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
-  gamma ~ 1 + group,
-  mu ~  s(year,bs="ps") + s(id, bs = "re") + s(year, id, bs = "re"),
-  sigma ~ 1,
-  alpha ~ 1,
-  dalpha ~ -1
-)
-
 d <- simdat %>%
                    filter(marker == "m1") %>% droplevels() %>%
                    as.data.frame()
@@ -27,10 +18,24 @@ d <- simdat %>%
 d$year[abs(d$year) < 0.0001] <- 0.0001
 d$Time[abs(d$Time) < 0.0001] <- 0.0001
 
+klong <- 5
+
+f_uni <- list(
+  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
+  gamma ~ 1 + group,
+  mu ~  ti(id, bs = "re") + 
+        ti(year, bs = "ps", k = klong) + 
+        ti(id, year, bs = c("re", "ps"), 
+           k = c(nlevels(d$id), klong)),
+  sigma ~ 1,
+  alpha ~ 1,
+  dalpha ~ -1
+)
+
 set.seed(1)
 
 b_uni1 <- bamlss(f_uni, family = "jm", data = d,
-                 timevar = "year", idvar = "id", verbose = TRUE, update.nu = FALSE, maxit = 20, criterion = "BIC")
+                 timevar = "year", idvar = "id", verbose = TRUE, update.nu = TRUE, maxit = 10, n.iter = 100)
 
 saveRDS(b_uni1, file = paste0(results_wd, "scen_mauff/uni/bamlss_uni1.Rds"))
 b_uni1 <- readRDS(paste0(results_wd, "scen_mauff/uni/bamlss_uni1.Rds"))
