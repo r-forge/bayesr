@@ -1052,6 +1052,7 @@ sm_time_transform <- function(x, data, grid, yname, timevar, take, derivMat = FA
   }
 
   X <- PredictMat(x, X)
+
   gdim <- c(length(grid), length(grid[[1]]))
 
   x$XT <- extract_XT(X, gdim[1], gdim[2])

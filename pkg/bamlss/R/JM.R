@@ -75,7 +75,7 @@ jm_transform <- function(x, y, data, terms, knots, formula, family,
   
   ## Create the time grid.  
   grid <- function(upper, length){
-    seq(from = 0, to = upper, length = length)
+    seq(from = sqrt(.Machine$double.eps), to = upper, length = length)
   }
   take <- NULL
   if(is.character(idvar)) {
@@ -480,7 +480,7 @@ sparse_Matrix_setup <- function(x, sparse = TRUE, force = FALSE, take, nonlinear
 
 opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
   criterion = c("AICc", "BIC", "AIC"), maxit = c(100, 1),
-  nu = c("lambda" = 0.1, "gamma" = 0.1, "mu" = 0.1, "sigma" = 0.1, "alpha" = 0.1, "dalpha" = 0.1),
+  nu = c("lambda" = 0.99, "gamma" = 0.99, "mu" = 0.99, "sigma" = 0.99, "alpha" = 0.99, "dalpha" = 0.99),
   update.nu = FALSE, eps = 0.0001, alpha.eps = 0.001, ic.eps = 1e-08, nback = 40,
   verbose = TRUE, digits = 4, ...)
 {
@@ -2724,14 +2724,15 @@ propose_jm_mu_Matrix <- function(x, y,
   }
   
   ## Update additive predictors.
+  fit <- drop(x$X %*% g)
   fit_timegrid <- x$fit.fun_timegrid(g)
+
   eta_timegrid_mu <- eta_timegrid_mu - x$state$fitted_timegrid + fit_timegrid
   if(!is.null(dx))
     eta_timegrid_dmu <- eta_timegrid_dmu - dx$state$fitted_timegrid + dx$fit.fun_timegrid(g)
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_alpha * eta_timegrid_mu + eta_timegrid_dalpha * eta_timegrid_dmu
   x$state$fitted_timegrid <- fit_timegrid
   
-  fit <- drop(x$X %*% g)
   eta$mu <- eta$mu - fitted(x$state) + fit
   x$state$fitted.values <- fit
   
@@ -2800,6 +2801,7 @@ propose_jm_mu_Matrix <- function(x, y,
 #cat("p1", p1, "\n")
 #cat("alpha", exp(x$state$alpha), "\n")
 #cat("edf", x$state$edf, "\n")
+#cat("tau2", get.par(x$state$parameters, "tau2"), "\n")
 #print(x$label)
   
   return(x$state)
@@ -4227,6 +4229,7 @@ sm_time_transform2 <- function(x, data, grid, yname, timevar, take, derivMat = F
     ddata <- data
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
+
   X <- NULL
   terms <- x$term[x$term %in% names(data)]
   for(j in terms) {
@@ -4271,7 +4274,14 @@ sm_time_transform2 <- function(x, data, grid, yname, timevar, take, derivMat = F
     X
   }
   x$propose <- NULL
-  
+
+
+#  if(length(x$S)) {
+#    if(inherits(x, "random.effect")) {
+#      x$S[[1L]] <- diag(1.00001, ncol(x$S[[1L]]))
+#    }
+#  }
+
   X <- PredictMat(x, X)
   gdim <- c(length(grid), length(grid[[1]]))
   
