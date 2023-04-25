@@ -2792,17 +2792,17 @@ propose_jm_mu_Matrix <- function(x, y,
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
 
-#cat("\n-----------\n")
-#cat("pibetaprop", pibetaprop, "\n")
-#cat("qbeta", qbeta, "\n")
-#cat("p2", p2, "\n")
-#cat("pibeta", pibeta, "\n")
-#cat("qbetaprop", qbetaprop, "\n")
-#cat("p1", p1, "\n")
-#cat("alpha", exp(x$state$alpha), "\n")
-#cat("edf", x$state$edf, "\n")
-#cat("tau2", get.par(x$state$parameters, "tau2"), "\n")
-#print(x$label)
+cat("\n-----------\n")
+cat("pibetaprop", pibetaprop, "\n")
+cat("qbeta", qbeta, "\n")
+cat("p2", p2, "\n")
+cat("pibeta", pibeta, "\n")
+cat("qbetaprop", qbetaprop, "\n")
+cat("p1", p1, "\n")
+cat("alpha", exp(x$state$alpha), "\n")
+cat("edf", x$state$edf, "\n")
+cat("tau2", get.par(x$state$parameters, "tau2"), "\n")
+print(x$label)
   
   return(x$state)
 }
