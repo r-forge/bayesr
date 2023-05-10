@@ -4480,15 +4480,13 @@ tF <- function(x, ...)
          d <- rep(NA, length(par[[1L]]))
        return(d)
     },
-    "p" = if(!inherits(pfun, "try-error")) function(q, par, log = FALSE, ...) {
-      y <- list(...)$y
+    "p" = if(!inherits(pfun, "try-error")) function(q, par, log = FALSE, y = NULL, ...) {
       if(!is.null(y))
         q <- y
       par <- check_range(par)
       eval(pc)
     } else NULL,
-    "q" = if(!inherits(qfun, "try-error")) function(p, par, log = FALSE, ...) {
-      y <- list(...)$y
+    "q" = if(!inherits(qfun, "try-error")) function(p, par, log = FALSE, y = NULL, ...) {
       if(!is.null(y))
         p <- y
       par <- check_range(par)
