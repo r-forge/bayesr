@@ -866,8 +866,6 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
       ###################
       ## Survival part ##
       ###################
-      eeta <- exp(eta_timegrid)
-      int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1)], 1, sum))
       
       if(!fix.lambda) {
         for(sj in seq_along(x$lambda$smooth.construct)) {
@@ -892,6 +890,8 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
       
       if(!fix.gamma) {
         if(length(x$gamma$smooth.construct)) {
+          eeta <- exp(eta_timegrid)
+          int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1)], 1, sum))
           for(sj in seq_along(x$gamma$smooth.construct)) {
             # cat("\n iteration: ", iter, ", predictor: gamma", ", term: ", sj)
             state <- update_jm_gamma(x$gamma$smooth.construct[[sj]], eta, eta_timegrid, int0,
@@ -1534,6 +1534,12 @@ update_jm_dmu <- function(dx, x)
 update_jm_sigma <- function(x, y, eta, eta_timegrid,
                             update.nu, criterion, get_LogPost, nobs, do.optim2, edf, ...)
 {
+  
+  # # IWLS instead of Newton-Raphson
+  # score <- drop(-1 + (y[, "obs"] - eta$mu)^2 / (exp(eta$sigma)^2))
+  # hess <- rep(2, nrow(y))
+  # z <- eta$sigma + 1/hess*score
+  
   xgrad <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
   xhess0 <- -2 * crossprod(x$X*drop((y[, "obs"] - eta$mu) / exp(eta$sigma)^2),
                            x$X*drop(y[, "obs"] - eta$mu))
@@ -1601,11 +1607,14 @@ update_jm_sigma <- function(x, y, eta, eta_timegrid,
     
     x$state$parameters[x$pid$tau2] <- tau2
   }
-  
+  # # IWLS isntead of N-R
+  # xhess <- do.XWX(x$X, 1 / rep(2, nrow(y)), x$sparse.setup$matrix)
   xhess <- xhess0 - x$hess(score = NULL, x$state$parameters, full = FALSE)
   xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
   
   ## Compute the inverse of the hessian.
+  # # IWLS instead of N-R
+  # Sigma <- matrix_inv(1 * xhess, index = NULL)
   Sigma <- matrix_inv(-1 * xhess, index = NULL)
   Hs <- Sigma %*% xgrad
   
@@ -1615,6 +1624,8 @@ update_jm_sigma <- function(x, y, eta, eta_timegrid,
   if(update.nu) {
     objfun2 <- function(nu) {
       g2 <- drop(g + nu * Hs)
+      # # IWLS instead of N-R
+      # g2 <- drop(Sigma %*% crossprod(x$X, z*2))
       names(g2) <- names(g)
       x$state$parameters <- set.par(x$state$parameters, g2, "b")
       fit <- x$fit.fun(x$X, g2)
@@ -1626,7 +1637,8 @@ update_jm_sigma <- function(x, y, eta, eta_timegrid,
     x$state$nu <- optimize(f = objfun2, interval = c(0, 1))$minimum
   }
   
-  
+  # # IWLS instead of N-R
+  # g2 <- drop(Sigma %*% crossprod(x$X, z*2))
   g2 <- drop(g + x$state$nu * Hs)
   names(g2) <- names(g)
   x$state$parameters <- set.par(x$state$parameters, g2, "b")
@@ -1634,6 +1646,8 @@ update_jm_sigma <- function(x, y, eta, eta_timegrid,
   ## Update fitted values.
   x$state$fitted.values <- x$fit.fun(x$X, g2)
   x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma)
+  # # IWLS instead of N-R
+  # x$state$edf <- sum_diag((1 * xhess) %*% Sigma)
   x$state$hessian <- -1 * xhess
   
   return(x$state)
@@ -1886,7 +1900,7 @@ update_jm_dalpha <- function(x, eta, eta_timegrid,
 ## (5) Joint model MCMC.
 sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   n.iter = 1200, burnin = 200, thin = 1, verbose = TRUE, 
-  digits = 4, step = 20, ...)
+  digits = 4, step = 20, save_nr = FALSE, ...)
 {
   ## Hard coded.
   fixed <- NULL
@@ -1910,6 +1924,10 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
       }
     }
     x <- set.starting.values(x, start)
+  }
+  
+  if (save_nr) {
+    newtraphs <- list()
   }
   
   ## Names of parameters/predictors.
@@ -2119,10 +2137,18 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
     if(save <- iter %in% iterthin)
       js <- which(iterthin == iter)
     
+    if (save_nr) {
+      newtraphs_step <- list()
+    }
+    
     for(i in nx2) {
       if(i == "gamma") {
         eeta <- exp(eta_timegrid)
         int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1)], 1, sum))
+      }
+      
+      if (save_nr) {
+        newtraphs_step[[i]] <- list()
       }
       
       prop_fun <- get_jm_prop_fun(i, slice[i], nonlinear)
@@ -2142,6 +2168,10 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
         #checks# if(i == "mu") cat("\n", sj, round(exp(p.state$alpha), 2))
         if(i %in% fixed)
           accepted <- FALSE
+        
+        if (save_nr) {
+          newtraphs_step[[i]][[sj]] <- p.state$newtraphs
+        }
         
         if(accepted) {
           if(i %in% c("lambda", "mu", "alpha", "dalpha")) {
@@ -2235,6 +2265,10 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
       logPost.samps[js] <- as.numeric(logLik.samps[js] + get.log.prior(x))
     }
     
+    if (save_nr) {
+      newtraphs[[iter]] <- newtraphs_step
+    }
+    
     if(verbose) barfun(ptm, n.iter, iter, step, nstep)
   }
   
@@ -2268,6 +2302,10 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
                  "DIC" = rep(DIC, length.out = nrow(samps)),
                  "pd" = rep(pd, length.out = nrow(samps))
   )
+  
+  if (save_nr) {
+    assign("NEWTONRAPHSON", newtraphs, envir = .GlobalEnv)
+  }
   
   return(as.mcmc(samps))
 }
@@ -2407,10 +2445,12 @@ propose_jm_lambda <- function(x, y,
   p1 <- x$prior(x$state$parameters)
   
   ## Compute gradient and hessian integrals.
-  int <- survint(X, eeta, width, exp(eta$gamma), index = x$sparse.setup$matrix)
-  xgrad <- drop(t(status) %*% x$XT - int$grad)
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
-  xhess <- int$hess + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  intOLD <- survint(X, eeta, width, exp(eta$gamma), index = x$sparse.setup$matrix)
+  xgrad0 <- drop(t(status) %*% x$XT - intOLD$grad)
+  pgrad0 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad0 + pgrad0
+  phess0 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- intOLD$hess + phess0
   
   ## Compute the inverse of the hessian.
   Sigma <- matrix_inv(xhess, index = NULL)
@@ -2452,9 +2492,11 @@ propose_jm_lambda <- function(x, y,
   
   ## Prior prob.
   int <- survint(X, eeta, width, exp(eta$gamma), index = x$sparse.setup$matrix)
-  xgrad <- drop(t(status) %*% x$XT - int$grad)
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
-  xhess <- int$hess + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xgrad1 <- drop(t(status) %*% x$XT - int$grad)
+  pgrad1 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad1 + pgrad1
+  phess1 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- int$hess + phess1
   
   Sigma2 <- matrix_inv(xhess, index = NULL)
   mu2 <- drop(g + nu * Sigma2 %*% xgrad)
@@ -2483,6 +2525,17 @@ propose_jm_lambda <- function(x, y,
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   # cat(paste("\n",pibeta, pibetaprop, qbeta, qbetaprop, p1, p2, x$state$alpha, sep=";"))
+  
+  x$state$newtraphs <- list("xgrad0" = xgrad0, "xgrad1" = xgrad1,
+                       "pgrad0" = pgrad0, "pgrad1" = pgrad1,
+                       "xhess0" = intOLD$hess, "xhess1" = int$hess,
+                       "phess0" = phess0, "phess1" = phess1,
+                       "g0" = g0, "g1" = g,
+                       "mu0" = mu, "mu1" = mu2,
+                       "pibetaprop" = pibetaprop, "pibeta" = pibeta,
+                       "qbetaprop" = qbetaprop, "qbeta" = qbeta,
+                       "p0" = p1, "p1" = p2)
+  
   return(x$state)
 }
 
@@ -2516,16 +2569,18 @@ propose_jm_mu_simple <- function(x, y,
                  dX, if(!is.null(dX)) eeta * eta_timegrid_dalpha else NULL,
                  if(!is.null(dX)) eeta * eta_timegrid_dalpha^2 else NULL)
   
-  xgrad <- drop(t(x$X) %*% drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2) +
+  xgrad0 <- drop(t(x$X) %*% drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2) +
                   t(x$XT) %*% drop(eta$alpha * status) - int$grad)
   if(!is.null(dx))
-    xgrad <- drop(xgrad + t(dx$XT) %*% drop(eta$dalpha * status))
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+    xgrad0 <- drop(xgrad0 + t(dx$XT) %*% drop(eta$dalpha * status))
+  pgrad0 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad0 + pgrad0
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
   } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
-  xhess <- -1 * XWX - int$hess
-  xhess <- xhess - x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess0 <- -1 * XWX - int$hess
+  phess0 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess0 - phess0
   
   ## Compute the inverse of the hessian.
   Sigma <- matrix_inv(-1 * xhess, index = NULL)
@@ -2569,16 +2624,18 @@ propose_jm_mu_simple <- function(x, y,
                  dX, if(!is.null(dX)) eeta * eta_timegrid_dalpha else NULL,
                  if(!is.null(dX)) eeta * eta_timegrid_dalpha^2 else NULL)
   
-  xgrad <- drop(t(x$X) %*% drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2) +
+  xgrad1 <- drop(t(x$X) %*% drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2) +
                   t(x$XT) %*% drop(eta$alpha * status) - int$grad)
   if(!is.null(dx))
-    xgrad <- drop(xgrad + t(dx$XT) %*% drop(eta$dalpha * status))
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+    xgrad1 <- drop(xgrad1 + t(dx$XT) %*% drop(eta$dalpha * status))
+  pgrad1 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad1 + pgrad1
   XWX <- if(is.null(x$sparse.setup$matrix)) {
     crossprod(x$X * (1 / exp(eta$sigma)^2), x$X)
   } else do.XWX(x$X, exp(eta$sigma)^2, index = x$sparse.setup$matrix)
-  xhess <- -1 * XWX - int$hess
-  xhess <- xhess - x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess1 <- -1 * XWX - int$hess
+  phess1 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess1 - phess1
   Sigma2 <- matrix_inv(-1 * xhess, index = NULL)
   mu2 <- drop(g + nu * Sigma2 %*% xgrad)
   qbeta <- dmvnorm(g0, mean = mu2, sigma = Sigma2, log = TRUE)
@@ -2606,6 +2663,16 @@ propose_jm_mu_simple <- function(x, y,
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   
+  x$state$newtraphs <- list("xgrad0" = xgrad0, "xgrad1" = xgrad1,
+                       "pgrad0" = pgrad0, "pgrad1" = pgrad1,
+                       "xhess0" = -xhess0, "xhess1" = -xhess1,
+                       "phess0" = phess0, "phess1" = phess1,
+                       "g0" = g0, "g1" = g,
+                       "mu0" = mu, "mu1" = mu2,
+                       "pibetaprop" = pibetaprop, "pibeta" = pibeta,
+                       "qbetaprop" = qbetaprop, "qbeta" = qbeta,
+                       "p0" = p1, "p1" = p2)
+  
   return(x$state)
 }
 
@@ -2627,24 +2694,6 @@ propose_jm_mu_Matrix <- function(x, y,
   int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1)], 1, sum))
   pibeta <- sum((eta_timegrid[,ncol(eta_timegrid)] + eta$gamma) * status, na.rm = TRUE) -
     exp(eta$gamma) %*% int0 + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
-
-  ## Sample smoothing variance.
-  if(!x$fixed & is.null(x$sp) & length(x$S)) {
-    if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
-      g <- get.par(x$state$parameters, "b")
-      a <- x$rank / 2 + x$a
-      b <- drop(0.5 * crossprod(g, x$S[[1]]) %*% g + x$b)
-      tau2 <- 1 / rgamma(1, a, b)
-      x$state$parameters <- set.par(x$state$parameters, tau2, "tau2")
-    } else {
-      i <- grep("tau2", names(x$state$parameters))
-      for(j in i) {
-        x$state$parameters <- uni.slice(x$state$parameters, x, NULL, NULL,
-                                        NULL, id = "mu", j, logPost = uni.slice_tau2_logPost, lower = 0, ll = pibeta)
-      }
-    }
-  }
-
   p1 <- x$prior(x$state$parameters)
   
   ## Compute gradient and hessian integrals.
@@ -2653,14 +2702,16 @@ propose_jm_mu_Matrix <- function(x, y,
                  dX, if(!is.null(dX)) eeta * eta_timegrid_dalpha else NULL,
                  if(!is.null(dX)) eeta * eta_timegrid_dalpha^2 else NULL)
   
-  xgrad <- crossprod(x$X, drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2)) +
+  xgrad0 <- crossprod(x$X, drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2)) +
     crossprod(x$XT,  drop(eta$alpha * status)) - int$grad
   if(!is.null(dx))
-    xgrad <- xgrad + crossprod(dx$XT, drop(eta$dalpha * status))
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+    xgrad0 <- xgrad0 + crossprod(dx$XT, drop(eta$dalpha * status))
+  pgrad0 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgradOLD <- xgrad0 + pgrad0
   XWX <- crossprod(Diagonal(x = 1 / exp(eta$sigma)^2) %*% x$X, x$X)
   xhess0 <- -1 * XWX - int$hess
-  xhess <- xhess0 - x$hess(score = NULL, x$state$parameters, full = FALSE)
+  phess0 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess0 - phess0
   
   ## Compute the inverse of the hessian.
   Sigma <- matrix_inv(-1 * xhess, index = NULL)
@@ -2669,7 +2720,7 @@ propose_jm_mu_Matrix <- function(x, y,
   g0 <- get.state(x, "b")
   
   ## Get new position.
-  mu <- drop(g0 + Sigma %*% xgrad)
+  mu <- drop(g0 + Sigma %*% xgradOLD)
   Sigma <- as.matrix(Sigma)
   
   ## Sample new parameters using blockdiagonal structure.
@@ -2724,15 +2775,14 @@ propose_jm_mu_Matrix <- function(x, y,
   }
   
   ## Update additive predictors.
-  fit <- drop(x$X %*% g)
   fit_timegrid <- x$fit.fun_timegrid(g)
-
   eta_timegrid_mu <- eta_timegrid_mu - x$state$fitted_timegrid + fit_timegrid
   if(!is.null(dx))
     eta_timegrid_dmu <- eta_timegrid_dmu - dx$state$fitted_timegrid + dx$fit.fun_timegrid(g)
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_alpha * eta_timegrid_mu + eta_timegrid_dalpha * eta_timegrid_dmu
   x$state$fitted_timegrid <- fit_timegrid
   
+  fit <- drop(x$X %*% g)
   eta$mu <- eta$mu - fitted(x$state) + fit
   x$state$fitted.values <- fit
   
@@ -2748,14 +2798,16 @@ propose_jm_mu_Matrix <- function(x, y,
                  dX, if(!is.null(dX)) eeta * eta_timegrid_dalpha else NULL,
                  if(!is.null(dX)) eeta * eta_timegrid_dalpha^2 else NULL)
   
-  xgrad <- crossprod(x$X, drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2)) +
+  xgrad1 <- crossprod(x$X, drop((y[, "obs"]  - eta$mu) / exp(eta$sigma)^2)) +
     crossprod(x$XT,  drop(eta$alpha * status)) - int$grad
   if(!is.null(dx))
-    xgrad <- xgrad + crossprod(dx$XT, drop(eta$dalpha * status))
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+    xgrad1 <- xgrad1 + crossprod(dx$XT, drop(eta$dalpha * status))
+  pgrad1 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad1 + pgrad1
   XWX <- crossprod(Diagonal(x = 1 / exp(eta$sigma)^2) %*% x$X, x$X)
-  xhess0 <- -1 * XWX - int$hess
-  xhess <- xhess0 - x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess1 <- -1 * XWX - int$hess
+  phess1 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess1 - phess1
   
   Sigma2 <- matrix_inv(-1 * xhess, index = NULL)
   if(is.character(Sigma2)) {
@@ -2787,22 +2839,49 @@ propose_jm_mu_Matrix <- function(x, y,
   
   
   ## Save edf.
-  x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma2)
+  x$state$edf <- sum_diag((-1 * xhess1) %*% Sigma2)
+  
+  ## Sample variance parameter.
+  if(!x$fixed & is.null(x$sp) & length(x$S)) {
+    if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig") & FALSE) {
+      g <- get.par(x$state$parameters, "b")
+      a <- x$rank / 2 + x$a
+      b <- drop(0.5 * crossprod(g, x$S[[1]]) %*% g + x$b)
+      tau2 <- 1 / rgamma(1, a, b)
+      x$state$parameters <- set.par(x$state$parameters, tau2, "tau2")
+    } else {
+      i <- grep("tau2", names(x$state$parameters))
+      for(j in i) {
+        x$state$parameters <- uni.slice(x$state$parameters, x, NULL, NULL,
+                                        NULL, id = "mu", j, logPost = uni.slice_tau2_logPost, lower = 0, ll = 0)
+      }
+    }
+  }
+
 
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
 
-cat("\n-----------\n")
-cat("pibetaprop", pibetaprop, "\n")
-cat("qbeta", qbeta, "\n")
-cat("p2", p2, "\n")
-cat("pibeta", pibeta, "\n")
-cat("qbetaprop", qbetaprop, "\n")
-cat("p1", p1, "\n")
-cat("alpha", exp(x$state$alpha), "\n")
-cat("edf", x$state$edf, "\n")
-cat("tau2", get.par(x$state$parameters, "tau2"), "\n")
-print(x$label)
+#cat("\n-----------\n")
+#cat("pibetaprop", pibetaprop, "\n")
+#cat("qbeta", qbeta, "\n")
+#cat("p2", p2, "\n")
+#cat("pibeta", pibeta, "\n")
+#cat("qbetaprop", qbetaprop, "\n")
+#cat("p1", p1, "\n")
+#cat("alpha", exp(x$state$alpha), "\n")
+#cat("edf", x$state$edf, "\n")
+#print(x$label)
+  
+  x$state$newtraphs <- list("xgrad0" = xgrad0, "xgrad1" = xgrad1,
+                       "pgrad0" = pgrad0, "pgrad1" = pgrad1,
+                       "xhess0" = -xhess0, "xhess1" = -xhess1,
+                       "phess0" = phess0, "phess1" = phess1,
+                       "g0" = g0, "g1" = g,
+                       "mu0" = mu, "mu1" = mu2,
+                       "pibetaprop" = pibetaprop, "pibeta" = pibeta,
+                       "qbetaprop" = qbetaprop, "qbeta" = qbeta,
+                       "p0" = p1, "p1" = p2)
   
   return(x$state)
 }
@@ -2826,11 +2905,13 @@ propose_jm_alpha <- function(x, y,
   p1 <- x$prior(x$state$parameters)
   
   ## Compute gradient and hessian integrals.
-  int <- survint(X, eeta * eta_timegrid_mu, width, exp(eta$gamma),
+  intOLD <- survint(X, eeta * eta_timegrid_mu, width, exp(eta$gamma),
                  eeta * eta_timegrid_mu^2, index = x$sparse.setup$matrix)
-  xgrad <- t(x$XT) %*% drop(eta_timegrid_mu[, ncol(eeta)] * status) - int$grad
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
-  xhess <- int$hess + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xgrad0 <- t(x$XT) %*% drop(eta_timegrid_mu[, ncol(eeta)] * status) - intOLD$grad
+  pgrad0 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad0 + pgrad0
+  phess0 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- intOLD$hess + phess0
   
   ## Compute the inverse of the hessian.
   Sigma <- matrix_inv(xhess, index = NULL)
@@ -2869,9 +2950,11 @@ propose_jm_alpha <- function(x, y,
   ## Prior prob.
   int <- survint(X, eeta * eta_timegrid_mu, width, exp(eta$gamma),
                  eeta * eta_timegrid_mu^2, index = x$sparse.setup$matrix)
-  xgrad <- t(x$XT) %*% drop(eta_timegrid_mu[, ncol(eeta)] * status) - int$grad
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
-  xhess <- int$hess + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xgrad1 <- t(x$XT) %*% drop(eta_timegrid_mu[, ncol(eeta)] * status) - int$grad
+  pgrad1 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad1 + pgrad1
+  phess1 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- int$hess + phess1
   
   Sigma2 <- matrix_inv(xhess, index = NULL)
   mu2 <- drop(g + nu * Sigma2 %*% xgrad)
@@ -2899,6 +2982,17 @@ propose_jm_alpha <- function(x, y,
   
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
+  
+  x$state$newtraphs <- list("xgrad0" = xgrad0, "xgrad1" = xgrad1,
+                       "pgrad0" = pgrad0, "pgrad1" = pgrad1,
+                       "xhess0" = intOLD$hess, "xhess1" = int$hess,
+                       "phess0" = phess0, "phess1" = phess1,
+                       "g0" = g0, "g1" = g,
+                       "mu0" = mu, "mu1" = mu2,
+                       "pibetaprop" = pibetaprop, "pibeta" = pibeta,
+                       "qbetaprop" = qbetaprop, "qbeta" = qbeta,
+                       "p0" = p1, "p1" = p2)
+  
   return(x$state)
 }
 
@@ -3012,14 +3106,16 @@ propose_jm_gamma <- function(x, y,
   p1 <- x$prior(x$state$parameters)
   
   ## Compute gradient and hessian integrals.
-  tint <- xhess <- 0
+  tint <- xhess0 <- 0
   for(i in 1:nobs) {
     tint <- tint + exp(eta$gamma[i]) * x$X[i, , drop = FALSE] * int[i]
-    xhess <- xhess + exp(eta$gamma[i]) * x$X[i, ] %*% t(x$X[i, ]) * int[i]
+    xhess0 <- xhess0 + exp(eta$gamma[i]) * x$X[i, ] %*% t(x$X[i, ]) * int[i]
   }
-  xgrad <- t(status) %*% x$X - tint
-  xgrad <- drop(xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE))
-  xhess <- xhess + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xgrad0 <- t(status) %*% x$X - tint
+  pgrad0 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- drop(xgrad0 + pgrad0)
+  phess0 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess0 + phess0
   
   ## Compute the inverse of the hessian.
   Sigma <- matrix_inv(xhess, index = NULL)
@@ -3049,15 +3145,17 @@ propose_jm_gamma <- function(x, y,
     exp(eta$gamma) %*% int + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
   
   ## Prior prob.
-  tint <- xhess <- 0
+  tint <- xhess1 <- 0
   for(i in 1:nobs) {
     tint <- tint + exp(eta$gamma[i]) * x$X[i, , drop = FALSE] * int[i]
-    xhess <- xhess + exp(eta$gamma[i]) * x$X[i, ] %*% t(x$X[i, ]) * int[i]
+    xhess1 <- xhess1 + exp(eta$gamma[i]) * x$X[i, ] %*% t(x$X[i, ]) * int[i]
   }
-  xgrad <- t(status) %*% x$X - tint
-  xgrad <- drop(xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE))
-  xhess0 <- xhess
-  xhess <- xhess + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xgrad1 <- t(status) %*% x$X - tint
+  pgrad1 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- drop(xgrad1 + pgrad1)
+ # xhess0 <- xhess
+  phess1 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess1 +phess1
   
   
   Sigma2 <- matrix_inv(xhess, index = NULL)
@@ -3065,7 +3163,7 @@ propose_jm_gamma <- function(x, y,
   qbeta <- dmvnorm(g0, mean = mu2, sigma = Sigma2, log = TRUE)
   
   ## Save edf.
-  x$state$edf <- sum_diag(xhess0 %*% Sigma2)
+  x$state$edf <- sum_diag(xhess1 %*% Sigma2)
   
   ## Sample variance parameter.
   if(!x$fixed & is.null(x$sp) & length(x$S)) {
@@ -3087,6 +3185,16 @@ propose_jm_gamma <- function(x, y,
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
   
+  x$state$newtraphs <- list("xgrad0" = xgrad0, "xgrad1" = xgrad1,
+                       "pgrad0" = pgrad0, "pgrad1" = pgrad1,
+                       "xhess0" = xhess0, "xhess1" = xhess1,
+                       "phess0" = phess0, "phess1" = phess1,
+                       "g0" = g0, "g1" = g,
+                       "mu0" = mu, "mu1" = mu2,
+                       "pibetaprop" = pibetaprop, "pibeta" = pibeta,
+                       "qbetaprop" = qbetaprop, "qbeta" = qbeta,
+                       "p0" = p1, "p1" = p2)
+  
   return(x$state)
 }
 
@@ -3105,12 +3213,14 @@ propose_jm_sigma <- function(x, y,
   p1 <- x$prior(x$state$parameters)
   
   ## Compute gradient and hessian integrals.
-  xgrad <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad0 <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
+  pgrad0 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad0 + pgrad0
   
-  xhess <- -2*crossprod(x$X*drop((y[, "obs"] - eta$mu)/exp(eta$sigma)^2),
-                        x$X*drop(y[, "obs"] - eta$mu))  
-  xhess <- xhess - x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess0 <- -2*crossprod(x$X*drop((y[, "obs"] - eta$mu)/exp(eta$sigma)^2),
+                         x$X*drop(y[, "obs"] - eta$mu))
+  phess0 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess0 - phess0
   
   ## Compute the inverse of the hessian.
   Sigma <- matrix_inv(-1 * xhess, index = NULL)
@@ -3140,19 +3250,21 @@ propose_jm_sigma <- function(x, y,
     exp(eta$gamma) %*% int + sum(dnorm(y[, "obs"], mean = eta$mu, sd = exp(eta$sigma), log = TRUE))
   
   ## Prior prob.
-  xgrad <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
-  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad1 <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
+  pgrad1 <- x$grad(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad1 + pgrad1
   
-  xhess <- xhess0 <- -2*crossprod(x$X*drop((y[, "obs"] - eta$mu)/exp(eta$sigma)^2),
-                                  x$X*drop(y[, "obs"] - eta$mu))  
-  xhess <- xhess - x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess1 <- -2*crossprod(x$X*drop((y[, "obs"] - eta$mu)/exp(eta$sigma)^2),
+                         x$X*drop(y[, "obs"] - eta$mu))
+  phess1 <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xhess <- xhess1 - phess1
   
   Sigma2 <- matrix_inv(-1 * xhess, index = NULL)
   mu2 <- drop(g + nu * Sigma2 %*% xgrad)
   qbeta <- dmvnorm(g0, mean = mu2, sigma = Sigma2, log = TRUE)
   
   ## Save edf.
-  x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma2)
+  x$state$edf <- sum_diag((-1 * xhess1) %*% Sigma2)
   
   ## Sample variance parameter.
   if(!x$fixed & is.null(x$sp) & length(x$S)) {
@@ -3173,6 +3285,16 @@ propose_jm_sigma <- function(x, y,
   
   ## Compute acceptance probablity.
   x$state$alpha <- drop((pibetaprop + qbeta + p2) - (pibeta + qbetaprop + p1))
+  
+  x$state$newtraphs <- list("xgrad0" = xgrad0, "xgrad1" = xgrad1,
+                       "pgrad0" = pgrad0, "pgrad1" = pgrad1,
+                       "xhess0" = -xhess0, "xhess1" = -xhess1,
+                       "phess0" = phess0, "phess1" = phess1,
+                       "g0" = g0, "g1" = g,
+                       "mu0" = mu, "mu1" = mu2,
+                       "pibetaprop" = pibetaprop, "pibeta" = pibeta,
+                       "qbetaprop" = qbetaprop, "qbeta" = qbeta,
+                       "p0" = p1, "p1" = p2)
   
   return(x$state)
 }
@@ -4229,7 +4351,6 @@ sm_time_transform2 <- function(x, data, grid, yname, timevar, take, derivMat = F
     ddata <- data
   if(!is.null(take))
     data <- data[take, , drop = FALSE]
-
   X <- NULL
   terms <- x$term[x$term %in% names(data)]
   for(j in terms) {
@@ -4274,14 +4395,7 @@ sm_time_transform2 <- function(x, data, grid, yname, timevar, take, derivMat = F
     X
   }
   x$propose <- NULL
-
-
-#  if(length(x$S)) {
-#    if(inherits(x, "random.effect")) {
-#      x$S[[1L]] <- diag(1.00001, ncol(x$S[[1L]]))
-#    }
-#  }
-
+  
   X <- PredictMat(x, X)
   gdim <- c(length(grid), length(grid[[1]]))
   
