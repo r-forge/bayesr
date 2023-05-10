@@ -4481,10 +4481,16 @@ tF <- function(x, ...)
        return(d)
     },
     "p" = if(!inherits(pfun, "try-error")) function(q, par, log = FALSE, ...) {
+      y <- list(...)$y
+      if(!is.null(y))
+        q <- y
       par <- check_range(par)
       eval(pc)
     } else NULL,
     "q" = if(!inherits(qfun, "try-error")) function(p, par, log = FALSE, ...) {
+      y <- list(...)$y
+      if(!is.null(y))
+        p <- y
       par <- check_range(par)
       eval(qc)
     } else NULL,
