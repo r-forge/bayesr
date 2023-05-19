@@ -1,4 +1,5 @@
 build_home.R
+index.md
 
 inst/tscript.R
 inst/fatalities.R
