@@ -1,6 +1,6 @@
 Package: bamlss
 Version: 1.2-0
-Date: 2023-02-02
+Date: 2023-05-19
 Title: Bayesian Additive Models for Location, Scale, and Shape (and Beyond)
 Authors@R: c(person(given = "Nikolaus", family = "Umlauf", role = c("aut", "cre"), email = "Nikolaus.Umlauf@uibk.ac.at",
          comment = c(ORCID = "0000-0003-2160-9803")),
@@ -21,7 +21,7 @@ Description: Infrastructure for estimating probabilistic distributional regressi
 Depends: R (>= 3.5.0), coda, colorspace, mgcv
 Imports: Formula, MBA, mvtnorm, sp, Matrix, survival, methods, parallel
 Suggests: bit, ff, fields, gamlss, gamlss.dist, interp, rjags, BayesX,
-  mapdata, maps, maptools, nnet, spatstat, spdep, zoo, keras, splines2,
+  mapdata, maps, sf, nnet, spatstat, spdep, zoo, keras, splines2,
   sdPrior, statmod, glogis, glmnet, scoringRules, knitr, rmarkdown, MASS, tensorflow
 License: GPL-2 | GPL-3
 LazyLoad: yes

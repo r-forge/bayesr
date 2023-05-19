@@ -1900,7 +1900,7 @@ update_jm_dalpha <- function(x, eta, eta_timegrid,
 ## (5) Joint model MCMC.
 sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   n.iter = 1200, burnin = 200, thin = 1, verbose = TRUE, 
-  digits = 4, step = 20, save_nr = FALSE, ...)
+  digits = 4, step = 20, ...)
 {
   ## Hard coded.
   fixed <- NULL
@@ -1925,6 +1925,10 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
     }
     x <- set.starting.values(x, start)
   }
+
+  save_nr <- list(...)$save_nr
+  if(is.null(save_nr))
+    save_nr <- FALSE
   
   if (save_nr) {
     newtraphs <- list()
