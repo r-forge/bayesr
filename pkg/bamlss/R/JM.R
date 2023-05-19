@@ -1926,13 +1926,13 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
     x <- set.starting.values(x, start)
   }
 
-  save_nr <- list(...)$save_nr
-  if(is.null(save_nr))
-    save_nr <- FALSE
-  
-  if (save_nr) {
-    newtraphs <- list()
-  }
+#  save_nr <- list(...)$save_nr
+#  if(is.null(save_nr))
+#    save_nr <- FALSE
+#  
+#  if (save_nr) {
+#    newtraphs <- list()
+#  }
   
   ## Names of parameters/predictors.
   nx <- names(x)
@@ -2141,9 +2141,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
     if(save <- iter %in% iterthin)
       js <- which(iterthin == iter)
     
-    if (save_nr) {
-      newtraphs_step <- list()
-    }
+#    if (save_nr) {
+#      newtraphs_step <- list()
+#    }
     
     for(i in nx2) {
       if(i == "gamma") {
@@ -2151,9 +2151,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
         int0 <- width * (0.5 * (eeta[, 1] + eeta[, sub]) + apply(eeta[, 2:(sub - 1)], 1, sum))
       }
       
-      if (save_nr) {
-        newtraphs_step[[i]] <- list()
-      }
+#      if (save_nr) {
+#        newtraphs_step[[i]] <- list()
+#      }
       
       prop_fun <- get_jm_prop_fun(i, slice[i], nonlinear)
       # 3jump
@@ -2173,9 +2173,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
         if(i %in% fixed)
           accepted <- FALSE
         
-        if (save_nr) {
-          newtraphs_step[[i]][[sj]] <- p.state$newtraphs
-        }
+#        if (save_nr) {
+#          newtraphs_step[[i]][[sj]] <- p.state$newtraphs
+#        }
         
         if(accepted) {
           if(i %in% c("lambda", "mu", "alpha", "dalpha")) {
@@ -2269,9 +2269,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
       logPost.samps[js] <- as.numeric(logLik.samps[js] + get.log.prior(x))
     }
     
-    if (save_nr) {
-      newtraphs[[iter]] <- newtraphs_step
-    }
+#    if (save_nr) {
+#      newtraphs[[iter]] <- newtraphs_step
+#    }
     
     if(verbose) barfun(ptm, n.iter, iter, step, nstep)
   }
@@ -2307,9 +2307,9 @@ sam_JM <- jm_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset
                  "pd" = rep(pd, length.out = nrow(samps))
   )
   
-  if (save_nr) {
-    assign("NEWTONRAPHSON", newtraphs, envir = .GlobalEnv)
-  }
+#  if(save_nr) {
+#    assign("NEWTONRAPHSON", newtraphs, envir = .GlobalEnv)
+#  }
   
   return(as.mcmc(samps))
 }
