@@ -42,13 +42,6 @@ importFrom(
 )
 
 importFrom(
-  "maptools",
-  "unionSpatialPolygons",
-  "readShapePoly",
-  "gpclibPermit"
-)
-
-importFrom(
   "shapefiles",
   "read.shapefile",
   "read.dbf"

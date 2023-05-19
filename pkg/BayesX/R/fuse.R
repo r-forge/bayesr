@@ -51,7 +51,10 @@ fuse <- function(map, regions, name) {
   ntemp <- length(testmap)
   # combine seleted regions to one single polygon, add this region to map again
   spatpol <- sp::SpatialPolygons(polys)
-  combine <- (maptools::unionSpatialPolygons(spatpol, rep(1, length(spatpol@polygons))))
+
+  combine <- sf::st_union(sf::st_as_sf(spatpol))
+  combine <- sf::as_Spatial(combine)
+
   regionadd <- combine@polygons
   regionadd <- (regionadd[[1]]@Polygons)
   for (i in 1:length(regionadd)) {
