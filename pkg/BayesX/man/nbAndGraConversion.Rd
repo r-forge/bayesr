@@ -26,31 +26,32 @@ gra2nb(graObject)
   between the geographical information formats and
   \code{\link{read.gra}}, \code{\link{write.gra}} for the interface to
   the BayesX files.} 
-\examples{
-\dontrun{## first nb to gra:
-library(spdep)
-library(maptools)
-columbus <- readShapePoly(system.file("etc/shapes/columbus.shp", package="spdep")[1])
-colNb <- poly2nb(columbus)
-## ... here manual editing is possible ...
-## then export to graph format
-colGra <- nb2gra(colNb)
+\examples{\dontrun{## first nb to gra:
+if(requireNamespace("spdep")) {
+  library("spdep")
+  library("maptools")
+  columbus <- readShapePoly(system.file("etc/shapes/columbus.shp", package="spdep")[1])
+  colNb <- poly2nb(columbus)
+  ## ... here manual editing is possible ...
+  ## then export to graph format
+  colGra <- nb2gra(colNb)
 
-## and save in BayesX file
-graFile <- tempfile()
-write.gra(colGra, file=graFile)
+  ## and save in BayesX file
+  graFile <- tempfile()
+  write.gra(colGra, file=graFile)
 
-## now back from gra to nb:
-colGra <- read.gra(graFile)
-newColNb <- gra2nb(colGra)
-newColNb
-## compare this with the original
-colNb
-## only the call attribute does not match (which is OK):
-all.equal(newColNb, colNb,
-          check.attributes=FALSE)
-attr(newColNb, "call")
-attr(colNb, "call")
+  ## now back from gra to nb:
+  colGra <- read.gra(graFile)
+  newColNb <- gra2nb(colGra)
+  newColNb
+  ## compare this with the original
+  colNb
+  ## only the call attribute does not match (which is OK):
+  all.equal(newColNb, colNb,
+    check.attributes=FALSE)
+  attr(newColNb, "call")
+  attr(colNb, "call")
+}
 }}
 
 \keyword{spatial}
