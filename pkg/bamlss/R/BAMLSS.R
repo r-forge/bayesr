@@ -426,6 +426,11 @@ design.construct <- function(formula, data = NULL, knots = NULL,
             if(is.null(tsm$xt$binning))
               tsm$xt$binning <- binning
             acons <- TRUE
+            if (is.null(tsm$xt$scale)) {
+              scale.pen <- TRUE
+            } else {
+              scale.pen <- FALSE
+            }
             if(!is.null(tsm$xt$center))
               acons <- tsm$xt$center
             tsm$xt$center <- acons
@@ -465,7 +470,7 @@ design.construct <- function(formula, data = NULL, knots = NULL,
               } else {
                 smt <- smoothCon(tsm, data, knots,
                   absorb.cons = if(is.null(absorb.cons)) acons else absorb.cons,
-                  sparse.cons = sparse.cons, scale.penalty=TRUE)
+                  sparse.cons = sparse.cons, scale.penalty=scale.pen) 
               }
               smooth <- c(smooth, smt)
             }
