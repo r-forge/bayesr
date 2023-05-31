@@ -738,7 +738,7 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
             x$alpha$smooth.construct[[sj]]$prior(state$parameters)
           LogPostUP <- get_LogPost(eta_timegridUP, etaUP, LogPrioUP)
           
-          if (LogPostUP > LogPostOld) {
+          if (LogPostUP > LogPostOld || iter == 0) {
             LogPrioOld <- LogPrioUP
             LogPostOld <- LogPostUP
             eta_timegrid_alphaUP <- eta_timegrid_alphaUP
@@ -791,7 +791,7 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
             x$dalpha$smooth.construct[[sj]]$prior(state$parameters)
           LogPostUP <- get_LogPost(eta_timegridUP, etaUP, LogPrioUP)
           
-          if (LogPostUP > LogPostOld) {
+          if (LogPostUP > LogPostOld || iter == 0) {
             LogPrioOld <- LogPrioUP
             LogPostOld <- LogPostUP
             eta_timegrid_dalpha <- eta_timegrid_dalphaUP
@@ -858,7 +858,7 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
             x$mu$smooth.construct[[sj]]$prior(state$parameters)
           LogPostUP <- get_LogPost(eta_timegridUP, etaUP, LogPrioUP)
           
-          if (LogPostUP > LogPostOld) {
+          if (LogPostUP > LogPostOld || iter == 0) {
             LogPrioOld <- LogPrioUP
             LogPostOld <- LogPostUP
             eta_timegrid_mu <- eta_timegrid_muUP
@@ -905,7 +905,7 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
               x$sigma$smooth.construct[[sj]]$prior(state$parameters)
             LogPostUP <- get_LogPost(eta_timegridUP, etaUP, LogPrioUP)
             
-            if (LogPostUP > LogPostOld) {
+            if (LogPostUP > LogPostOld || iter == 0) {
               LogPrioOld <- LogPrioUP
               LogPostOld <- LogPostUP
               eta_timegrid_dmu <- eta_timegrid_dmuUP
@@ -931,7 +931,7 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
             x$sigma$smooth.construct[[sj]]$prior(state$parameters)
           LogPostUP <- get_LogPost(eta_timegrid, etaUP, LogPrioUP)
           
-          if (LogPostUP > LogPostOld) {
+          if (LogPostUP > LogPostOld || iter == 0) {
             LogPrioOld <- LogPrioUP
             LogPostOld <- LogPostUP
             eta$sigma <- etaUP$sigma
@@ -977,7 +977,7 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
             x$lambda$smooth.construct[[sj]]$prior(state$parameters)
           LogPostUP <- get_LogPost(eta_timegridUP, etaUP, LogPrioUP)
           
-          if (LogPostUP > LogPostOld) {
+          if (LogPostUP > LogPostOld || iter == 0) {
             LogPrioOld <- LogPrioUP
             LogPostOld <- LogPostUP
             eta_timegrid_lambda <- eta_timegrid_lambdaUP
@@ -1008,7 +1008,7 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
               x$gamma$smooth.construct[[sj]]$prior(state$parameters)
             LogPostUP <- get_LogPost(eta_timegrid, etaUP, LogPrioUP)
             
-            if (LogPostUP > LogPostOld) {
+            if (LogPostUP > LogPostOld || iter == 0) {
               LogPrioOld <- LogPrioUP
               LogPostOld <- LogPostUP
               eta$gamma <- etaUP$gamma
