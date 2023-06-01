@@ -15,7 +15,7 @@ Description: Functions for exploring and visualising estimation results
   functions that allow to read, write and manipulate map objects that are required in spatial
   analyses performed with BayesX.
 Depends: shapefiles
-Imports: sp, sf, colorspace, coda, splines, methods
+Imports: sp, sf, colorspace, coda, splines, methods, interp
 Suggests: spdep, interp, rgeos
 LazyLoad: yes
 License: GPL-2 | GPL-3
