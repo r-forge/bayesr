@@ -27,10 +27,13 @@ gra2nb(graObject)
   \code{\link{read.gra}}, \code{\link{write.gra}} for the interface to
   the BayesX files.} 
 \examples{\dontrun{## first nb to gra:
-if(requireNamespace("spdep")) {
+if(requireNamespace("sf") &
+   requireNamespace("spdep")) {
+  library("sf")
   library("spdep")
-  library("maptools")
-  columbus <- readShapePoly(system.file("etc/shapes/columbus.shp", package="spdep")[1])
+
+  columbus <- st_read(system.file("etc/shapes/columbus.shp",
+    package = "spdep")[1])
   colNb <- poly2nb(columbus)
   ## ... here manual editing is possible ...
   ## then export to graph format

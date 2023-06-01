@@ -18,7 +18,7 @@ plotsurf <- function(data, x = 2, y = 3, z = 4, mode = 1, ticktype = "detailed",
 #  ## have to load the whole package (see DESCRIPTION).
 #  if (!isTRUE(akimaPermitStatus())) 
 #    stop("The licence for akima is not Free or Open Source and explicitly forbids commercial use.\nIf you want to use akima anyway, call akimaPermit() (see help(akimaPermit) for details.")
-  data <- interp::interp(x, y, z)
+  data <- interp(x, y, z)
   x <- data$x
   y <- data$y
   z <- data$z

@@ -53,6 +53,11 @@ importFrom(
 )
 
 importFrom(
+  "interp",
+  "interp"
+)
+
+importFrom(
   "coda",
   "mcmc",
   "as.mcmc",
