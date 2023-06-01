@@ -16,7 +16,7 @@ Description: Functions for exploring and visualising estimation results
   analyses performed with BayesX.
 Depends: shapefiles
 Imports: sp, sf, colorspace, coda, splines, methods, interp
-Suggests: spdep, interp, rgeos
+Suggests: spdep, rgeos
 LazyLoad: yes
 License: GPL-2 | GPL-3
 NeedsCompilation: no
