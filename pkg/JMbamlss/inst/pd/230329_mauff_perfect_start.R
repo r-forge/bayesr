@@ -100,7 +100,7 @@ seq1 <- seq(0, max(dat.id$Time), length.out = 101)
 b_funs <- rep(list(funData(argvals = seq1,
                            X = matrix(c(rep(1, length(seq1)), seq1),
                                       byrow = TRUE, ncol = length(seq1)))), 6)
-mfpca_tru <- MFPCA_cov(cov = as.matrix(D), basis_funs = b_funs, scores = b)
+mfpca_tru <- JMbamlss:::MFPCA_cov(cov = as.matrix(D), basis_funs = b_funs, scores = b)
 # names(b1) <- c(paste0("b", 1:500), "tau21", "edf")
 
 for (l in 1:12) {
@@ -187,5 +187,38 @@ f_tru <- list(
 
 set.seed(1)
 b_tru <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
-                timevar = "year", optimizer = FALSE, n.iter = 1500,
-                burnin = 500, thin = 5, verbose  = TRUE, start = par)
+                timevar = "year", optimizer = FALSE,# n.iter = 1500,
+                #burnin = 500, thin = 5,
+                verbose  = TRUE, start = par)
+
+
+
+# Estimate the univariate model with true parameters ----------------------
+
+# Full parameter list
+par <- list("lambda" = list("s(Time)" = lambda_pars),
+            "gamma" = list("p" = c(m$coefficients[1], "group1" = 0.5)),
+            "mu" = list("s" = list("s(id)" = b[, 1],
+                                   "s(year,id)" = b[, 2]),
+                        "p" = c("(Intercept)" = 4.93,
+                                "year" = 3.58)),
+            "sigma" = list(c("(Intercept)" = log(0.86))),
+            "alpha" = list(c("(Intercept)" = 0.1))
+)
+f_uni <- list(
+  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
+  gamma ~ 1 + group,
+  mu ~  year +
+    s(id, bs = "re") +
+    s(year, id, bs ="re"),
+  sigma ~ 1,
+  alpha ~ 1,
+  dalpha ~ -1
+)
+
+set.seed(1)
+b_uni <- bamlss(f_uni, family = jm_bamlss, data = d_rirs_tru %>%
+                  filter(marker == "m1") %>% droplevels() %>% as.data.frame(), 
+                timevar = "year", optimizer = FALSE,
+                verbose  = TRUE, start = par, idvar = "id")
+

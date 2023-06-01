@@ -35,27 +35,47 @@ plot(survfit(Surv(Time, event) ~ group, data = dat.id),
 # Univariate Joint Model --------------------------------------------------
 
 f_uni <- list(
-  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
+  Surv2(Time, event, obs = y) ~ -1 +
+    s(Time, k = 20, bs = "ps", xt = list("scale" = FALSE)),
   gamma ~ 1 + group,
-  mu ~  year + s(id, bs = "re") + s(year, id, bs = "re"),
+  mu ~  year + s(id, bs = "re", xt = list("scale" = FALSE)) +
+    s(year, id, bs = "re", xt = list("scale" = FALSE)),
   sigma ~ 1,
   alpha ~ 1,
   dalpha ~ -1
 )
 
-# To recreate the problem, the first e.g. 350 observations are sufficient
 set.seed(1)
 b_uni6 <- bamlss(f_uni, family = "jm", data = simdat %>%
                    filter(marker == "m6") %>% 
                    droplevels() %>%  
                    mutate(year = year + sqrt(.Machine$double.eps)) %>% 
                    as.data.frame(),
-                 timevar = "year", idvar = "id", maxit = 1500, update.nu = TRUE,
+                 timevar = "year", idvar = "id", maxit = 1500,
                  verbose = TRUE) 
 acc(b_uni6)
 
 
-
+# Fix the variance parameters to the true values
+f_uni_tau <- list(
+  Surv2(Time, event, obs = y) ~ -1 + 
+    s(Time, k = 20, bs = "ps", xt = list("scale" = FALSE)),
+  gamma ~ 1 + group,
+  mu ~  year +
+    s(id, bs = "re", xt = list("scale" = FALSE, "tau2" = (3.58))) +
+    s(year, id, bs = "re", xt = list("scale" = FALSE, "tau2" = (0.197))),
+  sigma ~ 1,
+  alpha ~ 1,
+  dalpha ~ -1
+)
+set.seed(1)
+b6_tau <-  bamlss(f_uni_tau, family = "jm", data = simdat %>%
+                    filter(marker == "m6") %>% 
+                    droplevels() %>%  
+                    mutate(year = year + sqrt(.Machine$double.eps)) %>% 
+                    as.data.frame(),
+                  timevar = "year", idvar = "id", maxit = 1500,
+                  verbose = TRUE) 
 
 
 # # Data can also be censored at 10 with same problems
@@ -213,6 +233,57 @@ ggplot(data.frame(x = c(-3, 3)), aes(x = x)) +
 rs_tau2
 
 
+# Compare all draws of RI and RS with the variance parameters (BAMLSS)
+ri_par <- grep("\\(id\\)", colnames(b_uni6$samples[[1]]))
+ri_id <- ri_par[1:500]
+ri_oth <- ri_par[501:504]
+rs_par <- grep("year,id", colnames(b_uni6$samples[[1]]))
+rs_id <- rs_par[1:500]
+rs_oth <- rs_par[501:504]
+
+all_draws <- data.frame(
+  id = rep(rep(seq_len(500), each = 1001), times = 2),
+  re = c(b_uni6$samples[[1]][, ri_id], b_uni6$samples[[1]][, rs_id]),
+  type = factor(rep(c("Random Intercept", "Random Slope"), each = 1001*500))
+)
+ri_tau2 <- summary(b_uni6$samples[[1]][, ri_oth])$statistics[1, 1]
+rs_tau2 <- summary(b_uni6$samples[[1]][, rs_oth])$statistics[1, 1]
+all_taus <- data.frame(
+  x = c(seq(-8, 6, by = 0.1), seq(-2, 2, by = 0.01)),
+  y = c(dnorm(seq(-8, 6, by = 0.1), 0, sqrt(ri_tau2)),
+        dnorm(seq(-2, 2, by = 0.01), 0, sqrt(rs_tau2))),
+  yt = c(dnorm(seq(-8, 6, by = 0.1), 0, sqrt(3.58)),
+         dnorm(seq(-2, 2, by = 0.01), 0, sqrt(0.197))),
+  type = factor(c(rep("Random Intercept", length(seq(-8, 6, by = 0.1))),
+                  rep("Random Slope", length(seq(-2, 2, by = 0.01)))))
+)
+ggplot(all_draws, aes(x = re)) +
+  geom_histogram(aes(y = after_stat(density)), alpha = 0.5) +
+  theme_bw() +
+  facet_wrap(~type, scales = "free") +
+  ggtitle("Distribution of All Random Slope Effect Samples", 
+          "Univariate JM m6 (bamlss), 500 Ids, 1001 Samples, Truth (Blue)") +
+  labs(x = "Random Effect Parameters", y = "Density")+
+  geom_line(data = all_taus, aes(x = x, y = yt), color = "blue") +
+  geom_line(data = all_taus, aes(x = x, y = y), linetype = "dashed", 
+            linewidth = 1) 
+
+
+
+# Compare to fixing the variance taus
+all_draws <- data.frame(
+  id = rep(rep(seq_len(500), each = 1001), times = 2),
+  re = c(b6_tau$samples[[1]][, ri_id], b6_tau$samples[[1]][, rs_id]),
+  type = factor(rep(c("Random Intercept", "Random Slope"), each = 1001*500))
+)
+ggplot(all_draws, aes(x = re)) +
+  geom_histogram(aes(y = after_stat(density)), alpha = 0.5) +
+  theme_bw() +
+  facet_wrap(~type, scales = "free") +
+  ggtitle("Distribution of All Random Slope Effect Samples (Fixed taus)", 
+          "Univariate JM m6 (bamlss), 500 Ids, 1001 Samples, Truth (Blue)") +
+  labs(x = "Random Effect Parameters", y = "Density") +
+  geom_line(data = all_taus, aes(x = x, y = yt), color = "blue")
 
 
 # Multivariate Joint Model ------------------------------------------------

@@ -438,3 +438,52 @@ ggplot(data = data.frame(t(sigma)) %>%
   labs(x = "Iteration", y =  "Estimate", col = "") +
   ggtitle("Sigma Parameters")
 
+
+
+
+# Compare Baseline Hazard -------------------------------------------------
+
+# Get the true lambda parameters
+phi <- 1.65
+
+hazard_dat <- data.frame(
+  id = dat.id$id,
+  Time = dat.id$Time,
+  hazard = log(phi) + (phi - 1) * log(dat.id$Time) - 5.8
+)
+
+m <- gam(hazard ~  s(Time, k = 20, bs = "ps"), data = hazard_dat)
+lambda_pars <- c(m$coefficients[2:20], m$sp, sum(m$edf[2:20]))
+names(lambda_pars) <- c(paste0("b", 1:19), "tau21", "edf")
+
+hazard_dat1 <- data.frame(
+  id = dat.id$id[1:150],
+  Time = dat.id$Time[1:150],
+  hazard = log(phi) + (phi - 1) * log(dat.id$Time[1:150]) - 5.8
+)
+
+m1 <- gam(hazard ~  s(Time, k = 20, bs = "ps"), data = hazard_dat1)
+lambda_pars1 <- c(m1$coefficients[2:20], m1$sp, sum(m$edf[2:20]))
+names(lambda_pars1) <- c(paste0("b", 1:19), "tau21", "edf")
+
+
+m1 <- gam(hazard ~  s(Time, k = 20), data = hazard_dat1)
+
+# Estimated Baseline Hazards
+lambga_dat <- data.frame("Time" = seq(0, 30, length.out = 100))
+x_lambga <- PredictMat(m$smooth[[1]], lambga_dat)
+x_lambga1 <- PredictMat(m1$smooth[[1]], lambga_dat)
+lambga_dat$fit <- x_lambga %*% lambda_pars[1:19] + 
+  m$coefficients[["(Intercept)"]]
+lambga_dat$fit1 <- x_lambga1 %*% lambda_pars1[1:19] + 
+  m1$coefficients[["(Intercept)"]]
+lambga_dat$tru <- log(1.65) + 0.65*log(lambga_dat$Time) - 5.8
+ggplot(lambga_dat, aes(x = Time)) +
+  geom_line(aes(y = fit, col = "blue")) +
+  geom_line(aes(y = fit1, col = "red")) +
+  geom_line(aes(y = tru), linetype = "dotted") +
+  theme_bw() +
+  labs(y = "Lambda + Gamma Intercept") +
+  ggtitle("Baseline Hazard Parameters") +
+  geom_point(data = hazard_dat, aes(x = Time, y = hazard), color = "blue") +
+  geom_point(data = hazard_dat1, aes(x = Time, y = hazard), color = "red")
