@@ -1,7 +1,7 @@
 Package: BayesX
 Type: Package
 Title: R Utilities Accompanying the Software Package BayesX
-Version: 0.3-2
+Version: 0.3-3
 Date: 2023-06-01
 Authors@R: c(person(given = "Nikolaus", family = "Umlauf", role = c("aut", "cre"), email = "Nikolaus.Umlauf@uibk.ac.at"),
   person(given = "Thomas", family = "Kneib", role = "aut", email = "tkneib@uni-goettingen.de"),
@@ -16,7 +16,7 @@ Description: Functions for exploring and visualising estimation results
   analyses performed with BayesX.
 Depends: shapefiles
 Imports: sp, sf, colorspace, coda, splines, methods, interp
-Suggests: spdep, rgeos
+Suggests: spdep
 LazyLoad: yes
 License: GPL-2 | GPL-3
 NeedsCompilation: no
