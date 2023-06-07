@@ -59,7 +59,6 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
         x$mu$smooth.construct[[j]]$state$fitted.values <- 
           x$mu$smooth.construct[[j]]$X %*% 
           x$mu$smooth.construct[[j]]$state$parameters
-        x$mu$smooth.construct[[j]]$nu <- nu["mu"] 
       }
       b <- get.par(x$mu$smooth.construct[[j]]$state$parameters, "b")
       if(inherits(x$mu$smooth.construct[[j]], "pcre2.random.effect")){
@@ -73,6 +72,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
       x$mu$smooth.construct[[j]]$state$fitted_T <- eta_T_sj
       eta_timegrid_mu <- eta_timegrid_mu + eta_grid_sj
       eta_T_mu <- eta_T_mu + eta_T_sj
+      x$mu$smooth.construct[[j]]$nu <- nu["mu"] 
       edf <- edf + x$mu$smooth.construct[[j]]$state$edf
     }
   }
@@ -157,7 +157,6 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
   
   # Updating the predictors
   while((eps0 > eps) & (iter < maxit)) {
-   
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
       state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y,
