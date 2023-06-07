@@ -131,7 +131,7 @@ update_mjm_lambda <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
 # Updating gamma predictor ------------------------------------------------
 
 
-update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, eta_T_mu, survtime,
+update_mjm_gamma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
                              update_nu, get_LogLik, update_tau, edf, ...) {
   
   b <- bamlss::get.state(x, "b")
@@ -240,7 +240,7 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, eta_T_mu, survtime,
 # Updating alpha predictor ------------------------------------------------
 
 
-update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_lambda,
+update_mjm_alpha <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
                              eta_timegrid_alpha, eta_timegrid_mu, 
                              eta_T_mu, survtime, update_nu, get_LogLik, 
                              update_tau, edf, ...) {
@@ -384,7 +384,7 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_lambda,
 # Updating mu predictor ---------------------------------------------------
 
 
-update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_lambda,
+update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
                           eta_timegrid_alpha, eta_timegrid_mu, eta_T_mu,
                           survtime, update_nu, get_LogLik, update_tau, edf, 
                           ...) {
@@ -556,7 +556,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_lambda,
 # Updating sigma predictor ------------------------------------------------
 
 
-update_mjm_sigma <- function(x, y, nu, eta, eta_timegrid, eta_T_mu, survtime,
+update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
                              get_LogLik, update_nu, update_tau, edf, ...) {
   
   b <- bamlss::get.state(x, "b")
