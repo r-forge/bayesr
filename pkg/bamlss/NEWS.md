@@ -6,7 +6,7 @@
 
 * Improvements on estimating deep distributional neural networks using TensorFlow.
 
-# bamlss 1.1-8
+# bamlss 1.1-9
 
 * Small fix in C code.
 
