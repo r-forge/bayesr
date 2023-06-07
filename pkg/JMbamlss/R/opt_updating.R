@@ -2,7 +2,7 @@
 # Updating lambda predictor -----------------------------------------------
 
 
-update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, eta_T_mu, survtime, 
+update_mjm_lambda <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime, 
                               update_nu, get_LogLik, update_tau, edf, ...)
 {
   ## grid matrix -> x$Xgrid
@@ -12,6 +12,7 @@ update_mjm_lambda <- function(x, y, nu, eta, eta_timegrid, eta_T_mu, survtime,
   
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
+  nu <- x$nu
   
   int_i <- survint_C(pred = "lambda", pre_fac = exp(eta$gamma),
                       omega = exp(eta_timegrid),
@@ -137,6 +138,7 @@ update_mjm_gamma <- function(x, y, nu, eta, eta_timegrid, eta_T_mu, survtime,
   b_p <- length(b)
   take_last <- attr(y, "take_last")
   exp_eta_gamma <- exp(eta$gamma)
+  nu <- x$nu
   
   int_i <- survint_C(pred = "gamma", pre_fac = exp_eta_gamma, pre_vec = x$X,
                       omega = exp(eta_timegrid),
@@ -249,6 +251,7 @@ update_mjm_alpha <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_lambda,
   status <- attr(y, "status")
   nsubj <- attr(y, "nsubj")
   n_w <- length(attr(y, "gq_weights"))
+  nu <- x$nu
   
   int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
                       omega = exp(eta_timegrid),
@@ -393,6 +396,7 @@ update_mjm_mu <- function(x, y, nu, eta, eta_timegrid, eta_timegrid_lambda,
   status <- attr(y, "status")
   nsubj <- attr(y, "nsubj")
   n_w <- length(attr(y, "gq_weights"))
+  nu <- x$nu
   
   if (any(class(x) == "unc_pcre.random.effect")) {
     int_i <- survint_C(pred = "fpc_re", pre_fac = exp(eta$gamma),
@@ -556,6 +560,7 @@ update_mjm_sigma <- function(x, y, nu, eta, eta_timegrid, eta_T_mu, survtime,
                              get_LogLik, update_nu, update_tau, edf, ...) {
   
   b <- bamlss::get.state(x, "b")
+  nu <- x$nu
   
   x_score0 <- crossprod(x$X, -1 + (y[[1]][, "obs"] - eta$mu)^2 /
                           exp(eta$sigma)^2)

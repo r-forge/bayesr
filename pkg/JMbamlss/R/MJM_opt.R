@@ -2,7 +2,9 @@
 
 # Optimizer for MJM -------------------------------------------------------
 
-MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
+MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, 
+                    nu = c("lambda" = 0.1, "gamma" = 0.1, "mu" = 1, 
+                           "sigma" = 1, "alpha" = 1),
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
                     verbose = FALSE, update_nu = FALSE, update_tau = FALSE,
                     ...) {
@@ -22,6 +24,11 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   logLik <- NULL
   edf <- 0
   
+  if(length(nu) != 5) {
+    stop("Please provide the optimizing step length for each predictor.")
+  }
+  if(is.null(names(nu)))
+    names(nu) <- c("lambda", "gamma", "mu", "sigma", "alpha")
 
   ## Set alpha/mu/sigma intercept starting value.
   eta_timegrid_alpha <- 0
@@ -33,6 +40,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
         x$alpha$smooth.construct[[j]]$state$fitted.values <- 
           x$alpha$smooth.construct[[j]]$X %*% 
           x$alpha$smooth.construct[[j]]$state$parameters
+        x$alpha$smooth.construct[[j]]$nu <- nu["alpha"]
       } 
       b <- get.par(x$alpha$smooth.construct[[j]]$state$parameters, "b")
       eta_grid_sj <- drop(x$alpha$smooth.construct[[j]]$Xgrid %*% b)
@@ -51,9 +59,9 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
         x$mu$smooth.construct[[j]]$state$fitted.values <- 
           x$mu$smooth.construct[[j]]$X %*% 
           x$mu$smooth.construct[[j]]$state$parameters
+        x$mu$smooth.construct[[j]]$nu <- nu["mu"] 
       }
       b <- get.par(x$mu$smooth.construct[[j]]$state$parameters, "b")
-      ### PASST DAS HIER NOCH MIT DEM PCRE2 ?
       if(inherits(x$mu$smooth.construct[[j]], "pcre2.random.effect")){
         eta_grid_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$Xgrid))
         eta_T_sj <- rep(0, nrow(x$mu$smooth.construct[[j]]$XT))
@@ -75,6 +83,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       b <- get.par(x$lambda$smooth.construct[[j]]$state$parameters, "b")
       eta_sj <- drop(x$lambda$smooth.construct[[j]]$Xgrid %*% b)
       x$lambda$smooth.construct[[j]]$state$fitted_timegrid <- eta_sj
+      x$lambda$smooth.construct[[j]]$nu <- nu[["lambda"]]
       eta_timegrid_lambda <- eta_timegrid_lambda + eta_sj
       edf <- edf + x$lambda$smooth.construct[[j]]$state$edf
     }
@@ -89,12 +98,14 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     x$sigma$smooth.construct$model.matrix$state$fitted.values <-
       x$sigma$smooth.construct$model.matrix$X %*% 
       x$sigma$smooth.construct$model.matrix$state$parameters
+    x$sigma$smooth.construct$model.matrix$nu <- nu[["sigma"]]
     edf <- edf + x$sigma$smooth.construct$model.matrix$state$edf
   }
   
   if (length(x$gamma$smooth.construct)) {
     for (j in names(x$gamma$smooth.construct)) {
       edf <- edf + x$gamma$smooth.construct[[j]]$state$edf
+      x$gamma$smooth.construct[[j]]$nu <- nu[["gamma"]]
     } 
   }
   
@@ -134,7 +145,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
   iter <- 0
   alpha_update <- if(is.null(start)) FALSE else TRUE
   
-  # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
+  # Parameter trace to follow the estimated parameter values
   if (par_trace) {
     it_param <- list()
   }
@@ -144,7 +155,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
    
     ## (1) update lambda.
     for(j in names(x$lambda$smooth.construct)) {
-      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y, nu = nu,
+      state <- update_mjm_lambda(x$lambda$smooth.construct[[j]], y = y,
                                  eta = eta, eta_timegrid = eta_timegrid,
                                  eta_T_mu = eta_T_mu,
                                  survtime = survtime, update_nu = update_nu,
@@ -163,7 +174,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     ## (2) update gamma.
     if(length(x$gamma$smooth.construct)) {
       for(j in seq_along(x$gamma$smooth.construct)) {
-        state <- update_mjm_gamma(x$gamma$smooth.construct[[j]], y = y, nu = nu,
+        state <- update_mjm_gamma(x$gamma$smooth.construct[[j]], y = y,
                                   eta = eta, eta_timegrid = eta_timegrid,
                                   eta_T_mu = eta_T_mu,
                                   survtime = survtime, update_nu = update_nu,
@@ -187,7 +198,6 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
         if(length(x$alpha$smooth.construct)) {
           for(j in seq_along(x$alpha$smooth.construct)) {
             state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, 
-                                      nu = nu,
                                       eta = eta, eta_timegrid = eta_timegrid,
                                       eta_timegrid_lambda = eta_timegrid_lambda,
                                       eta_timegrid_mu = eta_timegrid_mu,
@@ -215,7 +225,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       ## (4) update mu.
       if(length(x$mu$smooth.construct)) {
         for(j in seq_along(x$mu$smooth.construct)) {
-          state <- update_mjm_mu(x$mu$smooth.construct[[j]], y = y, nu = nu,
+          state <- update_mjm_mu(x$mu$smooth.construct[[j]], y = y,
                                  eta = eta, eta_timegrid = eta_timegrid,
                                  eta_timegrid_lambda = eta_timegrid_lambda,
                                  eta_timegrid_mu = eta_timegrid_mu,
@@ -243,7 +253,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
       if(length(x$sigma$smooth.construct)) {
         for(j in seq_along(x$sigma$smooth.construct)) {
           state <- update_mjm_sigma(x$sigma$smooth.construct[[j]], y = y, 
-                                    nu = nu, eta = eta, 
+                                    eta = eta, 
                                     eta_timegrid = eta_timegrid,
                                     eta_T_mu = eta_T_mu,
                                     get_LogLik = get_LogLik,
@@ -291,7 +301,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
     eta0_alpha <- eta1_alpha
     eta0_long <- eta1_long
     
-    # NUR ZUR NACHVERFOLGUNG DER GESCHÄTZTEN PARAMETER
+    # Parameter trace to follow the estimated parameter values
     if (par_trace) {
       it_param[[iter]] <- bamlss:::get.all.par(x)
     }
@@ -310,16 +320,5 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, nu = 0.1,
               "hessian" = bamlss:::get.hessian(x),
               "converged" = iter < maxit, 
               "par_trace" = if (par_trace) it_param else NULL))
-  
-  assign("b", x, envir = .GlobalEnv)
-  assign("eta", list(eta = eta,
-                     eta_timegrid = eta_timegrid,
-                     eta_timegrid_long = eta_timegrid_long,
-                     eta_timegrid_alpha = eta_timegrid_alpha, 
-                     eta_timegrid_mu = eta_timegrid_mu,
-                     eta_timegrid_lambda = eta_timegrid_lambda,
-                     eta_T_mu = eta_T_mu),
-         envir = .GlobalEnv)
-  stop("Basst.")
   
 }
