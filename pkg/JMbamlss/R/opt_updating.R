@@ -557,15 +557,22 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
 
 
 update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
-                             get_LogLik, update_nu, update_tau, edf, ...) {
+                             get_LogLik, update_nu, update_tau, edf, 
+                             iwls, ...) {
   
   b <- bamlss::get.state(x, "b")
   nu <- x$nu
   
-  x_score0 <- crossprod(x$X, -1 + (y[[1]][, "obs"] - eta$mu)^2 /
-                          exp(eta$sigma)^2)
-  x_H0 <- 2 * crossprod(x$X * drop((y[[1]][, "obs"] - eta$mu)/exp(eta$sigma)^2),
-                        x$X * drop(y[[1]][, "obs"] - eta$mu))
+  if (iwls) {
+    score <- drop(-1 + (y[[1]][, "obs"] - eta$mu)^2 / (exp(eta$sigma)^2))
+    hess <- rep(2, nrow(y))
+    z <- eta$sigma + 1/hess*score  
+  } else {
+    x_score0 <- crossprod(x$X, -1 + (y[[1]][, "obs"] - eta$mu)^2 /
+                            exp(eta$sigma)^2)
+    x_H0 <- 2 * crossprod(x$X * drop((y[[1]][, "obs"] - eta$mu)/exp(eta$sigma)^2),
+                          x$X * drop(y[[1]][, "obs"] - eta$mu))
+  }
 
   # Updating Taus
   if(update_tau && (x$state$do.optim || !x$fixed || !xfxsp)) {
@@ -578,15 +585,24 @@ update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
     # Defined here so that it accesses x_score and x_H
     tau_update_opt <- function(tau2) {
       par[x$pid$tau2] <- tau2
-      x_score <- x_score0 + x$grad(score = NULL, par, full = FALSE)
-      x_H <- x_H0 + x$hess(score = NULL, par, full = FALSE)
-      Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
-      Hs <- Sigma %*% x_score
+      if (iwls) {
+        xhess <- crossprod(x$X *rep(2, nrow(y)), x$X)
+        Sigma <- bamlss:::matrix_inv(1 * xhess, index = NULL)
+      } else {
+        x_score <- x_score0 + x$grad(score = NULL, par, full = FALSE)
+        x_H <- x_H0 + x$hess(score = NULL, par, full = FALSE)
+        Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+        Hs <- Sigma %*% x_score
+      }
       if(update_nu) {
         # Function for updating step length
         # Defined here so that it accesses Hs and par and fitted from parents
         nu_update_opt <- function(nu) {
-          b2 <- drop(b + nu * Hs)
+          if (iwls) {
+            b2 <- drop(Sigma %*% crossprod(x$X, z*2))
+          } else {
+            b2 <- drop(b + nu * Hs)
+          }
           par[x$pid$b] <- b2
           fit <- drop(x$X %*% b2)
           eta$sigma <- eta$sigma - fitted(x$state) + fit
@@ -597,10 +613,15 @@ update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
       }
       
       # Calculate the Information Criterion with given edf and nu
-      b2 <- drop(b + nu * Hs)
+      if (iwls) {
+        b2 <- drop(Sigma %*% crossprod(x$X, z*2))
+        edf <- sum_diag((1 * xhess) %*% Sigma)
+      } else {
+        b2 <- drop(b + nu * Hs)
+        edf1 <- bamlss:::sum_diag(x_H0 %*% Sigma) 
+      }
       fit <- drop(x$X %*% b2)
       eta$sigma <- eta$sigma - fitted(x$state) + fit
-      edf1 <- bamlss:::sum_diag(x_H0 %*% Sigma)
       edf <- edf0 + edf1
       logLik <- get_LogLik(eta_timegrid, eta_T_mu, eta)
       ic <- bamlss:::get.ic2(logLik, edf, n = length(eta$mu), type = "AICc")
@@ -629,17 +650,27 @@ update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
     
   }
   
-  # Newton-Raphson
-  x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
-  x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
-  Hs <- bamlss:::matrix_inv(x_H, index = NULL) %*% x_score
+  if (iwls) {
+    xhess <- crossprod(x$X *rep(2, nrow(y)), x$X)
+    Sigma <- bamlss:::matrix_inv(1 * xhess, index = NULL)
+  } else {
+    # Newton-Raphson
+    x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
+    x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
+    Hs <- bamlss:::matrix_inv(x_H, index = NULL) %*% x_score
+  }
+  
   
   if(update_nu) {
     par <- x$state$parameters
     # Function for updating step length
     # Defined here so that it accesses Hs and par and fitted from parents
     nu_update_opt <- function(nu) {
-      b2 <- drop(b + nu * Hs)
+      if(iwls) {
+        b2 <- drop(Sigma %*% crossprod(x$X, z*2))
+      } else {
+        b2 <- drop(b + nu * Hs)
+      }
       par[x$pid$b] <- b2
       fit <- drop(x$X %*% b2)
       eta$sigma <- eta$sigma - fitted(x$state) + fit
@@ -648,11 +679,19 @@ update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
     }
     nu <- optimize(f = nu_update_opt, interval = c(0, 1))$minimum
   }
-  b <- b + nu * Hs
+  if (iwls) {
+    b <- drop(Sigma %*% crossprod(x$X, z*2))
+  } else {
+    b <- b + nu * Hs
+  }
   
   x$state$parameters[x$pid$b] <- b
   x$state$fitted.values <- drop(x$X %*% b)
-  x$state$hessian <- x_H
+  if (iwls) {
+    x$state$hessian <- xhess
+  } else {
+    x$state$hessian <- x_H
+  }
 
   return(x$state)
   

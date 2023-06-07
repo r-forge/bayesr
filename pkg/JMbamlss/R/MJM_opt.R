@@ -7,7 +7,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                            "sigma" = 1, "alpha" = 1),
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
                     verbose = FALSE, update_nu = FALSE, update_tau = FALSE,
-                    nocheck_logpost = FALSE, ...) {
+                    nocheck_logpost = FALSE, iwls_sigma = TRUE, ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -332,7 +332,8 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                                     eta_T_mu = eta_T_mu,
                                     get_LogLik = get_LogLik,
                                     survtime = survtime, update_nu = update_nu,
-                                    update_tau = update_tau, edf = edf, ...)
+                                    update_tau = update_tau, edf = edf, 
+                                    iwls = iwls_sigma, ...)
           etaUP$sigma <- eta$sigma -
             drop(fitted(x$sigma$smooth.construct[[j]]$state)) +
             fitted(state)
