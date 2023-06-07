@@ -7,7 +7,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                            "sigma" = 1, "alpha" = 1),
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
                     verbose = FALSE, update_nu = FALSE, update_tau = FALSE,
-                    ...) {
+                    nocheck_logpost = FALSE, ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -136,6 +136,11 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
 
   }
   
+  # Compare if update increases logPost
+  LogPrioOLD <- bamlss:::get.log.prior(x)
+  LogLikOLD <- get_LogLik(eta_timegrid, eta_T_mu, eta)
+  etaUP <- eta
+  
   # For algorithm
   eps0 <- eps0_surv <- eps0_long <- eps + 1
   eta0_surv <- do.call("cbind", eta[c("lambda", "gamma")])
@@ -161,14 +166,31 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                                  survtime = survtime, update_nu = update_nu,
                                  get_LogLik = get_LogLik,
                                  update_tau = update_tau, edf = edf, ...)
-      eta_timegrid_lambda <- eta_timegrid_lambda -
+      eta_timegrid_lambdaUP <- eta_timegrid_lambda -
         x$lambda$smooth.construct[[j]]$state$fitted_timegrid +
         state$fitted_timegrid
-      eta_timegrid <- eta_timegrid_lambda +
+      eta_timegridUP <- eta_timegrid_lambdaUP +
         eta_timegrid_long
-      eta$lambda <- eta$lambda - fitted(x$lambda$smooth.construct[[j]]$state) +
+      etaUP$lambda <- eta$lambda - fitted(x$lambda$smooth.construct[[j]]$state) +
         fitted(state)
-      x$lambda$smooth.construct[[j]]$state <- state
+      
+      # Check for update
+      LogPrioUP <- LogPrioOLD -
+        x$lambda$smooth.construct[[j]]$prior(
+          x$lambda$smooth.construct[[j]]$state$parameters) +
+        x$lambda$smooth.construct[[j]]$prior(state$parameters)
+      LogLikUP <- get_LogLik(eta_timegridUP, eta_T_mu, etaUP)
+      if (nocheck_logpost || LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD || 
+          iter == 0) {
+        LogPrioOLD <- LogPrioUP
+        LogLikOLD <- LogLikUP
+        eta_timegrid_lambda <- eta_timegrid_lambdaUP
+        eta_timegrid <- eta_timegridUP
+        eta$lambda <- etaUP$lambda
+        x$lambda$smooth.construct[[j]]$state <- state
+      } else {
+        etaUP$lambda <- eta$lambda
+      }
     }
     
     ## (2) update gamma.
@@ -180,9 +202,24 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                                   survtime = survtime, update_nu = update_nu,
                                   get_LogLik = get_LogLik,
                                   update_tau = update_tau, edf = edf, ...)
-        eta$gamma <- eta$gamma - fitted(x$gamma$smooth.construct[[j]]$state) +
+        etaUP$gamma <- eta$gamma - fitted(x$gamma$smooth.construct[[j]]$state) +
           fitted(state)
-        x$gamma$smooth.construct[[j]]$state <- state
+        
+        # Check for update
+        LogPrioUP <- LogPrioOLD -
+          x$gamma$smooth.construct[[j]]$prior(
+            x$gamma$smooth.construct[[j]]$state$parameters) +
+          x$gamma$smooth.construct[[j]]$prior(state$parameters)
+        LogLikUP <- get_LogLik(eta_timegrid, eta_T_mu, etaUP)
+        if (nocheck_logpost || LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD ||
+            iter == 0) {
+          LogPrioOLD <- LogPrioUP
+          LogLikOLD <- LogLikUP
+          eta$gamma <- etaUP$gamma
+          x$gamma$smooth.construct[[j]]$state <- state
+        } else {
+          etaUP$gamma <- eta$gamma
+        }
       }
     }
     
@@ -206,18 +243,36 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                                       update_nu = update_nu,
                                       get_LogLik = get_LogLik,
                                       update_tau = update_tau, edf = edf, ...)
-            eta$alpha <- eta$alpha -
+            etaUP$alpha <- eta$alpha -
               drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
               fitted(state)
-            eta_timegrid_alpha <- eta_timegrid_alpha -
+            eta_timegrid_alphaUP <- eta_timegrid_alpha -
               x$alpha$smooth.construct[[j]]$state$fitted_timegrid +
               state$fitted_timegrid
-            eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha *
+            eta_timegrid_longUP <- rowSums(matrix(eta_timegrid_alphaUP *
                                                   eta_timegrid_mu,
                                                 nrow = nsubj*n_w,
                                                 ncol = nmarker))
-            eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
-            x$alpha$smooth.construct[[j]]$state <- state
+            eta_timegridUP <- eta_timegrid_lambda + eta_timegrid_longUP
+            
+            # Check for update
+            LogPrioUP <- LogPrioOLD -
+              x$alpha$smooth.construct[[j]]$prior(
+                x$alpha$smooth.construct[[j]]$state$parameters) +
+              x$alpha$smooth.construct[[j]]$prior(state$parameters)
+            LogLikUP <- get_LogLik(eta_timegridUP, eta_T_mu, etaUP)
+            if (nocheck_logpost || 
+                LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD || iter == 0) {
+              LogPrioOLD <- LogPrioUP
+              LogLikOLD <- LogLikUP
+              eta_timegrid_alpha <- eta_timegrid_alphaUP
+              eta_timegrid_long <- eta_timegrid_longUP
+              eta_timegrid <- eta_timegridUP
+              eta$alpha <- etaUP$alpha
+              x$alpha$smooth.construct[[j]]$state <- state
+            } else {
+              etaUP$alpha <- eta$alpha
+            }
           }
         }
       }
@@ -233,19 +288,38 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                                  eta_T_mu = eta_T_mu, survtime = survtime,
                                  get_LogLik = get_LogLik, update_nu = update_nu,
                                  update_tau = update_tau, edf = edf, ...)
-          eta$mu <- eta$mu -
+          etaUP$mu <- eta$mu -
             drop(fitted(x$mu$smooth.construct[[j]]$state)) + fitted(state)
-          eta_timegrid_mu <- eta_timegrid_mu -
+          eta_timegrid_muUP <- eta_timegrid_mu -
             x$mu$smooth.construct[[j]]$state$fitted_timegrid +
             state$fitted_timegrid
-          eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha * 
-                                                eta_timegrid_mu, 
+          eta_timegrid_longUP <- rowSums(matrix(eta_timegrid_alpha * 
+                                                eta_timegrid_muUP, 
                                               nrow = nsubj*n_w, ncol = nmarker))
-          eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
-          eta_T_mu <- eta_T_mu -
+          eta_timegridUP <- eta_timegrid_lambda + eta_timegrid_longUP
+          eta_T_muUP <- eta_T_mu -
             x$mu$smooth.construct[[j]]$state$fitted_T +
             state$fitted_T
-          x$mu$smooth.construct[[j]]$state <- state
+          
+          # Check for update
+          LogPrioUP <- LogPrioOLD -
+            x$mu$smooth.construct[[j]]$prior(
+              x$mu$smooth.construct[[j]]$state$parameters) +
+            x$mu$smooth.construct[[j]]$prior(state$parameters)
+          LogLikUP <- get_LogLik(eta_timegridUP, eta_T_muUP, etaUP)
+          if (nocheck_logpost || 
+              LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD || iter == 0) {
+            LogPrioOLD <- LogPrioUP
+            LogLikOLD <- LogLikUP
+            eta_timegrid_mu <- eta_timegrid_muUP
+            eta_timegrid_long <- eta_timegrid_longUP
+            eta_timegrid <- eta_timegridUP
+            eta_T_mu <- eta_T_muUP
+            eta$mu <- etaUP$mu
+            x$mu$smooth.construct[[j]]$state <- state
+          } else {
+            etaUP$mu <- eta$mu
+          }
         }
       }
       
@@ -259,10 +333,25 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                                     get_LogLik = get_LogLik,
                                     survtime = survtime, update_nu = update_nu,
                                     update_tau = update_tau, edf = edf, ...)
-          eta$sigma <- eta$sigma -
+          etaUP$sigma <- eta$sigma -
             drop(fitted(x$sigma$smooth.construct[[j]]$state)) +
             fitted(state)
-          x$sigma$smooth.construct[[j]]$state <- state
+          
+          # Check for update
+          LogPrioUP <- LogPrioOLD -
+            x$sigma$smooth.construct[[j]]$prior(
+              x$sigma$smooth.construct[[j]]$state$parameters) +
+            x$sigma$smooth.construct[[j]]$prior(state$parameters)
+          LogLikUP <- get_LogLik(eta_timegrid, eta_T_mu, etaUP)
+          if (nocheck_logpost || 
+              LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD || iter == 0) {
+            LogPrioOLD <- LogPrioUP
+            LogLikOLD <- LogLikUP
+            eta$sigma <- etaUP$sigma
+            x$sigma$smooth.construct[[j]]$state <- state
+          } else {
+            etaUP$sigma <- eta$sigma
+          }
         }
       }
     }
