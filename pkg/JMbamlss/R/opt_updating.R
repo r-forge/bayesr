@@ -441,6 +441,9 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
         # Defined here so that it accesses Hs and par and fitted from parents
         nu_update_opt <- function(nu) {
           b2 <- drop(b + nu * Hs)
+          if ("random.effect" %in% class(x)) {
+            b2 <- b2 - mean(b2)
+          }
           par[x$pid$b] <- b2
           fit <- drop(x$X %*% b2)
           fitted_timegrid <- drop(x$Xgrid %*% b2)
@@ -462,6 +465,9 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
       
       # Calculate the Information Criterion with given edf and nu
       b2 <- drop(b + nu * Hs)
+      if ("random.effect" %in% class(x)) {
+        b2 <- b2 - mean(b2)
+      }
       fit <- drop(x$X %*% b2)
       fitted_timegrid <- drop(x$Xgrid %*% b2)
       fitted_T <- drop(x$XT %*% b)
@@ -521,6 +527,9 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
     # Defined here so that it accesses Hs and par and fitted from parents
     nu_update_opt <- function(nu) {
       b2 <- drop(b + nu * Hs)
+      if ("random.effect" %in% class(x)) {
+        b2 <- b2 - mean(b2)
+      }
       par[x$pid$b] <- b2
       fit <- drop(x$X %*% b2)
       fitted_timegrid <- drop(x$Xgrid %*% b2)
@@ -540,13 +549,15 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
     nu <- optimize(f = nu_update_opt, interval = c(0, 1))$minimum
   }
   b <- b + nu * Hs
+  if ("random.effect" %in% class(x)) {
+    b <- b - mean(b)
+  }
   
   x$state$parameters[seq_len(b_p)] <- b
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
   x$state$fitted.values <- drop(x$X %*% b)
   x$state$fitted_T <- drop(x$XT %*% b)
   x$state$hessian <- x_H
-  
   return(x$state)
   
 }

@@ -117,6 +117,9 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   # if(is.null(prop)) {
     b_prop <- drop(mvtnorm::rmvnorm(n = 1, mean = mu_prop, sigma = Sigma_prop,
                                     method="chol"))
+  if ("random.effect" %in% class(x)) {
+    b_prop <- b_prop - mean(b_prop)
+  }
   # } else {
   #   b_prop <- prop[seq_along(mu_prop)]
   # }
