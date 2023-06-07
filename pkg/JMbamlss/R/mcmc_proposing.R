@@ -25,6 +25,29 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
     # state_fitted_timegrid_old <- x$state$fitted_timegrid
     # 
   #}
+  
+  ## Sample variance parameter.
+  if(!x$fixed & is.null(x$sp) & length(x$S)) {
+    if (!is.null(prop)) {
+      taus <- grep("tau2", names(prop))
+      x$state$parameters <- bamlss::set.par(x$state$parameters, prop[taus], 
+                                            "tau2")
+    } else {
+      if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
+        a <- x$rank / 2 + x$a
+        b <- 0.5 * crossprod(b_prop, x$S[[1]]) %*% b_prop + x$b
+        tau2 <- 1 / rgamma(1, a, b)
+        x$state$parameters <- bamlss::set.par(x$state$parameters, tau2, "tau2")
+      } else {
+        i <- grep("tau2", names(x$state$parameters))
+        for(j in i) {
+          x$state$parameters <- bamlss:::uni.slice(
+            x$state$parameters, x, NULL, NULL, NULL, id = predictor, j, 
+            logPost = bamlss:::uni.slice_tau2_logPost, lower = 0, ll = 0)
+        }
+      } }
+  }
+  
   n_w <- length(gq_weights)
   
   # Get old parameters
@@ -333,28 +356,6 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                         Sigma)
   }
   
-  
-  ## Sample variance parameter.
-  if(!x$fixed & is.null(x$sp) & length(x$S)) {
-    if (!is.null(prop)) {
-      taus <- grep("tau2", names(prop))
-      x$state$parameters <- bamlss::set.par(x$state$parameters, prop[taus], 
-                                            "tau2")
-    } else {
-    if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
-      a <- x$rank / 2 + x$a
-      b <- 0.5 * crossprod(b_prop, x$S[[1]]) %*% b_prop + x$b
-      tau2 <- 1 / rgamma(1, a, b)
-      x$state$parameters <- bamlss::set.par(x$state$parameters, tau2, "tau2")
-    } else {
-      i <- grep("tau2", names(x$state$parameters))
-      for(j in i) {
-        x$state$parameters <- bamlss:::uni.slice(
-          x$state$parameters, x, NULL, NULL, NULL, id = predictor, j, 
-          logPost = bamlss:::uni.slice_tau2_logPost, lower = 0, ll = 0)
-      }
-    } }
-  }
   
   if(verbose_sampler) {
     cat(predictor, "LLO:", logLik_old, "LLN:", logLik, 
