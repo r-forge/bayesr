@@ -108,6 +108,21 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
       scale.x = FALSE)[[j]]
   }
   
+  ## Add small constant to penalty diagonal for stabilization
+  for(j in names(object$x)) {
+    for(sj in names(object$x[[j]]$smooth.construct)) {
+      if(length(object$x[[j]]$smooth.construct[[sj]]$S)){
+        for(k in seq_along(object$x[[j]]$smooth.construct[[sj]]$S)){
+          if(!is.list(object$x[[j]]$smooth.construct[[sj]]$S[[k]]) & 
+             !is.function(object$x[[j]]$smooth.construct[[sj]]$S[[k]])) {
+            nc <- ncol(object$x[[j]]$smooth.construct[[sj]]$S[[k]])
+            object$x[[j]]$smooth.construct[[sj]]$S[[k]] <-
+              object$x[[j]]$smooth.construct[[sj]]$S[[k]] + diag(1e-08, nc, nc)
+          }
+        }
+      }
+    }
+  }
   
   ## The basic setup.
   if(is.null(attr(object$x, "bamlss.engine.setup")))
