@@ -97,7 +97,8 @@ update_mjm_lambda <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
   ## Newton-Raphson.
   x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
-  Hs <- bamlss:::matrix_inv(x_H, index = NULL) %*% x_score
+  Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+  Hs <- Sigma %*% x_score
   
   if(update_nu) {
     par <- x$state$parameters
@@ -122,6 +123,7 @@ update_mjm_lambda <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
   x$state$fitted.values <- drop(x$X %*% b)
   x$state$hessian <- x_H
+  x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
   return(x$state)
   
 }
@@ -211,7 +213,8 @@ update_mjm_gamma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
   
   x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
-  Hs <- bamlss:::matrix_inv(x_H, index = NULL) %*% x_score
+  Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+  Hs <- Sigma %*% x_score
   
   if(update_nu) {
     par <- x$state$parameters
@@ -232,6 +235,7 @@ update_mjm_gamma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
   x$state$parameters[seq_len(b_p)] <- b
   x$state$fitted.values <- drop(x$X %*% b)
   x$state$hessian <- x_H
+  x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
   return(x$state)
   
 }
@@ -344,7 +348,8 @@ update_mjm_alpha <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   # Newton Raphson
   x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
-  Hs <- bamlss:::matrix_inv(x_H, index = NULL) %*% x_score
+  Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+  Hs <- Sigma %*% x_score
   
   if(update_nu) {
     par <- x$state$parameters
@@ -374,6 +379,7 @@ update_mjm_alpha <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
   x$state$fitted.values <- drop(x$X %*% b)
   x$state$hessian <- x_H
+  x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
   
   return(x$state)
   
@@ -519,7 +525,8 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   # Newton Raphson
   x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
   x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
-  Hs <- bamlss:::matrix_inv(x_H, index = NULL) %*% x_score
+  Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+  Hs <- Sigma %*% x_score
   
   if(update_nu) {
     par <- x$state$parameters
@@ -558,6 +565,8 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   x$state$fitted.values <- drop(x$X %*% b)
   x$state$fitted_T <- drop(x$XT %*% b)
   x$state$hessian <- x_H
+  x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
+  
   return(x$state)
   
 }
@@ -668,7 +677,8 @@ update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
     # Newton-Raphson
     x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
     x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
-    Hs <- bamlss:::matrix_inv(x_H, index = NULL) %*% x_score
+    Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
+    Hs <- Sigma %*% x_score
   }
   
   
@@ -700,9 +710,12 @@ update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
   x$state$fitted.values <- drop(x$X %*% b)
   if (iwls) {
     x$state$hessian <- xhess
+    x$state$edf <- bamlss:::sum_diag((1 * xhess) %*% Sigma)
   } else {
     x$state$hessian <- x_H
+    x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
   }
+ 
 
   return(x$state)
   
