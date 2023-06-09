@@ -34,8 +34,9 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                             "tau2")
     } else {
       if((length(x$S) < 2) & (attr(x$prior, "var_prior") == "ig")) {
+        b_old <- bamlss::get.state(x, "b")
         a <- x$rank / 2 + x$a
-        b <- 0.5 * crossprod(b_prop, x$S[[1]]) %*% b_prop + x$b
+        b <- 0.5 * crossprod(b_old, x$S[[1]]) %*% b_old + x$b
         tau2 <- 1 / rgamma(1, a, b)
         x$state$parameters <- bamlss::set.par(x$state$parameters, tau2, "tau2")
       } else {

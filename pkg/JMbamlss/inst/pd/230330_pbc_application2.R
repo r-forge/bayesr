@@ -450,12 +450,13 @@ mfpca_est_list <- lapply(vals[seq_len(nfpc)], function (i, mfpca = mfpca_est) {
 p_long[, grepl("fpc", colnames(p_long))] <- NULL
 p_long <- JMbamlss:::attach_wfpc(mfpca_est, p_long, n = nfpc)
 f_est <- list(
-  Surv2(survtime, event, obs = logy) ~ -1 + s(survtime, k = 20, bs = "ps"),
+  Surv2(survtime, event, obs = logy) ~ -1 + 
+    s(survtime, k = 20, bs = "ps", xt = list("scale" = FALSE)),
   gamma ~ 1 + age + sex,
   as.formula(paste0(
-    "mu ~ -1 + marker + s(obstime, by = marker) + sex:marker +",
+    "mu ~ -1 + marker + s(obstime, by = marker, xt = list('scale' = FALSE)) + sex:marker +",
     paste0(lapply(seq_len(nfpc), function(x) {
-      paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
+      paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('scale' = FALSE, 'mfpc' = ",
              "mfpca_est_list[[", x, "]]))")
     }), collapse = " + "))),
   sigma ~ -1 + marker,
@@ -465,8 +466,7 @@ f_est <- list(
 # Model fit
 set.seed(1604)
 b_est <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
-                timevar = "obstime", maxit = 1500, update_nu = TRUE,
-                verbose = TRUE)
+                timevar = "obstime", maxit = 1500, verbose = TRUE)
 saveRDS(b_est, file = paste0("~/Documents/joint_models/JointModel/",
                              "PBC_analysis/pbc_mul_nuupdate_log.Rds"))
 
