@@ -2440,7 +2440,7 @@ opt_boost <- boost <- function(x, y, family, weights = NULL, offset = NULL,
     x <- bamlss.engine.setup(x, df = NULL, nodf = TRUE, ...)
 
   start <- list(...)$start
-print(start)
+
   if(!is.null(start))
     x <- set.starting.values(x, start)
   
@@ -2620,7 +2620,7 @@ print(start)
                     if(inherits(x[[i]]$smooth.construct[[j]], "lasso.smooth") | inherits(x[[i]]$smooth.construct[[j]], "nnet.smooth")) {
                       if(iter < 2) {
                         aset <- if(x[[i]]$smooth.construct[[j]]$fuse) {
-                          sum(abs(unique.fuse(get.par(states[[i]][[j]]$parameters, "b"))) > 1e-10)
+                          sum(abs(unique_fuse(get.par(states[[i]][[j]]$parameters, "b"))) > 1e-10)
                         } else {
                           sum(abs(get.par(states[[i]][[j]]$parameters, "b")) > 1e-10)
                         }
@@ -2630,8 +2630,8 @@ print(start)
                         aset1 <- apply(rbind(parm[[i]][[j]][1:(iter - 1L), , drop = FALSE],
                           get.par(states[[i]][[j]]$parameters, "b")), 2, sum)
                         if(x[[i]]$smooth.construct[[j]]$fuse) {
-                          aset0 <- sum(abs(unique.fuse(aset0)) > 1e-10)
-                          aset1 <- sum(abs(unique.fuse(aset1)) > 1e-10)
+                          aset0 <- sum(abs(unique_fuse(aset0)) > 1e-10)
+                          aset1 <- sum(abs(unique_fuse(aset1)) > 1e-10)
                         } else {
                           aset0 <- sum(abs(aset0) > 1e-10)
                           aset1 <- sum(abs(aset1) > 1e-10)
@@ -2842,7 +2842,7 @@ print(start)
           if(inherits(x[[take[1]]]$smooth.construct[[take[2]]], "lasso.smooth") | inherits(x[[take[1]]]$smooth.construct[[take[2]]], "nnet.smooth")) {
             if(iter < 2) {
               aset <- if(x[[take[1]]]$smooth.construct[[take[2]]]$fuse) {
-                  sum(abs(unique.fuse(parm[[take[1]]][[take[2]]][if(light) 1L else iter, ])) > 1e-10)
+                  sum(abs(unique_fuse(parm[[take[1]]][[take[2]]][if(light) 1L else iter, ])) > 1e-10)
                 } else {
                   sum(abs(parm[[take[1]]][[take[2]]][if(light) 1L else iter, ]) > 1e-10)
                 }
@@ -2851,8 +2851,8 @@ print(start)
               aset0 <- apply(parm[[take[1]]][[take[2]]][if(light) 1L else 1:(iter - 1L), , drop = FALSE], 2, sum)
               aset1 <- apply(parm[[take[1]]][[take[2]]][if(light) 1L else 1:iter, , drop = FALSE], 2, sum)
               if(x[[take[1]]]$smooth.construct[[take[2]]]$fuse) {
-                aset0 <- sum(abs(unique.fuse(aset0)) > 1e-10)
-                aset1 <- sum(abs(unique.fuse(aset1)) > 1e-10)
+                aset0 <- sum(abs(unique_fuse(aset0)) > 1e-10)
+                aset1 <- sum(abs(unique_fuse(aset1)) > 1e-10)
               } else {
                 aset0 <- sum(abs(aset0) > 1e-10)
                 aset1 <- sum(abs(aset1) > 1e-10)
@@ -3000,7 +3000,7 @@ reverse_edf <- function(x, bn, bmat, nobs, y, eta, approx = TRUE)
 }
 
 
-unique.fuse <- function(x, digits = 4) {
+unique_fuse <- function(x, digits = 4) {
   unique(round(x, digits = digits))
 }
 
@@ -4690,7 +4690,7 @@ stop()
 
 ## Extractor functions.
 fitted.dl.bamlss <- function(object, ...) { object$fitted.values }
-family.dl.bamlss <- function(object) { object$family }
+family.dl.bamlss <- function(object, ...) { object$family }
 residuals.dl.bamlss <- function(object, ...) { residuals.bamlss(object, ...) }
 plot.dl.bamlss <- function(x, ...) { plot(x$history, ...) }
 

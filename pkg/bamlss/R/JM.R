@@ -870,7 +870,6 @@ opt_JM <- jm_mode <- function(x, y, start = NULL, weights = NULL, offset = NULL,
               for (i in names(x$alpha$smooth.construct)){
                 if(i != "model.matrix"){   # only smooth.constructs need to be updated
                   eta_timegrid_alpha <- eta_timegrid_alphaUP
-                  eta$alpha <- eatUP$alpha
                   x$alpha$smooth.construct[[i]]$state$fitted_timegrid <- alpha_state
                   x$alpha$smooth.construct[[i]]$state$fitted.values <- alpha_state[, ncol(eta_timegrid)]
                 }
@@ -1657,14 +1656,9 @@ update_jm_dmu <- function(dx, x)
 update_jm_sigma <- function(x, y, eta, eta_timegrid,
                             update.nu, criterion, get_LogPost, nobs, do.optim2, edf, ...)
 {
-  # IWLS instead of Newton-Raphson
-  score <- drop(-1 + (y[, "obs"] - eta$mu)^2 / (exp(eta$sigma)^2))
-  hess <- rep(2, nrow(y))
-  z <- eta$sigma + 1/hess*score
-
-  # xgrad <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
-  # xhess0 <- -2 * crossprod(x$X*drop((y[, "obs"] - eta$mu) / exp(eta$sigma)^2),
-  #                          x$X*drop(y[, "obs"] - eta$mu))
+  xgrad <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
+  xhess0 <- -2 * crossprod(x$X*drop((y[, "obs"] - eta$mu) / exp(eta$sigma)^2),
+                           x$X*drop(y[, "obs"] - eta$mu))
   
   if((!(!x$state$do.optim | x$fixed | x$fxsp)) & do.optim2) {
     par <- x$state$parameters
@@ -1722,32 +1716,27 @@ update_jm_sigma <- function(x, y, eta, eta_timegrid,
     }
     
     assign("ic00_val", objfun1(get.state(x, "tau2")), envir = env)
-    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"))
+    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"), maxit = 1)
     
     if(!is.null(env$state))
       return(env$state)
     
     x$state$parameters[x$pid$tau2] <- tau2
   }
-  # IWLS isntead of N-R
-  xhess <- do.XWX(x$X, 1 / rep(2, nrow(y)), x$sparse.setup$matrix)
-  # xhess <- xhess0 - x$hess(score = NULL, x$state$parameters, full = FALSE)
-  # xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+  
+  xhess <- xhess0 - x$hess(score = NULL, x$state$parameters, full = FALSE)
+  xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
   
   ## Compute the inverse of the hessian.
-  # IWLS instead of N-R
-  Sigma <- matrix_inv(1 * xhess, index = NULL)
-  # Sigma <- matrix_inv(-1 * xhess, index = NULL)
-  # Hs <- Sigma %*% xgrad
+  Sigma <- matrix_inv(-1 * xhess, index = NULL)
+  Hs <- Sigma %*% xgrad
   
   ## Update regression coefficients.
   g <- get.state(x, "b")
   
   if(update.nu) {
     objfun2 <- function(nu) {
-      # g2 <- drop(g + nu * Hs)
-      # IWLS instead of N-R
-      g2 <- drop(Sigma %*% crossprod(x$X, z*2))
+      g2 <- drop(g + nu * Hs)
       names(g2) <- names(g)
       x$state$parameters <- set.par(x$state$parameters, g2, "b")
       fit <- x$fit.fun(x$X, g2)
@@ -1759,21 +1748,140 @@ update_jm_sigma <- function(x, y, eta, eta_timegrid,
     x$state$nu <- optimize(f = objfun2, interval = c(0, 1))$minimum
   }
   
-  # IWLS instead of N-R
-  g2 <- drop(Sigma %*% crossprod(x$X, z*2))
-  # g2 <- drop(g + x$state$nu * Hs)
+  
+  g2 <- drop(g + x$state$nu * Hs)
   names(g2) <- names(g)
   x$state$parameters <- set.par(x$state$parameters, g2, "b")
   
   ## Update fitted values.
   x$state$fitted.values <- x$fit.fun(x$X, g2)
-  # IWLS instead of N-R
-  x$state$edf <- sum_diag((1 * xhess) %*% Sigma)
-  # x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma)
+  x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma)
   x$state$hessian <- -1 * xhess
   
   return(x$state)
 }
+
+
+#update_jm_sigma_iwls <- function(x, y, eta, eta_timegrid,
+#                            update.nu, criterion, get_LogPost, nobs, do.optim2, edf, ...)
+#{
+#  # IWLS instead of Newton-Raphson
+#  score <- drop(-1 + (y[, "obs"] - eta$mu)^2 / (exp(eta$sigma)^2))
+#  hess <- rep(2, nrow(y))
+#  z <- eta$sigma + 1/hess*score
+
+#  # xgrad <- crossprod(x$X, -1 + (y[, "obs"] - eta$mu)^2 / exp(eta$sigma)^2)
+#  # xhess0 <- -2 * crossprod(x$X*drop((y[, "obs"] - eta$mu) / exp(eta$sigma)^2),
+#  #                          x$X*drop(y[, "obs"] - eta$mu))
+#  
+#  if((!(!x$state$do.optim | x$fixed | x$fxsp)) & do.optim2) {
+#    par <- x$state$parameters
+#    
+#    edf0 <- if(is.null(edf)) {
+#      0
+#    } else {
+#      edf - x$state$edf
+#    }
+#    
+#    env <- new.env()
+#    
+#    objfun1 <- function(tau2) {
+#      par <- set.par(par, tau2, "tau2")
+#      xgrad <- xgrad + x$grad(score = NULL, par, full = FALSE)
+#      xhess <- xhess0 - x$hess(score = NULL, par, full = FALSE)
+#      Sigma <- matrix_inv(-1 * xhess, index = NULL)
+#      Hs <- Sigma %*% xgrad
+#      g <- get.par(par, "b")
+#      if(update.nu) {
+#        objfun.nu <- function(nu) {
+#          g2 <- drop(g + nu * Hs)
+#          names(g2) <- names(g)
+#          x$state$parameters <- set.par(x$state$parameters, g2, "b")
+#          x$state$parameters <- set.par(x$state$parameters, tau2, "tau2")
+#          fit <- x$fit.fun(x$X, g2)
+#          eta$sigma <- eta$sigma - fitted(x$state) + fit
+#          lp <- get_LogPost(eta_timegrid, eta, x$prior(x$state$parameters))
+#          return(-1 * lp)
+#        }
+#        nu <- optimize(f = objfun.nu, interval = c(0, 1))$minimum
+#      } else {
+#        nu <- x$state$nu
+#      }
+#      g2 <- drop(g + nu * Hs)
+#      names(g2) <- names(g)
+#      fit <- x$fit.fun(x$X, g2)
+#      eta$sigma <- eta$sigma - fitted(x$state) + fit
+#      edf1 <- sum_diag((-1 * xhess0) %*% Sigma)
+#      edf <- edf0 + edf1
+#      logLik <- get_LogPost(eta_timegrid, eta, 0)
+#      ic <- get.ic2(logLik, edf, length(eta$mu), criterion)
+#      if(!is.null(env$ic_val)) {
+#        if((ic < env$ic_val) & (ic < env$ic00_val)) {
+#          par[x$pid$b] <- g2
+#          opt_state <- list("parameters" = par,
+#                            "fitted.values" = fit,
+#                            "edf" = edf1, "hessian" = -1 * xhess,
+#                            "nu" = nu, "do.optim" = x$state$do.optim)
+#          assign("state", opt_state, envir = env)
+#          assign("ic_val", ic, envir = env)
+#        }
+#      } else assign("ic_val", ic, envir = env)
+#      return(ic)
+#    }
+#    
+#    assign("ic00_val", objfun1(get.state(x, "tau2")), envir = env)
+#    tau2 <- tau2.optim(objfun1, start = get.state(x, "tau2"))
+#    
+#    if(!is.null(env$state))
+#      return(env$state)
+#    
+#    x$state$parameters[x$pid$tau2] <- tau2
+#  }
+#  # IWLS isntead of N-R
+#  xhess <- do.XWX(x$X, 1 / rep(2, nrow(y)), x$sparse.setup$matrix)
+#  # xhess <- xhess0 - x$hess(score = NULL, x$state$parameters, full = FALSE)
+#  # xgrad <- xgrad + x$grad(score = NULL, x$state$parameters, full = FALSE)
+#  
+#  ## Compute the inverse of the hessian.
+#  # IWLS instead of N-R
+#  Sigma <- matrix_inv(1 * xhess, index = NULL)
+#  # Sigma <- matrix_inv(-1 * xhess, index = NULL)
+#  # Hs <- Sigma %*% xgrad
+#  
+#  ## Update regression coefficients.
+#  g <- get.state(x, "b")
+#  
+#  if(update.nu) {
+#    objfun2 <- function(nu) {
+#      # g2 <- drop(g + nu * Hs)
+#      # IWLS instead of N-R
+#      g2 <- drop(Sigma %*% crossprod(x$X, z*2))
+#      names(g2) <- names(g)
+#      x$state$parameters <- set.par(x$state$parameters, g2, "b")
+#      fit <- x$fit.fun(x$X, g2)
+#      eta$sigma <- eta$sigma - fitted(x$state) + fit
+#      lp <- get_LogPost(eta_timegrid, eta, x$prior(x$state$parameters))
+#      return(-1 * lp)
+#    }
+#    
+#    x$state$nu <- optimize(f = objfun2, interval = c(0, 1))$minimum
+#  }
+#  
+#  # IWLS instead of N-R
+#  g2 <- drop(Sigma %*% crossprod(x$X, z*2))
+#  # g2 <- drop(g + x$state$nu * Hs)
+#  names(g2) <- names(g)
+#  x$state$parameters <- set.par(x$state$parameters, g2, "b")
+#  
+#  ## Update fitted values.
+#  x$state$fitted.values <- x$fit.fun(x$X, g2)
+#  # IWLS instead of N-R
+#  x$state$edf <- sum_diag((1 * xhess) %*% Sigma)
+#  # x$state$edf <- sum_diag((-1 * xhess0) %*% Sigma)
+#  x$state$hessian <- -1 * xhess
+#  
+#  return(x$state)
+#}
 
 
 update_jm_alpha <- function(x, eta, eta_timegrid,
@@ -3447,7 +3555,7 @@ propose_jm_sigma <- function(x, y,
 
 
 ## Time varying random slopes.
-smooth.construct.Re.smooth.spec <- function(object, data, knots)
+smooth.construct.Re.smooth.spec <- function(object, data, knots, ...)
 {
   isf <- sapply(data[object$term], is.factor)
   id <- data[[object$term[isf]]]
@@ -3505,7 +3613,7 @@ center.X <- function(X, S)
 }
 
 
-smooth.construct.Re2.smooth.spec <- function(object, data, knots)
+smooth.construct.Re2.smooth.spec <- function(object, data, knots, ...)
 {
   isf <- sapply(data[object$term], is.factor)
   id <- data[[object$term[isf]]]

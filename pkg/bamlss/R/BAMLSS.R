@@ -548,7 +548,7 @@ design.construct <- function(formula, data = NULL, knots = NULL,
             tfme <- eval(tfm$call, envir = tfm$data)
             smt <- smoothCon(tfme, data = tfm$data, n = nrow(tfm$data[[1L]]),
               knots = knots, absorb.cons = TRUE,scale.penalty=TRUE)
-            lab <- all.labels.formula(as.formula(paste("~", fterms[j])))
+            lab <- all_labels_formula(as.formula(paste("~", fterms[j])))
             for(jj in seq_along(smt)) {
               smt[[jj]]$model.frame <- tfm$data
               smt[[jj]]$orig.label <- smt[[jj]]$label
@@ -2852,7 +2852,7 @@ complete.bamlss.family <- function(family)
 
 
 ## Formula to list().
-as.list.Formula <- function(x)
+as_list_Formula <- function(x)
 {
   if(!inherits(x, "Formula"))
     x <- as.Formula(x)
@@ -2892,7 +2892,7 @@ bamlss.formula <- function(formula, family = NULL, specials = NULL, env = NULL, 
     if(!inherits(formula, "Formula"))
       formula <- as.Formula(formula)
     if(inherits(formula, "Formula"))
-      formula <- as.list.Formula(formula)
+      formula <- as_list_Formula(formula)
   }
   if(!is.null(family))
     family <- bamlss.family(family, ...)
@@ -3116,7 +3116,7 @@ make_fFormula <- function(formula)
 }
 
 
-all.vars.formula <- function(formula, lhs = TRUE, rhs = TRUE, specials = NULL, intercept = FALSE, type = 1)
+all_vars_formula <- function(formula, lhs = TRUE, rhs = TRUE, specials = NULL, intercept = FALSE, type = 1)
 {
   env <- environment(formula)
   specials <- unique(c(specials, "s", "te", "t2", "sx", "s2", "rs", "ti", "tx", "tx2", "tx3", "tx4", "la", "n", "h", "lf", "af", "lf.vd", "re", "peer", "fpc", "lin", "rb", "tree"))
@@ -3203,7 +3203,7 @@ splitFormula <- function(form, sep = "+")
 }
 
 
-terms.formula2 <- function(formula, specials, keep.order = TRUE, ...)
+terms_formula2 <- function(formula, specials, keep.order = TRUE, ...)
 {
   fs <- splitFormula(formula, sep = c("+", "-"))
   tl <- rep("", length = length(fs))
@@ -3224,11 +3224,11 @@ terms.formula2 <- function(formula, specials, keep.order = TRUE, ...)
 }
 
 
-all.labels.formula <- function(formula, specials = NULL, full.names = FALSE)
+all_labels_formula <- function(formula, specials = NULL, full.names = FALSE)
 {
   env <- environment(formula)
   specials <- unique(c("s", "te", "t2", "sx", "s2", "rs", "ti", "tx", "tx2", "tx3", "tx4", "la", "n", "h", "lf", "af", "lf.vd", "re", "peer", "fpc", "lin", "rb", "tree", specials))
-  tf <- terms.formula2(formula, specials = specials, keep.order = FALSE)
+  tf <- terms_formula2(formula, specials = specials, keep.order = FALSE)
   ## sid <- unlist(attr(tf, "specials")) - attr(tf, "response")
   tl <- attr(tf, "term.labels")
   sid <- NULL
@@ -3315,11 +3315,11 @@ fake.formula <- function(formula, lhs = TRUE, rhs = TRUE, specials = NULL)
   if(all(!lhs & !rhs))
     return(0 ~ 0)
   if(all(rhs)) {
-    f <- paste(all.vars.formula(formula, lhs = FALSE, rhs = TRUE, specials, intercept = TRUE, type = 2), collapse = "+")
+    f <- paste(all_vars_formula(formula, lhs = FALSE, rhs = TRUE, specials, intercept = TRUE, type = 2), collapse = "+")
     if(f == "") f <- "-1"
   }
   if(all(lhs))
-    f <- paste(all.vars.formula(formula, lhs = TRUE, rhs = FALSE, type = 2), "~", if(!is.null(f)) f else 0)
+    f <- paste(all_vars_formula(formula, lhs = TRUE, rhs = FALSE, type = 2), "~", if(!is.null(f)) f else 0)
   else
     f <- paste("~", if(!is.null(f)) f else 0)
   f <- as.formula(f, env = NULL)
@@ -4143,7 +4143,7 @@ predict.bamlss <- function(object, newdata, model = NULL, term = NULL, match.nam
   ## Remove by s(): variables.
   uenames <- drop_by_fac(uenames)
   ff <- as.formula(paste("~", paste(uenames, collapse = "+")), env = NULL)
-  vars <- all.vars.formula(ff)
+  vars <- all_vars_formula(ff)
   if(!all(vars[vars != "Intercept"] %in% nn))
     stop("cannot compute prediction, variables missing in newdata!")
   type <- match.arg(type)
@@ -4192,7 +4192,7 @@ predict.bamlss <- function(object, newdata, model = NULL, term = NULL, match.nam
   enames <- lapply(enames, function(x) {
     if(is.null(x)) return(NULL)
     f <- as.formula(paste("~", paste(x, collapse = "+")), env = NULL)
-    all.labels.formula(f, full.names = TRUE)
+    all_labels_formula(f, full.names = TRUE)
   })
 
   if(!is.null(list(...)$get.bamlss.predict.setup)) {
@@ -4622,7 +4622,7 @@ rsc <- function(..., by = NA)
 
 
 ## Smooth constructor function for random scaling terms.
-smooth.construct.rsc.smooth.spec <- function(object, data, knots) {
+smooth.construct.rsc.smooth.spec <- function(object, data, knots, ...) {
   class(object) <- object$class
   acons <- TRUE
   if(!is.null(object$xt$center))
@@ -4680,15 +4680,15 @@ rs <- function(formula, link = "log", ...)
   kn <- sum(unlist(attr(terms(fn, specials = c("s", "te", "t2", "ti")), "specials")))
   kd <- sum(unlist(attr(terms(fn, specials = c("s", "te", "t2", "ti")), "specials")))
 
-  fnl <- all.labels.formula(fn)
-  fdl <- all.labels.formula(fd)
+  fnl <- all_labels_formula(fn)
+  fdl <- all_labels_formula(fd)
   fnl <- paste(fnl, collapse = "+")
   fdl <- paste(fdl, collapse = "+")
   if(fdl == "")
     nd <- FALSE
   label <- if(nd) paste("rs(", fnl, "|", fdl, ")", sep = "") else paste("rs(", fnl, ")", sep = "")
-  vn <- all.vars.formula(fn)
-  vd <- all.vars.formula(fd)
+  vn <- all_vars_formula(fn)
+  vd <- all_vars_formula(fd)
   formula <- bamlss.formula(list(fn, fd))
   names(formula) <- c("numerator", "denominator")
   xt <- list(...)
@@ -4717,7 +4717,7 @@ rs <- function(formula, link = "log", ...)
   rval
 }
 
-smooth.construct.rs.smooth.spec <- function(object, data, knots) 
+smooth.construct.rs.smooth.spec <- function(object, data, knots, ...) 
 {
   object$linkfun <- make.link2("identity")$linkfun
   object$linkinv <- make.link2("identity")$linkinv
@@ -5263,10 +5263,10 @@ la <- function(formula, type = c("single", "multiple"), ...)
     if(any(grepl(":", formula, fixed = TRUE))) {
       label <- paste0("la(", paste(as.character(formula), collapse = ""), ")")
     } else {
-      label <- paste("la(", paste(all.vars.formula(as.formula(formula)), collapse = "+"), ")", sep = "")
+      label <- paste("la(", paste(all_vars_formula(as.formula(formula)), collapse = "+"), ")", sep = "")
     }
   }
-  vars <- unique(all.vars.formula(formula))
+  vars <- unique(all_vars_formula(formula))
   rval <- list(
     "formula" = formula,
     "term" = vars,
@@ -7950,7 +7950,7 @@ if(FALSE) {
 
 
 ## Penalized harmonic smooth.
-smooth.construct.ha.smooth.spec <- function(object, data, knots) 
+smooth.construct.ha.smooth.spec <- function(object, data, knots, ...) 
 {
   x <- data[[object$term]]
 
@@ -8006,7 +8006,7 @@ smooth.construct.ha.smooth.spec <- function(object, data, knots)
 }
 
 
-Predict.matrix.harmon.smooth <- function(object, data, knots)
+Predict.matrix.harmon.smooth <- function(object, data)
 {
   x <- data[[object$term]]
   x <- x / object$frequency
@@ -8177,7 +8177,7 @@ Predict.matrix.kriging.smooth <- function(object, data)
 
 
 ## Space-time random effect constructor functions.
-smooth.construct.str.smooth.spec <- function(object, data, knots)
+smooth.construct.str.smooth.spec <- function(object, data, knots, ...)
 {
   if(object$dim < 3) stop("need at least 3 variables!")
   if(object$bs.dim < 0) object$bs.dim <- 10
@@ -8249,7 +8249,7 @@ Predict.matrix.strandom.smooth <- function(object, data, knots)
 ## Smooth constructor for lag function.
 ## (C) Viola Obermeier; Flexible distributed lags for modelling earthquake data,
 ##                      DOI: 10.1111/rssc.12077.
-smooth.construct.fdl.smooth.spec <- function(object, data, knots)
+smooth.construct.fdl.smooth.spec <- function(object, data, knots, ...)
 {
   ## Modify object so that it's fitted as a p-spline signal regression term.
   object$bs <- "ps"
@@ -9662,7 +9662,7 @@ get_sterms_labels <- function(x, specials = NULL)
   if(has_sterms(x, specials)) {
     x <- drop.terms.bamlss(x, pterms = FALSE, sterms = TRUE,
       keep.response = FALSE, specials = specials)
-    tl <- all.labels.formula(x)
+    tl <- all_labels_formula(x)
   } else tl <- character(0)
   tl
 }
@@ -9994,7 +9994,7 @@ samples.bamlss <- samples.bamlss.frame <- function(object, model = NULL, term = 
     rval <- vector(mode = "list", length = length(x))
     nx <- names(tx)
     for(i in seq_along(tx)) {
-      tl <- all.labels.formula(tx[[i]], full.names = TRUE)
+      tl <- all_labels_formula(tx[[i]], full.names = TRUE)
       if(attr(tx[[i]], "intercept") > 0)
         tl <- c(tl, "(Intercept)")
       if(is.character(term)) {
@@ -10380,7 +10380,7 @@ term.labels2 <- function(x, model = NULL, pterms = TRUE, sterms = TRUE,
     if(type < 2) {
       rval[[j]] <- attr(txj, "term.labels")
     } else {
-      rval[[j]] <- all.labels.formula(txj)
+      rval[[j]] <- all_labels_formula(txj)
     }
     if(intercept & (attr(txj, "intercept") > 0))
       rval[[j]] <- c(rval[[j]], "(Intercept)")

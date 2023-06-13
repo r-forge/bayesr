@@ -73,7 +73,7 @@ bamlss_shiny_server <- function(input, output, session)
       m <- get(input$selected_model, envir = .GlobalEnv)
       mf <- model.frame(m)
       tn <- lapply(formula(m), function(x) {
-        all.labels.formula(x$formula)
+        all_labels_formula(x$formula)
       })
       tn <- unique(do.call("c", tn))
       output$select_intercept <- renderUI({

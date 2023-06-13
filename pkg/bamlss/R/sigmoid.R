@@ -56,7 +56,7 @@ sigmoid.fit.w <- function(X, y, weights = NULL, j = 2, ...) {
   rval
 }
 
-sigmoid.fit <- function(X, y, weights = NULL) {
+sigmoid.fit <- function(X, y, weights = NULL, ...) {
   if(any(is.na(y)) | any(is.na(X)))
     stop("NA values in data!")
   nr <- nrow(X)
@@ -106,7 +106,7 @@ logLik.sigmoid <- function(object, ...) {
   val
 }
 
-sigmoid <- function(x, ...) {
+sigmoid <- function(X, y, ...) {
   UseMethod("sigmoid")
 }
 
@@ -143,8 +143,8 @@ sigmoid.formula <- function(formula, data, weights, ..., subset, na.action, cont
   res
 }
 
-sigmoid.default <- function(x, y, weights, ...) {
-  sigmoid.fit(x, y, weights)
+sigmoid.default <- function(X, y, weights, ...) {
+  sigmoid.fit(X, y, weights, ...)
 }
 
 estfun.sigmoid <- function(x, ...) {
