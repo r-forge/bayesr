@@ -330,7 +330,7 @@ design.construct <- function(formula, data = NULL, knots = NULL,
         }
         if(ncol(obj$model.matrix) > 0) {
           if(scale.x)
-            obj$model.matrix <- scale.model.matrix(obj$model.matrix)
+            obj$model.matrix <- scale_model_matrix(obj$model.matrix)
         } else obj$model.matrix <- NULL
       } else {
         mm_terms <- drop.terms.bamlss(obj$terms,
@@ -8235,7 +8235,7 @@ stop()
 }
 
 
-Predict.matrix.strandom.smooth <- function(object, data, knots) 
+Predict.matrix.strandom.smooth <- function(object, data) 
 {
   D <- krDesign2D(data[[object$term[1]]], data[[object$term[2]]],
     knots = object$knots,
@@ -11241,7 +11241,7 @@ XnotinY <-
 
 
 ## Small helper function to scale the model.matrix.
-scale.model.matrix <- function(x)
+scale_model_matrix <- function(x)
 {
   if(!is.matrix(x))
     x <- as.matrix(x)
