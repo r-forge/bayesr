@@ -96,13 +96,14 @@ d_rirs_tru <- JMbamlss:::attach_wfpc(mfpca_tru, d_rirs, n = 12,
                                      obstime = "year")
 # Reduce nfpc to 5 for faster computation
 f_tru <- list(
-  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps"),
+  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps", 
+                                       xt = list("scale = FALSE")),
   gamma ~ 1 + group,
   as.formula(paste0(
     "mu ~ -1 + marker + year:marker +",
     paste0(lapply(seq_along(1:5), function(x) {
       paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
-             "mfpca_list[[", x, "]]))")
+             "mfpca_list[[", x, "]], 'scale' = FALSE))")
     }), collapse = " + "))),
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
@@ -110,9 +111,10 @@ f_tru <- list(
 
 # Use it with new add-on that Score and Hesse are also returned
 set.seed(i)
-b_est <- bamlss(f_tru, family = mjm_bamlss, data = d_rirs_tru, 
-                timevar = "year", maxit = 80, sampler = FALSE,
-                burnin = 1000, thin = 3, verbose = TRUE, nu = 1,
+b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
+                timevar = "year", maxit = 1500,
+                #burnin = 1000, thin = 3,
+                verbose = TRUE, sampler = FALSE,
                 par_trace = TRUE)
 # Doesn't work, also for fewer MFPCs
 saveRDS(b_est, file = paste0(server_wd, setting, "/bamlss_est/b_trunc", i,
@@ -168,7 +170,7 @@ ggplot(data = data.frame(t(gamma)) %>%
   ggtitle("Gamma Parameters")
 
 ggplot(data = data.frame(t(alpha)) %>%
-         mutate(it = 1:80) %>%
+         mutate(it = 1:1500) %>%
          pivot_longer(cols = -it),
        aes(x = it, y = value, col = name)) +
   geom_line() +

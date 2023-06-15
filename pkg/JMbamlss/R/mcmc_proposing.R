@@ -4,7 +4,7 @@
 propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                         eta_timegrid_alpha, eta_timegrid_mu, eta_timegrid_long,
                         eta_timegrid_lambda, survtime, logLik_old, nsubj, 
-                        gq_weights, status, nmarker, nu, verbose_sampler,
+                        gq_weights, status, nmarker, verbose_sampler,
                         prop#, prop_dens
                         ) {
   
@@ -25,6 +25,7 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
     # state_fitted_timegrid_old <- x$state$fitted_timegrid
     # 
   #}
+  nu <- x$state$nu
   
   ## Sample variance parameter.
   if(!x$fixed & is.null(x$sp) & length(x$S)) {

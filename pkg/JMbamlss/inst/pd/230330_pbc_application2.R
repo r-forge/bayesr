@@ -466,7 +466,8 @@ f_est <- list(
 # Model fit
 set.seed(1604)
 b_est <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
-                timevar = "obstime", maxit = 1500, verbose = TRUE)
+                timevar = "obstime", maxit = 1500, verbose = TRUE, 
+                par_trace = TRUE)
 saveRDS(b_est, file = paste0("~/Documents/joint_models/JointModel/",
                              "PBC_analysis/pbc_mul_nuupdate_log.Rds"))
 

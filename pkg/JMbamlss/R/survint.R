@@ -211,6 +211,8 @@ if(FALSE) {
 }
 
 # Old version of survival integral GQ -------------------------------------
+# NOTE: THIS VERSION DOES NOT RETURN CORRECT RESULTS
+# Hessian is not calculated correctly
 survint_gq <- function(pred = c("lambda", "gamma", "long"), pre_fac,
                        pre_vec = NULL, omega, int_fac = NULL,
                        int_vec = NULL, weights, survtime) {

@@ -3,7 +3,7 @@
 
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
-                     nu_sampler = 1, verbose = FALSE,
+                     nu_sampler = 1, verbose = FALSE, accthreshold = 0.1,
                      prop_list = NULL,# prop_update = NULL, 
                      ...)
 {
@@ -126,6 +126,13 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     x
   }
   
+  # Allow different steplenghts per model term
+  for(j in names(x)) {
+    for(sj in names(x[[j]]$smooth.construct)) {
+      x[[j]]$smooth.construct[[sj]]$state$nu <- nu_sampler
+      x[[j]]$smooth.construct[[sj]]$low_acc <- 0
+    }
+  }
   
   ## Process iterations
   if (burnin < 1) burnin <- 1
@@ -169,7 +176,6 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     if(verbose) {
       cat("Iteration", iter, "\n")
     }
-    #if(iter == 2) browser()
     
     for (i in nx) {
       
@@ -187,8 +193,7 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                eta_timegrid_lambda = eta_timegrid_lambda,
                                survtime = survtime, logLik_old = logLik_old, 
                                nsubj = nsubj, gq_weights = gq_weights, 
-                               status = status, nmarker = nmarker, 
-                               nu = nu_sampler,
+                               status = status, nmarker = nmarker,
                                verbose_sampler = verbose, 
                                prop = if(!is.null(prop_list)) {
                                  prop_list[[iter]][[nx_iter]][[j_iter]]
@@ -205,6 +210,22 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
         } else {
           log(runif(1)) <= p_state$xstate$alpha
         }}
+        
+        # Check whether the step-size should be decreased
+        if(is.na(p_state$xstate$alpha) || 
+           exp(p_state$xstate$alpha) < accthreshold) {
+          x[[i]]$smooth.construct[[j]]$low_acc <- 
+            x[[i]]$smooth.construct[[j]]$low_acc + 1
+        } else {
+          x[[i]]$smooth.construct[[j]]$low_acc <- 0
+        }
+        if (x[[i]]$smooth.construct[[j]]$low_acc == 10) {
+          x[[i]]$smooth.construct[[j]]$state$nu <- 
+            x[[i]]$smooth.construct[[j]]$state$nu / 10
+          x[[i]]$smooth.construct[[j]]$low_acc <- 0
+          cat("HAPPENED\n")
+        }
+        
         #cat(i, ": ", j, " - ", accepted, "\n")
         if (accepted) {
           
