@@ -7,7 +7,8 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                            "sigma" = 1, "alpha" = 1),
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
                     verbose = FALSE, update_nu = FALSE, update_tau = FALSE,
-                    nocheck_logpost = FALSE, iwls_sigma = TRUE, ...) {
+                    nocheck_logpost = FALSE, iwls_sigma = TRUE, coll = FALSE,
+                    ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -155,6 +156,11 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
     it_param <- list()
   }
   
+  # Collinearity measures for the alpha predictors
+  if (coll) {
+    it_coll <- list()
+  }
+  
   # Updating the predictors
   while((eps0 > eps) & (iter < maxit)) {
     ## (1) update lambda.
@@ -241,7 +247,8 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                                       eta_T_mu = eta_T_mu, survtime = survtime, 
                                       update_nu = update_nu,
                                       get_LogLik = get_LogLik,
-                                      update_tau = update_tau, edf = edf, ...)
+                                      update_tau = update_tau, edf = edf, 
+                                      coll = coll, ...)
             etaUP$alpha <- eta$alpha -
               drop(fitted(x$alpha$smooth.construct[[j]]$state)) +
               fitted(state)
@@ -271,6 +278,11 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
               x$alpha$smooth.construct[[j]]$state <- state
             } else {
               etaUP$alpha <- eta$alpha
+            }
+            
+            # Collinearity measures for alpha
+            if (coll) {
+              it_coll[[iter]] <- state$coll
             }
           }
         }
@@ -408,6 +420,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
               "logLik" = logLik, "logPost" = logPost,
               "hessian" = bamlss:::get.hessian(x),
               "converged" = iter < maxit, 
-              "par_trace" = if (par_trace) it_param else NULL))
+              "par_trace" = if (par_trace) it_param else NULL,
+              "coll" = if (coll) it_coll else NULL))
   
 }

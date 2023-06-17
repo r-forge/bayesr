@@ -30,6 +30,10 @@ acc <- function(model){
 }
 
 
+
+# Prepare the PBC data ----------------------------------------------------
+
+
 # Cox model for the composite event death or transplantation
 pbc2$event <- as.numeric(pbc2$status != 'alive')
 
@@ -88,6 +92,10 @@ mfpca_est_list <- lapply(vals[seq_len(nfpc)], function (i, mfpca = mfpca_est) {
 # Prepare objects for model fit
 p_long[, grepl("fpc", colnames(p_long))] <- NULL
 p_long <- JMbamlss:::attach_wfpc(mfpca_est, p_long, n = nfpc)
+
+
+# Model Fit ---------------------------------------------------------------
+
 f_est <- list(
   Surv2(survtime, event, obs = logy) ~ -1 + 
     s(survtime, k = 20, bs = "ps", xt = list("scale" = FALSE)),
@@ -112,6 +120,11 @@ f_est <- list(
 
 b_est <- readRDS(file.path(server_wd, "JMbamlss/inst/objects",
                            "230615_pbc_est.Rds"))
+
+
+
+# Evaluate Model ----------------------------------------------------------
+
 
 # Acceptance probabilities
 acc(b_est)
@@ -157,3 +170,64 @@ ggplot(all_draws, aes(x = re)) +
   labs(x = "Random Scores", y = "Density") +
   geom_line(data = all_taus, aes(x = x, y = y), linetype = "dashed")
   
+
+
+# Analyze Collinearity ----------------------------------------------------
+
+# Argument coll needed
+devtools::load_all(".")
+
+set.seed(1604)
+b_est <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
+                timevar = "obstime", maxit = 1500, verbose = TRUE,
+                par_trace = TRUE, accthreshold = -1, coll = TRUE, 
+                sampler = FALSE)
+
+
+nmarker <- length(mfpca_est$functions)
+start <- max(which(sapply(b_est$model.stats$optimizer$coll, is.null))) + 1
+stop <- length(b_est$model.stats$optimizer$coll)
+
+# Use data matrix
+col_x <- sapply(b_est$model.stats$optimizer$coll[start:stop], function (x) {
+  X <- matrix(x$X, ncol = nmarker)
+  svd(crossprod(X))$d
+})
+condi_x <- apply(col_x, 2, function (x) x[1] / x[nmarker])
+ratio_x <- apply(col_x, 2, function (x) x / sum(x))
+
+# Use Hesse matrix
+col_i <- sapply(b_est$model.stats$optimizer$coll[start:stop], function (x) {
+  H <- matrix(x$I, ncol = nmarker)
+  s <- diag(diag(H)^(-1/2))
+  svd(s %*% H %*% s)$d
+})
+condi_i <- apply(col_i, 2, function (x) x[1] / x[nmarker])
+ratio_i <- apply(col_i, 2, function (x) x / sum(x))
+
+condi_dat <- data.frame(
+  it = rep(start:stop, times = 2),
+  vals = c(condi_x, condi_i),
+  type = factor(rep(c(0, 1), each = length(start:stop)), labels = c("XTX", "I_S"))
+)
+ggplot(condi_dat, aes(x = it, y = vals, col = type)) +
+  geom_line() +
+  theme_bw() +
+  ggtitle("Condition Numbers for PBC Data") +
+  labs(x = "Iteration", y = "max(Eigenval) / min(Eigenval)", col = NULL)
+
+
+ratio_dat <- data.frame(
+  it = rep(rep(start:stop, times = nmarker), 2),
+  vals = c(ratio_x, ratio_i),
+  type = factor(rep(c(0, 1), each = nmarker * length(start:stop)),
+                labels = c("XTX", "I_S")),
+  ev = factor(seq_len(nmarker), labels = paste("EV", seq_len(nmarker)))
+)
+ggplot(ratio_dat, aes(x = it, y = vals, col = type,
+                      group = interaction(ev, type))) +
+  geom_line() +
+  theme_bw() +
+  ggtitle("Ratio of Eigenvalues for PBC Data") +
+  labs(x = "Iteration", y = "Eigenval / sum(Eigenval)", col = NULL,
+       ev = NULL)

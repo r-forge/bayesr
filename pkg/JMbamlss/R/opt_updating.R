@@ -247,7 +247,7 @@ update_mjm_gamma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
 update_mjm_alpha <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
                              eta_timegrid_alpha, eta_timegrid_mu, 
                              eta_T_mu, survtime, update_nu, get_LogLik, 
-                             update_tau, edf, ...) {
+                             update_tau, edf, coll, ...) {
   
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
@@ -347,7 +347,8 @@ update_mjm_alpha <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   
   # Newton Raphson
   x_score <- x_score0 + x$grad(score = NULL, x$state$parameters, full = FALSE)
-  x_H <- x_H0 + x$hess(score = NULL, x$state$parameters, full = FALSE)
+  p_H <- x$hess(score = NULL, x$state$parameters, full = FALSE)
+  x_H <- x_H0 + p_H
   Sigma <- bamlss:::matrix_inv(x_H, index = NULL)
   Hs <- Sigma %*% x_score
   
@@ -380,6 +381,9 @@ update_mjm_alpha <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   x$state$fitted.values <- drop(x$X %*% b)
   x$state$hessian <- x_H
   x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
+  if(coll) {
+    x$state$coll <- list("X" = eta_T_mu, "I" = int_i$hess_int, "P" = p_H)
+  }
   
   return(x$state)
   
