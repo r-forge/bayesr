@@ -11,7 +11,9 @@ Authors@R: c(person(given = "Nikolaus", family = "Umlauf", role = c("aut", "cre"
   person(given = "Meike", family = "Koehler", role = "ctb", email = "meike_koehler@gmx.de"),
   person(given = "Thorsten", family = "Simon", role = "aut", email = "Thorsten.Simon@uibk.ac.at",
          comment = c(ORCID = "0000-0002-3778-7738")),
-  person(given = "Stanislaus", family = "Stadlmann", role = "ctb", email = "stadlmann@uni-goettingen.de"))
+  person(given = "Stanislaus", family = "Stadlmann", role = "ctb", email = "stadlmann@uni-goettingen.de"),
+  person(given = "Alexander", family = "Volkmann", role = "ctb", email = "alexander.volkmann@hu-berlin.de",
+  comment = c(ORCID = "0000-0001-5028-8098")))
 Description: Infrastructure for estimating probabilistic distributional regression models in a Bayesian framework.
   The distribution parameters may capture location, scale, shape, etc. and every parameter may depend
   on complex additive terms (fixed, random, smooth, spatial, etc.) similar to a generalized additive model.
