@@ -407,27 +407,34 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   nsubj <- attr(y, "nsubj")
   n_w <- length(attr(y, "gq_weights"))
   nu <- x$nu
+  eta_bar <- attr(eta, "std_long")$long_bar
+  eta_std <- attr(eta, "std_long")$long_sds
   
   if (any(class(x) == "unc_pcre.random.effect")) {
     int_i <- survint_C(pred = "fpc_re", pre_fac = exp(eta$gamma),
                        omega = exp(eta_timegrid),
-                       int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                       int_fac = eta_timegrid_alpha /
+                         rep(eta_std, each = nsubj*n_w),
+                       int_vec = x$Xgrid,
                        weights = attr(y, "gq_weights"),
                        survtime = survtime)
     x_score0 <- drop(
       crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-        crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
+        crossprod(delta * x$XT, eta$alpha / rep(eta_std, each = nsubj))) - 
+      int_i$score_int
     x_H0 <- diag(psi_mat_crossprod(Psi = x, R = 1 / exp(eta$sigma)^2) +
                   int_i$hess_int)
   } else {
     int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
                        omega = exp(eta_timegrid),
-                       int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                       int_fac = eta_timegrid_alpha /
+                         rep(eta_std, each = nsubj*n_w), int_vec = x$Xgrid,
                        weights = attr(y, "gq_weights"),
                        survtime = survtime)
     x_score0 <- drop(
       crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-        crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
+        crossprod(delta * x$XT, eta$alpha / rep(eta_std, each = nsubj))) -
+      int_i$score_int
     x_H0 <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
       matrix(int_i$hess_int, ncol = b_p)
   }
@@ -565,9 +572,12 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   }
   
   x$state$parameters[seq_len(b_p)] <- b
-  x$state$fitted_timegrid <- drop(x$Xgrid %*% b)
+  x$state$fitted_timegrid <- (drop(x$Xgrid %*% b) -
+                                rep(eta_bar, each = nsubj*n_w)) / 
+                                rep(eta_std, each = nsubj*n_w) 
   x$state$fitted.values <- drop(x$X %*% b)
-  x$state$fitted_T <- drop(x$XT %*% b)
+  x$state$fitted_T <- (drop(x$XT %*% b) - rep(eta_bar, each = nsubj)) /
+    rep(eta_std, each = nsubj)
   x$state$hessian <- x_H
   x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
   
@@ -721,6 +731,58 @@ update_mjm_sigma <- function(x, y, eta, eta_timegrid, eta_T_mu, survtime,
   }
  
 
+  return(x$state)
+  
+}
+
+
+# Alternative alpha updater -----------------------------------------------
+
+update_mjm_alpha_optim <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
+                             eta_timegrid_alpha, eta_timegrid_mu, 
+                             eta_T_mu, survtime, update_nu, get_LogLik, 
+                             update_tau, edf, coll, start, ...) {
+  
+  b <- bamlss::get.state(x, "b")
+  if (start) {
+   b[seq_along(b)] <- 0 
+  }
+  b_p <- length(b)
+  nmarker <- attr(y, "nmarker")
+  status <- attr(y, "status")
+  nsubj <- attr(y, "nsubj")
+  n_w <- length(attr(y, "gq_weights"))
+  nu <- x$nu
+  par <- x$state$parameters
+  
+    # Function for updating step length
+    # Defined here so that it accesses Hs and par and fitted from parents
+    logLik_fun <- function(b) {
+      par[x$pid$b] <- b
+      fit <- drop(x$X %*% b)
+      fitted_timegrid <- drop(x$Xgrid %*% b)
+      eta$alpha <- eta$alpha - fitted(x$state) + fit
+      eta_timegrid_alpha <- eta_timegrid_alpha -
+        x$state$fitted_timegrid + fitted_timegrid
+      eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha *
+                                            eta_timegrid_mu,
+                                          nrow = nsubj*n_w,
+                                          ncol = nmarker))
+      eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
+      LogLik <- get_LogLik(eta_timegrid, eta_T_mu, eta) + x$prior(par)
+      return(-1 * LogLik)
+    }
+    
+    b_new <- optim(b, logLik_fun)$par
+  
+  x$state$parameters[seq_len(b_p)] <- b_new
+  x$state$fitted_timegrid <- drop(x$Xgrid %*% b_new)
+  x$state$fitted.values <- drop(x$X %*% b_new)
+  x$state$edf <- length(b_new)
+  # if(coll) {
+  #   x$state$coll <- list("X" = eta_T_mu, "I" = int_i$hess_int, "P" = p_H)
+  # }
+  
   return(x$state)
   
 }

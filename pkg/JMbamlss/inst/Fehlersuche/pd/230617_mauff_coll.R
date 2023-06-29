@@ -160,18 +160,200 @@ ggsave("mjm_mauff_trunc_coll_ratio.pdf", device = "pdf", path = "plots",
        width = 8, height = 4)
 
 
+# Further Cutoff (5 FPCs) -------------------------------------------------
+
+nfpc <- 5
+f_tru <- list(
+  Surv2(Time, event, obs = y) ~ -1 + s(Time, k = 20, bs = "ps", 
+                                       xt = list("scale = FALSE")),
+  gamma ~ 1 + group,
+  as.formula(paste0(
+    "mu ~ -1 + marker + year:marker +",
+    paste0(lapply(seq_len(nfpc), function(x) {
+      paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
+             "mfpca_list[[", x, "]], 'scale' = FALSE))")
+    }), collapse = " + "))),
+  sigma ~ -1 + marker,
+  alpha ~ -1 + marker
+)
+b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
+                timevar = "year", maxit = 1500, sampler = FALSE,
+                verbose = TRUE, coll = TRUE, par_trace = TRUE)
+start <- max(which(sapply(b_est$model.stats$optimizer$coll, is.null))) + 1
+stop <- length(b_est$model.stats$optimizer$coll)
+
+
 # Trace plot of updating the alpha parameter
 alpha <- sapply(b_est$model.stats$optimizer$par_trace, 
                 function(x) x$alpha$p)
-ggplot(data = data.frame(t(alpha)) %>%
-         mutate(it = 1:1500) %>%
-         pivot_longer(cols = -it),
+p1 <- ggplot(data = data.frame(t(alpha)) %>%
+         mutate(it = seq_len(ncol(alpha))) %>%
+         pivot_longer(cols = -it) %>% filter(it %in% 200:225),
        aes(x = it, y = value, col = name)) +
   geom_line() +
   geom_hline(yintercept = c(0.1, -0.6, -0.1, -1.41, -1.81, 0.75), 
              linetype = "dotted") +
+  geom_vline(xintercept = 204, linetype = "dashed") +
   theme_bw() +
   labs(x = "Iteration", y =  "Estimate", col = NULL) +
-  ggtitle("Alpha Parameters Mauff Simulation (Truncated)")
-ggsave("mjm_mauff_trunc_alphapar.pdf", device = "pdf", path = "plots",
-       width = 8, height = 4)
+  ggtitle("Zoom2: Alpha Parameters Mauff Simulation (Truncated at 5 FPCs)")
+p2 <- ggplot(data = data.frame(t(alpha)) %>%
+               mutate(it = seq_len(ncol(alpha))) %>%
+               pivot_longer(cols = -it) %>% filter(it %in% 200:300),
+             aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = c(0.1, -0.6, -0.1, -1.41, -1.81, 0.75), 
+             linetype = "dotted") +
+  geom_vline(xintercept = 204, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Zoom1: Alpha Parameters Mauff Simulation (Truncated at 5 FPCs)")
+p3 <- ggplot(data = data.frame(t(alpha)) %>%
+               mutate(it = seq_len(ncol(alpha))) %>%
+               pivot_longer(cols = -it),
+             aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = c(0.1, -0.6, -0.1, -1.41, -1.81, 0.75), 
+             linetype = "dotted") +
+  geom_vline(xintercept = 204, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Alpha Parameters Mauff Simulation (Truncated at 5 FPCs)")
+p4 <- gridExtra::grid.arrange(p3, p2, p1, ncol = 1)
+ggsave("mjm_mauff_trunc5_alphapar.pdf", device = "pdf", path = "~/Downloads",
+       width = 8, height = 9, plot = p4)
+
+
+# Trace plot of updating the gamma parameter
+gamma <- sapply(b_est$model.stats$optimizer$par_trace, 
+                function(x) x$gamma$p)
+p1 <- ggplot(data = data.frame(t(gamma)) %>%
+               mutate(it = seq_len(ncol(gamma))) %>%
+               pivot_longer(cols = -it) %>% filter(it %in% 200:225),
+             aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = c(-5.8, 0.5), 
+             linetype = "dotted") +
+  geom_vline(xintercept = 204, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Zoom2: Gamma Parameters Mauff Simulation (Truncated at 5 FPCs)")
+p2 <- ggplot(data = data.frame(t(gamma)) %>%
+         mutate(it = seq_len(ncol(gamma))) %>%
+         pivot_longer(cols = -it) %>% filter(it %in% 200:300),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = c(-5.8, 0.5), 
+             linetype = "dotted") +
+  geom_vline(xintercept = 204, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Zoom1: Gamma Parameters Mauff Simulation (Truncated at 5 FPCs)")
+p3 <- ggplot(data = data.frame(t(gamma)) %>%
+               mutate(it = seq_len(ncol(gamma))) %>%
+               pivot_longer(cols = -it),
+             aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_hline(yintercept = c(-5.8, 0.5), 
+             linetype = "dotted") +
+  geom_vline(xintercept = 204, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Gamma Parameters Mauff Simulation (Truncated at 5 FPCs)")
+p4 <- gridExtra::grid.arrange(p3, p2, p1, ncol = 1)
+ggsave("mjm_mauff_trunc5_gammapar.pdf", device = "pdf", path = "~/Downloads",
+       width = 8, height = 9, plot = p4)
+
+# Use data matrix
+col_x <- sapply(b_est$model.stats$optimizer$coll[start:stop], function (x) {
+  X <- matrix(x$X, ncol = nmarker)
+  svd(crossprod(X))$d
+})
+condi_x <- apply(col_x, 2, function (x) x[1] / x[nmarker])
+ratio_x <- apply(col_x, 2, function (x) x / sum(x))
+
+# Use Hesse matrix
+col_i <- sapply(b_est$model.stats$optimizer$coll[start:stop], function (x) {
+  H <- matrix(x$I, ncol = nmarker)
+  s <- diag(diag(H)^(-1/2))
+  svd(s %*% H %*% s)$d
+})
+condi_i <- apply(col_i, 2, function (x) x[1] / x[nmarker])
+ratio_i <- apply(col_i, 2, function (x) x / sum(x))
+
+condi_dat <- data.frame(
+  it = rep(start:stop, times = 2),
+  vals = c(condi_x, condi_i),
+  type = factor(rep(c(0, 1), each = length(start:stop)), 
+                labels = c("XTX", "I_S"))
+)
+p1 <- ggplot(condi_dat, aes(x = it, y = vals, col = type)) +
+  geom_line() +
+  theme_bw() +
+  ggtitle("Condition Numbers for Mauff It 1 (Truncated at 5 FPCs)") +
+  labs(x = "Iteration", y = "max(Eigenval) / min(Eigenval)", col = NULL)
+p2 <- ggplot(condi_dat %>% filter(it %in% c(start:300)),
+             aes(x = it, y = vals, col = type)) +
+  geom_line() +
+  theme_bw() +
+  ggtitle("Zoom1: Condition Numbers for Mauff It 1 (Truncated at 5 FPCs)") +
+  labs(x = "Iteration", y = "max(Eigenval) / min(Eigenval)", col = NULL)
+p3 <-ggplot(condi_dat %>% filter(it %in% c(start:225)),
+            aes(x = it, y = vals, col = type)) +
+  geom_line() +
+  theme_bw() +
+  ggtitle("Condition Numbers for Mauff It 1 (Truncated at 5 FPCs)") +
+  labs(x = "Iteration", y = "max(Eigenval) / min(Eigenval)", col = NULL)
+p4 <- gridExtra::grid.arrange(p1, p2, p3, ncol = 1)
+ggsave("mjm_mauff_trunc5_coll_condi.pdf", device = "pdf", path = "~/Downloads",
+       width = 8, height = 9, plot = p4)
+
+
+# Trace plot of updating the lambda part
+lambda <- sapply(b_est$model.stats$optimizer$par_trace, 
+                 function(x) x$lambda$s[[1]])
+ggplot(data = data.frame(t(lambda)) %>%
+         select(-tau21, -edf) %>%
+         mutate(it = seq_len(ncol(lambda))) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = start, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  theme(legend.position = "None") +
+  ggtitle("Lambda Parameters Mauff Simulation (Truncated at 5 FPCs)")
+ggsave("mjm_mauff_trunc5_lambdapar.pdf", device = "pdf", path = "~/Downloads",
+       width = 8, height = 3)
+
+# Trace plot of updating the mu parameter part
+mu <- sapply(b_est$model.stats$optimizer$par_trace, 
+             function(x) x$mu$p)
+ggplot(data = data.frame(t(mu)) %>%
+         mutate(it = seq_len(ncol(gamma))) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = start, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Mu Parameters Mauff Simulation (Truncated at 5 FPCs)")
+ggsave("mjm_mauff_trunc5_muppar.pdf", device = "pdf", path = "~/Downloads",
+       width = 8, height = 3)
+
+# Longitudinal fixed effects
+mus1 <- sapply(b_est$model.stats$optimizer$par_trace, 
+               function(x) x$mu$s[[1]])
+ggplot(data = data.frame(t(mus1)) %>%
+         select(-tau21, -edf) %>%
+         mutate(it = seq_len(ncol(lambda))) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = start, linetype = "dashed") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  theme(legend.position = "None") +
+  ggtitle("Mu FPC1 Mauff Simulation (Truncated at 5 FPCs)")
+ggsave("mjm_mauff_trunc5_mufpc1par.pdf", device = "pdf", path = "~/Downloads",
+       width = 8, height = 3)

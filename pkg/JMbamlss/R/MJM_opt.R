@@ -8,7 +8,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
                     verbose = FALSE, update_nu = FALSE, update_tau = FALSE,
                     nocheck_logpost = FALSE, iwls_sigma = TRUE, coll = FALSE,
-                    ...) {
+                    std_surv = TRUE, ...) {
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
@@ -111,6 +111,20 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
   }
   
   eta <- bamlss:::get.eta(x, expand = FALSE)
+  
+  # Standardizing the Survival design matrices
+  if (std_surv) {
+    attr(eta, "std_w") <- list(
+      w_bar = x$gamma$smooth.construct$model.matrix$w_bar, 
+      w_sds = x$gamma$smooth.construct$model.matrix$w_sds)
+    attr(eta, "std_long") <- list(long_bar = rep(0, nmarker), 
+                                  long_sds = rep(1, nmarker))
+  } else {
+    attr(eta, "std_w") <- list(w_bar = 0, w_sds = 1)
+    attr(eta, "std_long") <- list(long_bar = rep(0, nmarker), 
+                                  long_sds = rep(1, nmarker))
+  }
+  
   eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu,
                                       nrow = nsubj*n_w, ncol = nmarker))
   eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
@@ -120,6 +134,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
   # Define here so data is available in the function environment
   # Used for updating nu / verbose 
   get_LogLik <- function(eta_timegrid, eta_T_mu, eta) {
+    
     
     eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj,
                                  ncol = nmarker))
@@ -229,7 +244,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
     }
     
     if (!alpha_update && max(c(eps0_surv, eps0_long)) < alpha.eps) {
-      alpha_update <- TRUE
+      alpha_update <- 1
       if (verbose) {
         cat("It ", iter, "-- Start Alpha Update", "\n") 
       }
@@ -237,6 +252,13 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
     if (opt_long) {
       ## (3) update alpha.
       if(alpha_update) {
+        if(alpha_update == 1 && std_surv) {
+          x_std <- matrix(eta_timegrid_mu, ncol = nmarker)
+          attr(eta, "std_long") <- list(
+            long_bar = colMeans(x_std),
+            long_sds = apply(x_std, 2, sd)
+          )
+        }
         if(length(x$alpha$smooth.construct)) {
           for(j in seq_along(x$alpha$smooth.construct)) {
             state <- update_mjm_alpha(x$alpha$smooth.construct[[j]], y = y, 
@@ -268,7 +290,8 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
               x$alpha$smooth.construct[[j]]$prior(state$parameters)
             LogLikUP <- get_LogLik(eta_timegridUP, eta_T_mu, etaUP)
             if (nocheck_logpost || 
-                LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD || iter == 0) {
+                LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD || 
+                alpha_update == 1) {
               LogPrioOLD <- LogPrioUP
               LogLikOLD <- LogLikUP
               eta_timegrid_alpha <- eta_timegrid_alphaUP
@@ -276,6 +299,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
               eta_timegrid <- eta_timegridUP
               eta$alpha <- etaUP$alpha
               x$alpha$smooth.construct[[j]]$state <- state
+              alpha_update <- alpha_update + 1
             } else {
               etaUP$alpha <- eta$alpha
             }
@@ -419,7 +443,8 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
   return(list("fitted.values" = eta, "parameters" = bamlss:::get.all.par(x),
               "logLik" = logLik, "logPost" = logPost,
               "hessian" = bamlss:::get.hessian(x),
-              "converged" = iter < maxit, 
+              "converged" = iter < maxit,
+              "scaling" = attr(eta, std_long),
               "par_trace" = if (par_trace) it_param else NULL,
               "coll" = if (coll) it_coll else NULL))
   

@@ -11,7 +11,9 @@ if(location %in% c("server_linux", "server_windows")){
   setwd(if (location == "server_linux") "~/H:/volkmana.hub/JMbamlss"
         else "H:/JMbamlss")
 }
-
+server_wd <- paste0("/run/user/1000/gvfs/smb-share:",
+                    "server=clapton.wiwi.hu-berlin.de,",
+                    "share=volkmana.hub/JMbamlss")
 
 # Always
 library(survival)
@@ -77,8 +79,9 @@ fm3 <- lme(SGOT ~ ns(obstime, df = 3) + sex, data = p_long_jmb,
 
 # the joint model that links all sub-models
 jointFit <- jm(CoxFit, list(fm1, fm2, fm3), time_var = "obstime",
-               n_iter = 12000L, n_burnin = 2000L, n_thin = 5L)
+               n_iter = 12000L, n_burnin = 2000L, n_thin = 5L, cores = 1)
 saveRDS(jointFit, file = "inst/objects/pbc_jmb_rirs.Rds")
+# jmb_rirs <- readRDS(file.path(server_wd, "inst/objects/pbc_jmb_rirs.Rds"))
 
 
 # Random Intercept - ns(slope) --------------------------------------------
@@ -95,5 +98,19 @@ fm3ns <- lme(SGOT ~ ns(obstime, df = 3) + sex, data = p_long_jmb,
 
 # the joint model that links all sub-models
 jointFit <- jm(CoxFit, list(fm1ns, fm2ns, fm3ns), time_var = "obstime",
-               n_iter = 12000L, n_burnin = 2000L, n_thin = 5L)
+               n_iter = 12000L, n_burnin = 2000L, n_thin = 5L, cores = 1)
 saveRDS(jointFit, file = "inst/objects/pbc_jmb_ns.Rds")
+# jmb_ns <- readRDS(file.path(server_wd, "inst/objects/pbc_jmb_ns.Rds"))
+
+
+# Plot the Baseline Hazard ------------------------------------------------
+
+# Necessary:
+eta_gamma <- drop(jmb_ns$model_data$W_h %*% 
+  summary(jmb_ns$mcmc$gammas)$statistics[, 1])
+eta_timegrid
+eta_timegrid_mu <- jmb_ns$model_data$X
+x_Xgrid <- model.matrix(~ -1 + as.factor(rep(1:3, each = 15*304)))
+weights
+survtime
+eta_T_long <- 

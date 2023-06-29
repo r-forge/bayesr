@@ -3,7 +3,7 @@
 
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
-                     nu_sampler = 1, verbose = FALSE, accthreshold = 0.1,
+                     nu_sampler = 1, verbose = FALSE, accthreshold = -1,
                      prop_list = NULL,# prop_update = NULL, 
                      ...)
 {

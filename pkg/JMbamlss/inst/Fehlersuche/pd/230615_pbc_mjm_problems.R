@@ -98,7 +98,7 @@ p_long <- JMbamlss:::attach_wfpc(mfpca_est, p_long, n = nfpc)
 
 f_est <- list(
   Surv2(survtime, event, obs = logy) ~ -1 + 
-    s(survtime, k = 20, bs = "ps", xt = list("scale" = FALSE)),
+    s(survtime, k = 10, bs = "ps", xt = list("scale" = FALSE)),
   gamma ~ 1 + age + sex,
   as.formula(paste0(
     "mu ~ -1 + marker + s(obstime, by = marker, xt = list('scale' = FALSE))",
@@ -134,7 +134,7 @@ acc(b_est)
 alpha <- sapply(b_est$model.stats$optimizer$par_trace, 
                 function(x) x$alpha$p)
 ggplot(data = data.frame(t(alpha)) %>%
-         mutate(it = 1:600) %>%
+         mutate(it = seq_len(ncol(alpha))) %>%
          pivot_longer(cols = -it),
        aes(x = it, y = value, col = name)) +
   geom_line() +

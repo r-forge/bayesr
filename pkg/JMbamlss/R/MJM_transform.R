@@ -2,7 +2,7 @@
 # MJM_transform -----------------------------------------------------------
 
 MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
-                          idvar = NULL, uni = FALSE, ...) {
+                          idvar = NULL, uni = FALSE, std_surv = TRUE, ...) {
   
   
   # Gaussian Quadrature
@@ -188,6 +188,19 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
         }
       }
     }
+  }
+  
+  # Standardize the survival covariates
+  if (std_surv) {
+    object$x$gamma$smooth.construct$model.matrix$w_bar <- 
+      colMeans(object$x$gamma$smooth.construct$model.matrix$X)[-1]
+    object$x$gamma$smooth.construct$model.matrix$w_sd <- 
+      apply(object$x$gamma$smooth.construct$model.matrix$X, 2, sd)[-1]
+    object$x$gamma$smooth.construct$model.matrix$X[, -1] <- scale(
+      object$x$gamma$smooth.construct$model.matrix$X[, -1],
+      center = object$x$gamma$smooth.construct$model.matrix$w_bar,
+      scale = object$x$gamma$smooth.construct$model.matrix$w_sd
+    )
   }
   
   ## Now linear part.
