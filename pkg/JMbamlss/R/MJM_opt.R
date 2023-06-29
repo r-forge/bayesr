@@ -444,7 +444,7 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
               "logLik" = logLik, "logPost" = logPost,
               "hessian" = bamlss:::get.hessian(x),
               "converged" = iter < maxit,
-              "scaling" = attr(eta, std_long),
+              "scaling" = attr(eta, "std_long"),
               "par_trace" = if (par_trace) it_param else NULL,
               "coll" = if (coll) it_coll else NULL))
   
