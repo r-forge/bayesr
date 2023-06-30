@@ -113,17 +113,23 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
   eta <- bamlss:::get.eta(x, expand = FALSE)
   
   # Standardizing the Survival design matrices
-  if (std_surv) {
-    attr(eta, "std_w") <- list(
-      w_bar = x$gamma$smooth.construct$model.matrix$w_bar, 
-      w_sds = x$gamma$smooth.construct$model.matrix$w_sds)
-    attr(eta, "std_long") <- list(long_bar = rep(0, nmarker), 
-                                  long_sds = rep(1, nmarker))
+  eta_timegrid_mu_unst <- eta_timegrid_mu
+  eta_T_mu_unst <- eta_T_mu
+  if (!is.null(start) && std_surv) {
+    x_std <- matrix(eta_timegrid_mu, ncol = nmarker)
+    long_bar <- colMeans(x_std)
+    long_sds <- apply(x_std, 2, sd)
   } else {
-    attr(eta, "std_w") <- list(w_bar = 0, w_sds = 1)
-    attr(eta, "std_long") <- list(long_bar = rep(0, nmarker), 
-                                  long_sds = rep(1, nmarker))
+    long_bar <- rep(0, nmarker) 
+    long_sds <- rep(1, nmarker)
   }
+  attr(eta, "std_long") <- list("long_bar" = long_bar, 
+                                "long_sds" = long_sds)
+  eta_timegrid_mu <- 
+    (eta_timegrid_mu_unst - rep(long_bar, each = nsubj * n_w)) /
+    rep(long_sds, each = nsubj * n_w)
+  eta_T_mu <- (eta_T_mu_unst - rep(long_bar, each = nsubj)) /
+    rep(long_sds, each = nsubj)
   
   eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu,
                                       nrow = nsubj*n_w, ncol = nmarker))
@@ -254,10 +260,19 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
       if(alpha_update) {
         if(alpha_update == 1 && std_surv) {
           x_std <- matrix(eta_timegrid_mu, ncol = nmarker)
+          long_bar <- colMeans(x_std)
+          long_sds <- apply(x_std, 2, sd)
           attr(eta, "std_long") <- list(
-            long_bar = colMeans(x_std),
-            long_sds = apply(x_std, 2, sd)
+            "long_bar" = long_bar,
+            "long_sds" = long_sds
           )
+          if(is.null(start)) {
+            eta_timegrid_mu <- 
+              (eta_timegrid_mu_unst - rep(long_bar, each = nsubj * n_w)) /
+              rep(long_sds, each = nsubj * n_w)
+            eta_T_mu <- (eta_T_mu_unst - rep(long_bar, each = nsubj)) /
+              rep(long_sds, each = nsubj)
+          }
         }
         if(length(x$alpha$smooth.construct)) {
           for(j in seq_along(x$alpha$smooth.construct)) {
@@ -318,23 +333,28 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
           state <- update_mjm_mu(x$mu$smooth.construct[[j]], y = y,
                                  eta = eta, eta_timegrid = eta_timegrid,
                                  eta_timegrid_lambda = eta_timegrid_lambda,
-                                 eta_timegrid_mu = eta_timegrid_mu,
+                                 eta_timegrid_mu_unst = eta_timegrid_mu_unst,
                                  eta_timegrid_alpha = eta_timegrid_alpha,
                                  eta_T_mu = eta_T_mu, survtime = survtime,
                                  get_LogLik = get_LogLik, update_nu = update_nu,
                                  update_tau = update_tau, edf = edf, ...)
           etaUP$mu <- eta$mu -
             drop(fitted(x$mu$smooth.construct[[j]]$state)) + fitted(state)
-          eta_timegrid_muUP <- eta_timegrid_mu -
+          eta_timegrid_mu_unstUP <- eta_timegrid_mu_unst -
             x$mu$smooth.construct[[j]]$state$fitted_timegrid +
             state$fitted_timegrid
+          eta_timegrid_muUP <- 
+            (eta_timegrid_mu_unstUP - rep(long_bar, each = nsubj * n_w)) /
+            rep(long_sds, each = nsubj * n_w)
           eta_timegrid_longUP <- rowSums(matrix(eta_timegrid_alpha * 
                                                 eta_timegrid_muUP, 
                                               nrow = nsubj*n_w, ncol = nmarker))
           eta_timegridUP <- eta_timegrid_lambda + eta_timegrid_longUP
-          eta_T_muUP <- eta_T_mu -
+          eta_T_mu_unstUP <- eta_T_mu_unst -
             x$mu$smooth.construct[[j]]$state$fitted_T +
             state$fitted_T
+          eta_T_muUP <-  (eta_T_mu_unst - rep(long_bar, each = nsubj)) /
+            rep(long_sds, each = nsubj)
           
           # Check for update
           LogPrioUP <- LogPrioOLD -
@@ -346,9 +366,11 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
               LogPrioUP + LogLikUP > LogPrioOLD + LogLikOLD || iter == 0) {
             LogPrioOLD <- LogPrioUP
             LogLikOLD <- LogLikUP
+            eta_timegrid_mu_unst <- eta_timegrid_mu_unstUP
             eta_timegrid_mu <- eta_timegrid_muUP
             eta_timegrid_long <- eta_timegrid_longUP
             eta_timegrid <- eta_timegridUP
+            eta_T_mu_unst <- eta_T_mu_unstUP
             eta_T_mu <- eta_T_muUP
             eta$mu <- etaUP$mu
             x$mu$smooth.construct[[j]]$state <- state

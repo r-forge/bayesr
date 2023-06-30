@@ -395,9 +395,9 @@ update_mjm_alpha <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
 
 
 update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
-                          eta_timegrid_alpha, eta_timegrid_mu, eta_T_mu,
-                          survtime, update_nu, get_LogLik, update_tau, edf, 
-                          ...) {
+                          eta_timegrid_alpha, eta_timegrid_mu_unst,
+                          eta_T_mu_unst, survtime, update_nu, get_LogLik, 
+                          update_tau, edf, ...) {
   
   b <- bamlss::get.state(x, "b")
   b_p <- length(b)
@@ -408,19 +408,19 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   n_w <- length(attr(y, "gq_weights"))
   nu <- x$nu
   eta_bar <- attr(eta, "std_long")$long_bar
-  eta_std <- attr(eta, "std_long")$long_sds
+  eta_sds <- attr(eta, "std_long")$long_sds
   
   if (any(class(x) == "unc_pcre.random.effect")) {
     int_i <- survint_C(pred = "fpc_re", pre_fac = exp(eta$gamma),
                        omega = exp(eta_timegrid),
                        int_fac = eta_timegrid_alpha /
-                         rep(eta_std, each = nsubj*n_w),
+                         rep(eta_sds, each = nsubj*n_w),
                        int_vec = x$Xgrid,
                        weights = attr(y, "gq_weights"),
                        survtime = survtime)
     x_score0 <- drop(
       crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-        crossprod(delta * x$XT, eta$alpha / rep(eta_std, each = nsubj))) - 
+        crossprod(delta * x$XT, eta$alpha / rep(eta_sds, each = nsubj))) - 
       int_i$score_int
     x_H0 <- diag(psi_mat_crossprod(Psi = x, R = 1 / exp(eta$sigma)^2) +
                   int_i$hess_int)
@@ -428,12 +428,12 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
     int_i <- survint_C(pred = "long", pre_fac = exp(eta$gamma),
                        omega = exp(eta_timegrid),
                        int_fac = eta_timegrid_alpha /
-                         rep(eta_std, each = nsubj*n_w), int_vec = x$Xgrid,
+                         rep(eta_sds, each = nsubj*n_w), int_vec = x$Xgrid,
                        weights = attr(y, "gq_weights"),
                        survtime = survtime)
     x_score0 <- drop(
       crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2)  + 
-        crossprod(delta * x$XT, eta$alpha / rep(eta_std, each = nsubj))) -
+        crossprod(delta * x$XT, eta$alpha / rep(eta_sds, each = nsubj))) -
       int_i$score_int
     x_H0 <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
       matrix(int_i$hess_int, ncol = b_p)
@@ -466,14 +466,19 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
           fitted_timegrid <- drop(x$Xgrid %*% b2)
           fitted_T <- drop(x$XT %*% b)
           eta$mu <- eta$mu - fitted(x$state) + fit
-          eta_timegrid_mu <- eta_timegrid_mu -
+          eta_timegrid_mu_unst <- eta_timegrid_mu_unst -
             x$state$fitted_timegrid + fitted_timegrid
+          eta_timegrid_mu <- 
+            (eta_timegrid_mu_unst - rep(eta_bar, each = nsubj*n_w)) /
+            rep(eta_sds, each = nsubj*n_w)
           eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha *
                                                 eta_timegrid_mu,
                                               nrow = nsubj*n_w,
                                               ncol = nmarker))
           eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
-          eta_T_mu <- eta_T_mu - x$state$fitted_T + fitted_T
+          eta_T_mu_unst <- eta_T_mu_unst - x$state$fitted_T + fitted_T
+          eta_T_mu <- (eta_T_mu_unst - rep(eta_bar, each = nsubj)) /
+            rep(eta_sds, each = nsubj)
           LogPost <- get_LogLik(eta_timegrid, eta_T_mu, eta) + x$prior(par)
           return(-1 * LogPost)
         }
@@ -489,14 +494,19 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
       fitted_timegrid <- drop(x$Xgrid %*% b2)
       fitted_T <- drop(x$XT %*% b)
       eta$mu <- eta$mu - fitted(x$state) + fit
-      eta_timegrid_mu <- eta_timegrid_mu -
+      eta_timegrid_mu_unst <- eta_timegrid_mu_unst -
         x$state$fitted_timegrid + fitted_timegrid
+      eta_timegrid_mu <-  
+        (eta_timegrid_mu_unst - rep(eta_bar, each = nsubj*n_w)) /
+        rep(eta_sds, each = nsubj*n_w)
       eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha *
                                             eta_timegrid_mu,
                                           nrow = nsubj*n_w,
                                           ncol = nmarker))
       eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
-      eta_T_mu <- eta_T_mu - x$state$fitted_T + fitted_T
+      eta_T_mu_unst <- eta_T_mu_unst - x$state$fitted_T + fitted_T
+      eta_T_mu <- (eta_T_mu_unst - rep(eta_bar, each = nsubj)) /
+        rep(eta_sds, each = nsubj)
       edf1 <- if (any(class(x) == "unc_pcre.random.effect")) {
         sum(diag(x_H0) * diag(Sigma))
       } else {
@@ -553,14 +563,19 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
       fitted_timegrid <- drop(x$Xgrid %*% b2)
       fitted_T <- drop(x$XT %*% b)
       eta$mu <- eta$mu - fitted(x$state) + fit
-      eta_timegrid_mu <- eta_timegrid_mu -
+      eta_timegrid_mu_unst <- eta_timegrid_mu_unst -
         x$state$fitted_timegrid + fitted_timegrid
+      eta_timegrid_mu <-  
+        (eta_timegrid_mu_unst - rep(eta_bar, each = nsubj*n_w)) /
+        rep(eta_sds, each = nsubj*n_w)
       eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha *
                                             eta_timegrid_mu,
                                           nrow = nsubj*n_w,
                                           ncol = nmarker))
       eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
-      eta_T_mu <- eta_T_mu - x$state$fitted_T + fitted_T
+      eta_T_mu_unst <- eta_T_mu_unst - x$state$fitted_T + fitted_T
+      eta_T_mu <- (eta_T_mu_unst - rep(eta_bar, each = nsubj)) /
+        rep(eta_sds, each = nsubj)
       LogPost <- get_LogLik(eta_timegrid, eta_T_mu, eta) + x$prior(par)
       return(-1 * LogPost)
     }
@@ -572,12 +587,9 @@ update_mjm_mu <- function(x, y, eta, eta_timegrid, eta_timegrid_lambda,
   }
   
   x$state$parameters[seq_len(b_p)] <- b
-  x$state$fitted_timegrid <- (drop(x$Xgrid %*% b) -
-                                rep(eta_bar, each = nsubj*n_w)) / 
-                                rep(eta_std, each = nsubj*n_w) 
+  x$state$fitted_timegrid <- drop(x$Xgrid %*% b) 
   x$state$fitted.values <- drop(x$X %*% b)
-  x$state$fitted_T <- (drop(x$XT %*% b) - rep(eta_bar, each = nsubj)) /
-    rep(eta_std, each = nsubj)
+  x$state$fitted_T <- drop(x$XT %*% b)
   x$state$hessian <- x_H
   x$state$edf <- bamlss:::sum_diag(x_H0 %*% Sigma)
   
