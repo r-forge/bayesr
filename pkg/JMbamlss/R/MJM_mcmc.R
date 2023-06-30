@@ -4,7 +4,7 @@
 MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                      n.iter = 1200, burnin = 200, thin = 1, step = 20, 
                      nu_sampler = 1, verbose = FALSE, accthreshold = -1,
-                     prop_list = NULL,# prop_update = NULL, 
+                     prop_list = NULL, std_surv = TRUE, 
                      ...)
 {
 ########## REMOVE prop_pred
@@ -62,7 +62,9 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
   ## predictors based on the time grid.
   # mu
   eta_timegrid_mu <- 0
+  eta_timegrid_mu_unst <- 0
   eta_T_mu <- 0
+  eta_T_mu_unst <- 0
   if(length(x$mu$smooth.construct)) {
     for(j in names(x$mu$smooth.construct)) {
       b <- get.par(x$mu$smooth.construct[[j]]$state$parameters, "b")
@@ -70,11 +72,30 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
         drop(x$mu$smooth.construct[[j]]$Xgrid %*% b)
       x$mu$smooth.construct[[j]]$state$fitted_T <- 
         drop(x$mu$smooth.construct[[j]]$XT %*% b)
-      eta_timegrid_mu <- eta_timegrid_mu + 
+      eta_timegrid_mu_unst <- eta_timegrid_mu_unst + 
         x$mu$smooth.construct[[j]]$state$fitted_timegrid
-      eta_T_mu <- eta_T_mu + x$mu$smooth.construct[[j]]$state$fitted_T
+      eta_T_mu_unst <- eta_T_mu_unst + x$mu$smooth.construct[[j]]$state$fitted_T
     }
   }
+  # Calculate standardization constants
+  if (std_surv) {
+    x_std <- matrix(eta_timegrid_mu_unst, ncol = nmarker)
+    long_bar <- colMeans(x_std)
+    long_sds <- apply(x_std, 2, sd)
+  } else {
+    long_bar <- rep(0, nmarker)
+    long_sds <- rep(1, nmarker)
+  }
+  attr(eta, "std_long") <- list(
+    "long_bar" = long_bar,
+    "long_sds" = long_sds
+  )
+  eta_timegrid_mu <- 
+    (eta_timegrid_mu_unst - rep(long_bar, each = nsubj * nw)) /
+    rep(long_sds, each = nsubj * nw)
+  eta_T_mu <- (eta_T_mu_unst - rep(long_bar, each = nsubj)) /
+    rep(long_sds, each = nsubj)
+  
   # alpha
   eta_timegrid_alpha <- 0
   if(length(x$alpha$smooth.construct)) {
@@ -187,8 +208,10 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                                x = x[[i]]$smooth.construct[[j]], y = y,
                                eta = eta, eta_timegrid = eta_timegrid,
                                eta_T = eta_T, eta_T_mu = eta_T_mu,
+                               eta_T_mu_unst = eta_T_mu_unst,
                                eta_timegrid_alpha = eta_timegrid_alpha,
-                               eta_timegrid_mu = eta_timegrid_mu, 
+                               eta_timegrid_mu_unst = eta_timegrid_mu_unst,
+                               eta_timegrid_mu = eta_timegrid_mu,
                                eta_timegrid_long = eta_timegrid_long,
                                eta_timegrid_lambda = eta_timegrid_lambda,
                                survtime = survtime, logLik_old = logLik_old, 
@@ -244,9 +267,11 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
           }, "mu" = {
             eta_T <- p_state$etas$eta_T
             eta_T_mu <- p_state$etas$eta_T_mu
+            eta_T_mu_unst <- p_state$etas$eta_T_mu_unst
             eta_timegrid <- p_state$etas$eta_timegrid
             eta_timegrid_long <- p_state$etas$eta_timegrid_long
             eta_timegrid_mu <- p_state$etas$eta_timegrid_mu
+            eta_timegrid_mu_unst <- p_state$etas$eta_timegrid_mu_unst
           })
           eta <- p_state$etas$eta
           

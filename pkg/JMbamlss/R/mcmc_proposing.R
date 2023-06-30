@@ -2,7 +2,8 @@
 # Proposals for all predictors --------------------------------------------
 
 propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
-                        eta_timegrid_alpha, eta_timegrid_mu, eta_timegrid_long,
+                        eta_T_mu_unst, eta_timegrid_alpha, eta_timegrid_mu_unst, 
+                        eta_timegrid_mu, eta_timegrid_long,
                         eta_timegrid_lambda, survtime, logLik_old, nsubj, 
                         gq_weights, status, nmarker, verbose_sampler,
                         prop#, prop_dens
@@ -51,6 +52,9 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
   }
   
   n_w <- length(gq_weights)
+  nsubj <- attr(y, "nsubj")
+  long_bar <- attr(eta, "std_long")$long_bar
+  long_sds <- attr(eta, "std_long")$long_sds
   
   # Get old parameters
   b_old <- bamlss::get.state(x, "b")
@@ -93,19 +97,25 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
            "mu" = {
              int_i <- survint_C(pred = pred_l, pre_fac = exp(eta$gamma),
                                 omega = exp(eta_timegrid),
-                                int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                                int_fac = eta_timegrid_alpha /
+                                  rep(long_sds, each = nsubj*n_w),
+                                int_vec = x$Xgrid,
                                 weights = gq_weights, survtime = survtime)
              if (pred_l == "fpc_re") {
                x_score <- drop(
                  crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2) + 
-                   crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
+                   crossprod(delta * x$XT, eta$alpha /
+                               rep(long_sds, each = nsubj))) -
+                 int_i$score_int
                x_H <- diag(psi_mat_crossprod(Psi = x, 
                                              R = 1 / exp(eta$sigma)^2) + 
                              int_i$hess_int)
              } else {
                x_score <- drop(
                  crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2) + 
-                   crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
+                   crossprod(delta * x$XT, eta$alpha / 
+                               rep(long_sds, each = nsubj))) - 
+                 int_i$score_int
                x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
                  matrix(int_i$hess_int, ncol = length(b_old))
              }
@@ -215,8 +225,11 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
      
       # timegrids
       fitted_timegrid_prop <- drop(x$Xgrid %*% b_prop)
-      eta_timegrid_mu <- eta_timegrid_mu - x$state$fitted_timegrid + 
-       fitted_timegrid_prop
+      eta_timegrid_mu_unst <- eta_timegrid_mu_unst - x$state$fitted_timegrid + 
+        fitted_timegrid_prop
+      eta_timegrid_mu <- 
+        (eta_timegrid_mu_unst - rep(long_bar, each = nsubj * n_w)) /
+        rep(long_sds, each = nsubj * n_w)
       eta_timegrid_long <- rowSums(matrix(eta_timegrid_alpha*eta_timegrid_mu,
                                           nrow = nsubj*n_w, ncol = nmarker))
       eta_timegrid <- eta_timegrid_lambda + eta_timegrid_long
@@ -227,7 +240,9 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       
       # fitted survival values
       fit_T_prop <- drop(x$XT %*% b_prop)
-      eta_T_mu <- eta_T_mu - x$state$fitted_T + fit_T_prop
+      eta_T_mu_unst <- eta_T_mu_unst - x$state$fitted_T + fit_T_prop
+      eta_T_mu <-  (eta_T_mu_unst - rep(long_bar, each = nsubj)) /
+        rep(long_sds, each = nsubj)
       eta_T_long <- rowSums(matrix(eta$alpha*eta_T_mu, nrow = nsubj, 
                                    ncol = nmarker))
       eta_T <- eta$lambda + eta$gamma + eta_T_long
@@ -285,19 +300,23 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
            "mu" = {
              int_i <- survint_C(pred = pred_l, pre_fac = exp(eta$gamma),
                                 omega = exp(eta_timegrid),
-                                int_fac = eta_timegrid_alpha, int_vec = x$Xgrid,
+                                int_fac = eta_timegrid_alpha /
+                                  rep(long_sds, each = nsubj*n_w), 
+                                int_vec = x$Xgrid,
                                 weights = gq_weights, survtime = survtime)
              if (pred_l == "fpc_re") {
                x_score <- drop(
                  crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2) + 
-                   crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
+                   crossprod(delta * x$XT, eta$alpha / 
+                               rep(long_sds, each = nsubj))) - int_i$score_int
                x_H <- diag(psi_mat_crossprod(Psi = x, 
                                              R = 1 / exp(eta$sigma)^2) + 
                              int_i$hess_int)
              } else {
                x_score <- drop(
                  crossprod(x$X, (y[[1]][, "obs"] - eta$mu) / exp(eta$sigma)^2) + 
-                   crossprod(delta * x$XT, eta$alpha)) - int_i$score_int
+                   crossprod(delta * x$XT, eta$alpha / 
+                               rep(long_sds, each = nsubj))) - int_i$score_int
                x_H <- crossprod(x$X * (1 / exp(eta$sigma)^2), x$X) +
                  matrix(int_i$hess_int, ncol = length(b_old))
              }
@@ -380,10 +399,13 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                              eta_timegrid_alpha),
                             "mu" = list(eta = eta, eta_T = eta_T, 
                                         eta_T_mu = eta_T_mu,
+                                        eta_T_mu_unst = eta_T_mu_unst,
                                         eta_timegrid = eta_timegrid,
                                         eta_timegrid_long = 
                                           eta_timegrid_long,
-                                        eta_timegrid_mu = eta_timegrid_mu),
+                                        eta_timegrid_mu = eta_timegrid_mu,
+                                        eta_timegrid_mu_unst = 
+                                          eta_timegrid_mu_unst),
                             "sigma" = list(eta = eta)),
               logLik = logLik
               # ,prop_dens = list(list("mu" = mu_prop, "Sigma" = Sigma_prop),
