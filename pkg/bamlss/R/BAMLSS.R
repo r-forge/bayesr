@@ -12240,7 +12240,7 @@ GramSchmidt <- function(X) {
   ref2 <- "Umlauf N, Klein N, Zeileis A (2018). BAMLSS: Bayesian Additive Models for Location, Scale and Shape (and Beyond). Journal of Computational and Graphical Statistics, 27(3):612-627. https://doi.org/10.1080/10618600.2017.1407325"
 
   packageStartupMessage("--")
-  packageStartupMessage(paste("More information can be found at",  packageDescription("bamlss")$URL))
+  packageStartupMessage(paste("More information can be found at http://www.bamlss.org/"))
   packageStartupMessage("--")
   packageStartupMessage("Please cite as:")
   packageStartupMessage("-")
