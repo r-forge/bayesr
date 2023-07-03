@@ -12235,8 +12235,8 @@ GramSchmidt <- function(X) {
 
 
 .onAttach <- function(...) {
-  ref1 <- "Umlauf N., Klein N and Zeileis A. (2018). BAMLSS: Bayesian Additive Models for Location, Scale and Shape (and Beyond). Journal of Computational and Graphical Statistics, 27(3):612-627. URL: https://www.tandfonline.com/doi/full/10.1080/10618600.2017.1407325"
-  ref2 <- "Umlauf N., Klein N., Simon T. and Zeileis A. (2021). bamlss: A Lego Toolbox for Flexible Bayesian Regression (and Beyond). Journal of Statistical Software, 100(4):1-53. URL: https://www.jstatsoft.org/article/view/v100i04"
+  ref2 <- "Umlauf N., Klein N and Zeileis A. (2018). BAMLSS: Bayesian Additive Models for Location, Scale and Shape (and Beyond). Journal of Computational and Graphical Statistics, 27(3):612-627. doi:10.1080/10618600.2017.1407325"
+  ref1 <- "Umlauf N., Klein N., Simon T. and Zeileis A. (2021). bamlss: A Lego Toolbox for Flexible Bayesian Regression (and Beyond). Journal of Statistical Software, 100(4):1-53. doi:10.18637/jss.v100.i04"
 
   packageStartupMessage("--")
   packageStartupMessage(paste("More information can be found at",  packageDescription("bamlss")$URL))
