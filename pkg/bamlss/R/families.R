@@ -4045,6 +4045,18 @@ ztnbinom_bamlss <- function(...) {
   rval
 }
 
+
+RPS <- function(y, par, pfun, ymin = 1L, ymax = max(max(y), 100L)) {
+  K <- seq(ymin, ymax, by = 1L)
+  rps <- rep(0, length(y))
+  for (k in K) {
+    P <- pfun(k, par)
+    O <- y <= k
+    rps <- rps + (P - O)^2
+  }
+  return(rps)
+}
+
 ztnbinomVAR_bamlss <- function(...) {
 ### Zero-truncated neg bin with alternative parameterization
 ###   gamma models the VAR of the un-truncated neg-bin, and replaces theta

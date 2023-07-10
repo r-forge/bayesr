@@ -3812,9 +3812,13 @@ print.boost_summary <- function(x, summary = TRUE, plot = TRUE,
           dthres <- 0.02
         for(i in 1:(length(plab) - 1)) {
           dp <- abs(plab[i] - plab[i + 1]) / rplab
-          if(dp <= dthres) {
-            labs[i + 1] <- paste(c(labs[i], labs[i + 1]), collapse = ",")
-            labs[i] <- ""
+          if(length(dp)) {
+            if(!is.na(dp)) {
+              if(dp <= dthres) {
+                labs[i + 1] <- paste(c(labs[i], labs[i + 1]), collapse = ",")
+                labs[i] <- ""
+              }
+            }
           }
         }
         labs <- labs[order(o)]
@@ -5972,6 +5976,11 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
   tau2f <- rep(1, length(nx))
   names(tau2f) <- nx
 
+  batch_type <- list(...)$batch_type
+  if(is.null(batch_type))
+    batch_type <- "classic"
+  batch_type <- c("classic", "same", "random")[pmatch(tolower(batch_type), c("classic", "same", "random"))]
+
   iter <- 1L
 
   ptm <- proc.time()
@@ -6003,10 +6012,18 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
       if(!srandom) {
         if(length(batch[[bid]]) > 2) {
           take <- batch[[bid]]
-          take2 <- if(bid < 2) {
-            batch[[bid + 1L]]
-          } else {
-            batch[[bid - 1L]]
+          if(batch_type == "classic") {
+            take2 <- if(bid < 2) {
+              batch[[bid + 1L]]
+            } else {
+              batch[[bid - 1L]]
+            }
+          }
+          if(batch_type == "same") {
+            take2 <- take
+          }
+          if(batch_type == "random") {
+            take2 <- batch[[sample(bind[bind != bid], size = 1)]]
           }
         } else {
           take <- batch[[bid]][1L]:batch[[bid]][2L]
