@@ -336,6 +336,19 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                  "DIC" = rep(DIC, length.out = nrow(samps)),
                  "pd" = rep(pd, length.out = nrow(samps))
   )
+  if (std_surv) {
+    samps <- cbind(samps,
+                   matrix(rep(long_bar, each = nrow(samps)),
+                          ncol = length(long_bar), 
+                          dimnames = list(
+                            NULL, 
+                            paste0("long_barM", seq_along(long_bar)))),
+                   matrix(rep(long_sds, each = nrow(samps)),
+                          ncol = length(long_sds), 
+                          dimnames = list(
+                            NULL, 
+                            paste0("long_sdsM", seq_along(long_sds)))))
+  }
   samps[is.na(samps)] <- 0
   
   

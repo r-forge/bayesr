@@ -1,4 +1,11 @@
 ## Prediction.
+#' Prediction of MJM model
+#' 
+#' Note: Writing a predict function is a bit tricky.
+#' For longitudinal prediction, if subject specific predictions are wanted, then
+#' the PCRE terms must be attached to newdata and already evaluated.
+#' If the model uses standardized survival matrices, the different linear 
+#' predictors should be predicted using different data sets.
 MJM_predict <- function(object, newdata,
                         type = c("link", "parameter", "probabilities", 
                                  "cumhaz"),
@@ -15,6 +22,13 @@ MJM_predict <- function(object, newdata,
   nmarker <- attr(object$y, "nmarker")
   marker_levels <- levels(attr(object$y, "marker"))
   timevar_mu <- attr(object$y, "timevar")["mu"]
+  
+  # # Check whether standardization of survival design matrices happened
+  # std_surv <- !is.null(object$std_surv)
+  # if (std_surv) {
+  #   warning("Standardization of Survival Design Matrices used for model fit.",
+  #           "\n -> Predict Function does not include this.")
+  # }
   
   if(length(type) > 1)
     type <- type[1]

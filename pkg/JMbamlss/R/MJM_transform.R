@@ -201,6 +201,9 @@ MJM_transform <- function(object, subdivisions = 7, timevar = NULL, tau = NULL,
       center = object$x$gamma$smooth.construct$model.matrix$w_bar,
       scale = object$x$gamma$smooth.construct$model.matrix$w_sd
     )
+    object$std_surv <- TRUE
+  } else {
+    object$std_surv <- NULL
   }
   
   ## Now linear part.

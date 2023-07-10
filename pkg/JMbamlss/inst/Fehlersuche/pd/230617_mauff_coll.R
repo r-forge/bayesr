@@ -98,10 +98,22 @@ f_tru <- list(
   alpha ~ -1 + marker
 )
 
+# # Cap the survival times at the maximum observation times
+# max_obstime <- max(d_rirs_tru$year)
+# d_rirs_tru <- d_rirs_tru %>%
+#   mutate(Time = ifelse(Time > max_obstime, max_obstime, Time))
+
+
 # Use it with new add-on that Score and Hesse are also returned
+set.seed(1432)
 b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
-                timevar = "year", maxit = 1500, sampler = FALSE,
-                verbose = TRUE, coll = TRUE, par_trace = TRUE)
+                timevar = "year", verbose = TRUE, sampler = FALSE,
+                maxit = 800, std_surv = TRUE, par_trace = TRUE)
+set.seed(1213)
+b_new <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru,
+                timevar = "year", verbose = TRUE, optimizer = FALSE,
+                start = parameters(b_est))
+
 # Full model (nfpc = 12) crashes at iteration 541 (alpha starts at 219)
 
 

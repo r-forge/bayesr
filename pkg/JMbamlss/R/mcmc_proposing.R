@@ -222,11 +222,13 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
       
     },
     "mu" = {
-     
       # timegrids
       fitted_timegrid_prop <- drop(x$Xgrid %*% b_prop)
       eta_timegrid_mu_unst <- eta_timegrid_mu_unst - x$state$fitted_timegrid + 
         fitted_timegrid_prop
+      # x_std <- matrix(eta_timegrid_mu_unst, ncol = nmarker)
+      # long_bar <- colMeans(x_std)
+      # long_sds <- apply(x_std, 2, sd)
       eta_timegrid_mu <- 
         (eta_timegrid_mu_unst - rep(long_bar, each = nsubj * n_w)) /
         rep(long_sds, each = nsubj * n_w)
@@ -384,6 +386,11 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
         "PriO:", p_old, "PriN:", p_prop, "Alph:", exp(x$state$alpha), "\n")
   }
   
+  # attr(eta, "std_long") <- list(
+  #   "long_bar" = long_bar,
+  #   "long_sds" = long_sds
+  # )
+  
   return(list(xstate = x$state,
               etas = switch(predictor,
                             "lambda" = list(eta = eta, eta_T = eta_T, 
@@ -406,6 +413,8 @@ propose_mjm <- function(predictor, x, y, eta, eta_timegrid, eta_T, eta_T_mu,
                                         eta_timegrid_mu = eta_timegrid_mu,
                                         eta_timegrid_mu_unst = 
                                           eta_timegrid_mu_unst),
+                                        # long_bar = long_bar, 
+                                        # long_sds = long_sds),
                             "sigma" = list(eta = eta)),
               logLik = logLik
               # ,prop_dens = list(list("mu" = mu_prop, "Sigma" = Sigma_prop),

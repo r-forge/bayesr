@@ -109,6 +109,8 @@ Predict.matrix.unc_pcre.random.effect <- function(object, data){
   
   if(ncol(X) != (length(object$term) - 2))
     stop("check M argument in MFPCA()!")
+  if(any(is.na(X)))
+    stop("Problems in FPC. Maybe survtime > max(obstime)?")
   X <- data.frame(data[[object$term[1]]], X)
   colnames(X) <- object$term[-length(object$term)]
   

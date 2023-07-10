@@ -2,7 +2,7 @@
 
 # Optimizer for MJM -------------------------------------------------------
 
-MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100, 
+MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 1500, 
                     nu = c("lambda" = 0.1, "gamma" = 0.1, "mu" = 1, 
                            "sigma" = 1, "alpha" = 1),
                     opt_long = TRUE, alpha.eps = 0.001, par_trace = FALSE,
@@ -12,7 +12,6 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 100,
   
   if(!is.null(start))
     x <- bamlss:::set.starting.values(x, start)
-  
   nsubj <- attr(y, "nsubj")
   gq_weights <- attr(y, "gq_weights")
   n_w <- length(gq_weights)

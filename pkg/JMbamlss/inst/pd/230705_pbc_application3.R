@@ -117,57 +117,170 @@ f_est <- list(
 )
 
 # Model fit
-
 set.seed(1604)
 b_opt_uns <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
-                timevar = "obstime", maxit = 1500, verbose = TRUE,
-                par_trace = TRUE, accthreshold = -1, sampler = FALSE,
-                std_surv = FALSE)
+                timevar = "obstime", maxit = 1500, verbose = FALSE,
+                par_trace = TRUE, sampler = FALSE, std_surv = FALSE)
 b_opt_std <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
-                timevar = "obstime", maxit = 1500, verbose = TRUE,
-                par_trace = TRUE, accthreshold = -1, sampler = FALSE,
-                std_surv = TRUE)
+                timevar = "obstime", maxit = 1500, verbose = FALSE,
+                par_trace = TRUE, sampler = FALSE, std_surv = TRUE)
 set.seed(1213)
 b_sam_uns <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
                     timevar = "obstime", verbose = FALSE, optimizer = FALSE,
-                    start = parameters(b_opt), std_surv = FALSE)
+                    start = parameters(b_opt_uns), std_surv = FALSE)
 set.seed(1213)
 b_sam_std <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
                     timevar = "obstime", verbose = FALSE, optimizer = FALSE,
-                    start = parameters(b_std), std_surv = TRUE)
-# saved on clapton in JMbamlss/inst/objects/230615_pbc_est.Rdata
+                    start = parameters(b_opt_std), std_surv = TRUE)
 
-b_est <- readRDS(file.path(server_wd, "JMbamlss/inst/objects",
-                           "230615_pbc_est.Rds"))
+save(b_opt_uns, b_opt_std, b_sam_uns, b_sam_std, 
+     file = file.path(server_wd, "JMbamlss/inst/objects/230705_pbc.Rdata"))
 
-set.seed(1112)
-b_nostd <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
-                  timevar = "obstime", maxit = 1500, verbose = TRUE,
-                  std_surv = FALSE)
-set.seed(1112)
-b_std <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
-                timevar = "obstime", maxit = 1500, verbose = TRUE,
-                std_surv = TRUE)
+
+
+
 
 # Evaluate Model ----------------------------------------------------------
 
+# Optimizer only converges for std
+b_opt_uns$model.stats$optimizer$converged
+b_opt_std$model.stats$optimizer$converged
+
+
 
 # Acceptance probabilities
-acc(b_est)
-# xtable::xtable(acc(b_est))
+acc(b_sam_uns)
+acc(b_sam_std)
+# xtable::xtable(acc(b_std))
+
+
 
 # Trace plot of updating the alpha parameter
-alpha <- sapply(b_est$model.stats$optimizer$par_trace, 
+alpha_uns <- sapply(b_opt_uns$model.stats$optimizer$par_trace, 
                 function(x) x$alpha$p)
-ggplot(data = data.frame(t(alpha)) %>%
-         mutate(it = seq_len(ncol(alpha))) %>%
+alpha_std <- sapply(b_opt_std$model.stats$optimizer$par_trace, 
+                    function(x) x$alpha$p)
+ggplot(data = data.frame(t(alpha_uns)) %>%
+         mutate(it = seq_len(ncol(alpha_uns))) %>%
          pivot_longer(cols = -it),
        aes(x = it, y = value, col = name)) +
   geom_line() +
   geom_vline(xintercept = 190, linetype = "dotted") +
   theme_bw() +
   labs(x = "Iteration", y =  "Estimate", col = NULL) +
-  ggtitle("Alpha Parameters")
+  ggtitle("Alpha Parameters (Unstandardized Survival Matrices)")
+ggplot(data = data.frame(t(alpha_std)) %>%
+         mutate(it = seq_len(ncol(alpha_std))) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 190, linetype = "dotted") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Alpha Parameters (Standardized Survival Matrices)")
+
+
+# Trace Plots of alpha parameters
+plot(b_sam_uns, model = "alpha", which = "samples", ask = FALSE)
+plot(b_sam_std, model = "alpha", which = "samples", ask = FALSE)
+
+
+
+# Compare estimates of alpha and gamma intercept
+alpha_std <- summary(b_sam_std$samples[[1]][, 
+    grep("alpha\\.", colnames(b_sam_std$samples[[1]]))]
+  )$statistics[1:3, 1]
+alpha_uns <- summary(b_sam_uns$samples[[1]][, 
+    grep("alpha\\.", colnames(b_sam_uns$samples[[1]]))]
+  )$statistics[1:3, 1]
+gamma_std <- summary(b_sam_std$samples[[1]][, 
+    grep("gamma\\.", colnames(b_sam_std$samples[[1]]))]
+  )$statistics[1:3, 1]
+gamma_uns <- summary(b_sam_uns$samples[[1]][, 
+    grep("gamma\\.", colnames(b_sam_uns$samples[[1]]))]
+  )$statistics[1:3, 1]
+
+long_sds <- b_sam_std$samples[[1]][1, 1627:1629]
+long_bar <- b_sam_std$samples[[1]][1, 1624:1626]
+gamma_sds <- b_sam_std$x$gamma$smooth.construct$model.matrix$w_sd
+gamma_bar <- b_sam_std$x$gamma$smooth.construct$model.matrix$w_bar
+
+alpha_uns
+alpha_std / long_sds
+
+gamma_uns
+c(gamma_std[1] - sum(gamma_std[2:3] * gamma_bar / gamma_sds) -
+  sum(alpha_std *long_bar / long_sds), gamma_std[2:3] / gamma_sds)
+
+
+
+# Compare fitted values for survival part
+newdat <- b_sam_std$model.frame %>%
+  group_by(id) %>%
+  slice(1) %>%
+  mutate(obstime = survtime) %>%
+  select(!(fpc.1:fpc.5)) %>%
+  ungroup() %>%
+  as.data.frame()
+newdat_std <- newdat %>%
+  mutate(age = (age - gamma_bar[1]) / gamma_sds[1],
+         sex = (as.numeric(sex) - gamma_bar[2]) / gamma_sds[2])
+
+mcmc_lambda_std <- as.matrix(predict(b_sam_std, newdat, model = "lambda", 
+                                     FUN = function(x) {x}))
+mcmc_gamma_std <- as.matrix(predict(b_sam_std, newdat_std, model="gamma",
+                                    FUN = function(x) {x}))
+mcmc_lambga_std <- mcmc_gamma_std + mcmc_lambda_std
+
+mcmc_lambda_uns <- as.matrix(predict(b_sam_uns, newdat, model = "lambda", 
+                                     FUN = function(x) {x}))
+mcmc_gamma_uns <- as.matrix(predict(b_sam_uns, newdat, model="gamma",
+                                    FUN = function(x) {x}))
+mcmc_lambga_uns <- mcmc_gamma_uns + mcmc_lambda_uns
+# Hier fehlen noch die longitudinalen!
+
+
+
+
+# Trace plot of updating the gamma parameter
+gamma_uns <- sapply(b_opt_uns$model.stats$optimizer$par_trace, 
+                    function(x) x$gamma$p)
+gamma_std <- sapply(b_opt_std$model.stats$optimizer$par_trace, 
+                    function(x) x$gamma$p)
+ggplot(data = data.frame(t(gamma_uns)) %>%
+         mutate(it = seq_len(ncol(gamma_uns))) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 190, linetype = "dotted") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Gamma Parameters (Unstandardized Survival Matrices)")
+ggplot(data = data.frame(t(gamma_std)) %>%
+         mutate(it = seq_len(ncol(gamma_std))) %>%
+         pivot_longer(cols = -it),
+       aes(x = it, y = value, col = name)) +
+  geom_line() +
+  geom_vline(xintercept = 190, linetype = "dotted") +
+  theme_bw() +
+  labs(x = "Iteration", y =  "Estimate", col = NULL) +
+  ggtitle("Gamma Parameters (Standardized Survival Matrices)")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Variance estimates
 fpc1 <- grep("\\(id,fpc\\.1\\)", colnames(b_est$samples[[1]]))[1:304]
