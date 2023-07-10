@@ -5978,8 +5978,8 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
 
   batch_type <- list(...)$batch_type
   if(is.null(batch_type))
-    batch_type <- "classic"
-  batch_type <- c("classic", "same", "random")[pmatch(tolower(batch_type), c("classic", "same", "random"))]
+    batch_type <- "next"
+  batch_type <- c("next", "same", "random")[pmatch(tolower(batch_type), c("next", "same", "random"))]
 
   iter <- 1L
 
@@ -6012,7 +6012,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
       if(!srandom) {
         if(length(batch[[bid]]) > 2) {
           take <- batch[[bid]]
-          if(batch_type == "classic") {
+          if(batch_type == "next") {
             take2 <- if(bid < 2) {
               batch[[bid + 1L]]
             } else {
