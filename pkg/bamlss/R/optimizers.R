@@ -5978,7 +5978,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
 
   batch_type <- list(...)$batch_type
   if(is.null(batch_type))
-    batch_type <- "next"
+    batch_type <- "same"
   batch_type <- c("next", "same", "random")[pmatch(tolower(batch_type), c("next", "same", "random"))]
 
   iter <- 1L
