@@ -4688,6 +4688,31 @@ dl.bamlss <- function(object,
 }
 
 
+## Optimize epochs using CV.
+cv_dl.bamlss <- function(formula, data, folds = 10, min_epochs = 300, max_epochs = 400, interval = c(-Inf, Inf), ...)
+{
+  i <- sample(1:folds, size = nrow(data), replace = TRUE)
+  epochs <- NULL
+  for(j in 1:folds) {
+    cat(".. start fold", j, "\n")
+    dtrain <- subset(data, i != j)
+    dtest <- subset(data, i == j)
+    crps <- NULL
+    epochs_v <- min_epochs:max_epochs
+    for(e in epochs_v) {
+      cat(e, "/", sep = "")
+      b <- dl.bamlss(formula, data = dtrain, epochs = e, verbose = FALSE, ...)
+      crps <- c(crps, CRPS(b, newdata = dtest, interval = interval))
+    }
+    epochs <- c(epochs, epochs_v[which.min(crps)])
+    cat("\n.. fold =", j, "CRPS =", fmt(min(crps), digits = 5, width = 8), "epoch =", epochs_v[which.min(crps)], "\n")
+  }
+  epochs <- floor(mean(epochs))
+  cat(".. fitting final model using epochs =", epochs, "\n")
+  dl.bamlss(formula, data = dtrain, epochs = epochs, verbose = FALSE, ...)
+}
+
+
 ## Extractor functions.
 fitted.dl.bamlss <- function(object, ...) { object$fitted.values }
 family.dl.bamlss <- function(object, ...) { object$family }

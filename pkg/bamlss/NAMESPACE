@@ -209,6 +209,7 @@ export(
   "predictn",
   "dl.bamlss",
   "predict.dl.bamlss",
+  "cv_dl.bamlss",
   "make_weights",
 
   ## linear effects

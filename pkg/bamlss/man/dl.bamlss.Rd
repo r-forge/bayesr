@@ -23,6 +23,13 @@ dl.bamlss(object, optimizer = "adam",
 \method{predict}{dl.bamlss}(object, newdata,
   model = NULL, type = c("link", "parameter"),
   drop = TRUE, ...)
+
+## CV method for optimizing
+## the number of epochs using
+## the CRPS.
+cv_dl.bamlss(formula, data, folds = 10,
+  min_epochs = 300, max_epochs = 400,
+  interval = c(-Inf, Inf), ...)
 }
 
 \arguments{
@@ -48,6 +55,11 @@ dl.bamlss(object, optimizer = "adam",
     is returned. If \code{type = "parameter"} predictions on the distributional parameter scale
     are returned.}
   \item{drop}{If predictions for only one \code{model} are returned, the list structure is dropped.}
+  \item{formula}{The model formula.}
+  \item{data}{The data used for estimation.}
+  \item{folds}{The number of folds that should be generated.}
+  \item{min_epochs, max_epochs}{Defines the minimum and maximum epochs thet should be used.}
+  \item{interval}{Response interval, see function \code{\link{CRPS}}.}
   \item{\dots}{For function \code{dl.boost()}, arguments passed to \code{\link{bamlss.frame}}.}
 }
 
