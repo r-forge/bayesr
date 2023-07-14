@@ -1,8 +1,8 @@
-\name{dl.bamlss}
-\alias{dl.bamlss}
-\alias{predict.dl.bamlss}
+\name{ddnn}
+\alias{ddnn}
+\alias{predict.ddnn}
 
-\title{Deep Learning BAMLSS}
+\title{Deep Distributional Neural Network}
 
 \description{
   This function interfaces \pkg{keras} infrastructures for high-level neural networks. The function
@@ -12,22 +12,22 @@
 }
 
 \usage{
-## Deep learning bamlss.
-dl.bamlss(object, optimizer = "adam",
+## Deep distributional neural net.
+ddnn(object, optimizer = "adam",
   epochs = 30, batch_size = NULL,
   nlayers = 2, units = 100, activation = "sigmoid",
   l1 = NULL, l2 = NULL,
   verbose = TRUE, ...)
 
 ## Predict method.
-\method{predict}{dl.bamlss}(object, newdata,
+\method{predict}{ddnn}(object, newdata,
   model = NULL, type = c("link", "parameter"),
   drop = TRUE, ...)
 
 ## CV method for optimizing
 ## the number of epochs using
 ## the CRPS.
-cv_dl.bamlss(formula, data, folds = 10,
+cv_ddnn(formula, data, folds = 10,
   min_epochs = 300, max_epochs = 400,
   interval = c(-Inf, Inf), ...)
 }
@@ -60,7 +60,7 @@ cv_dl.bamlss(formula, data, folds = 10,
   \item{folds}{The number of folds that should be generated.}
   \item{min_epochs, max_epochs}{Defines the minimum and maximum epochs thet should be used.}
   \item{interval}{Response interval, see function \code{\link{CRPS}}.}
-  \item{\dots}{For function \code{dl.boost()}, arguments passed to \code{\link{bamlss.frame}}.}
+  \item{\dots}{Arguments passed to \code{\link{bamlss.frame}}.}
 }
 
 \details{
@@ -70,13 +70,13 @@ cv_dl.bamlss(formula, data, folds = 10,
 }
 
 \value{
-  For function \code{dl.bamlss()} an object of class \code{"dl.bamlss"}. Note that extractor
+  For function \code{ddnn()} an object of class \code{"ddnn"}. Note that extractor
   functions \code{\link[stats]{fitted}} and \code{\link{residuals.bamlss}} can be applied.
-  For function \code{predict.dl.bamlss()} a list or vector of predicted values.
+  For function \code{predict.ddnn()} a list or vector of predicted values.
 }
 
 \section{WARNINGS}{
-  The BAMLSS deep learning infrastructure is still experimental!
+  The deep learning infrastructure is experimental!
 }
 
 \seealso{
@@ -99,7 +99,7 @@ f <- list(
 
 ## Fit neural network.
 library("keras")
-b <- dl.bamlss(f, epochs = 2000)
+b <- ddnn(f, epochs = 2000)
 
 ## Plot estimated functions.
 par(mfrow = c(1, 2))

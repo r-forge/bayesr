@@ -4541,7 +4541,7 @@ lasso_stop <- function(x)
 
 
 ## Deep learning bamlss.
-dl.bamlss <- function(object,
+ddnn <- function(object,
   optimizer = "adam", epochs = 30, batch_size = NULL,
   nlayers = 2, units = 100, activation = "sigmoid", l1 = NULL, l2 = NULL,
   verbose = TRUE, ...)
@@ -4682,14 +4682,14 @@ dl.bamlss <- function(object,
   object$elapsed <- elapsed
   object$history <- history
 
-  class(object) <- c("dl.bamlss", "bamlss.frame")
+  class(object) <- c("ddnn", "bamlss.frame")
 
   return(object)
 }
 
 
 ## Optimize epochs using CV.
-cv_dl.bamlss <- function(formula, data, folds = 10, min_epochs = 300, max_epochs = 400, interval = c(-Inf, Inf), ...)
+cv_ddnn <- function(formula, data, folds = 10, min_epochs = 300, max_epochs = 400, interval = c(-Inf, Inf), ...)
 {
   i <- sample(1:folds, size = nrow(data), replace = TRUE)
   epochs <- NULL
@@ -4701,7 +4701,7 @@ cv_dl.bamlss <- function(formula, data, folds = 10, min_epochs = 300, max_epochs
     epochs_v <- min_epochs:max_epochs
     for(e in epochs_v) {
       cat(e, "/", sep = "")
-      b <- dl.bamlss(formula, data = dtrain, epochs = e, verbose = FALSE, ...)
+      b <- ddnn(formula, data = dtrain, epochs = e, verbose = FALSE, ...)
       crps <- c(crps, CRPS(b, newdata = dtest, interval = interval))
     }
     epochs <- c(epochs, epochs_v[which.min(crps)])
@@ -4709,17 +4709,17 @@ cv_dl.bamlss <- function(formula, data, folds = 10, min_epochs = 300, max_epochs
   }
   epochs <- floor(mean(epochs))
   cat(".. fitting final model using epochs =", epochs, "\n")
-  dl.bamlss(formula, data = dtrain, epochs = epochs, verbose = FALSE, ...)
+  ddnn(formula, data = dtrain, epochs = epochs, verbose = FALSE, ...)
 }
 
 
 ## Extractor functions.
-fitted.dl.bamlss <- function(object, ...) { object$fitted.values }
-family.dl.bamlss <- function(object, ...) { object$family }
-residuals.dl.bamlss <- function(object, ...) { residuals.bamlss(object, ...) }
-plot.dl.bamlss <- function(x, ...) { plot(x$history, ...) }
+fitted.ddnn <- function(object, ...) { object$fitted.values }
+family.ddnn <- function(object, ...) { object$family }
+residuals.ddnn <- function(object, ...) { residuals.bamlss(object, ...) }
+plot.ddnn <- function(x, ...) { plot(x$history, ...) }
 
-logLik.dl.bamlss <- function(object, ...)
+logLik.ddnn <- function(object, ...)
 {
   nd <- list(...)$newdata
   rn <- response_name(object)
@@ -4738,7 +4738,7 @@ logLik.dl.bamlss <- function(object, ...)
 
 
 ## Predict function.
-predict.dl.bamlss <- function(object, newdata, model = NULL,
+predict.ddnn <- function(object, newdata, model = NULL,
   type = c("link", "parameter"), drop = TRUE, ...)
 {
   ## If data have been scaled (scale.d = TRUE)
