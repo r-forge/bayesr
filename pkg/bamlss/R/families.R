@@ -6488,3 +6488,64 @@ mix_bamlss <- function(f1, f2, ...)
   rval
 }
 
+
+## ZANBI.
+ldZANBI <- function(y, mu = 1, sigma = 1, nu = 0.3)
+{
+  n <- length(y)
+  mu <- rep(mu, n)
+  sigma <- rep(sigma, n)
+  nu <- rep(nu, n)
+  .Call("dZANBI", as.numeric(y), as.numeric(mu),
+    as.numeric(sigma), as.numeric(nu), package = "bamlss")
+}
+
+llZANBI <- function(y, mu = 1, sigma = 1, nu = 0.3)
+{
+  n <- length(y)
+  mu <- rep(mu, n)
+  sigma <- rep(sigma, n)
+  nu <- rep(nu, n)
+  .Call("llZANBI", as.numeric(y), as.numeric(mu),
+    as.numeric(sigma), as.numeric(nu), package = "bamlss")
+}
+
+ZANBI_bamlss <- function(...)
+{
+  stopifnot(requireNamespace("gamlss.dist"))
+
+  rval <- list(
+    "family" = "ZANBI",
+    "names"  = c("mu", "sigma", "nu"),
+    "links"  = c(mu = "log", sigma = "log", nu = "logit"),
+    "loglik" = function(y, par, ...) {
+      llZANBI(y, par$mu, par$sigma, par$nu)
+    },
+    "d" = function(y, par, log = FALSE) {
+      d <- ldZANBI(y, par$mu, par$sigma, par$nu)
+      if(!log)
+        d <- exp(d)
+    }
+  )
+
+  rval$p <- gamlss.dist::pZANBI
+  rval$q <- gamlss.dist::qZANBI
+  rval$r <- gamlss.dist::rZANBI
+
+  rval$rps <- function(y, par, ymin = 0L, ymax = max(max(y), 100L)) {
+    K <- seq(ymin, ymax, by = 1L)
+    rps <- rep(0, length(y))
+    for (k in K) {
+      P <- rval$p(k, par)
+      O <- y <= k
+      rps <- rps + (P - O)^2
+    }
+    return(rps)
+  }
+
+  rval$type <- "discrete"
+
+  class(rval) <- "family.bamlss"
+  rval
+}
+

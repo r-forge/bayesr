@@ -130,6 +130,7 @@ export(
   "GEV_bamlss",
   "mix_bamlss",
   "DGP_bamlss",
+  "ZANBI_bamlss",
 
   ## extractor functions
   "DIC",
