@@ -142,7 +142,30 @@ sim_results <- function(result_list, dat_list, name) {
                   }, e = split(est$mu_long, est$mu_long$marker), s = sim_marker)
                 }))))
     
-    rbind(eval_lambga, eval_alpha, eval_sigma, eval_mu, eval_mu_long)
+    eval_lambga_long <- data.frame(
+      type = c("Bias", "MSE", "Coverage"),
+      model = name,
+      predictor = "lambga_long",
+      marker = "all",
+      t = "all",
+      value = c(mean(-(est$lambga_long$Mean - sim$lambga_long)),
+                mean((est$lambga_long$Mean - sim$lambga_long)^2),
+                mean(est$lambga_long[, 1] < sim$lambga_long & 
+                       est$lambga_long[, 3] > sim$lambga_long)))
+    
+    eval_lambga_event <- data.frame(
+      type = c("Bias", "MSE", "Coverage"),
+      model = name,
+      predictor = "lambga_event",
+      marker = "all",
+      t = "all",
+      value = c(mean(-(est$lambga_event$Mean - sim$lambga_event)),
+                mean((est$lambga_event$Mean - sim$lambga_event)^2),
+                mean(est$lambga_event[, 1] < sim$lambga_event & 
+                       est$lambga_event[, 3] > sim$lambga_event)))
+    
+    rbind(eval_lambga, eval_alpha, eval_sigma, eval_mu, eval_mu_long, 
+          eval_lambga_long, eval_lambga_event)
     
   }, est = result_list, sim = dat_list, SIMPLIFY = FALSE)
   
@@ -180,10 +203,10 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
   # Longitudinal grid
   mcmc_lambda_long <- as.matrix(predict(b_est, model = "lambda", 
                                         newdata = d_rirs_long,
-                                        FUN = function(x) {x})[nodupl_ids, ])
+                                        FUN = function(x) {x}))
   mcmc_gamma_long <- as.matrix(predict(b_est, model="gamma",
                                        newdata = d_rirs_long,
-                                       FUN = function(x) {x})[nodupl_ids, ])
+                                       FUN = function(x) {x}))
   mcmc_lambga_long <- mcmc_gamma_long + mcmc_lambda_long
   # Individual event times
   mcmc_lambda_event <- as.matrix(predict(b_est, model = "lambda", 
@@ -359,7 +382,7 @@ sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE,
          "mu" = d_rirs$data[, c("mu", "marker")],
          "sigma" = d_rirs$data$sigma[marks],
          "mu_long" = d_rirs$data_full$mu,
-         "lambga_long" = rowSums(d_rirs_long[, c("lambda", "gamma")]),
+         "lambga_long" = rowSums(d_rirs$data_full[, c("lambda", "gamma")]),
          "lambga_event" = rowSums(d_rirs$data[ids, c("lambda", "gamma")])
        ))
   

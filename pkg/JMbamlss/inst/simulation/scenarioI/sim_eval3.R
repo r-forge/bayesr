@@ -1,20 +1,57 @@
-source("R/sim_helperfun.R")
 
-wd <- paste0("/home/RDC/volkmana.hub/H:/volkmana.hub/JMbamlss/", 
-             "simulation/scen_I_051022")
+
+location <- "workstation"
+if(location %in% c("server_linux", "server_windows")){
+  .libPaths(if (location == "server_linux") {
+    c("~/H:/volkmana.hub/R4_linux_b", "~/H:/volkmana.hub/R4_linux")
+  } else "H:/R4_windows")
+  setwd(if (location == "server_linux") "~/H:/volkmana.hub/JMbamlss"
+        else "H:/JMbamlss")
+}
+server_wd <- switch(location,
+                    "workstation" = paste0("/run/user/1000/gvfs/smb-share:",
+                                           "server=clapton.wiwi.hu-berlin.de,",
+                                           "share=volkmana.hub/JMbamlss/",
+                                           "simulation"),
+                    "server_linux" = "~/H:/volkmana.hub/JMbamlss/simulation",
+                    "server_windows" = "H:/JMbamlss/simulation")
+
+# Always
+library(survival)
+library(JMbayes2)
+library(bamlss)
+library(MFPCA)
+library(tidyverse)
+library(parallel)
+library(Rcpp)
+library(Matrix)
+library(sparseFLMM)
+library(JMbamlss)
+
+
+debugonce(JMbamlss:::sim_jmbamlss_eval)
+m_tru <- JMbamlss:::sim_jmbamlss_eval(
+  wd = file.path(server_wd, "scen_I_230719/"), model_wd = "bamlss_tru/",
+  data_wd = "data/", name = "bamlss_tru")
+
+debugonce(JMbamlss:::sim_jmbayes_eval)
+m_jmb <- JMbamlss:::sim_jmbayes_eval(
+  wd = file.path(server_wd, "scen_I_230719/"), model_wd = "jmb/",
+  data_wd = "data/", name = "jmb")
+
 m_tru <- list.files(path = paste0(wd, "/bamlss_tru"))
-m_full <- m_tru[which(as.numeric(substr(m_tru, 2, 4)) < 150)]
-m_975 <- m_tru[which(as.numeric(substr(m_tru, 2, 4)) > 149)]
+m_est1 <- list.files(path = paste0(wd, "/bamlss_est1"))
+m_est95 <- list.files(path = paste0(wd, "/bamlss_est95"))
 
 
-load(paste0("/home/RDC/volkmana.hub/H:/volkmana.hub/JMbamlss/", 
-            "simulation/scen_I_130922/bamlss_tru/b101.Rdata"))
-mfpca_est <- attr(b_est, "FPCs")
+# load(paste0("/home/RDC/volkmana.hub/H:/volkmana.hub/JMbamlss/", 
+#             "simulation/scen_I_130922/bamlss_tru/b101.Rdata"))
+# mfpca_est <- attr(b_est, "FPCs")
 
-res_full <- lapply(m_full, function (x) {
+res_tru <- lapply(m_tru, function (x) {
   
   # Load the data set and extract information about it
-  load(paste0(wd, "/bamlss_tru/", x))
+  m <- readRDS(paste0(wd, "/bamlss_tru/", x))
   load(paste0(wd, "/data/d", substr(x, 2, 4), ".Rdata"))
   nodupl_ids <- which(!duplicated(b_est$model.frame[, c("id", "obstime")]))
   marks <- which(!duplicated(b_est$model.frame$marker))
