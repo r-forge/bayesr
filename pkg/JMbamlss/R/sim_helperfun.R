@@ -162,13 +162,35 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
   }
   nodupl_ids <- which(!duplicated(b_est$model.frame[, c("id", "obstime")]))
   marks <- which(!duplicated(b_est$model.frame$marker))
+  ids <- which(!duplicated(b_est$model.frame[, "id"]))
+  d_rirs_obs <- d_rirs$data
+  d_rirs_obs$survtime <- d_rirs_obs$obstime
+  d_rirs_long <- d_rirs$data_full
+  d_rirs_long$survtime <- d_rirs_long$obstime
   
   # Extract MCMC samples to calculate the survival part
-  mcmc_lambda <- as.matrix(predict(b_est, model = "lambda", 
+  # All longitudinal observation points
+  mcmc_lambda <- as.matrix(predict(b_est, model = "lambda",
+                                   newdata = d_rirs_obs,
                                    FUN = function(x) {x})[nodupl_ids, ])
   mcmc_gamma <- as.matrix(predict(b_est, model="gamma",
+                                  newdata = d_rirs_obs,
                                   FUN = function(x) {x})[nodupl_ids, ])
   mcmc_lambga <- mcmc_gamma + mcmc_lambda
+  # Longitudinal grid
+  mcmc_lambda_long <- as.matrix(predict(b_est, model = "lambda", 
+                                        newdata = d_rirs_long,
+                                        FUN = function(x) {x})[nodupl_ids, ])
+  mcmc_gamma_long <- as.matrix(predict(b_est, model="gamma",
+                                       newdata = d_rirs_long,
+                                       FUN = function(x) {x})[nodupl_ids, ])
+  mcmc_lambga_long <- mcmc_gamma_long + mcmc_lambda_long
+  # Individual event times
+  mcmc_lambda_event <- as.matrix(predict(b_est, model = "lambda", 
+                                         FUN = function(x) {x})[ids, ])
+  mcmc_gamma_event <- as.matrix(predict(b_est, model="gamma",
+                                        FUN = function(x) {x})[ids, ])
+  mcmc_lambga_event <- mcmc_gamma_event + mcmc_lambda_event
   
   # Output list
   list("predictions" =  list(
@@ -186,14 +208,26 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
     "mu_long" = cbind(predict(b_est, model = "mu", FUN = c95, 
                               newdata = d_rirs$data_full),
                       data.frame("marker" = d_rirs$data_full$marker,
-                                 "obstime" = d_rirs$data_full$obstime))
+                                 "obstime" = d_rirs$data_full$obstime)),
+    "lambga_long" = data.frame("2.5%" = apply(mcmc_lambga_long, 1, quantile, 
+                                              probs = 0.025),
+                               "Mean" = rowMeans(mcmc_lambga_long),
+                               "97.5%" = apply(mcmc_lambga_long, 1, quantile, 
+                                               probs = 0.975)),
+    "lambga_event" = data.frame("2.5%" = apply(mcmc_lambga_event, 1, quantile, 
+                                         probs = 0.025),
+                          "Mean" = rowMeans(mcmc_lambga_event),
+                          "97.5%" = apply(mcmc_lambga_event, 1, quantile, 
+                                          probs = 0.975))
   ),
   "simulations" = list(
     "lambga" = rowSums(d_rirs$data[nodupl_ids, c("lambda", "gamma")]),
     "alpha" = d_rirs$data$alpha[marks],
     "mu" = d_rirs$data[, c("mu", "marker")],
     "sigma" = d_rirs$data$sigma[marks],
-    "mu_long" = d_rirs$data_full$mu
+    "mu_long" = d_rirs$data_full$mu,
+    "lambga_long" = rowSums(d_rirs_long[, c("lambda", "gamma")]),
+    "lambga_event" = rowSums(d_rirs$data[ids, c("lambda", "gamma")])
   ))
   
 }
@@ -208,11 +242,14 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
 #' @param data_wd Simulation data folder.
 #' @param rds Objects are saved as .rds files (for backwards compatibility when
 #'   .Rdata files were used). Defaults to TRUE.
+#' @param gamma_timeconst Only implemented for timeconstant gamma predictors. If
+#'   FALSE a warning message is returned
 sim_bamlss_predict <- Vectorize(sim_bamlss_predict_i, vectorize.args = "m", 
                                 SIMPLIFY = FALSE)
 
 
-sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
+sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE, 
+                              gamma_timeconst = TRUE) {
   
   # Load the fitted model and the original data
   if (rds) {
@@ -223,9 +260,13 @@ sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
     load(paste0(wd, data_wd, "d", substr(m, 4, 6), ".Rdata"))
   }
 
+  # Problem if exogenous covariates in gamma: X_long for survival is not correct
+  if(!gamma_timeconst) warning("Time constant gamma assumed")
+  
   nodupl_ids <- which(!duplicated(d_rirs$data[, c("id", "obstime")]))
   n_dim <- length(levels(d_rirs$data$marker))
   marks <- which(!duplicated(d_rirs$data$marker))
+  ids <- which(!duplicated(d_rirs$data[, "id"]))
   
   # Longitudinal fits
   X <- jmb$model_data$X
@@ -262,10 +303,18 @@ sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
                         data = d_rirs$data)[[1]]$knots
   Z <- splineDesign(knots = kn, x = d_rirs$data$obstime, ord = 4, 
                     outer.ok = TRUE)
+  Z_long <- splineDesign(knots = kn, x = d_rirs$data_full$obstime, ord = 4, 
+                         outer.ok = TRUE)
+  Z_event <- splineDesign(knots = kn, x = d_rirs$data$survtime[ids], ord = 4, 
+                          outer.ok = TRUE)
   X <- jmb$model_data$W_h[unlist(jmb$model_data$idL), , drop = FALSE]
+  X_long <- jmb$model_data$W_h[as.numeric(d_rirs$data_full$id), , drop = FALSE]
+  X_event <- jmb$model_data$W_h
   B <- jmb$mcmc$bs_gammas[[1]]
   Beta <- jmb$mcmc$gammas[[1]]
   mcmc_lambga <- (tcrossprod(Z, B) + tcrossprod(X, Beta))[nodupl_ids, ]
+  mcmc_lambga_long <- (tcrossprod(Z_long, B) + tcrossprod(X_long, Beta))
+  mcmc_lambga_event <- (tcrossprod(Z_event, B) + tcrossprod(X_event, Beta))
   
   list("predictions" = list(
         "lambga" = data.frame("2.5%" = apply(mcmc_lambga, 1, quantile, 
@@ -293,13 +342,25 @@ sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
                                "97.5%" = apply(mcmc_mu_long, 1, quantile, 
                                                probs = 0.975),
                                "marker" = d_rirs$data_full$marker,
-                               "obstime" = d_rirs$data_full$obstime)),
+                               "obstime" = d_rirs$data_full$obstime),
+        "lambga_long" = data.frame("2.5%" = apply(mcmc_lambga_long, 1, quantile, 
+                                                  probs = 0.025),
+                                   "Mean" = rowMeans(mcmc_lambga_long),
+                                   "97.5%" = apply(mcmc_lambga_long, 1, 
+                                                   quantile, probs = 0.975)),
+        "lambga_event" = data.frame("2.5%" = apply(mcmc_lambga_event, 1,
+                                                   quantile, probs = 0.025),
+                                    "Mean" = rowMeans(mcmc_lambga_event),
+                                    "97.5%" = apply(mcmc_lambga_event, 1,
+                                                    quantile, probs = 0.975))),
        "simulations" = list(
          "lambga" = rowSums(d_rirs$data[nodupl_ids, c("lambda", "gamma")]),
          "alpha" = d_rirs$data$alpha[marks],
          "mu" = d_rirs$data[, c("mu", "marker")],
          "sigma" = d_rirs$data$sigma[marks],
-         "mu_long" = d_rirs$data_full$mu
+         "mu_long" = d_rirs$data_full$mu,
+         "lambga_long" = rowSums(d_rirs_long[, c("lambda", "gamma")]),
+         "lambga_event" = rowSums(d_rirs$data[ids, c("lambda", "gamma")])
        ))
   
   

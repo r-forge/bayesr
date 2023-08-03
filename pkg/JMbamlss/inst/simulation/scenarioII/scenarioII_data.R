@@ -8,17 +8,17 @@
 
 
 # Specify location
-location <- "workstation"
+location <- "server_linux"
 if(location %in% c("server_linux", "server_windows")){
   .libPaths(if (location == "server_linux") {
     c("~/H:/volkmana.hub/R4_linux_b", "~/H:/volkmana.hub/R4_linux")
   } else "H:/R4_windows")
   setwd(if (location == "server_linux") "~/H:/volkmana.hub/JMbamlss"
         else "H:/JMbamlss")
-  results_wd <- if(location == "server_linux") "./simulation/"
+  results_wd <- if(location == "server_linux") "./simulation"
 } else {
   results_wd <- paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-",
-                       "berlin.de,share=volkmana.hub/JMbamlss/simulation/")
+                       "berlin.de,share=volkmana.hub/JMbamlss/simulation")
 }
 
 
@@ -36,10 +36,17 @@ library(JMbamlss)
 
 # Setting for the simulation
 start <- 100
-stop <- 199
+stop <- 299
 number_cores <- 5
-setting <- "scen_II_230117" # 221209: all data sets are the same
-dir.create(paste0(results_wd, setting, "/data"), showWarnings = FALSE)
+setting <- "scen_II_230719"
+dir.create(file.path(results_wd, setting), showWarnings = FALSE)
+dir.create(file.path(results_wd, setting, "data"), showWarnings = FALSE)
+dir.create(file.path(results_wd, setting, "/bamlss_tru"), showWarnings = FALSE)
+dir.create(file.path(results_wd, setting, "/bamlss_est1"), showWarnings = FALSE)
+dir.create(file.path(results_wd, setting, "/bamlss_est95"), 
+           showWarnings = FALSE)
+dir.create(file.path(results_wd, setting, "/jmb"), showWarnings = FALSE)
+
 Sys.time()
 sessionInfo()
 
@@ -90,7 +97,6 @@ parallel_data <- function(i) {
                                  max_obs = 15, probmiss = 0.75, maxfac = 3,
                                  nmark = 2, long_assoc = "FPC", M = 6, 
                                  FPC_bases = m$functions, FPC_evals = m$values, 
-                                 #mfpc_args = NULL, re_cov_mat = NULL,
                                  ncovar = 2,
                                  lambda = function(t, x) {
                                    1.65 * t^(0.65)
@@ -114,8 +120,8 @@ parallel_data <- function(i) {
                                  tmax = NULL, seed = NULL, 
                                  full = TRUE, file = NULL)
   
-  
-  saveRDS(d_sim, file = paste0(results_wd, setting, "/data/d", i, ".rds"))
+  saveRDS(d_sim, file = file.path(results_wd, setting, "data",
+                                   paste0("d", i, ".rds")))
   NULL
 }
 

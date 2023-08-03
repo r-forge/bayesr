@@ -8,13 +8,17 @@
 
 
 # Specify location
-location <- "workstation"
+location <- "server_linux"
 if(location %in% c("server_linux", "server_windows")){
   .libPaths(if (location == "server_linux") {
     c("~/H:/volkmana.hub/R4_linux_b", "~/H:/volkmana.hub/R4_linux")
   } else "H:/R4_windows")
   setwd(if (location == "server_linux") "~/H:/volkmana.hub/JMbamlss"
         else "H:/JMbamlss")
+  results_wd <- if(location == "server_linux") "./simulation"
+} else {
+  results_wd <- paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-",
+                       "berlin.de,share=volkmana.hub/JMbamlss/simulation")
 }
 
 
@@ -28,30 +32,14 @@ library(parallel)
 library(Rcpp)
 library(Matrix)
 library(sparseFLMM)
-source("R/preprocessing.R")
-source("R/simMultiJM.R")
-source("R/eval_mfun.R")
-source("R/pcre_smooth.R")
-source("R/mjm_bamlss.R")
-source("R/MJM_transform.R")
-source("R/MJM_opt.R")
-source("R/opt_updating_cpp.R")
-source("R/MJM_mcmc.R")
-source("R/mcmc_proposing_cpp.R")
-source("R/MJM_predict.R")
-source("R/survint.R")
-source("R/fpca.R")
-source("R/mfpca_sim.R")
-source("R/compile.R")
-compile_alex(location)
-sourceCpp("MatrixProd.cpp")
+library(JMbamlss)
 
 
 # Setting for the simulation
 start <- 100
-stop <- 149
+stop <- 299
 number_cores <- 2
-setting <- "scen_I_130922"
+setting <- "scen_I_230719"
 Sys.time()
 sessionInfo()
 
@@ -80,7 +68,7 @@ b_funs <- rep(list(funData(argvals = seq1,
 # Prepare the model using the true FPCs -----------------------------------
 
 # Prepare objects for the model on different data sets
-mfpca_tru <- MFPCA_cov(cov = cov, basis_funs = b_funs)
+mfpca_tru <- JMbamlss:::MFPCA_cov(cov = cov, basis_funs = b_funs)
 
 nfpc <- min(which(
   cumsum(mfpca_tru$values)/sum(mfpca_tru$values) > 0.95))
@@ -95,7 +83,7 @@ f_tru <- list(
     "mu ~ -1 + marker + obstime:marker + x3:marker + obstime:x3:marker +",
     paste0(lapply(seq_len(nfpc), function(x) {
       paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
-             "mfpca_tru_list[[", x, "]]))")
+             "mfpca_tru_list[[", x, "]], 'scale' = FALSE))")
     }), collapse = " + "))),
   sigma ~ -1 + marker,
   alpha ~ -1 + marker
@@ -109,22 +97,23 @@ parallel_bamlss_est <- function(i) {
   set.seed(i)
   
   # Load the data
-  load(paste0("simulation/", setting, "/data/d", i, ".Rdata"))
+  d_rirs <- readRDS(file.path(results_wd, setting, "data",
+                              paste0("d", i, ".rds")))
 
   try_obj <- try({
     
     # Estimate the model using tru FPCs
-    d_rirs_tru <- attach_wfpc(mfpca_tru, d_rirs$data, n = nfpc)
+    d_rirs_tru <- JMbamlss:::attach_wfpc(mfpca_tru, d_rirs$data, n = nfpc)
     t_tru <- system.time(
-      b_est <- bamlss(f_tru, family = mjm_bamlss, data = d_rirs_tru, 
+      b_est <- bamlss(f_tru, family = JMbamlss:::mjm_bamlss, data = d_rirs_tru, 
                       timevar = "obstime", maxit = 1500, n.iter = 5500,
                       burnin = 500, thin = 5)
     )
     attr(b_est, "comp_time") <- t_tru
     attr(b_est, "FPCs") <- mfpca_tru
     attr(b_est, "nfpc") <- nfpc
-    save(b_est, file = paste0("simulation/", setting, "/bamlss_tru/b", i, 
-                              ".Rdata"))
+    saveRDS(b_est, file = file.path(results_wd, setting, "bamlss_tru", 
+                                    paste0("b", i, ".rds")))
   }, silent = TRUE)
   if(class(try_obj) == "try-error") try_obj else i
 }
