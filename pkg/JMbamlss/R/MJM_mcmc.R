@@ -337,17 +337,46 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
                  "pd" = rep(pd, length.out = nrow(samps))
   )
   if (std_surv) {
-    samps <- cbind(samps,
-                   matrix(rep(long_bar, each = nrow(samps)),
-                          ncol = length(long_bar), 
-                          dimnames = list(
-                            NULL, 
-                            paste0("long_barM", seq_along(long_bar)))),
-                   matrix(rep(long_sds, each = nrow(samps)),
-                          ncol = length(long_sds), 
-                          dimnames = list(
-                            NULL, 
-                            paste0("long_sdsM", seq_along(long_sds)))))
+    
+    # Scaling of the survival design matrices
+    # NOTE: The samples are adapted so that the parameters are on the original
+    # scale. This makes interpretation and prediction easier. Parameters from
+    # the optimizing step, however, are not yet adjusted as they are needed as
+    # starting values for the MCMC algorithm. Note that the implementation so 
+    # far focusses only on one gamma covariate without smooth constructor term.
+    # If a more complex model is fit with JMbamlss, please adjust the following
+    # code accordingly.
+    # In general: Scale the parameters beta by the standard deviation sd. 
+    # Subtract beta*bar/sd from the intercept.
+    
+    # Rescale the alpha samples (accounting for standardization)
+    alpha_cols <- grep("alpha.+marker", colnames(samps))
+    which_sd <- as.numeric(sub("alpha.+markerm", "", 
+                               colnames(samps)[alpha_cols]))
+    for (i in seq_along(alpha_cols)) {
+      samps[, alpha_cols[i]] <- samps[, alpha_cols[i]] / long_sds[which_sd[i]]
+    }
+    
+    # Calculate gamma intercept adaption for standardization
+    surv_int <- apply(samps[, alpha_cols], 1, "%*%", long_bar)
+    
+    # Rescale the gamma covariates samples
+    gamma_bar <- x$gamma$smooth.construct$model.matrix$w_bar
+    gamma_sd <- x$gamma$smooth.construct$model.matrix$w_sd
+    if (length(gamma_bar) > 1)
+      warning("Standardization is not tested for this case of gamma.")
+    gamma_names <- colnames(x$gamma$smooth.construct$model.matrix$X)[-1]
+    for (j in seq_along(gamma_names)) {
+      gamma_col <- grep(paste0("gamma.+", gamma_names[j]), colnames(samps))
+      samps[, gamma_col] <- samps[, gamma_col] / gamma_sd[j]
+      surv_int <- surv_int + samps[, gamma_col] * gamma_bar[j]
+    }
+    
+    # Adapt the intercept
+    col_gamma_int <- grep("gamma\\.p\\.model\\.matrix\\.\\(Intercept", 
+                          colnames(samps))
+    samps[, col_gamma_int] <- samps[, col_gamma_int] - surv_int
+    
   }
   samps[is.na(samps)] <- 0
   

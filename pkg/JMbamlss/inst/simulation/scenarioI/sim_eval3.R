@@ -110,3 +110,38 @@ eval_jmb <- do.call(rbind, Map(cbind, it = sub("\\.rds", "", names(it_list)),
 saveRDS(eval_jmb,
         file = file.path(server_wd, "scen_I_230719", "eval_jmb.rds"))
 rm(preds_jmb, eval_jmb, it_list)
+
+
+
+# Table for Paper ---------------------------------------------------------
+
+e_btru <- readRDS(file.path(server_wd, "scen_I_230719", "eval_btru.rds"))
+e_best1 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best1.rds"))
+e_best95 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best95.rds"))
+e_jmb <- readRDS(file.path(server_wd, "scen_I_230719", "eval_jmb.rds"))
+
+
+r <- rbind(e_btru, e_best1, e_best95, e_jmb) %>%
+  mutate(Model = factor(model, levels = c("TRU", "EST1", "EST95", "JMB"),
+                        labels = c("TRUE", "EST", "TRUNC", "JMB")))
+
+bias <- r %>%
+  filter(type == "Bias", predictor != "mu_long") %>%
+  group_by(Model, predictor, marker) %>%
+  summarise(mean = mean(value), .groups = "drop") %>%
+  pivot_wider(id_cols = c(predictor, marker), names_from = Model, 
+              values_from = mean)
+mse <- r %>%
+  filter(type == "MSE", predictor != "mu_long") %>%
+  group_by(Model, predictor, marker) %>%
+  summarise(mean = mean(value), .groups = "drop") %>%
+  pivot_wider(id_cols = c(predictor, marker), names_from = Model, 
+              values_from = mean)
+
+r %>% 
+  filter(predictor == "sigma", type == "Coverage") %>%
+  group_by(Model, marker) %>%
+  summarize(Mean = mean(value)) %>%
+  pivot_wider(names_from = Model, values_from = Mean) %>%
+  xtable::xtable(digits = 3) %>%
+  xtable::print.xtable(include.rownames = FALSE)

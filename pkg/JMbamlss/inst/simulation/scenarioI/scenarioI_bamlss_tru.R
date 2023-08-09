@@ -70,8 +70,7 @@ b_funs <- rep(list(funData(argvals = seq1,
 # Prepare objects for the model on different data sets
 mfpca_tru <- JMbamlss:::MFPCA_cov(cov = cov, basis_funs = b_funs)
 
-nfpc <- min(which(
-  cumsum(mfpca_tru$values)/sum(mfpca_tru$values) > 0.95))
+nfpc <- length(mfpca_tru$values)
 mfpca_tru_list <- lapply(seq_len(nfpc), function (i, mfpca = mfpca_tru) {
   list(functions = extractObs(mfpca$functions, i),
        values = mfpca$values[i])

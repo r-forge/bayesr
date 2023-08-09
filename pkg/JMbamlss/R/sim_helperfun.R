@@ -172,7 +172,8 @@ sim_results <- function(result_list, dat_list, name) {
 }
 
 
-sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
+sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE, 
+                                 old = FALSE) {
   
   
   # Load the data set and extract information about it
@@ -190,6 +191,50 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
   d_rirs_obs$survtime <- d_rirs_obs$obstime
   d_rirs_long <- d_rirs$data_full
   d_rirs_long$survtime <- d_rirs_long$obstime
+  
+  # Handle standardized survival matrices
+  if (old) {
+    
+    # Standardization constants
+    long_bar <- unique(samples(b_est)[, grep("long_bar", 
+                                             colnames(samples(b_est)))])
+    long_sds <- unique(samples(b_est)[, grep("long_sds",
+                                             colnames(samples(b_est)))])
+    
+    # Standardization constants for gamma
+    gamma_bar <- b_est$x$gamma$smooth.construct$model.matrix$w_bar
+    gamma_sds <- b_est$x$gamma$smooth.construct$model.matrix$w_sd
+    if (length(b_est$x$gamma$smooth.construct) > 1) {
+      warning("Accounting for standardization of smooths not yet implemented.")
+    }
+    std_x <- attr(b_est$terms$gamma, "term.labels")
+    if (length(std_x) > 1) {
+      warning("Accounting for standardization of more than one covariate not",
+              " yet implemented.")
+    }
+
+    # Multiply the samples with standardization factor
+    col_gamma <- grep(paste0("gamma\\.p\\.model\\.matrix\\.", std_x), 
+                      colnames(samples(b_est)))
+    b_est$samples[[1]][, col_gamma] <- b_est$samples[[1]][, col_gamma] /
+      gamma_sds
+    col_alpha <- grep("alpha\\.", colnames(samples(b_est)))[
+      seq_len(length(marks))]
+    for (i in seq_along(col_alpha)) {
+      b_est$samples[[1]][, col_alpha[i]] <-
+        b_est$samples[[1]][, col_alpha[i]] / long_sds[i]
+    }
+    
+    # Calculate standardization adaptation for intercept in each sample
+    mcmc_int <- samples(b_est)[, col_gamma] * gamma_bar + 
+      apply(samples(b_est)[, col_alpha], 1, "%*%", long_bar)
+    
+    col_gamma_int <- grep("gamma\\.p\\.model\\.matrix\\.\\(Intercept", 
+                          colnames(samples(b_est)))
+    b_est$samples[[1]][, col_gamma_int] <- 
+      b_est$samples[[1]][, col_gamma_int] - mcmc_int
+    
+  }
   
   # Extract MCMC samples to calculate the survival part
   # All longitudinal observation points
@@ -265,8 +310,8 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE) {
 #' @param data_wd Simulation data folder.
 #' @param rds Objects are saved as .rds files (for backwards compatibility when
 #'   .Rdata files were used). Defaults to TRUE.
-#' @param gamma_timeconst Only implemented for timeconstant gamma predictors. If
-#'   FALSE a warning message is returned
+#' @param old Simulated data sets before Version 0.0.3 (samples need to be adapted
+#'   for standardized survival matrices). Defaults to FALSE.
 sim_bamlss_predict <- Vectorize(sim_bamlss_predict_i, vectorize.args = "m", 
                                 SIMPLIFY = FALSE)
 
@@ -399,5 +444,7 @@ sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE,
 #' @param data_wd Simulation data folder.
 #' @param rds Objects are saved as .rds files (for backwards compatibility when
 #'   .Rdata files were used). Defaults to TRUE.
+#' @param gamma_timeconst Only implemented for timeconstant gamma predictors. If
+#'   FALSE a warning message is returned.
 sim_jmb_predict <- Vectorize(sim_jmb_predict_i, vectorize.args = "m", 
                                 SIMPLIFY = FALSE)
