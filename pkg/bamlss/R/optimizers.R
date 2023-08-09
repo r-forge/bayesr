@@ -6089,7 +6089,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
                 mfj <- mean(fj, na.rm = TRUE)
                 eta[[i]] <- eta[[i]] + (fj - mfj)
                 etas[[i]] <- etas[[i]] + drop((x[[i]]$smooth.construct[[j]]$X[shuffle_id[take2], , drop = FALSE] %*% beta[[i]][[paste0("s.", j)]]) - mfj)
-                beta[[i]]$p["(Intercept)"] <- beta[[i]]$p["(Intercept)"] + mfj
+                #beta[[i]]$p["(Intercept)"] <- beta[[i]]$p["(Intercept)"] + mfj
               } else {
                 eta[[i]] <- eta[[i]] + drop(x[[i]]$smooth.construct[[j]]$X[shuffle_id[take], , drop = FALSE] %*% beta[[i]][[paste0("s.", j)]])
                 etas[[i]] <- etas[[i]] + drop(x[[i]]$smooth.construct[[j]]$X[shuffle_id[take2], , drop = FALSE] %*% beta[[i]][[paste0("s.", j)]])
@@ -6414,7 +6414,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
                   mfj <- mean(fj, na.rm = TRUE)
                   eta[[i]] <- eta[[i]] + (fj - mfj)
                   etas[[i]] <- etas[[i]] + (drop(Xt %*% beta[[i]][[paste0("s.", j)]]) - mfj)
-                  beta[[i]]$p["(Intercept)"] <- beta[[i]]$p["(Intercept)"] + mfj
+                  #beta[[i]]$p["(Intercept)"] <- beta[[i]]$p["(Intercept)"] + mfj
                 } else {
                   eta[[i]] <- eta[[i]] + drop(Xn %*% beta[[i]][[paste0("s.", j)]])
                   etas[[i]] <- etas[[i]] + drop(Xt %*% beta[[i]][[paste0("s.", j)]])
@@ -6467,7 +6467,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
             mfj <- mean(fj, na.rm = TRUE)
             eta[[llc[1]]] <- eta[[llc[1]]] + (fj - mfj)
             etas[[llc[1]]] <- etas[[llc[1]]] + (drop(Xt %*% b0) - mfj)
-            beta[[llc[1]]]$p["(Intercept)"] <- beta[[llc[1]]]$p["(Intercept)"] + mfj
+            #beta[[llc[1]]]$p["(Intercept)"] <- beta[[llc[1]]]$p["(Intercept)"] + mfj
           } else {
             eta[[llc[1]]] <- eta[[llc[1]]] + drop(Xn %*% b0)
             etas[[llc[1]]] <- etas[[llc[1]]] + drop(Xt %*% b0)
