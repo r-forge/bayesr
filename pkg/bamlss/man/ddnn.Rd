@@ -14,9 +14,11 @@
 \usage{
 ## Deep distributional neural net.
 ddnn(object, optimizer = "adam",
-  epochs = 30, batch_size = NULL,
-  nlayers = 2, units = 100, activation = "sigmoid",
+  learning_rate = 0.01,
+  epochs = 100, batch_size = NULL,
+  nlayers = 2, units = 100, activation = "relu",
   l1 = NULL, l2 = NULL,
+  validation_split = 0.2, early_stopping = TRUE, patience = 50,
   verbose = TRUE, ...)
 
 ## Predict method.
@@ -38,6 +40,7 @@ cv_ddnn(formula, data, folds = 10,
     For character, options are: \code{"adam"} \code{"sgd"}, \code{"rmsprop"}, \code{"adagrad"},
     \code{"adadelta"}, \code{"adamax"}, \code{"adam"}. The default is
     \code{\link[keras]{optimizer_rmsprop}} with learning rate set to \code{1e-04}.}
+  \item{learning_rate}{The learning rate of the optimizer.}
   \item{epochs}{Number of times to iterate over the training data arrays, see
     \code{\link[keras]{fit}}.}
   \item{batch_size}{Number of samples per gradient update, see \code{\link[keras]{fit}}.}
@@ -46,6 +49,10 @@ cv_ddnn(formula, data, folds = 10,
   \item{activation}{Activation functions used for the hidden layers, can be a vector.}
   \item{l1}{Shrinkage parameter for L1 penalty.}
   \item{l2}{Shrinkage parameter for L2 penalty.}
+  \item{validation_split}{Proportion of data that should be used for validation.}
+  \item{early_stopping}{Logical, should early stopping of the optimizer be applied?}
+  \item{patience}{Integer, number of iterations the optimizer waits until early stopping is applied
+    after changes get small in validation data set.}
   \item{verbose}{Print information during runtime of the algorithm.}
   \item{newdata}{A \code{\link[base]{list}} or \code{\link[base]{data.frame}} that should
     be used for prediction.}

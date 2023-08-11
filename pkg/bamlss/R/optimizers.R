@@ -4542,9 +4542,9 @@ lasso_stop <- function(x)
 
 ## Deep learning bamlss.
 ddnn <- function(object,
-  optimizer = "adam", epochs = 30, batch_size = NULL,
-  nlayers = 2, units = 100, activation = "sigmoid", l1 = NULL, l2 = NULL,
-  verbose = TRUE, ...)
+  optimizer = "adam", learning_rate = 0.01, epochs = 100, batch_size = NULL,
+  nlayers = 2, units = 100, activation = "relu", l1 = NULL, l2 = NULL,
+  validation_split = 0.2, early_stopping = TRUE, patience = 50, verbose = TRUE, ...)
 {
   stopifnot(requireNamespace("keras"))
   stopifnot(requireNamespace("tensorflow"))
@@ -4634,6 +4634,11 @@ ddnn <- function(object,
 
   model <- keras::keras_model(inputs, final_output)
 
+  if(is.character(optimizer)) {
+    if(optimizer == "adam")
+      optimizer <- optimizer_adam(learning_rate = learning_rate)
+  }
+
   model <- keras::compile(model,
     loss = nll, 
     optimizer = optimizer
@@ -4657,13 +4662,22 @@ ddnn <- function(object,
       Y <- cbind(Y, 1)
   }
 
+  callbacks <- list()
+  if(early_stopping) {
+    callbacks <- list(
+      callback_early_stopping(patience = patience)
+    )
+  }
+
   ptm <- proc.time()
 
   history <- keras::fit(model,
     x = X, 
     y = Y, 
     epochs = epochs, batch_size = batch_size,
-    verbose = as.integer(verbose)
+    verbose = as.integer(verbose),
+    validation_split = validation_split,
+    callbacks = callbacks
   )
 
   elapsed <- c(proc.time() - ptm)[3]
