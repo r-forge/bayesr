@@ -115,9 +115,9 @@ rm(preds_jmb, eval_jmb, it_list)
 
 # Table for Paper ---------------------------------------------------------
 
-e_btru <- readRDS(file.path(server_wd, "scen_I_230719", "eval_btru.rds"))
-e_best1 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best1.rds"))
-e_best95 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best95.rds"))
+e_btru <- readRDS(file.path(server_wd, "scen_I_230719", "eval_btru1008.rds"))
+e_best1 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best11008.rds"))
+e_best95 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best951008.rds"))
 e_jmb <- readRDS(file.path(server_wd, "scen_I_230719", "eval_jmb.rds"))
 
 
@@ -126,22 +126,56 @@ r <- rbind(e_btru, e_best1, e_best95, e_jmb) %>%
                         labels = c("TRUE", "EST", "TRUNC", "JMB")))
 
 bias <- r %>%
-  filter(type == "Bias", predictor != "mu_long") %>%
+  filter(type == "Bias", 
+         !(predictor %in% c("mu_long", "lambga", "lambga_long"))) %>%
   group_by(Model, predictor, marker) %>%
   summarise(mean = mean(value), .groups = "drop") %>%
+  mutate(mean = ifelse(predictor == "mu", mean*1000, mean)) %>%
   pivot_wider(id_cols = c(predictor, marker), names_from = Model, 
-              values_from = mean)
+              values_from = mean) %>%
+  rowid_to_column() %>%
+  mutate(rowid = ifelse(predictor == "sigma", 16, rowid),
+         marker = ifelse(predictor == "sigma", "all", marker)) %>%
+  group_by(rowid, predictor, marker) %>%
+  summarise(across(1:4, mean), .groups = "drop") %>%
+  slice(7, 1:6, 8:14)
+  
 mse <- r %>%
-  filter(type == "MSE", predictor != "mu_long") %>%
+  filter(type == "MSE", 
+         !(predictor %in% c("mu_long", "lambga", "lambga_long"))) %>%
+  group_by(Model, predictor, marker) %>%
+  summarise(mean = mean(value), .groups = "drop") %>%
+  mutate(mean = ifelse(predictor == "mu", mean*1000, mean)) %>%
+  pivot_wider(id_cols = c(predictor, marker), names_from = Model, 
+              values_from = mean) %>%
+  rowid_to_column() %>%
+  mutate(rowid = ifelse(predictor == "sigma", 16, rowid),
+         marker = ifelse(predictor == "sigma", "all", marker)) %>%
+  group_by(rowid, predictor, marker) %>%
+  summarise(across(1:4, mean), .groups = "drop") %>%
+  slice(7, 1:6, 8:14)
+
+coverage <- r %>%
+  filter(type == "Coverage", 
+         !(predictor %in% c("mu_long", "lambga", "lambga_long"))) %>%
   group_by(Model, predictor, marker) %>%
   summarise(mean = mean(value), .groups = "drop") %>%
   pivot_wider(id_cols = c(predictor, marker), names_from = Model, 
-              values_from = mean)
+              values_from = mean) %>%
+  rowid_to_column() %>%
+  mutate(rowid = ifelse(predictor == "sigma", 16, rowid),
+         marker = ifelse(predictor == "sigma", "all", marker)) %>%
+  group_by(rowid, predictor, marker) %>%
+  summarise(across(1:4, mean), .groups = "drop") %>%
+  slice(7, 1:6, 8:14)
 
-r %>% 
-  filter(predictor == "sigma", type == "Coverage") %>%
-  group_by(Model, marker) %>%
-  summarize(Mean = mean(value)) %>%
-  pivot_wider(names_from = Model, values_from = Mean) %>%
-  xtable::xtable(digits = 3) %>%
-  xtable::print.xtable(include.rownames = FALSE)
+eval <- left_join(bias, mse, by = c("rowid", "predictor", "marker"), 
+                  suffix = c("bias", "mse")) %>%
+  left_join(coverage, by = c("rowid", "predictor", "marker")) %>%
+  mutate(rowid = NULL,
+         marker = NULL,
+         predictor = c("$\\lambda + \\gamma$", paste0("$\\alpha_{", 1:6, "}$"),
+                       paste0("$\\mu_{", 1:6, "}$"), "$\\sigma$"))
+
+xtable::print.xtable(xtable::xtable(eval, digits = 3), include.rownames = FALSE,
+                     sanitize.text.function = identity)
