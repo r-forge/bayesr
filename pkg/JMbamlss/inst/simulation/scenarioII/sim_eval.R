@@ -36,7 +36,8 @@ mnames_btru <- list.files(path = file.path(server_wd, "scen_II_230719",
                                            "bamlss_tru"))
 preds_btru <- JMbamlss:::sim_bamlss_predict(mnames_btru, server_wd, 
                                             "/scen_II_230719/bamlss_tru/",
-                                            "/scen_II_230719/data/", rds = TRUE)
+                                            "/scen_II_230719/data/", rds = TRUE,
+                                            old = TRUE)
 saveRDS(preds_btru,
         file = file.path(server_wd, "scen_II_230719", "preds_btru.rds"))
 # saveRDS(preds_btru, file = "preds_btru.rds")
@@ -61,7 +62,7 @@ mnames_best1 <- list.files(path = file.path(server_wd, "scen_II_230719",
 preds_best1 <- JMbamlss:::sim_bamlss_predict(mnames_best1, server_wd, 
                                              "/scen_II_230719/bamlss_est1/",
                                              "/scen_II_230719/data/", 
-                                             rds = TRUE)
+                                             rds = TRUE, old = TRUE)
 saveRDS(preds_best1,
         file = file.path(server_wd, "scen_II_230719", "preds_best1.rds"))
 # saveRDS(preds_best1, 
@@ -88,7 +89,7 @@ mnames_best95 <- list.files(path = file.path(server_wd, "scen_II_230719",
 preds_best95 <- JMbamlss:::sim_bamlss_predict(mnames_best95, server_wd, 
                                              "/scen_II_230719/bamlss_est95/",
                                              "/scen_II_230719/data/",
-                                             rds = TRUE)
+                                             rds = TRUE, old = TRUE)
 saveRDS(preds_best95,
         file = file.path(server_wd, "scen_II_230719", "preds_best95.rds"))
 # saveRDS(preds_best95, 
@@ -134,14 +135,10 @@ rm(preds_jmb, eval_jmb, it_list)
 
 # Table for Paper ---------------------------------------------------------
 
-# e_btru <- readRDS(file.path(server_wd, "scen_II_230719", "eval_btru.rds"))
-# e_best1 <- readRDS(file.path(server_wd, "scen_II_230719", "eval_best1.rds"))
-# e_best95 <- readRDS(file.path(server_wd, "scen_II_230719", "eval_best95.rds"))
-# e_jmb <- readRDS(file.path(server_wd, "scen_II_230719", "eval_jmb.rds"))
-e_btru <- readRDS(file.path("~/Downloads", "transfer_scenII", "eval_btru.rds"))
-e_best1 <- readRDS(file.path("~/Downloads", "transfer_scenII", "eval_best1.rds"))
-e_best95 <- readRDS(file.path("~/Downloads", "transfer_scenII", "eval_best95.rds"))
-e_jmb <- readRDS(file.path("~/Downloads", "transfer_scenII", "eval_jmb.rds"))
+e_btru <- readRDS(file.path(server_wd, "scen_II_230719", "eval_btru.rds"))
+e_best1 <- readRDS(file.path(server_wd, "scen_II_230719", "eval_best1.rds"))
+e_best95 <- readRDS(file.path(server_wd, "scen_II_230719", "eval_best95.rds"))
+e_jmb <- readRDS(file.path(server_wd, "scen_II_230719", "eval_jmb.rds"))
 
 
 r <- rbind(e_btru, e_best1, e_best95, e_jmb) %>%
