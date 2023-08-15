@@ -182,3 +182,56 @@ eval <- left_join(bias, mse, by = c("rowid", "predictor", "marker"),
 
 xtable::print.xtable(xtable::xtable(eval, digits = 3), include.rownames = FALSE,
                      sanitize.text.function = identity)
+
+
+
+# Plot longitudinal fits --------------------------------------------------
+
+d_rirs <- readRDS(file.path(server_wd, "scen_I_230719", "data", "d100.rds"))
+set.seed(1444)
+ids <- c(sample(which(d_rirs$data_short$survtime[1:150] > 0.2 & 
+                        d_rirs$data_short$survtime[1:150] < 0.35), size = 1),
+         sample(which(d_rirs$data_short$survtime[1:150] > 0.35 & 
+                        d_rirs$data_short$survtime[1:150] < 0.7), size = 1),
+         sample(which(d_rirs$data_short$survtime[1:150] > 0.7), size = 1))
+
+p_btru <- readRDS(file.path(server_wd, "scen_I_230719", 
+                            "preds_btru.rds"))$b100.rds$predictions
+p_best1 <- readRDS(file.path(server_wd, "scen_I_230719", 
+                             "preds_best1.rds"))$b100.rds$predictions
+p_best95 <- readRDS(file.path(server_wd, "scen_I_230719", 
+                              "preds_best95.rds"))$b100.rds$predictions
+p_jmb <- readRDS(file.path(server_wd, "scen_I_230719", 
+                           "preds_jmb.rds"))$jmb100.rds$predictions
+
+# Compare the fitted values to the observed values
+mean_dat <- d_rirs$data_full %>%
+  select(id, marker, obstime, mu) %>%
+  left_join(d_rirs$data %>% select(id, marker, obstime, y), 
+            by = c("id", "marker", "obstime")) %>%
+  cbind(p_btru$mu_long %>% mutate("TRUE" = Mean) %>%
+          select("TRUE")) %>%
+  cbind(p_best1$mu_long %>% mutate(EST = Mean) %>% 
+          select(EST)) %>%
+  cbind(p_best95$mu_long %>% mutate(TRUNC = Mean) %>%
+          select(TRUNC)) %>%
+  cbind(p_jmb$mu_long %>% mutate(JMB = Mean) %>%
+          select(JMB)) %>%
+  pivot_longer(c(4, 6:ncol(.))) %>%
+  mutate(name = factor(name, levels = c("mu", "TRUE", "EST", "TRUNC", "JMB")))
+
+ggplot(mean_dat %>% filter(id %in% ids) %>%
+         mutate(marker = factor(marker, labels = paste("Outcome", 1:6)),
+                id = factor(id, labels = c("Subject 28", "Subject 70", 
+                                           "Subject 130"))),
+       aes(x = obstime, y = value, color = name)) +
+  facet_grid(id ~ marker, scales = "free_y")+
+  theme_bw() +
+  geom_point(aes(y = y), color = "grey") +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 1), labels = c(0, 0.5, 1),
+                     breaks = c(0, 0.5, 1)) +
+  scale_color_manual(values = c("black", scales::hue_pal()(4))) +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL,
+       x = "Time")
+# save 6x12
