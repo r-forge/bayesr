@@ -3812,9 +3812,13 @@ print.boost_summary <- function(x, summary = TRUE, plot = TRUE,
           dthres <- 0.02
         for(i in 1:(length(plab) - 1)) {
           dp <- abs(plab[i] - plab[i + 1]) / rplab
-          if(dp <= dthres) {
-            labs[i + 1] <- paste(c(labs[i], labs[i + 1]), collapse = ",")
-            labs[i] <- ""
+          if(length(dp)) {
+            if(!is.na(dp)) {
+              if(dp <= dthres) {
+                labs[i + 1] <- paste(c(labs[i], labs[i + 1]), collapse = ",")
+                labs[i] <- ""
+              }
+            }
           }
         }
         labs <- labs[order(o)]
@@ -4537,10 +4541,10 @@ lasso_stop <- function(x)
 
 
 ## Deep learning bamlss.
-dl.bamlss <- function(object,
-  optimizer = "adam", epochs = 30, batch_size = NULL,
-  nlayers = 2, units = 100, activation = "sigmoid", l1 = NULL, l2 = NULL,
-  verbose = TRUE, ...)
+ddnn <- function(object,
+  optimizer = "adam", learning_rate = 0.01, epochs = 100, batch_size = NULL,
+  nlayers = 2, units = 100, activation = "relu", l1 = NULL, l2 = NULL,
+  validation_split = 0.2, early_stopping = TRUE, patience = 50, verbose = TRUE, ...)
 {
   stopifnot(requireNamespace("keras"))
   stopifnot(requireNamespace("tensorflow"))
@@ -4630,6 +4634,11 @@ dl.bamlss <- function(object,
 
   model <- keras::keras_model(inputs, final_output)
 
+  if(is.character(optimizer)) {
+    if(optimizer == "adam")
+      optimizer <- optimizer_adam(learning_rate = learning_rate)
+  }
+
   model <- keras::compile(model,
     loss = nll, 
     optimizer = optimizer
@@ -4653,13 +4662,22 @@ dl.bamlss <- function(object,
       Y <- cbind(Y, 1)
   }
 
+  callbacks <- list()
+  if(early_stopping) {
+    callbacks <- list(
+      callback_early_stopping(patience = patience)
+    )
+  }
+
   ptm <- proc.time()
 
   history <- keras::fit(model,
     x = X, 
     y = Y, 
     epochs = epochs, batch_size = batch_size,
-    verbose = as.integer(verbose)
+    verbose = as.integer(verbose),
+    validation_split = validation_split,
+    callbacks = callbacks
   )
 
   elapsed <- c(proc.time() - ptm)[3]
@@ -4678,19 +4696,44 @@ dl.bamlss <- function(object,
   object$elapsed <- elapsed
   object$history <- history
 
-  class(object) <- c("dl.bamlss", "bamlss.frame")
+  class(object) <- c("ddnn", "bamlss.frame")
 
   return(object)
 }
 
 
-## Extractor functions.
-fitted.dl.bamlss <- function(object, ...) { object$fitted.values }
-family.dl.bamlss <- function(object, ...) { object$family }
-residuals.dl.bamlss <- function(object, ...) { residuals.bamlss(object, ...) }
-plot.dl.bamlss <- function(x, ...) { plot(x$history, ...) }
+## Optimize epochs using CV.
+cv_ddnn <- function(formula, data, folds = 10, min_epochs = 300, max_epochs = 400, interval = c(-Inf, Inf), ...)
+{
+  i <- sample(1:folds, size = nrow(data), replace = TRUE)
+  epochs <- NULL
+  for(j in 1:folds) {
+    cat(".. start fold", j, "\n")
+    dtrain <- subset(data, i != j)
+    dtest <- subset(data, i == j)
+    crps <- NULL
+    epochs_v <- min_epochs:max_epochs
+    for(e in epochs_v) {
+      cat(e, "/", sep = "")
+      b <- ddnn(formula, data = dtrain, epochs = e, verbose = FALSE, ...)
+      crps <- c(crps, CRPS(b, newdata = dtest, interval = interval))
+    }
+    epochs <- c(epochs, epochs_v[which.min(crps)])
+    cat("\n.. fold =", j, "CRPS =", fmt(min(crps), digits = 5, width = 8), "epoch =", epochs_v[which.min(crps)], "\n")
+  }
+  epochs <- floor(mean(epochs))
+  cat(".. fitting final model using epochs =", epochs, "\n")
+  ddnn(formula, data = dtrain, epochs = epochs, verbose = FALSE, ...)
+}
 
-logLik.dl.bamlss <- function(object, ...)
+
+## Extractor functions.
+fitted.ddnn <- function(object, ...) { object$fitted.values }
+family.ddnn <- function(object, ...) { object$family }
+residuals.ddnn <- function(object, ...) { residuals.bamlss(object, ...) }
+plot.ddnn <- function(x, ...) { plot(x$history, ...) }
+
+logLik.ddnn <- function(object, ...)
 {
   nd <- list(...)$newdata
   rn <- response_name(object)
@@ -4709,7 +4752,7 @@ logLik.dl.bamlss <- function(object, ...)
 
 
 ## Predict function.
-predict.dl.bamlss <- function(object, newdata, model = NULL,
+predict.ddnn <- function(object, newdata, model = NULL,
   type = c("link", "parameter"), drop = TRUE, ...)
 {
   ## If data have been scaled (scale.d = TRUE)
@@ -6517,6 +6560,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
 
   rval
 }
+
 
 contribplot <- function(x, ...) {
   if(is.null(ll <- x$model.stats$optimizer$llcontrib))
