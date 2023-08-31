@@ -1791,10 +1791,14 @@ cnorm_bamlss <- function(...)
       as.integer(attr(y, "check")), PACKAGE = "bamlss")
   }
   f$d <- function(y, par, log = FALSE) {
+    if(length(y) == 1)
+      y <- rep(y, length(par[[1L]]))
     ifelse(y <= 0, pnorm(-par$mu / par$sigma, log.p = log),
       dnorm((y - par$mu) / par$sigma, log = log) / par$sigma^(1 - log) - log(par$sigma) * log)
   }
   f$p <- function(y, par, log = FALSE) {
+    if(length(y) == 1)
+      y <- rep(y, length(par[[1L]]))
     return(ifelse(y == 0, runif(length(y), 0, pnorm(0, par$mu, par$sigma)), pnorm(y - par$mu, 0, par$sigma)))
   }
   f$q <- function(p, par, ...) {
