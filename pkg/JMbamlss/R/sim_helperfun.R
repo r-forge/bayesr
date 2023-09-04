@@ -143,15 +143,35 @@ sim_results <- function(result_list, dat_list, name) {
                 }))))
     
     eval_lambga_long <- data.frame(
-      type = c("Bias", "MSE", "Coverage"),
+      type =  rep(c("Bias", "MSE", "Coverage"), each = 101),
       model = name,
       predictor = "lambga_long",
       marker = "all",
-      t = "all",
-      value = c(mean(-(est$lambga_long$Mean - sim$lambga_long)),
-                mean((est$lambga_long$Mean - sim$lambga_long)^2),
-                mean(est$lambga_long[, 1] < sim$lambga_long & 
-                       est$lambga_long[, 3] > sim$lambga_long)))
+      t = rep(seq(0, 1, by = 0.01), times = 3),
+      value = c(c(sapply(seq(0, 1, by = 0.01), function (t) {
+        e <- split(est$lambga_long, est$mu_long$marker)[[1]]
+        # Following line should be replaced
+        e$obstime <- split(est$mu_long, est$mu_long$marker)[[1]]$obstime
+        s <- sim_marker[[1]]
+        same_t <- e$obstime == t
+        mean(-(e$Mean[same_t] - s[same_t]))
+      })),
+      c(sapply(seq(0, 1, by = 0.01), function (t) {
+        e <- split(est$lambga_long, est$mu_long$marker)[[1]]
+        # Following line should be replaced
+        e$obstime <- split(est$mu_long, est$mu_long$marker)[[1]]$obstime
+        s <- sim_marker[[1]]
+        same_t <- e$obstime == t
+        mean((e$Mean[same_t] - s[same_t])^2)
+      })),
+      c(sapply(seq(0, 1, by = 0.01), function (t) {
+        e <- split(est$lambga_long, est$mu_long$marker)[[1]]
+        # Following line should be replaced
+        e$obstime <- split(est$mu_long, est$mu_long$marker)[[1]]$obstime
+        s <- sim_marker[[1]]
+        same_t <- e$obstime == t
+        mean(e[same_t, 1] < s[same_t] & e[same_t, 3] > s[same_t])
+      }))))
     
     eval_lambga_event <- data.frame(
       type = c("Bias", "MSE", "Coverage"),
@@ -246,6 +266,7 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE,
                                   FUN = function(x) {x})[nodupl_ids, ])
   mcmc_lambga <- mcmc_gamma + mcmc_lambda
   # Longitudinal grid
+  # Should be improved here. Only the first marker in d_rirs_long is needed.
   mcmc_lambda_long <- as.matrix(predict(b_est, model = "lambda", 
                                         newdata = d_rirs_long,
                                         FUN = function(x) {x}))
@@ -284,7 +305,10 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE,
                                               probs = 0.025),
                                "Mean" = rowMeans(mcmc_lambga_long),
                                "97.5%" = apply(mcmc_lambga_long, 1, quantile, 
-                                               probs = 0.975)),
+                                               probs = 0.975),
+                               "marker" = d_rirs$data_full$marker,
+                               "obstime" = d_rirs$data_full$obstime,
+                               "id" = d_rirs$data_full$id),
     "lambga_event" = data.frame("2.5%" = apply(mcmc_lambga_event, 1, quantile, 
                                          probs = 0.025),
                           "Mean" = rowMeans(mcmc_lambga_event),
@@ -297,7 +321,9 @@ sim_bamlss_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE,
     "mu" = d_rirs$data[, c("mu", "marker")],
     "sigma" = d_rirs$data$sigma[marks],
     "mu_long" = d_rirs$data_full$mu,
-    "lambga_long" = rowSums(d_rirs_long[, c("lambda", "gamma")]),
+    "lambga_long" = data.frame(
+      "lambga" = rowSums(d_rirs_long[, c("lambda", "gamma")]),
+      "t" = d_rirs_long$survtime),
     "lambga_event" = rowSums(d_rirs$data[ids, c("lambda", "gamma")])
   ))
   
@@ -433,7 +459,9 @@ sim_jmb_predict_i <- function(m, wd, model_wd, data_wd, rds = TRUE,
          "mu" = d_rirs$data[, c("mu", "marker")],
          "sigma" = d_rirs$data$sigma[marks],
          "mu_long" = d_rirs$data_full$mu,
-         "lambga_long" = rowSums(d_rirs$data_full[, c("lambda", "gamma")]),
+         "lambga_long" = data.frame(
+           "lambga" = rowSums(d_rirs$data_full[, c("lambda", "gamma")]),
+           "t" = d_rirs$data_full$obstime),
          "lambga_event" = rowSums(d_rirs$data[ids, c("lambda", "gamma")])
        ))
   

@@ -67,6 +67,19 @@ simI_jmb <- comptime_info(results_wd = server_wd,
                           setting = "scen_I_230719",
                           folder = "jmb")
 
+load(file.path(server_wd, "scen_I_230719", "comp_times.Rdata"))
+# bamlss_true: mavis - 100:128, springsteen - 129:199, afflux - 200:249,
+# pandia 250:299
+summary(simI_tru["elapsed", 1:29])
+summary(simI_tru["elapsed", 30:100])
+# bamlss_est1: springsteen - 100:299
+summary(simI_est1["elapsed", ])
+# bamlss_est95: mavis - 100:299
+summary(simI_est95["elapsed", ])
+# jmb: springsteen - 100:299
+summary(simI_jmb["elapsed", ])
+
+
 # Simulation Scenario II
 simII_tru <- comptime_info(results_wd = server_wd,
                           setting = "scen_II_230719",

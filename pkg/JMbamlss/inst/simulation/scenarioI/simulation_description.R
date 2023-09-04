@@ -7,7 +7,7 @@ library(tidyverse)
 file_location <- paste0("/run/user/1000/gvfs/smb-share:server=clapton.wiwi.hu-",
                         "berlin.de,share=volkmana.hub/JMbamlss/simulation/scen",
                         "_I_130922/data")
-files <- list.files(path = file_location, pattern = "Rdata")
+files <- list.files(path = file_location, pattern = "rds")
 all_dat <- lapply(files, function (dat) {
   load(paste0(file_location, "/", dat))
   out <- d_rirs$data
@@ -15,7 +15,7 @@ all_dat <- lapply(files, function (dat) {
   out
 })
 all_dat_id <- lapply(files, function (dat) {
-  load(paste0(file_location, "/", dat))
+  d_rirs <- readRDS(paste0(file_location, "/", dat))
   out <- d_rirs$data_short
   rm(d_rirs)
   out

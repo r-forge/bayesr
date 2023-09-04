@@ -351,10 +351,8 @@ MJM_mcmc <- function(x, y, family, start = NULL, weights = NULL, offset = NULL,
     
     # Rescale the alpha samples (accounting for standardization)
     alpha_cols <- grep("alpha.+marker", colnames(samps))
-    which_sd <- as.numeric(sub("alpha.+markerm", "", 
-                               colnames(samps)[alpha_cols]))
     for (i in seq_along(alpha_cols)) {
-      samps[, alpha_cols[i]] <- samps[, alpha_cols[i]] / long_sds[which_sd[i]]
+      samps[, alpha_cols[i]] <- samps[, alpha_cols[i]] / long_sds[i]
     }
     
     # Calculate gamma intercept adaption for standardization

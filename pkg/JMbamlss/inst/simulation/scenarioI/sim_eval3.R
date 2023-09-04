@@ -72,6 +72,50 @@ saveRDS(eval_best1,
 rm(preds_best1, eval_best1, it_list)
 
 
+# Evaluate bamlss EST 99 FPCs ---------------------------------------------
+
+mnames_best99 <- list.files(path = file.path(server_wd, "scen_I_230719", 
+                                              "bamlss_est99"))
+preds_best99 <- JMbamlss:::sim_bamlss_predict(mnames_best99, server_wd, 
+                                               "/scen_I_230719/bamlss_est99/",
+                                               "/scen_I_230719/data/", 
+                                               rds = TRUE)
+saveRDS(preds_best99, 
+        file = file.path(server_wd, "scen_I_230719", "preds_best99.rds"))
+
+it_list <- JMbamlss:::sim_results(lapply(preds_best99, "[[", "predictions"),
+                                  lapply(preds_best99, "[[", "simulations"),
+                                  name = "EST99")
+eval_best99 <- do.call(rbind, Map(cbind, it = sub("\\.rds", "",
+                                                   names(it_list)), it_list))
+saveRDS(eval_best99,
+        file = file.path(server_wd, "scen_I_230719", "eval_best99.rds"))
+rm(preds_best99, eval_best99, it_list)
+
+
+
+# Evaluate bamlss EST 975 FPCs --------------------------------------------
+
+mnames_best975 <- list.files(path = file.path(server_wd, "scen_I_230719", 
+                                              "bamlss_est975"))
+preds_best975 <- JMbamlss:::sim_bamlss_predict(mnames_best975, server_wd, 
+                                               "/scen_I_230719/bamlss_est975/",
+                                               "/scen_I_230719/data/", 
+                                               rds = TRUE)
+saveRDS(preds_best975, 
+        file = file.path(server_wd, "scen_I_230719", "preds_best975.rds"))
+
+it_list <- JMbamlss:::sim_results(lapply(preds_best975, "[[", "predictions"),
+                                  lapply(preds_best975, "[[", "simulations"),
+                                  name = "EST975")
+eval_best975 <- do.call(rbind, Map(cbind, it = sub("\\.rds", "",
+                                                   names(it_list)), it_list))
+saveRDS(eval_best975,
+        file = file.path(server_wd, "scen_I_230719", "eval_best975.rds"))
+rm(preds_best975, eval_best975, it_list)
+
+
+
 
 
 # Evaluate bamlss EST 95 FPCs ---------------------------------------------
@@ -120,12 +164,14 @@ rm(preds_jmb, eval_jmb, it_list)
 
 e_btru <- readRDS(file.path(server_wd, "scen_I_230719", "eval_btru.rds"))
 e_best1 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best1.rds"))
+e_best99 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best99.rds"))
+e_best975 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best975.rds"))
 e_best95 <- readRDS(file.path(server_wd, "scen_I_230719", "eval_best95.rds"))
 e_jmb <- readRDS(file.path(server_wd, "scen_I_230719", "eval_jmb.rds"))
 
 
-r <- rbind(e_btru, e_best1, e_best95, e_jmb) %>%
-  mutate(Model = factor(model, levels = c("TRU", "EST1", "EST95", "JMB"),
+r <- rbind(e_btru, e_best1, e_best99, e_jmb) %>%
+  mutate(Model = factor(model, levels = c("TRU", "EST1", "EST99", "JMB"),
                         labels = c("TRUE", "EST", "TRUNC", "JMB")))
 
 bias <- r %>%
@@ -185,6 +231,61 @@ xtable::print.xtable(xtable::xtable(eval, digits = 3), include.rownames = FALSE,
 
 
 
+# Time dependent evaluation -----------------------------------------------
+
+# Bamlss
+ggplot(e_best1 %>% 
+         filter(type == "Bias", predictor == "lambga_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() +
+  ggtitle("Bias")
+ggplot(e_best1 %>% 
+         filter(type == "Bias", predictor == "mu_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() + 
+  facet_wrap(~marker, nrow = 2) + 
+  ylim(c(-0.1, 0.1)) + ggtitle("Bias") # Bias
+  # ylim(c(0, 0.05)) + ggtitle("MSE") # Change to type == MSE
+  # ggtitle("Coverage") # Change to type == Coverage
+
+# JMbayes2
+ggplot(e_jmb %>% 
+         filter(type == "Coverage", predictor == "lambga_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() +
+  ggtitle("Coverage")
+ggplot(e_jmb %>% 
+         filter(type == "Coverage", predictor == "mu_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() + 
+  facet_wrap(~marker, nrow = 2) + 
+  # ylim(c(-0.01, 0.01)) + ggtitle("Bias") # Bias
+  # ylim(c(0, 0.002)) + ggtitle("MSE") # Change to type == MSE
+  ggtitle("Coverage") # Change to type == Coverage
+
+# True MFPCs
+ggplot(e_btru %>% 
+         filter(type == "Bias", predictor == "lambga_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() +
+  ggtitle("Bias")
+ggplot(e_btru %>% 
+         filter(type == "Coverage", predictor == "mu_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() + 
+  facet_wrap(~marker, nrow = 2) + 
+  # ylim(c(-0.01, 0.01)) + ggtitle("Bias") # Bias
+  # ylim(c(0, 0.0015)) + ggtitle("MSE") # Change to type == MSE
+  ggtitle("Coverage") # Change to type == Coverage
+
+
+
 # Plot longitudinal fits --------------------------------------------------
 
 d_rirs <- readRDS(file.path(server_wd, "scen_I_230719", "data", "d100.rds"))
@@ -199,8 +300,8 @@ p_btru <- readRDS(file.path(server_wd, "scen_I_230719",
                             "preds_btru.rds"))$b100.rds$predictions
 p_best1 <- readRDS(file.path(server_wd, "scen_I_230719", 
                              "preds_best1.rds"))$b100.rds$predictions
-p_best95 <- readRDS(file.path(server_wd, "scen_I_230719", 
-                              "preds_best95.rds"))$b100.rds$predictions
+p_best99 <- readRDS(file.path(server_wd, "scen_I_230719", 
+                              "preds_best99.rds"))$b100.rds$predictions
 p_jmb <- readRDS(file.path(server_wd, "scen_I_230719", 
                            "preds_jmb.rds"))$jmb100.rds$predictions
 
@@ -213,7 +314,7 @@ mean_dat <- d_rirs$data_full %>%
           select("TRUE")) %>%
   cbind(p_best1$mu_long %>% mutate(EST = Mean) %>% 
           select(EST)) %>%
-  cbind(p_best95$mu_long %>% mutate(TRUNC = Mean) %>%
+  cbind(p_best99$mu_long %>% mutate(TRUNC = Mean) %>%
           select(TRUNC)) %>%
   cbind(p_jmb$mu_long %>% mutate(JMB = Mean) %>%
           select(JMB)) %>%

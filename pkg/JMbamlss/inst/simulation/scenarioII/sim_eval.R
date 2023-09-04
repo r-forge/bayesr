@@ -80,6 +80,27 @@ saveRDS(eval_best1,
 rm(preds_best1, eval_best1, it_list)
 
 
+# Evaluate bamlss EST 99 FPCs ---------------------------------------------
+
+mnames_best99 <- list.files(path = file.path(server_wd, "scen_II_230719", 
+                                             "bamlss_est99"))
+preds_best99 <- JMbamlss:::sim_bamlss_predict(mnames_best99, server_wd, 
+                                              "/scen_II_230719/bamlss_est99/",
+                                              "/scen_II_230719/data/",
+                                              rds = TRUE)
+saveRDS(preds_best99,
+        file = file.path(server_wd, "scen_II_230719", "preds_best99.rds"))
+
+it_list <- JMbamlss:::sim_results(lapply(preds_best99, "[[", "predictions"),
+                                  lapply(preds_best99, "[[", "simulations"),
+                                  name = "EST99")
+eval_best99 <- do.call(rbind, Map(cbind, it = sub("\\.rds", "", names(it_list)),
+                                  it_list))
+saveRDS(eval_best99,
+        file = file.path(server_wd, "scen_II_230719", "eval_best99.rds"))
+rm(preds_best99, eval_best99, it_list)
+
+
 
 
 # Evaluate bamlss EST 95 FPCs ---------------------------------------------
@@ -137,12 +158,13 @@ rm(preds_jmb, eval_jmb, it_list)
 
 e_btru <- readRDS(file.path(server_wd, "scen_II_230719", "eval_btru.rds"))
 e_best1 <- readRDS(file.path(server_wd, "scen_II_230719", "eval_best1.rds"))
+e_best99 <- readRDS(file.path(server_wd, "scen_II_230719", "eval_best99.rds"))
 e_best95 <- readRDS(file.path(server_wd, "scen_II_230719", "eval_best95.rds"))
 e_jmb <- readRDS(file.path(server_wd, "scen_II_230719", "eval_jmb.rds"))
 
 
-r <- rbind(e_btru, e_best1, e_best95, e_jmb) %>%
-  mutate(Model = factor(model, levels = c("TRU", "EST1", "EST95", "JMB"),
+r <- rbind(e_btru, e_best1, e_best99, e_jmb) %>%
+  mutate(Model = factor(model, levels = c("TRU", "EST1", "EST99", "JMB"),
                         labels = c("TRUE", "EST", "TRUNC", "JMB")))
 
 bias <- r %>%
@@ -200,3 +222,91 @@ eval <- left_join(bias, mse, by = c("predictor", "marker"),
 
 xtable::print.xtable(xtable::xtable(eval, digits = 3), include.rownames = FALSE,
                      sanitize.text.function = identity)
+
+# Time dependent evaluation -----------------------------------------------
+
+ggplot(e_best1 %>% 
+         filter(type == "MSE", predictor == "lambga_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw()
+ggplot(e_best1 %>% 
+         filter(type == "Coverage", predictor == "mu_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() + 
+  facet_wrap(~marker, nrow = 2) + 
+  # ylim(c(-0.25, 0.1)) + ggtitle("Bias") # Bias
+  # ylim(c(0, 0.05)) + ggtitle("MSE") # Change to type == MSE
+  ggtitle("Coverage") # Change to type == Coverage
+
+# JMbayes2
+ggplot(e_jmb %>% 
+         filter(type == "Coverage", predictor == "lambga_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() +
+  ggtitle("Coverage")
+ggplot(e_jmb %>% 
+         filter(type == "Bias", predictor == "mu_long"),
+       aes(x = t, y = value))+
+  geom_boxplot() +
+  theme_bw() + 
+  facet_wrap(~marker, nrow = 2) + 
+  ggtitle("Bias") # Bias
+  # ylim(c(0, 1)) + ggtitle("MSE") # Change to type == MSE
+  # ggtitle("Coverage") # Change to type == Coverage
+
+
+
+# Plot longitudinal fits --------------------------------------------------
+
+d_sim <- readRDS(file.path(server_wd, "scen_II_230719", "data", "d100.rds"))
+# set.seed(1444)
+# ids <- c(sample(which(d_sim$data_short$survtime[1:150] > 0.2 & 
+#                         d_sim$data_short$survtime[1:150] < 0.35), size = 1),
+#          sample(which(d_sim$data_short$survtime[1:150] > 0.35 & 
+#                         d_sim$data_short$survtime[1:150] < 0.7), size = 1),
+#          sample(which(d_sim$data_short$survtime[1:150] > 0.7), size = 1))
+ids <- c(16, 56, 136)
+
+p_btru <- readRDS(file.path(server_wd, "scen_II_230719", 
+                            "preds_btru.rds"))$b100.rds$predictions
+p_best1 <- readRDS(file.path(server_wd, "scen_II_230719", 
+                             "preds_best1.rds"))$b100.rds$predictions
+p_best95 <- readRDS(file.path(server_wd, "scen_II_230719", 
+                              "preds_best95.rds"))$b100.rds$predictions
+p_jmb <- readRDS(file.path(server_wd, "scen_II_230719", 
+                           "preds_jmb.rds"))$jmb100.rds$predictions
+
+# Compare the fitted values to the observed values
+mean_dat <- d_sim$data_full %>%
+  select(id, marker, obstime, mu) %>%
+  left_join(d_sim$data %>% select(id, marker, obstime, y), 
+            by = c("id", "marker", "obstime")) %>%
+  cbind(p_btru$mu_long %>% mutate("TRUE" = Mean) %>%
+          select("TRUE")) %>%
+  cbind(p_best1$mu_long %>% mutate(EST = Mean) %>% 
+          select(EST)) %>%
+  cbind(p_best95$mu_long %>% mutate(TRUNC = Mean) %>%
+          select(TRUNC)) %>%
+  cbind(p_jmb$mu_long %>% mutate(JMB = Mean) %>%
+          select(JMB)) %>%
+  pivot_longer(c(4, 6:ncol(.))) %>%
+  mutate(name = factor(name, levels = c("mu", "TRUE", "EST", "TRUNC", "JMB")))
+
+ggplot(mean_dat %>% filter(id %in% ids) %>%
+         mutate(marker = factor(marker, labels = paste("Outcome", 1:2)),
+                id = factor(id, labels = c("Subject 16", "Subject 56",
+                                           "Subject 136"))),
+       aes(x = obstime, y = value, color = name)) +
+  facet_grid(id ~ marker, scales = "free_y")+
+  theme_bw() +
+  geom_point(aes(y = y), color = "grey") +
+  geom_line() +
+  scale_x_continuous(limits = c(0, 1), labels = c(0, 0.5, 1),
+                     breaks = c(0, 0.5, 1)) +
+  scale_color_manual(values = c("black", scales::hue_pal()(4))) +
+  labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL,
+       x = "Time")
+# save 4x8

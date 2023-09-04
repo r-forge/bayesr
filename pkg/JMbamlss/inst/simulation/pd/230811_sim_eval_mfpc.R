@@ -53,10 +53,10 @@ fpc_info <- function (results_wd, setting, folder) {
 
 simI <- fpc_info(results_wd = server_wd,
                  setting = "scen_I_230719",
-                 folder = "bamlss_est95")
+                 folder = "bamlss_est99")
 simII <- fpc_info(results_wd = server_wd,
                   setting = "scen_II_230719",
-                  folder = "bamlss_est95")
+                  folder = "bamlss_est99")
 
 
 
@@ -107,6 +107,20 @@ eigenfun_norm <- Vectorize(eigenfun_norm_i, vectorize.args = "mfpca",
 norm_simI <- eigenfun_norm(lapply(simI, "[[", "mfpca"), simI_tru$mfpca)
 norm_simII <- eigenfun_norm(lapply(simII, "[[", "mfpca"), simII_tru$mfpca)
 
+norm_simI <- readRDS(file.path(server_wd, "scen_I_230719", "mfpc_norms.rds"))
+ggplot(data.frame(t(norm_simI)) %>% pivot_longer(seq_len(ncol(.))),
+       aes(x = name, y = value)) +
+  geom_boxplot() +
+  theme_bw()
+
+norm_simII <- readRDS(file.path(server_wd, "scen_II_230719", "mfpc_norms.rds"))
+ggplot(data.frame(t(norm_simII)) %>% pivot_longer(seq_len(ncol(.))),
+       aes(x = name, y = value)) +
+  geom_boxplot() +
+  theme_bw()
+
+xtable::print.xtable(xtable::xtable(matrix(rowMeans(norm_simI), nrow = 1)))
+xtable::print.xtable(xtable::xtable(matrix(rowMeans(norm_simII), nrow = 1)))
 
 # Plot the estimated MFPCs ------------------------------------------------
 
