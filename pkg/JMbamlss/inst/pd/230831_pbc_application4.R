@@ -64,16 +64,14 @@ which_mis <- p_long %>%
   select(id) %>%
   unlist()
 p_long <- p_long %>%
-  filter(id %in% which_mis)
+  filter(id %in% which_mis) %>%
+  droplevels()
 
 # Data for JMbayes2
 # Use logy for logarithmic transform
-# Same dataset has to be used for all models and lme cannot handle missing
-# values
 p_long_jmb <- p_long %>%
   pivot_wider(id_cols = c(id, obstime, survtime, event, sex, age),
-              values_from = logy, names_from = marker) %>%
-  na.omit()
+              values_from = logy, names_from = marker) 
 
 p_long_id <- p_long_jmb %>%
   group_by(id) %>%
@@ -83,6 +81,9 @@ p_long_id <- p_long_jmb %>%
 
 
 # Fit the JMbamlss Model --------------------------------------------------
+
+
+# Model using 10 Basis Functions ------------------------------------------
 
 # Estimate the model using estimated FPCs
 few_obs <- apply(table(p_long$id, p_long$marker), 1,
@@ -125,7 +126,7 @@ f_est <- list(
   gamma ~ 1 + s(age) + sex,
   as.formula(paste0(
     "mu ~ -1 + marker + s(obstime, by = marker, xt = list('scale' = FALSE))",
-    "+ sex:marker +",
+    "+ sex:marker + s(age, by = marker, xt = list('scale' = FALSE)) + ",
     paste0(lapply(seq_len(nfpc), function(x) {
       paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
              "mfpca_est_list[[", x, "]], 'scale' = FALSE))")
@@ -135,37 +136,41 @@ f_est <- list(
 )
 
 set.seed(1252)
-bamlss_fit <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
-                     timevar = "obstime", maxit = 1500,
-                     n.iter = 12000L, burnin = 2000L, thin = 5)
+t_99 <- system.time(
+  bamlss_fit <- bamlss(f_est, family = JMbamlss:::mjm_bamlss, data = p_long,
+                       timevar = "obstime", maxit = 1500,
+                       n.iter = 12000L, burnin = 2000L, thin = 5)
+)
 saveRDS(bamlss_fit, file = file.path(results_wd, "inst", "objects", 
                                      "pbc_analysis", "pbc_fit_99.rds"))
 rm(bamlss_fit)
 # Also: fit for truncation order 99.9% and 100%
-# 99.9
-nfpc999 <- min(which(
-  cumsum(mfpca_est$values[vals])/sum(mfpca_est$values[vals]) > 0.999))
-f_est999 <- list(
-  Surv2(survtime, event, obs = logy) ~ -1 + 
-    s(survtime, k = 10, bs = "ps", xt = list("scale" = FALSE)),
-  gamma ~ 1 + s(age) + sex,
-  as.formula(paste0(
-    "mu ~ -1 + marker + s(obstime, by = marker, xt = list('scale' = FALSE))",
-    "+ sex:marker +",
-    paste0(lapply(seq_len(nfpc999), function(x) {
-      paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
-             "mfpca_est_list[[", x, "]], 'scale' = FALSE))")
-    }), collapse = " + "))),
-  sigma ~ -1 + marker,
-  alpha ~ -1 + marker
-)
-set.seed(1252)
-bamlss_fit <- bamlss(f_est999, family = JMbamlss:::mjm_bamlss, data = p_long,
-                     timevar = "obstime", maxit = 1500,
-                     n.iter = 12000L, burnin = 2000L, thin = 5)
-saveRDS(bamlss_fit, file = file.path(results_wd, "inst", "objects", 
-                                     "pbc_analysis", "pbc_fit_999.rds"))
-rm(bamlss_fit)
+# # 99.9
+# nfpc999 <- min(which(
+#   cumsum(mfpca_est$values[vals])/sum(mfpca_est$values[vals]) > 0.999))
+# f_est999 <- list(
+#   Surv2(survtime, event, obs = logy) ~ -1 + 
+#     s(survtime, k = 10, bs = "ps", xt = list("scale" = FALSE)),
+#   gamma ~ 1 + s(age) + sex,
+#   as.formula(paste0(
+#     "mu ~ -1 + marker + s(obstime, by = marker, xt = list('scale' = FALSE))",
+#     "+ sex:marker + s(age, by = marker, xt = list('scale' = FALSE)) + ",
+#     paste0(lapply(seq_len(nfpc999), function(x) {
+#       paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
+#              "mfpca_est_list[[", x, "]], 'scale' = FALSE))")
+#     }), collapse = " + "))),
+#   sigma ~ -1 + marker,
+#   alpha ~ -1 + marker
+# )
+# set.seed(1252)
+# t_999 <- system.time(
+#   bamlss_fit <- bamlss(f_est999, family = JMbamlss:::mjm_bamlss, data = p_long,
+#                        timevar = "obstime", maxit = 1500,
+#                        n.iter = 12000L, burnin = 2000L, thin = 5)
+# )
+# saveRDS(bamlss_fit, file = file.path(results_wd, "inst", "objects", 
+#                                      "pbc_analysis", "pbc_fit_999.rds"))
+# rm(bamlss_fit)
 # 100
 nfpc1 <- length(vals)
 f_est1 <- list(
@@ -174,7 +179,7 @@ f_est1 <- list(
   gamma ~ 1 + s(age) + sex,
   as.formula(paste0(
     "mu ~ -1 + marker + s(obstime, by = marker, xt = list('scale' = FALSE))",
-    "+ sex:marker +",
+    "+ sex:marker + s(age, by = marker, xt = list('scale' = FALSE)) + ",
     paste0(lapply(seq_len(nfpc1), function(x) {
       paste0("s(id, fpc.", x, ", bs = 'unc_pcre', xt = list('mfpc' = ",
              "mfpca_est_list[[", x, "]], 'scale' = FALSE))")
@@ -183,42 +188,81 @@ f_est1 <- list(
   alpha ~ -1 + marker
 )
 set.seed(1252)
-bamlss_fit <- bamlss(f_est1, family = JMbamlss:::mjm_bamlss, data = p_long,
-                     timevar = "obstime", maxit = 1500,
-                     n.iter = 12000L, burnin = 2000L, thin = 5)
+t_1 <- system.time(
+  bamlss_fit <- bamlss(f_est1, family = JMbamlss:::mjm_bamlss, data = p_long,
+                       timevar = "obstime", maxit = 1500,
+                       n.iter = 12000L, burnin = 2000L, thin = 5)
+)
 saveRDS(bamlss_fit, file = file.path(results_wd, "inst", "objects", 
                                      "pbc_analysis", "pbc_fit_1.rds"))
 rm(bamlss_fit)
 
 
+
 # JMbayes2 Model ----------------------------------------------------------
+
+# Get the quantile-based knots for comparability
+kn <- mgcv::smoothCon(mgcv::s(survtime, k = 10, bs = "ps"), 
+                      data = p_long)[[1]]$knots
 
 set.seed(1205)
 # Cox Model
-CoxFit <- coxph(Surv(survtime, event) ~ age + sex, data = p_long_id)
-
-# Univariate longitudinal models
-fm1ns <- lme(albumin ~ ns(obstime, df = 3) + sex + ns(age, df = 3),
-             data = p_long_jmb, 
-             random = ~ ns(obstime, df = 2) | id)
-fm2ns <- lme(serBilir ~ ns(obstime, df = 3) + sex + ns(age, df = 3), 
-             data = p_long_jmb, 
-             random = ~ ns(obstime, df = 2) | id)
-fm3ns <- lme(serChol ~ ns(obstime, df = 3) + sex + ns(age, df = 3),
-             data = p_long_jmb, 
-             random = ~ ns(obstime, df = 2) | id)
-fm4ns <- lme(SGOT ~ ns(obstime, df = 3) + sex + ns(age, df = 3),
-             data = p_long_jmb, 
-             random = ~ ns(obstime, df = 2) | id)
-
-
-# Multivariate Joint Model
-# the joint model that links all sub-models
-jointFit <- jm(CoxFit, list(fm1ns, fm2ns, fm3ns, fm4ns), time_var = "obstime",
-               n_iter = 12000L, n_burnin = 2000L, n_thin = 5L, cores = 1,
-               save_random_effects = TRUE)
+t_jmb <- system.time({
+  
+  CoxFit <- coxph(Surv(survtime, event) ~ ns(age, df = 3) + sex,
+                  data = p_long_id)
+  
+  # Univariate longitudinal models
+  fm1ns <- lme(albumin ~ ns(obstime, df = 3) + sex + ns(age, df = 3),
+               data = p_long_jmb, na.action = na.omit,
+               random = ~ ns(obstime, df = 2) | id)
+  fm2ns <- lme(serBilir ~ ns(obstime, df = 3) + sex + ns(age, df = 3), 
+               data = p_long_jmb, na.action = na.omit, 
+               random = ~ ns(obstime, df = 2) | id)
+  fm3ns <- lme(serChol ~ ns(obstime, df = 3) + sex + ns(age, df = 3),
+               data = p_long_jmb, na.action = na.omit, 
+               random = ~ ns(obstime, df = 2) | id)
+  fm4ns <- lme(SGOT ~ ns(obstime, df = 3) + sex + ns(age, df = 3),
+               data = p_long_jmb, na.action = na.omit, 
+               random = ~ ns(obstime, df = 2) | id)
+  
+  
+  # Multivariate Joint Model
+  # the joint model that links all sub-models
+  jointFit <- jm(CoxFit, list(fm1ns, fm2ns, fm3ns, fm4ns), time_var = "obstime",
+                 n_iter = 12000L, n_burnin = 2000L, n_thin = 5L,
+                 cores = 1, n_chains = 1, 
+                 GK_k = 7, Bsplines_degree = 3, diff = 2, knots = list(kn),
+                 save_random_effects = TRUE)
+  
+})
 saveRDS(jointFit, file = file.path(results_wd, "inst", "objects", 
                                    "pbc_analysis", "pbc_fit_jmb.rds"))
+
+
+
+# Computation Times -------------------------------------------------------
+
+# bamlss_1
+# > t_1
+# user    system   elapsed 
+# 11983.029    15.524 11995.517 
+
+# bamlss_999
+# > t_999
+# user   system  elapsed 
+# 10376.79     7.12 10381.26 
+
+# bamlss_99
+# > t_99
+# user   system  elapsed 
+# 7142.438    3.056 7143.590 
+
+# jmb
+# > t_jmb
+# user  system elapsed 
+# 723.656   2.784 726.288 
+
 
 
 # Plot Observations -------------------------------------------------------
@@ -268,12 +312,10 @@ mcmc_mu <- do.call(rbind, lapply(seq_len(4), function (dim) {
       Z[[dim]][i, ] %*% B[idL[i], (dim - 1)*n_re + seq_len(n_re), ]
     }))
 }))
-preds <- cbind(
-  preds,
-  data.frame("jmb_2.5" = apply(mcmc_mu, 1, quantile, probs = 0.025),
-             "jmb_Mean" = rowMeans(mcmc_mu),
-             "jmb_97.5" = apply(mcmc_mu, 1, quantile, probs = 0.975))
-)
+jmb_preds <- data.frame("jmb_2.5" = apply(mcmc_mu, 1, quantile, probs = 0.025),
+                        "jmb_Mean" = rowMeans(mcmc_mu),
+                        "jmb_97.5" = apply(mcmc_mu, 1, quantile, probs = 0.975))
+preds <- cbind(preds, jmb_preds)
 
 # Reform the data set for nicer plotting
 preds_plot <- pivot_longer(preds, cols = c("Mean", "jmb_Mean"), 

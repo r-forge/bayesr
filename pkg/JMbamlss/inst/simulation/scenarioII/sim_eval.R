@@ -274,8 +274,8 @@ p_btru <- readRDS(file.path(server_wd, "scen_II_230719",
                             "preds_btru.rds"))$b100.rds$predictions
 p_best1 <- readRDS(file.path(server_wd, "scen_II_230719", 
                              "preds_best1.rds"))$b100.rds$predictions
-p_best95 <- readRDS(file.path(server_wd, "scen_II_230719", 
-                              "preds_best95.rds"))$b100.rds$predictions
+p_best99 <- readRDS(file.path(server_wd, "scen_II_230719", 
+                              "preds_best99.rds"))$b100.rds$predictions
 p_jmb <- readRDS(file.path(server_wd, "scen_II_230719", 
                            "preds_jmb.rds"))$jmb100.rds$predictions
 
@@ -288,7 +288,7 @@ mean_dat <- d_sim$data_full %>%
           select("TRUE")) %>%
   cbind(p_best1$mu_long %>% mutate(EST = Mean) %>% 
           select(EST)) %>%
-  cbind(p_best95$mu_long %>% mutate(TRUNC = Mean) %>%
+  cbind(p_best99$mu_long %>% mutate(TRUNC = Mean) %>%
           select(TRUNC)) %>%
   cbind(p_jmb$mu_long %>% mutate(JMB = Mean) %>%
           select(JMB)) %>%
