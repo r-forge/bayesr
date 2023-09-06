@@ -1,3 +1,7 @@
+# This file fits several JMbamlss models with different MFPCs. They differ in 
+# the number of basis functions used in the estimation of the MFPCs. Finally,
+# use the DIC to select the number of basis functions.
+
 # Set up R session --------------------------------------------------------
 
 
@@ -139,3 +143,13 @@ for (nbas in 4:9) {
   rm(bamlss_fit)
 }
 
+dics <- vector(length = 6)
+for (nbas in 4:9) {
+  bamlss_fit <- readRDS(file.path(results_wd, "inst", "objects", 
+                                  "pbc_analysis", 
+                                  paste0("pbc_fit_", nbas, "_99.rds")))
+  
+  dics[nbas-3] <- bamlss_fit$model.stats$sampler$DIC
+}
+# > dics
+# [1]   47.32648  -23.67283 -412.70238 -479.86343 -249.84627 -263.44913
