@@ -4778,7 +4778,7 @@ predict.ddnn <- function(object, newdata, model = NULL,
 
   type <- match.arg(type)
 
-  nx <- names(object$formula)
+  nx <- object$family$names
   X <- list()
   for(i in seq_along(nx)) {
     tfi <- drop.terms.bamlss(object$x[[i]]$terms,

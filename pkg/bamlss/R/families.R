@@ -6497,9 +6497,12 @@ mix_bamlss <- function(f1, f2, ...)
 ldZANBI <- function(y, mu = 1, sigma = 1, nu = 0.3)
 {
   n <- length(y)
-  mu <- rep(mu, n)
-  sigma <- rep(sigma, n)
-  nu <- rep(nu, n)
+  if(length(mu) != n)
+    mu <- rep(mu, length.out = n)
+  if(length(sigma) != n)
+    sigma <- rep(sigma, length.out = n)
+  if(length(nu) != n)
+    nu <- rep(nu, length.out = n)
   .Call("dZANBI", as.numeric(y), as.numeric(mu),
     as.numeric(sigma), as.numeric(nu), package = "bamlss")
 }
@@ -6507,9 +6510,12 @@ ldZANBI <- function(y, mu = 1, sigma = 1, nu = 0.3)
 llZANBI <- function(y, mu = 1, sigma = 1, nu = 0.3)
 {
   n <- length(y)
-  mu <- rep(mu, n)
-  sigma <- rep(sigma, n)
-  nu <- rep(nu, n)
+  if(length(mu) != n)
+    mu <- rep(mu, length.out = n)
+  if(length(sigma) != n)
+    sigma <- rep(sigma, length.out = n)
+  if(length(nu) != n)
+    nu <- rep(nu, length.out = n)
   .Call("llZANBI", as.numeric(y), as.numeric(mu),
     as.numeric(sigma), as.numeric(nu), package = "bamlss")
 }
