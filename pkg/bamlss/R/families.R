@@ -6535,6 +6535,7 @@ ZANBI_bamlss <- function(...)
       d <- ldZANBI(y, par$mu, par$sigma, par$nu)
       if(!log)
         d <- exp(d)
+      return(d)
     }
   )
 
