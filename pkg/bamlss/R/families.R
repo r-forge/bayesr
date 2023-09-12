@@ -6539,9 +6539,21 @@ ZANBI_bamlss <- function(...)
     }
   )
 
-  rval$p <- gamlss.dist::pZANBI
+  rval$p <- functiongamlss.dist::pZANBI
   rval$q <- gamlss.dist::qZANBI
   rval$r <- gamlss.dist::rZANBI
+
+  rval$p <- function(y, par, ...) {
+    functiongamlss.dist::pZANBI(y, mu = par$mu, sigma = par$sigma, nu = par$nu)
+  }
+
+  rval$p <- function(p, par, ...) {
+    functiongamlss.dist::qZANBI(q, mu = par$mu, sigma = par$sigma, nu = par$nu)
+  }
+
+  rval$r <- function(n, par, ...) {
+    functiongamlss.dist::rZANBI(n, mu = par$mu, sigma = par$sigma, nu = par$nu)
+  }
 
   rval$rps <- function(y, par, ymin = 0L, ymax = max(max(y), 100L)) {
     K <- seq(ymin, ymax, by = 1L)
