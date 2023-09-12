@@ -6540,15 +6540,15 @@ ZANBI_bamlss <- function(...)
   )
 
   rval$p <- function(y, par, ...) {
-    functiongamlss.dist::pZANBI(y, mu = par$mu, sigma = par$sigma, nu = par$nu)
+    gamlss.dist::pZANBI(y, mu = par$mu, sigma = par$sigma, nu = par$nu)
   }
 
   rval$q <- function(p, par, ...) {
-    functiongamlss.dist::qZANBI(q, mu = par$mu, sigma = par$sigma, nu = par$nu)
+    gamlss.dist::qZANBI(q, mu = par$mu, sigma = par$sigma, nu = par$nu)
   }
 
   rval$r <- function(n, par, ...) {
-    functiongamlss.dist::rZANBI(n, mu = par$mu, sigma = par$sigma, nu = par$nu)
+    gamlss.dist::rZANBI(n, mu = par$mu, sigma = par$sigma, nu = par$nu)
   }
 
   rval$rps <- function(y, par, ymin = 0L, ymax = max(max(y), 100L)) {
