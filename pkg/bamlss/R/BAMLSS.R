@@ -292,6 +292,12 @@ design.construct <- function(formula, data = NULL, knots = NULL,
       na.strings = "", header = TRUE, sep = ",")
   }
   if(inherits(data, "ffdf")) {
+    if(nrow(data) <= 50000) {
+      data <- as.data.frame(data)
+      no_ff <- TRUE
+    }
+  }
+  if(inherits(data, "ffdf")) {
     before <- TRUE
     gam.side <- FALSE
     if(is.null(binning))

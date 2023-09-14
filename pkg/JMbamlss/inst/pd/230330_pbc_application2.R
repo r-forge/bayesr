@@ -108,16 +108,22 @@ f_uni_log <- list(
   dalpha ~ -1
 )
 
+d <- p_long %>% filter(marker == "serBilir")
+thres <- sqrt(.Machine$double.eps)
+d$obstime[abs(d$obstime) < thres] <- thres
+
 set.seed(1559)
 b_bil <- bamlss(f_uni_log, family = "jm",
-                data = p_long %>% filter(marker == "serBilir"),
+                data = d,
                 timevar = "obstime", idvar = "id", maxit = 5000)#,
                 # n.iter = 5500, burnin = 500, thin = 5, verbose = TRUE,
                 # update.nu = TRUE)
+
 b_cho <- bamlss(f_uni_log, family = "jm",
-                data = p_long %>% filter(marker == "serChol"),
-                timevar = "obstime", idvar = "id", maxit = 5000,
-                n.iter = 5500, burnin = 500, thin = 5, verbose = TRUE)
+                data = d,
+                timevar = "obstime", idvar = "id", verbose = TRUE)
+
+
 b_sgo <- bamlss(f_uni_log, family = "jm",
                 data = p_long %>% filter(marker == "SGOT"),
                 timevar = "obstime", idvar = "id", maxit = 5000,
