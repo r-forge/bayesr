@@ -42,7 +42,9 @@ sam_BayesX <- BayesX <- function(x, y, family, start = NULL, weights = NULL, off
   data = NULL, control = BayesX.control(...), ...)
 {
   cmd <- paste0('stopifnot(require', 'Name', 'space("Bayes', 'X', 'src"))')
-  eval(parse(text = cmd))
+  ok <- try(eval(parse(text = cmd)), silent = TRUE)
+  if(inherits(ok, "try-error"))
+    stop("please install the 'BayesXsrc' package!")
 
   if(is.null(family$bayesx))
     stop("BayesX specifications missing in family object, cannot set up model!")
