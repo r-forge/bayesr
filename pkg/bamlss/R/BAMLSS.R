@@ -21,7 +21,7 @@ bamlss.frame <- function(formula, data = NULL, family = "gaussian",
 
   ## Create the model frame.
   bf$model.frame <- bamlss.model.frame(formula, data, family, weights,
-    subset, offset, na.action, specials, contrasts)
+    subset, offset, na.action, specials, contrasts, nthres = list(...)$nthres)
 
   if(!inherits(bf$model.frame, "ffdf")) {
     ## Type of y.
@@ -1014,13 +1014,16 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          } else {
 #            nd[[j]] <- sample(rep(xq, length.out = 1000L))
 #          }
-#          xmin <- ffbase_min.ff(data[[j]])
-#          xmax <- ffbase_max.ff(data[[j]])
-#          nd[[j]] <- seq(xmin, xmax, length = 1000L)
-          ux <- unique_ff(data[[j]])
-          lux <- length(ux)
-          uxl <- if(lux < 1000L) lux - 1L else 1000L
-          nd[[j]] <- rep(ffbase::quantile.ff(data[[j]], probs = seq(0, 1, length = uxl), na.rm = TRUE)[], length.out = 1000L)
+          xl <- ffbase_min.ff(data[[j]])
+          xu <- ffbase_max.ff(data[[j]])
+          nd[[j]] <- sample(data[[j]], size = 1000L, replace = nrow(data) < 1000L)
+          nd[[j]][1] <- xl
+          nd[[j]][2] <- xu
+
+#          ux <- unique_ff(data[[j]])
+#          lux <- length(ux)
+#          uxl <- if(lux < 1000L) lux - 1L else 1000L
+#          nd[[j]] <- rep(ffbase::quantile.ff(data[[j]], probs = seq(0, 1, length = uxl), na.rm = TRUE)[], length.out = 1000L)
         } else {
           nd[[j]] <- sample(rep(unique(data[[j]]), length.out = 1000L))
         }
@@ -1029,7 +1032,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     nd <- as.data.frame(nd)
   }
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
-    knots = knots, absorb.cons = FALSE, scale.penalty=FALSE)[[1L]] ##nrow(data) <= nthres)[[1L]]
+    knots = knots, absorb.cons = FALSE, scale.penalty = TRUE)[[1L]] ##nrow(data) <= nthres)[[1L]]
   rm(nd)
   nobs <- nrow(data)
   if(file.exists(paste0(xfile, ".rds"))) {
@@ -2540,8 +2543,14 @@ bamlss.model.frame <- function(formula, data, family = gaussian_bamlss(),
       }
       return(data_ff)
     }
-    if(inherits(data, "ffdf"))
+    if(inherits(data, "ffdf")) {
+      nthres <- list(...)$nthres
+      if(is.null(nthres))
+        nthres <- 30000
+      if(nrow(data) < nthres)
+        data <- as.data.frame(data)
       return(data)
+    }
   } else data <- NULL
 
   if(inherits(formula, "bamlss.frame") | inherits(formula, "bamlss")) {
