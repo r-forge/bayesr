@@ -3500,6 +3500,7 @@ formula_hcheck <- function(formula)
 
 formula_insert <- function(from, to, formula)
 {
+  formula0 <- formula
   nf <- names(formula)
   hm <- sapply(to, max)
   o <- order(hm, decreasing = TRUE)
@@ -3511,7 +3512,15 @@ formula_insert <- function(from, to, formula)
     }
   }
   formula <- formula[take <- !(1:length(formula) %in% from)]
-  names(formula) <- nf[take]
+  if(any(take)) {
+    names(formula) <- nf[take]
+  } else {
+    formula <- formula0
+    if(length(formula) > 1) {
+      for(j in 2:length(formula))
+        formula[[j]] <- update(formula[[j]], NULL ~ .)
+    }
+  }
   formula
 }
 
