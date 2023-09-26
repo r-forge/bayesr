@@ -3873,6 +3873,7 @@ compute_s.effect <- function(x, get.X, fit.fun, psamples,
 
   cnames <- colnames(smf)
   smf <- as.data.frame(smf)
+
   for(l in 1:nt) {
     if(is.matrix(data[[tterms[l]]])) {
       if(ncol(data[[tterms[l]]]) < 2)
@@ -3921,6 +3922,9 @@ compute_s.effect <- function(x, get.X, fit.fun, psamples,
 
   ## Assign class and attributes.
   if(!any_f)
+    smf <- unique(smf)
+
+  if(any_f & (length(x$terms) < 2))
     smf <- unique(smf)
 
   class(smf) <- c(class(x), "data.frame")
@@ -8786,7 +8790,7 @@ plot.bamlss.effect.default <- function(x, ...) {
         } else {
           if(is.null(args$ylab))
             args$ylab <- attr(x, "specs")$label
-            args$xlab <- attr(x, "specs")$term
+          args$xlab <- attr(x, "specs")$term
           do.call("plotblock", delete.args("plotblock", args,
             c("xlim", "ylim", "pch", "main", "xlab", "ylab", "lwd", "axes", "add", "scheme")))
         }
