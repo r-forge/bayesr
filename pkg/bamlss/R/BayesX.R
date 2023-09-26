@@ -308,7 +308,7 @@ sam_BayesX <- BayesX <- function(x, y, family, start = NULL, weights = NULL, off
 
   warn <- getOption("warn")
   options(warn = -1)
-  cmd <- paste0("Bayes", "X", "src", rep(":", 2),
+  cmd <- paste0("Bayes", "X", "src", ":", ":",
     "run.bayesx(prg = prgf, verbose = control$setup$verbose)")
   ok <- eval(parse(text = cmd))
   options("warn" = warn)
