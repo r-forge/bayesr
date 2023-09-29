@@ -172,7 +172,7 @@ bias <- r %>%
          !(predictor %in% c("mu_long", "lambga", "lambga_long"))) %>%
   group_by(Model, predictor, marker) %>%
   summarise(mean = mean(value), .groups = "drop") %>%
-  mutate(mean = ifelse(predictor == "mu", mean*1000, mean)) %>%
+  mutate(mean = ifelse(predictor == "mu", mean*100, mean)) %>%
   pivot_wider(id_cols = c(predictor, marker), names_from = Model, 
               values_from = mean) %>%
   # rowid_to_column() %>%
@@ -183,11 +183,11 @@ bias <- r %>%
   slice(3, 1:2, 4:7)
 
 mse <- r %>%
-  filter(type == "MSE", 
+  filter(type == "rMSE", 
          !(predictor %in% c("mu_long", "lambga", "lambga_long"))) %>%
   group_by(Model, predictor, marker) %>%
   summarise(mean = mean(value), .groups = "drop") %>%
-  mutate(mean = ifelse(predictor == "mu", mean*1000, mean)) %>%
+  mutate(mean = ifelse(predictor == "mu", mean*100, mean)) %>%
   pivot_wider(id_cols = c(predictor, marker), names_from = Model, 
               values_from = mean) %>%
   # rowid_to_column() %>%
@@ -310,3 +310,33 @@ ggplot(mean_dat %>% filter(id %in% ids) %>%
   labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL,
        x = "Time")
 # save 4x8
+
+
+# Plot baseline hazard ----------------------------------------------------
+
+p_btru <- readRDS(file.path(server_wd, "scen_II_230719", 
+                            "preds_btru.rds"))
+lambga_dat <- lapply(seq_along(p_btru), function (x) {
+  d_rirs <- readRDS(file.path(server_wd, "scen_II_230719", "data", 
+                              sub("b", "d", names(p_btru)[x])))
+  max_ids <- d_rirs$data_full %>% 
+    group_by(x3) %>%
+    slice(which.max(obstime)) %>% 
+    .$id %>% 
+    as.vector
+  dat <- d_rirs$data_full %>% 
+    select(id, obstime, x3) %>% 
+    cbind("lambga" = p_btru[[x]]$simulations$lambga_long) %>%
+    cbind("est" = p_btru[[x]]$predictions$lambga_long$Mean) %>%
+    filter(id %in% max_ids)
+  dat
+})
+lambga_dat <- 
+  do.call(rbind, Map(cbind, it = seq_along(lambga_dat), lambga_dat)) %>%
+  mutate(itid = interaction(it, id))
+
+ggplot(lambga_dat, aes(x = obstime, group = itid)) + 
+  geom_line(aes(y = est), col = "red", alpha = 0.1) +
+  geom_line(aes(y = lambga)) + 
+  facet_grid(~x3) +
+  theme_bw()

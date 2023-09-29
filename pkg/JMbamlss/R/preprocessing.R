@@ -39,8 +39,8 @@
 #'  proposed by Cederbaum.
 #' @param npc Number of univariate principal components to use in fpca.sc, PACE.
 #' @param fve_uni Fraction of univariate variance explained for method FPCA.
-#' @param pve_uni Proportion of univariate variance explained for method 
-#'  fpca.sc,PACE.
+#' @param pve_uni Proportion of univariate variance explained for methods 
+#'  fpca, fpca.sc, PACE.
 #' @param fit MFPCA argument to return a truncated KL fit to the data. Defaults
 #'  to FALSE.
 #' @param max_time If supplied, forces the evaluation of the MFPCs up to maxtime.

@@ -62,42 +62,42 @@ sim_results <- function(result_list, dat_list, name) {
   n_dim <- length(levels(dat_list[[1]]$mu$marker))
   mapply(function (est, sim) {
     
-    # Bias, MSE, Coverage
+    # Bias, rMSE, Coverage
     eval_lambga <- data.frame(
-      type = c("Bias", "MSE", "Coverage"),
+      type = c("Bias", "rMSE", "Coverage"),
       model = name,
       predictor = "lambga",
       marker = "all",
       t = "all",
       value = c(mean(-(est$lambga$Mean - sim$lambga)),
-                mean((est$lambga$Mean - sim$lambga)^2),
+                sqrt(mean((est$lambga$Mean - sim$lambga)^2)),
                 mean(est$lambga[, 1] < sim$lambga & 
                        est$lambga[, 3] > sim$lambga)))
     
     eval_alpha = data.frame(
-      type = rep(c("Bias", "MSE", "Coverage"), each = n_dim),
+      type = rep(c("Bias", "rMSE", "Coverage"), each = n_dim),
       model = name,
       predictor = "alpha",
       marker = paste0("m", seq_len(n_dim)),
       t = "all",
       value = c(-(est$alpha$Mean - sim$alpha),
-                (est$alpha$Mean - sim$alpha)^2,
+                sqrt((est$alpha$Mean - sim$alpha)^2),
                 as.numeric(est$alpha[, 1] < sim$alpha & 
                              est$alpha[, 3] > sim$alpha)))
     
     eval_sigma = data.frame(
-      type = rep(c("Bias", "MSE", "Coverage"), each = n_dim),
+      type = rep(c("Bias", "rMSE", "Coverage"), each = n_dim),
       model = name,
       predictor = "sigma",
       marker = paste0("m", seq_len(n_dim)),
       t = "all",
       value = c(-(est$sigma$Mean - sim$sigma),
-                (est$sigma$Mean - sim$sigma)^2,
+                sqrt((est$sigma$Mean - sim$sigma)^2),
                 as.numeric(est$sigma[, 1] < sim$sigma & 
                              est$sigma[, 3] > sim$sigma)))
     
     eval_mu <- data.frame(
-      type = rep(c("Bias", "MSE", "Coverage"), each = n_dim),
+      type = rep(c("Bias", "rMSE", "Coverage"), each = n_dim),
       model =  name,
       predictor = "mu",
       marker = paste0("m", seq_len(n_dim)),
@@ -107,7 +107,7 @@ sim_results <- function(result_list, dat_list, name) {
                 }, e = split(est$mu$Mean, est$mu$marker), 
                 s = split(sim$mu$mu, sim$mu$marker)),
                 mapply(function (e, s) {
-                  mean((e - s)^2)
+                  sqrt(mean((e - s)^2))
                 }, e = split(est$mu$Mean, est$mu$marker), 
                 s = split(sim$mu$mu, sim$mu$marker)),
                 mapply(function (l, u, s) {
@@ -118,7 +118,7 @@ sim_results <- function(result_list, dat_list, name) {
     
     sim_marker <- split(sim$mu_long, est$mu_long$marker)
     eval_mu_long <- data.frame(
-      type = rep(c("Bias", "MSE", "Coverage"), each = n_dim*101),
+      type = rep(c("Bias", "rMSE", "Coverage"), each = n_dim*101),
       model =  name,
       predictor = "mu_long",
       marker = paste0("m", seq(n_dim)),
@@ -132,7 +132,7 @@ sim_results <- function(result_list, dat_list, name) {
                 c(sapply(seq(0, 1, by = 0.01), function (t) {
                   mapply(function(e, s) {
                     same_t <- e$obstime == t
-                    mean((e$Mean[same_t] - s[same_t])^2)
+                    sqrt(mean((e$Mean[same_t] - s[same_t])^2))
                   }, e = split(est$mu_long, est$mu_long$marker), s = sim_marker)
                 })),
                 c(sapply(seq(0, 1, by = 0.01), function (t) {
@@ -143,7 +143,7 @@ sim_results <- function(result_list, dat_list, name) {
                 }))))
     
     eval_lambga_long <- data.frame(
-      type =  rep(c("Bias", "MSE", "Coverage"), each = 101),
+      type =  rep(c("Bias", "rMSE", "Coverage"), each = 101),
       model = name,
       predictor = "lambga_long",
       marker = "all",
@@ -162,7 +162,7 @@ sim_results <- function(result_list, dat_list, name) {
         e$obstime <- split(est$mu_long, est$mu_long$marker)[[1]]$obstime
         s <- sim_marker[[1]]
         same_t <- e$obstime == t
-        mean((e$Mean[same_t] - s[same_t])^2)
+        sqrt(mean((e$Mean[same_t] - s[same_t])^2))
       })),
       c(sapply(seq(0, 1, by = 0.01), function (t) {
         e <- split(est$lambga_long, est$mu_long$marker)[[1]]
@@ -174,13 +174,13 @@ sim_results <- function(result_list, dat_list, name) {
       }))))
     
     eval_lambga_event <- data.frame(
-      type = c("Bias", "MSE", "Coverage"),
+      type = c("Bias", "rMSE", "Coverage"),
       model = name,
       predictor = "lambga_event",
       marker = "all",
       t = "all",
       value = c(mean(-(est$lambga_event$Mean - sim$lambga_event)),
-                mean((est$lambga_event$Mean - sim$lambga_event)^2),
+                sqrt(mean((est$lambga_event$Mean - sim$lambga_event)^2)),
                 mean(est$lambga_event[, 1] < sim$lambga_event & 
                        est$lambga_event[, 3] > sim$lambga_event)))
     

@@ -104,7 +104,7 @@ mfpca_est <- JMbamlss:::preproc_MFPCA(p_long %>%
                                         droplevels(), 
                                       uni_mean = paste0("logy ~ 1 + s(obstime) +
                                                         sex + s(age)"),
-                                      fve_uni = 1,
+                                      fve_uni = 1,################NBASIS########
                                       save_uniFPCA = TRUE)
 # saveRDS(mfpca_est, file = "~/Downloads/mfpca_est.rds")
 vals <- which(mfpca_est$values > 0)
@@ -511,10 +511,10 @@ alpha_bw <- summary(samples(bamlss_wei)[, grep("alpha\\.",
                                                colnames(samples(bamlss_wei)))])
 ab_mean <- alpha_b$statistics[1:4, 1]
 ab_low <- alpha_b$quantiles[1:4, 1]
-ab_up <- alpha_b$quantiles[1:4, 3]
+ab_up <- alpha_b$quantiles[1:4, 5]
 abw_mean <- alpha_bw$statistics[1:4, 1]
 abw_low <- alpha_bw$quantiles[1:4, 1]
-abw_up <- alpha_bw$quantiles[1:4, 3]
+abw_up <- alpha_bw$quantiles[1:4, 5]
 
 cat(mapply(function(marker, a_mean, a_low, a_up, b_mean, b_low, b_up, c_mean,
                     c_low, c_up){
