@@ -6303,9 +6303,10 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
                   iedf <- sum_diag(XWX %*% P)
                   ll <- -2 * family$loglik(yt, family$map2par(etas)) + K * iedf
                 } else {
-                  names(b) <- paste0("b", 1:length(b))
-                  names(tau2) <- paste0("tau2", 1:length(tau2))
-                  ll <- -1 * (family$loglik(yt, family$map2par(etas)) + x[[i]]$smooth.construct[[j]]$prior(c(b, tau2)))
+                  #names(b) <- paste0("b", 1:length(b))
+                  #names(tau2) <- paste0("tau2", 1:length(tau2))
+                  #ll <- -1 * (family$loglik(yt, family$map2par(etas)) + x[[i]]$smooth.construct[[j]]$prior(c(b, tau2)))
+                  ll <- -1 * family$loglik(yt, family$map2par(etas))
                 }
               } else {
                 ll <- mean((zs - etas[[i]])^2, na.rm = TRUE)
