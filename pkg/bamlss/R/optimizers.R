@@ -6551,6 +6551,7 @@ opt_bbfit <- bbfit <- function(x, y, family, shuffle = TRUE, start = NULL, offse
   rval$runtime <- elapsed
   rval$edf <- edf
   rval$nbatch <- nbatch
+  rval$sbatch <- length(take)
   rval$parpaths <- parm
   rval$epochs <- epochs
   rval$n.iter <- iter
