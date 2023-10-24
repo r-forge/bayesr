@@ -957,6 +957,28 @@ ffbase_max.ff <- function(x, ..., na.rm = FALSE, range = NULL)
   }))
 }
 
+## From ffbase.
+ffordered <- function (x) 
+{
+  ordered <- attr(x, "ffordered")
+  if(is.null(ordered)) {
+    ordered <- ff::fforder(x)
+  }
+  ordered
+}
+
+quantile_ff <- function (x, probs = seq(0, 1, 0.25), na.rm = FALSE, names = TRUE, ...) 
+{
+  N <- length(x)
+  nms <- if(names) paste(100 * probs, "%", sep = "") else NULL
+  qnt <- 1L + as.integer(probs * (N - 1))
+  idx <- ffordered(x)
+  ql <- x[idx[qnt]]
+  names(ql) <- nms
+  ql
+}
+
+
 smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = NULL, ...)
 {
   object$xt$center <- TRUE
@@ -1001,7 +1023,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          uxn <- length(ux)
 #          if(uxn > 2) {
 #            uxl <- if(uxn < 1000L) uxn - 1L else 1000L
-#            xq <- ffbase::quantile.ff(data[[j]], probs = seq(0, 1, length = uxl), na.rm = TRUE)
+#            
 #            names(xq) <- NULL
 #            if(length(unique(xq)) < 100) {
 #              xq <- sort(rep(ux[], length.out = 1000L))
@@ -1014,11 +1036,20 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          } else {
 #            nd[[j]] <- sample(rep(xq, length.out = 1000L))
 #          }
-          xl <- ffbase_min.ff(data[[j]])
-          xu <- ffbase_max.ff(data[[j]])
-          nd[[j]] <- sample(data[[j]], size = 1000L, replace = nrow(data) < 1000L)
-          nd[[j]][1] <- xl
-          nd[[j]][2] <- xu
+#          xl <- ffbase_min.ff(data[[j]])
+#          xu <- ffbase_max.ff(data[[j]])
+#          nd[[j]] <- sample(data[[j]], size = 1000L, replace = nrow(data) < 1000L)
+#          nd[[j]][1] <- xl
+#          nd[[j]][2] <- xu
+
+          xq <- quantile_ff(data[[j]],
+            probs = seq(0, 1, length = 1000L),
+            na.rm = TRUE, names = FALSE)
+          nd[[j]] <- sample(xq)
+
+          #ux <- unique_ff(data[[j]])
+          #ux_ind <- floor(seq(1, length(ux), length = 1000L))
+          #nd[[j]] <- ux[ux_ind]
 
 #          ux <- unique_ff(data[[j]])
 #          lux <- length(ux)
@@ -1032,7 +1063,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     nd <- as.data.frame(nd)
   }
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
-    knots = knots, absorb.cons = FALSE, scale.penalty = TRUE)[[1L]] ##nrow(data) <= nthres)[[1L]]
+    knots = knots, absorb.cons = FALSE, scale.penalty = FALSE)[[1L]] ##nrow(data) <= nthres)[[1L]]
   rm(nd)
   nobs <- nrow(data)
   if(file.exists(paste0(xfile, ".rds"))) {
