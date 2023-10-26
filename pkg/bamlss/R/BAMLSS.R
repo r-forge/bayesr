@@ -984,11 +984,11 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
   object$xt$center <- TRUE
   object$xt$nocenter <- FALSE
   terms <- object$term
-  if(length(object$term) < 2) {
-    if(inherits(object, "tp.smooth.spec")) {
-      class(object) <- "ps.smooth.spec"
-    }
-  }
+#  if(length(object$term) < 2) {
+#    if(inherits(object, "tp.smooth.spec")) {
+#      class(object) <- "ps.smooth.spec"
+#    }
+#  }
   if(object$by != "NA") {
     if(!grepl(paste0("by=", object$by), object$label, fixed = TRUE)) {
       object$label <- strsplit(object$label, "")[[1]]
@@ -1002,6 +1002,8 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
   xfile <- rmf(object$label)
   xfile <- file.path(ff_name, xfile)
   is_f <- sapply(data, is.factor)
+  if(is.null(object$xt$digits))
+    object$xt$digits <- 3
   if(is.null(nthres))
     nthres <- 30000
   if(nrow(data) > nthres) {
@@ -1042,10 +1044,9 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          nd[[j]][1] <- xl
 #          nd[[j]][2] <- xu
 
-          xq <- quantile_ff(data[[j]],
-            probs = seq(0, 1, length = 1000L),
-            na.rm = TRUE, names = FALSE)
-          nd[[j]] <- sample(xq)
+          nd[[j]] <- unique(round(as.numeric(data[[j]]), digits = object$xt$digits))
+          cat(".. .. unique obs. = ", length(nd[[j]]),
+            ", digits = ", object$xt$digits, "\n", sep = "")
 
           #ux <- unique_ff(data[[j]])
           #ux_ind <- floor(seq(1, length(ux), length = 1000L))
@@ -1060,10 +1061,13 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
         }
       }
     }
+    nmax <- max(sapply(nd, length))
+    for(j in 1:length(nd))
+      nd[[j]] <- rep(nd[[j]], length.out = nmax)
     nd <- as.data.frame(nd)
   }
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
-    knots = knots, absorb.cons = FALSE, scale.penalty = FALSE)[[1L]] ##nrow(data) <= nthres)[[1L]]
+    knots = knots, absorb.cons = TRUE, scale.penalty = TRUE)[[1L]] ##nrow(data) <= nthres)[[1L]]
   rm(nd)
   nobs <- nrow(data)
   if(file.exists(paste0(xfile, ".rds"))) {
@@ -1097,7 +1101,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     }
     cat("\n")
 
-    if(!inherits(object, "nnet0.smooth")) {
+    if(!inherits(object, "nnet0.smooth") & FALSE) {
       csum <- 0
       for(ic in bamlss_chunk(object[["X"]])) {
         csum <- csum + colSums(object[["X"]][ic, ])
