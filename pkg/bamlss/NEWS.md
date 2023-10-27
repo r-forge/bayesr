@@ -1,3 +1,7 @@
+# bamlss 1.2-2
+
+* Small touch ups for ff based smooth terms.
+
 # bamlss 1.2-1
 
 * Support for distributions3/topmodels infrastructure.

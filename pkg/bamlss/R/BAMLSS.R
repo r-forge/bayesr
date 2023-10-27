@@ -978,17 +978,49 @@ quantile_ff <- function (x, probs = seq(0, 1, 0.25), na.rm = FALSE, names = TRUE
   ql
 }
 
+unique_ff <- function (x, incomparables = FALSE, fromLast = FALSE, trace = FALSE, ...) 
+{
+  if(!identical(incomparables, FALSE)) {
+    .NotYetUsed("incomparables != FALSE")
+  }
+  if(vmode(x) == "integer" & length(res <- levels(x)) > 0) {
+    if(any(is.na(x))) {
+      res <- c(res, NA)
+    }
+    res <- ff(res, levels = res)
+  } else {
+    xorder <- fforder(x, decreasing = fromLast, na.last = TRUE)
+    xchunk <- chunk(x, ...)
+    res <- NULL
+    lastel <- NULL
+    for(i in xchunk) {
+      Log$chunk(i)
+      iorder <- xorder[i]
+      iorder <- as.integer(iorder)
+      xi <- x[iorder]
+      xi <- unique(xi)
+      if(sum(duplicated(c(xi[1], lastel))) > 0) {
+        xi <- xi[-1]
+      }
+      if(length(xi) > 0) {
+        lastel <- xi[length(xi)]
+        res <- ffappend(x = res, xi)
+      }
+    }
+  }
+  res
+}
 
 smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = NULL, ...)
 {
   object$xt$center <- TRUE
   object$xt$nocenter <- FALSE
   terms <- object$term
-#  if(length(object$term) < 2) {
-#    if(inherits(object, "tp.smooth.spec")) {
-#      class(object) <- "ps.smooth.spec"
-#    }
-#  }
+  if(length(object$term) < 2) {
+    if(inherits(object, "tp.smooth.spec")) {
+      class(object) <- "ps.smooth.spec"
+    }
+  }
   if(object$by != "NA") {
     if(!grepl(paste0("by=", object$by), object$label, fixed = TRUE)) {
       object$label <- strsplit(object$label, "")[[1]]
@@ -998,7 +1030,7 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     terms <- unique(c(terms, object$by))
   }
   nd <- list()
-  cat("  .. ff processing term", object$label, "\n")
+  cat("  .. ff processing term", object$label)
   xfile <- rmf(object$label)
   xfile <- file.path(ff_name, xfile)
   is_f <- sapply(data, is.factor)
@@ -1043,9 +1075,8 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 #          nd[[j]] <- sample(data[[j]], size = 1000L, replace = nrow(data) < 1000L)
 #          nd[[j]][1] <- xl
 #          nd[[j]][2] <- xu
-
-          nd[[j]] <- unique(round(as.numeric(data[[j]]), digits = object$xt$digits))
-          cat(".. .. unique obs. = ", length(nd[[j]]),
+          nd[[j]] <- unique(round(data[[j]][], digits = object$xt$digits))
+          cat("\n  .. .. unique obs. ", j, " = ", length(nd[[j]]),
             ", digits = ", object$xt$digits, "\n", sep = "")
 
           #ux <- unique_ff(data[[j]])
@@ -1067,14 +1098,14 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
     nd <- as.data.frame(nd)
   }
   object <- smoothCon(object, data = if(nrow(data) > nthres) nd else as.data.frame(data),
-    knots = knots, absorb.cons = TRUE, scale.penalty = TRUE)[[1L]] ##nrow(data) <= nthres)[[1L]]
+    knots = knots, absorb.cons = TRUE, scale.penalty = FALSE)[[1L]] ##nrow(data) <= nthres)[[1L]]
   rm(nd)
   nobs <- nrow(data)
   if(file.exists(paste0(xfile, ".rds"))) {
     object[["X"]] <- readRDS(paste0(xfile, ".rds"))
     bit::physical(object[["X"]])$filename <- paste0(xfile, ".ff")
     object[["S"]] <- readRDS(paste0(xfile, "_S", ".rds"))
-    object[["Z"]] <- readRDS(paste0(xfile, "_Z", ".rds"))
+    ##object[["Z"]] <- readRDS(paste0(xfile, "_Z", ".rds"))
   } else {
     object[["X"]] <- ff::ff(0.0,
       length = nrow(data) * ncol(object[["X"]]),
@@ -1124,20 +1155,21 @@ smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = N
 
     saveRDS(object[["X"]], file = paste0(xfile, ".rds"))
     saveRDS(object[["S"]], file = paste0(xfile, "_S", ".rds"))
-    saveRDS(object[["Z"]], file = paste0(xfile, "_Z", ".rds"))
+    ##saveRDS(object[["Z"]], file = paste0(xfile, "_Z", ".rds"))
   }
 
-  object$orig.class <- class(object)
-  class(object) <- "ff_smooth.smooth.spec"
+  ##object$orig.class <- class(object)
+  ##class(object) <- "ff_smooth.smooth.spec"
   return(object)
 }
 
 Predict.matrix.ff_smooth.smooth.spec <- function(object, data)
 {
   class(object) <- object$orig.class
+  data <- as.data.frame(data)
   if(is.null(object$PredictMat)) {
     X <- PredictMat(object, data)
-    if(!is.null(object[["Z"]]))
+    if(!is.null(object[["Z"]]) & FALSE)
       X <- X %*% object[["Z"]]
   } else {
     X <- object$PredictMat(object, data)
