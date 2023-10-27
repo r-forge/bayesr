@@ -80,7 +80,7 @@ Sichel_bamlss(...)
 GEV_bamlss(...)
 gumbel_bamlss(...)
 mix_bamlss(f1, f2, ...)
-ZANBI_bamlss(f1, f2, ...)
+ZANBI_bamlss(...)
 
 ## Extractor functions:
 \method{family}{bamlss}(object, ...)

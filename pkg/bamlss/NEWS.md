@@ -1,5 +1,7 @@
 # bamlss 1.2-2
 
+* More support for deep distributional networks.
+
 * Small touch ups for ff based smooth terms.
 
 # bamlss 1.2-1

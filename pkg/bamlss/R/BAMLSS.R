@@ -978,39 +978,6 @@ quantile_ff <- function (x, probs = seq(0, 1, 0.25), na.rm = FALSE, names = TRUE
   ql
 }
 
-unique_ff <- function (x, incomparables = FALSE, fromLast = FALSE, trace = FALSE, ...) 
-{
-  if(!identical(incomparables, FALSE)) {
-    .NotYetUsed("incomparables != FALSE")
-  }
-  if(vmode(x) == "integer" & length(res <- levels(x)) > 0) {
-    if(any(is.na(x))) {
-      res <- c(res, NA)
-    }
-    res <- ff(res, levels = res)
-  } else {
-    xorder <- fforder(x, decreasing = fromLast, na.last = TRUE)
-    xchunk <- chunk(x, ...)
-    res <- NULL
-    lastel <- NULL
-    for(i in xchunk) {
-      Log$chunk(i)
-      iorder <- xorder[i]
-      iorder <- as.integer(iorder)
-      xi <- x[iorder]
-      xi <- unique(xi)
-      if(sum(duplicated(c(xi[1], lastel))) > 0) {
-        xi <- xi[-1]
-      }
-      if(length(xi) > 0) {
-        lastel <- xi[length(xi)]
-        res <- ffappend(x = res, xi)
-      }
-    }
-  }
-  res
-}
-
 smooth.construct_ff.default <- function(object, data, knots, ff_name, nthres = NULL, ...)
 {
   object$xt$center <- TRUE

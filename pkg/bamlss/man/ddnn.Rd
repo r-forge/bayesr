@@ -1,6 +1,7 @@
 \name{ddnn}
 \alias{ddnn}
 \alias{predict.ddnn}
+\alias{cv_ddnn}
 
 \title{Deep Distributional Neural Network}
 

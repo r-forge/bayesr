@@ -4636,7 +4636,7 @@ ddnn <- function(object,
 
   if(is.character(optimizer)) {
     if(optimizer == "adam")
-      optimizer <- optimizer_adam(learning_rate = learning_rate)
+      optimizer <- keras::optimizer_adam(learning_rate = learning_rate)
   }
 
   model <- keras::compile(model,
@@ -4665,7 +4665,7 @@ ddnn <- function(object,
   callbacks <- list()
   if(early_stopping) {
     callbacks <- list(
-      callback_early_stopping(patience = patience)
+      keras::callback_early_stopping(patience = patience)
     )
   }
 
