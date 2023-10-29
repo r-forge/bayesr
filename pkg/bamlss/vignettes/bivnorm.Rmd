@@ -22,6 +22,10 @@ library("bamlss")
 
 if (!dir.exists("figures")) dir.create("figures")
 
+if(!file.exists("figures/bivnorm_data.rds")) {
+  download.file("http://bayesr.r-forge.r-project.org/misc/bivnorm_data.rds", "figures")
+}
+
 if(!file.exists("figures/bivnorm_models.rda")) {
   # -------------------------------------------------------------------
   # Formulas
