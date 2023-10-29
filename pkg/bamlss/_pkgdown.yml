@@ -73,6 +73,7 @@ reference:
   - title: Main Model Fitting Function
     contents:
     - '`bamlss`'
+    
   - title: Optimizers
     desc: >
       Optimizer functions that can be used for model fitting using `bamlss()`
@@ -116,6 +117,7 @@ reference:
     - '`Golf`'
   - title: Misc
     contents:
+    - '`BAMLSS`'
     - '`DIC`'
     - '`Surv2`'
     - '`bamlss-package`'
@@ -130,7 +132,7 @@ reference:
     - '`cox_bamlss`'
     - '`cox_predict`'
     - '`CRPS`'
-    - '`dl.bamlss`'
+    - '`ddnn`'
     - '`engines`'
     - '`gamlss_distributions`'
     - '`family.bamlss`'
