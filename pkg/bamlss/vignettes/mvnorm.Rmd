@@ -1,0 +1,26 @@
+---
+title: "Multivariate Normal Model"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+bibliography: bamlss.bib
+nocite: '@bamlss:Umlauf+bamlss:2018'
+vignette: >
+  %\VignetteIndexEntry{Cox}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteDepends{bamlss}
+  %\VignetteKeywords{distributional regression, multivariate normal}
+  %\VignettePackage{bamlss}
+---
+
+```{r preliminaries, echo=FALSE, message=FALSE}
+library("bamlss")
+set.seed(123)
+```
+
+## Intro
+
+Coming soon, for details see [@bamlss:Muschinski+Mayr+Simon+Umlauf+Zeileis:2022].
+
