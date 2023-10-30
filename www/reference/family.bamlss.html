@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -130,43 +130,44 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## Family objects in bamlss:</span>
-<span class="fu">ALD_bamlss</span><span class="op">(</span><span class="va">...</span>, tau <span class="op">=</span> <span class="fl">0.5</span>, eps <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>
-<span class="fu">beta_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">binomial_bamlss</span><span class="op">(</span>link <span class="op">=</span> <span class="st">"logit"</span>, <span class="va">...</span><span class="op">)</span>
-<span class="fu">cnorm_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">cox_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">dw_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">DGP_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">dirichlet_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">ELF_bamlss</span><span class="op">(</span><span class="va">...</span>, tau <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
-<span class="fu">gaussian_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">gaussian2_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">Gaussian_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">gamma_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">logNN_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">multinomial_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">mvnorm_bamlss</span><span class="op">(</span>k <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span>
-<span class="fu">mvnormAR1_bamlss</span><span class="op">(</span>k <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span>
-<span class="fu">poisson_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">gpareto_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">glogis_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">AR1_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">beta1_bamlss</span><span class="op">(</span><span class="va">ar.start</span>, <span class="va">...</span><span class="op">)</span>
-<span class="fu">nbinom_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">ztnbinom_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">lognormal_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">weibull_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">Sichel_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">GEV_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">gumbel_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">mix_bamlss</span><span class="op">(</span><span class="va">f1</span>, <span class="va">f2</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Extractor functions:</span>
-<span class="co"># S3 method for bamlss</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span>
-<span class="co"># S3 method for bamlss.frame</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## Family objects in bamlss:</span></span>
+<span><span class="fu">ALD_bamlss</span><span class="op">(</span><span class="va">...</span>, tau <span class="op">=</span> <span class="fl">0.5</span>, eps <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
+<span><span class="fu">beta_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">binomial_bamlss</span><span class="op">(</span>link <span class="op">=</span> <span class="st">"logit"</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">cnorm_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">cox_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">dw_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">DGP_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">dirichlet_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">ELF_bamlss</span><span class="op">(</span><span class="va">...</span>, tau <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
+<span><span class="fu">gaussian_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">gaussian2_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">Gaussian_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">gamma_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">logNN_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">multinomial_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">mvnorm_bamlss</span><span class="op">(</span>k <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">mvnormAR1_bamlss</span><span class="op">(</span>k <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">poisson_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">gpareto_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">glogis_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">AR1_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">beta1_bamlss</span><span class="op">(</span><span class="va">ar.start</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">nbinom_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">ztnbinom_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">lognormal_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">weibull_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">Sichel_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">GEV_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">gumbel_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">mix_bamlss</span><span class="op">(</span><span class="va">f1</span>, <span class="va">f2</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">ZANBI_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Extractor functions:</span></span>
+<span><span class="co"># S3 method for bamlss</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S3 method for bamlss.frame</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -254,70 +255,70 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## New family object for the normal distribution,</span></span>
-<span class="r-in"><span class="co">## can be used by function opt_bfit() and sam_GMCMC().</span></span>
-<span class="r-in"><span class="va">normal_bamlss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">    <span class="st">"family"</span> <span class="op">=</span> <span class="st">"normal"</span>,</span>
-<span class="r-in">    <span class="st">"names"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mu"</span>, <span class="st">"sigma"</span><span class="op">)</span>,</span>
-<span class="r-in">    <span class="st">"links"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"identity"</span>, <span class="st">"log"</span><span class="op">)</span>,</span>
-<span class="r-in">    <span class="st">"d"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">log</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">      <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">y</span>, mean <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span>, sd <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">sigma</span>, log <span class="op">=</span> <span class="va">log</span><span class="op">)</span></span>
-<span class="r-in">    <span class="op">}</span>,</span>
-<span class="r-in">    <span class="st">"score"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">      <span class="st">"mu"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">        <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">      <span class="op">}</span>,</span>
-<span class="r-in">      <span class="st">"sigma"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">        <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">      <span class="op">}</span></span>
-<span class="r-in">    <span class="op">)</span>,</span>
-<span class="r-in">    <span class="st">"hess"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">      <span class="st">"mu"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">        <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">      <span class="op">}</span>,</span>
-<span class="r-in">      <span class="st">"sigma"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span> </span>
-<span class="r-in">        <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">      <span class="op">}</span></span>
-<span class="r-in">    <span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"family.bamlss"</span></span>
-<span class="r-in">  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Test on simulated data.</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span>
-<span class="r-in">  data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"normal"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## New family object for the normal distribution,</span></span></span>
+<span class="r-in"><span><span class="co">## can be used by function opt_bfit() and sam_GMCMC().</span></span></span>
+<span class="r-in"><span><span class="va">normal_bamlss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"family"</span> <span class="op">=</span> <span class="st">"normal"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"names"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mu"</span>, <span class="st">"sigma"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"links"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"identity"</span>, <span class="st">"log"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"d"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">log</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">y</span>, mean <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span>, sd <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">sigma</span>, log <span class="op">=</span> <span class="va">log</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"score"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"mu"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">}</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"sigma"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"hess"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"mu"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">}</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"sigma"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span> </span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">}</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"family.bamlss"</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Test on simulated data.</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"normal"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(parse(text = family[1])):</span> object 'normal_bamlss' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Compute the log-likelihood using the family object.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Compute the log-likelihood using the family object.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in family(b):</span> object 'b' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">f</span><span class="op">$</span><span class="fu">d</span><span class="op">(</span>y <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">num</span>, par <span class="op">=</span> <span class="va">f</span><span class="op">$</span><span class="fu">map2par</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">)</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">f</span><span class="op">$</span><span class="fu">d</span><span class="op">(</span>y <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">num</span>, par <span class="op">=</span> <span class="va">f</span><span class="op">$</span><span class="fu">map2par</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">)</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'f' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## For using JAGS() more details are needed.</span></span>
-<span class="r-in"><span class="va">norm4JAGS_bamlss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu">normal_bamlss</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">f</span><span class="op">$</span><span class="va">bugs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">    <span class="st">"dist"</span> <span class="op">=</span> <span class="st">"dnorm"</span>,</span>
-<span class="r-in">    <span class="st">"eta"</span> <span class="op">=</span> <span class="va">BUGSeta</span>,</span>
-<span class="r-in">    <span class="st">"model"</span> <span class="op">=</span> <span class="va">BUGSmodel</span>,</span>
-<span class="r-in">    <span class="st">"reparam"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sigma <span class="op">=</span> <span class="st">"1 / sqrt(sigma)"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in">  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Now with opt_bfit() and sam_JAGS().</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>,</span>
-<span class="r-in">  optimizer <span class="op">=</span> <span class="va">opt_bfit</span>, sampler <span class="op">=</span> <span class="va">sam_JAGS</span>, family <span class="op">=</span> <span class="st">"norm4JAGS"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## For using JAGS() more details are needed.</span></span></span>
+<span class="r-in"><span><span class="va">norm4JAGS_bamlss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu">normal_bamlss</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">f</span><span class="op">$</span><span class="va">bugs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"dist"</span> <span class="op">=</span> <span class="st">"dnorm"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"eta"</span> <span class="op">=</span> <span class="va">BUGSeta</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"model"</span> <span class="op">=</span> <span class="va">BUGSmodel</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"reparam"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sigma <span class="op">=</span> <span class="st">"1 / sqrt(sigma)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Now with opt_bfit() and sam_JAGS().</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>,</span></span>
+<span class="r-in"><span>  optimizer <span class="op">=</span> <span class="va">opt_bfit</span>, sampler <span class="op">=</span> <span class="va">sam_JAGS</span>, family <span class="op">=</span> <span class="st">"norm4JAGS"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(parse(text = family[1])):</span> object 'norm4JAGS_bamlss' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -332,7 +333,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

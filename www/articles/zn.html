@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="zn_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Spatial location-scale model</h1>
@@ -144,242 +144,217 @@
 
     
     
-<p>This example is taken from the <em>R2BayesX</em> package <span class="citation">(Umlauf et al. 2015)</span> and is about undernutrition
-of new born children in Zambia. The data is loaded with</p>
+<p>This example is taken from the <em>R2BayesX</em> package <span class="citation">(Umlauf et al. 2015)</span> and is about undernutrition of new born children in Zambia. The data is loaded with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ZambiaNutrition"</span>, package <span class="op">=</span> <span class="st">"R2BayesX"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##        stunting  mbmi agechild district memployment meducation urban gender</span>
-<span class="co">## 1893 -0.6817840 22.33       29       12         yes         no   yes   male</span>
-<span class="co">## 1894 -1.5876900 22.33       57       12         yes         no   yes female</span>
-<span class="co">## 1895  0.3110890 18.66       16       12         yes         no   yes female</span>
-<span class="co">## 1896  0.0067044 18.66       46       12         yes         no   yes   male</span>
-<span class="co">## 1897  1.8765000 24.00       28       12         yes    primary   yes female</span>
-<span class="co">## 1898  0.1009190 24.22        9       12         yes    primary   yes   male</span></code></pre>
-<p>Here, the primary interest is to model the dependence of
-<code>stunting</code> of newborn children, with an age ranging from 0 to
-5 years, on covariates such as the body mass index of the mother, the
-age of the child and others. Moreover, we apply a full distributional
-regression model with <span class="math display">\[
-\texttt{stunting} \sim \mathcal{N}(\mu = \eta_{\mu}, \log(\sigma) =
-\eta_{\sigma})),
-\]</span> where the predictors <span class="math inline">\(\eta_{\mu}\)</span> and <span class="math inline">\(\eta_{\sigma}\)</span> are specified by the
-following formula</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ZambiaNutrition"</span>, package <span class="op">=</span> <span class="st">"R2BayesX"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##        stunting  mbmi agechild district memployment meducation urban gender</span></span>
+<span><span class="co">## 1893 -0.6817840 22.33       29       12         yes         no   yes   male</span></span>
+<span><span class="co">## 1894 -1.5876900 22.33       57       12         yes         no   yes female</span></span>
+<span><span class="co">## 1895  0.3110890 18.66       16       12         yes         no   yes female</span></span>
+<span><span class="co">## 1896  0.0067044 18.66       46       12         yes         no   yes   male</span></span>
+<span><span class="co">## 1897  1.8765000 24.00       28       12         yes    primary   yes female</span></span>
+<span><span class="co">## 1898  0.1009190 24.22        9       12         yes    primary   yes   male</span></span></code></pre>
+<p>Here, the primary interest is to model the dependence of <code>stunting</code> of newborn children, with an age ranging from 0 to 5 years, on covariates such as the body mass index of the mother, the age of the child and others. Moreover, we apply a full distributional regression model with <span class="math display">\[
+\texttt{stunting} \sim \mathcal{N}(\mu = \eta_{\mu}, \log(\sigma) = \eta_{\sigma})),
+\]</span> where the predictors <span class="math inline">\(\eta_{\mu}\)</span> and <span class="math inline">\(\eta_{\sigma}\)</span> are specified by the following formula</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-  <span class="va">stunting</span> <span class="op">~</span> <span class="va">memployment</span> <span class="op">+</span> <span class="va">urban</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">meducation</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">mbmi</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">agechild</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"mrf"</span>, xt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"penalty"</span> <span class="op">=</span> <span class="va">K</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,
-  <span class="va">sigma</span>  <span class="op">~</span> <span class="va">memployment</span> <span class="op">+</span> <span class="va">urban</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">meducation</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">mbmi</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">agechild</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"mrf"</span>, xt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"penalty"</span> <span class="op">=</span> <span class="va">K</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
-<p>Note that for setting up the Markov random field smooth term a
-penalty matrix <code>K</code> needs to be provided. The penalty matrix
-forces penalization for neighboring regions of the districts in Zambia.
-To compute the <code>K</code> matrix, we need the spatial information
-about the regions in Zambia, which is shipped as a <code>"bnd"</code>
-object in the <em>R2BayesX</em> package and can be loaded with</p>
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="va">stunting</span> <span class="op">~</span> <span class="va">memployment</span> <span class="op">+</span> <span class="va">urban</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">meducation</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">mbmi</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">agechild</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"mrf"</span>, xt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"penalty"</span> <span class="op">=</span> <span class="va">K</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span>  <span class="va">sigma</span>  <span class="op">~</span> <span class="va">memployment</span> <span class="op">+</span> <span class="va">urban</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">meducation</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">mbmi</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">agechild</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"mrf"</span>, xt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"penalty"</span> <span class="op">=</span> <span class="va">K</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">district</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Note that for setting up the Markov random field smooth term a penalty matrix <code>K</code> needs to be provided. The penalty matrix forces penalization for neighboring regions of the districts in Zambia. To compute the <code>K</code> matrix, we need the spatial information about the regions in Zambia, which is shipped as a <code>"bnd"</code> object in the <em>R2BayesX</em> package and can be loaded with</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ZambiaBnd"</span>, package <span class="op">=</span> <span class="st">"R2BayesX"</span><span class="op">)</span></code></pre></div>
-<p>The <code>K</code> matrix can then be computed using function
-<code><a href="../reference/neighbormatrix.html">neighbormatrix()</a></code></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ZambiaBnd"</span>, package <span class="op">=</span> <span class="st">"R2BayesX"</span><span class="op">)</span></span></code></pre></div>
+<p>The <code>K</code> matrix can then be computed using function <code><a href="../reference/neighbormatrix.html">neighbormatrix()</a></code></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">K</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/neighbormatrix.html">neighbormatrix</a></span><span class="op">(</span><span class="va">ZambiaBnd</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##    87 76 67 92 97 94 86 85 83 71 45 44 41 32 96 95 91 74 63 65 62 61 53 52 42</span>
-<span class="co">## 87  1  0  0  0  0 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 76  0  3  0  0  0  0  0 -1 -1 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 67  0  0  2  0  0  0  0  0  0 -1 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 92  0  0  0  3 -1 -1  0  0  0  0  0  0  0  0 -1  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 97  0  0  0 -1  5 -1  0  0  0  0  0  0  0  0 -1 -1 -1  0  0  0  0  0  0  0  0</span>
-<span class="co">## 94 -1  0  0 -1 -1  6 -1  0  0  0  0  0  0  0  0  0 -1 -1  0  0  0  0  0  0  0</span>
-<span class="co">##    34 99 93 98 84 75 88 81 43 89 73 72 68 69 66 36 35 26 23 14 12 13 11 33 28</span>
-<span class="co">## 87  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 76  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 67  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 92  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 97  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">## 94  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span>
-<span class="co">##    22 21 15 31 25 24 27</span>
-<span class="co">## 87  0  0  0  0  0  0  0</span>
-<span class="co">## 76  0  0  0  0  0  0  0</span>
-<span class="co">## 67  0  0  0  0  0  0  0</span>
-<span class="co">## 92  0  0  0  0  0  0  0</span>
-<span class="co">## 97  0  0  0  0  0  0  0</span>
-<span class="co">## 94  0  0  0  0  0  0  0</span></code></pre>
+<code class="sourceCode R"><span><span class="va">K</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/neighbormatrix.html">neighbormatrix</a></span><span class="op">(</span><span class="va">ZambiaBnd</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##    87 76 67 92 97 94 86 85 83 71 45 44 41 32 96 95 91 74 63 65 62 61 53 52 42</span></span>
+<span><span class="co">## 87  1  0  0  0  0 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 76  0  3  0  0  0  0  0 -1 -1 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 67  0  0  2  0  0  0  0  0  0 -1 -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 92  0  0  0  3 -1 -1  0  0  0  0  0  0  0  0 -1  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 97  0  0  0 -1  5 -1  0  0  0  0  0  0  0  0 -1 -1 -1  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 94 -1  0  0 -1 -1  6 -1  0  0  0  0  0  0  0  0  0 -1 -1  0  0  0  0  0  0  0</span></span>
+<span><span class="co">##    34 99 93 98 84 75 88 81 43 89 73 72 68 69 66 36 35 26 23 14 12 13 11 33 28</span></span>
+<span><span class="co">## 87  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 76  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 67  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 92  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 97  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 94  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</span></span>
+<span><span class="co">##    22 21 15 31 25 24 27</span></span>
+<span><span class="co">## 87  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 76  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 67  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 92  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 97  0  0  0  0  0  0  0</span></span>
+<span><span class="co">## 94  0  0  0  0  0  0  0</span></span></code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Also need to transform to factor for</span>
-<span class="co">## setting up the MRF smooth.</span>
-<span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span><span class="op">)</span>
-
-<span class="co">## Now note that not all regions are observed,</span>
-<span class="co">## therefore we need to remove those regions</span>
-<span class="co">## from the penalty matrix</span>
-<span class="va">rn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span>
-<span class="va">lv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span><span class="op">)</span>
-<span class="va">i</span> <span class="op">&lt;-</span> <span class="va">rn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">lv</span>
-<span class="va">K</span> <span class="op">&lt;-</span> <span class="va">K</span><span class="op">[</span><span class="va">i</span>, <span class="va">i</span><span class="op">]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## Also need to transform to factor for</span></span>
+<span><span class="co">## setting up the MRF smooth.</span></span>
+<span><span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Now note that not all regions are observed,</span></span>
+<span><span class="co">## therefore we need to remove those regions</span></span>
+<span><span class="co">## from the penalty matrix</span></span>
+<span><span class="va">rn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span></span>
+<span><span class="va">lv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span><span class="op">)</span></span>
+<span><span class="va">i</span> <span class="op">&lt;-</span> <span class="va">rn</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">lv</span></span>
+<span><span class="va">K</span> <span class="op">&lt;-</span> <span class="va">K</span><span class="op">[</span><span class="va">i</span>, <span class="va">i</span><span class="op">]</span></span></code></pre></div>
 <p>Then, the model can be estimated with</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">321</span><span class="op">)</span>
-<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">ZambiaNutrition</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">321</span><span class="op">)</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">ZambiaNutrition</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></code></pre></div>
 <p>and the estimated univariate effects are plotted with</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<p><img src="zn_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;">
-The plot indicates that only the effect of variable <code>mbmi</code> on
-the standard deviation is not significant according the 95% credible
-intervals and basically follows the zero horizontal line.</p>
-<p>To visualize the structured and unstructured spatial effects we
-predict using the district information</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></code></pre></div>
+<p><img src="zn_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"> The plot indicates that only the effect of variable <code>mbmi</code> on the standard deviation is not significant according the 95% credible intervals and basically follows the zero horizontal line.</p>
+<p>To visualize the structured and unstructured spatial effects we predict using the district information</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## First, note that we have the structured id = 'mrf1' and unstructured</span>
-<span class="co">## spatial effect id = 're2', also indicated in the model summary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = "gaussian", data = ZambiaNutrition)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: gaussian </span>
-<span class="co">## Link function: mu = identity, sigma = log</span>
-<span class="co">## *---</span>
-<span class="co">## Formula mu:</span>
-<span class="co">## ---</span>
-<span class="co">## stunting ~ memployment + urban + gender + meducation + s(mbmi) + </span>
-<span class="co">##     s(agechild) + s(district, bs = "mrf", xt = list(penalty = K)) + </span>
-<span class="co">##     s(district, bs = "re")</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                        Mean      2.5%       50%     97.5% parameters</span>
-<span class="co">## (Intercept)        0.112453  0.054741  0.112688  0.164649      0.111</span>
-<span class="co">## memploymentno     -0.009098 -0.033846 -0.009121  0.017945     -0.010</span>
-<span class="co">## urbanno           -0.088765 -0.133416 -0.089598 -0.046433     -0.090</span>
-<span class="co">## genderfemale       0.059348  0.034577  0.059318  0.083425      0.059</span>
-<span class="co">## meducationno      -0.180022 -0.236665 -0.180923 -0.124206     -0.176</span>
-<span class="co">## meducationprimary -0.054656 -0.106017 -0.055213 -0.003093     -0.055</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##       Mean 2.5% 50% 97.5%</span>
-<span class="co">## alpha    1    1   1     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##                                  Mean      2.5%       50%     97.5% parameters</span>
-<span class="co">## s(mbmi).tau21               2.084e-02 6.699e-05 1.876e-03 1.555e-01      0.000</span>
-<span class="co">## s(mbmi).alpha               1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span>
-<span class="co">## s(mbmi).edf                 1.371e+00 1.004e+00 1.101e+00 2.995e+00      0.968</span>
-<span class="co">## s(agechild).tau21           1.781e+00 3.113e-01 1.137e+00 7.115e+00      5.961</span>
-<span class="co">## s(agechild).alpha           1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span>
-<span class="co">## s(agechild).edf             6.351e+00 4.844e+00 6.292e+00 8.056e+00      7.956</span>
-<span class="co">## s(district,id='mrf1').tau21 3.519e-03 9.780e-04 3.370e-03 6.699e-03      0.006</span>
-<span class="co">## s(district,id='mrf1').alpha 1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span>
-<span class="co">## s(district,id='mrf1').edf   3.008e+01 1.814e+01 3.066e+01 3.737e+01     35.955</span>
-<span class="co">## s(district,id='re2').tau21  4.176e-03 6.933e-05 1.175e-03 2.426e-02      0.000</span>
-<span class="co">## s(district,id='re2').alpha  1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span>
-<span class="co">## s(district,id='re2').edf    1.104e+01 4.409e-01 6.224e+00 3.601e+01      0.000</span>
-<span class="co">## ---</span>
-<span class="co">## Formula sigma:</span>
-<span class="co">## ---</span>
-<span class="co">## sigma ~ memployment + urban + gender + meducation + s(mbmi) + </span>
-<span class="co">##     s(agechild) + s(district, bs = "mrf", xt = list(penalty = K)) + </span>
-<span class="co">##     s(district, bs = "re")</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                        Mean      2.5%       50%     97.5% parameters</span>
-<span class="co">## (Intercept)       -0.136367 -0.177225 -0.136755 -0.092489     -0.165</span>
-<span class="co">## memploymentno     -0.015910 -0.038422 -0.015772  0.004915     -0.017</span>
-<span class="co">## urbanno            0.036322 -0.002975  0.035881  0.071793      0.022</span>
-<span class="co">## genderfemale       0.026088  0.006519  0.025961  0.047295      0.026</span>
-<span class="co">## meducationno       0.031518 -0.017891  0.031465  0.075792      0.032</span>
-<span class="co">## meducationprimary -0.030673 -0.073803 -0.029815  0.009465     -0.029</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.9278 0.6580 0.9852     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##                                  Mean      2.5%       50%     97.5% parameters</span>
-<span class="co">## s(mbmi).tau21               1.850e-01 8.480e-05 9.515e-03 1.154e+00     10.289</span>
-<span class="co">## s(mbmi).alpha               9.611e-01 7.032e-01 9.979e-01 1.000e+00         NA</span>
-<span class="co">## s(mbmi).edf                 2.111e+00 1.007e+00 1.551e+00 5.379e+00      7.754</span>
-<span class="co">## s(agechild).tau21           9.199e-02 3.791e-03 3.750e-02 5.667e-01      0.018</span>
-<span class="co">## s(agechild).alpha           9.666e-01 8.027e-01 9.965e-01 1.000e+00         NA</span>
-<span class="co">## s(agechild).edf             3.394e+00 1.836e+00 3.218e+00 5.938e+00      2.691</span>
-<span class="co">## s(district,id='mrf1').tau21 1.548e-03 5.780e-04 1.437e-03 3.226e-03      0.000</span>
-<span class="co">## s(district,id='mrf1').alpha 7.536e-01 1.863e-01 8.365e-01 1.000e+00         NA</span>
-<span class="co">## s(district,id='mrf1').edf   2.588e+01 1.697e+01 2.607e+01 3.447e+01      0.001</span>
-<span class="co">## s(district,id='re2').tau21  4.062e-03 9.555e-05 3.259e-03 1.379e-02      0.017</span>
-<span class="co">## s(district,id='re2').alpha  8.480e-01 3.013e-01 9.636e-01 1.000e+00         NA</span>
-<span class="co">## s(district,id='re2').edf    1.737e+01 8.979e-01 1.755e+01 3.454e+01     36.606</span>
-<span class="co">## ---</span>
-<span class="co">## Sampler summary:</span>
-<span class="co">## -</span>
-<span class="co">## DIC = 12616.75 logLik = -6262.522 pd = 91.7017</span>
-<span class="co">## runtime = 150.96</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## AICc = 12617.72 edf = 103.9308 logLik = -6202.629</span>
-<span class="co">## logPost = -35164.45 nobs = 4847 runtime = 19.623</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## First, note that we have the structured id = 'mrf1' and unstructured</span></span>
+<span><span class="co">## spatial effect id = 're2', also indicated in the model summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## bamlss(formula = f, family = "gaussian", data = ZambiaNutrition)</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Family: gaussian </span></span>
+<span><span class="co">## Link function: mu = identity, sigma = log</span></span>
+<span><span class="co">## *---</span></span>
+<span><span class="co">## Formula mu:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## stunting ~ memployment + urban + gender + meducation + s(mbmi) + </span></span>
+<span><span class="co">##     s(agechild) + s(district, bs = "mrf", xt = list(penalty = K)) + </span></span>
+<span><span class="co">##     s(district, bs = "re")</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                        Mean      2.5%       50%     97.5% parameters</span></span>
+<span><span class="co">## (Intercept)        0.112453  0.054741  0.112688  0.164649      0.111</span></span>
+<span><span class="co">## memploymentno     -0.009098 -0.033846 -0.009121  0.017945     -0.010</span></span>
+<span><span class="co">## urbanno           -0.088765 -0.133416 -0.089598 -0.046433     -0.090</span></span>
+<span><span class="co">## genderfemale       0.059348  0.034577  0.059318  0.083425      0.059</span></span>
+<span><span class="co">## meducationno      -0.180022 -0.236665 -0.180923 -0.124206     -0.176</span></span>
+<span><span class="co">## meducationprimary -0.054656 -0.106017 -0.055213 -0.003093     -0.055</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##       Mean 2.5% 50% 97.5%</span></span>
+<span><span class="co">## alpha    1    1   1     1</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Smooth terms:</span></span>
+<span><span class="co">##                                  Mean      2.5%       50%     97.5% parameters</span></span>
+<span><span class="co">## s(mbmi).tau21               2.084e-02 6.699e-05 1.876e-03 1.555e-01      0.000</span></span>
+<span><span class="co">## s(mbmi).alpha               1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span></span>
+<span><span class="co">## s(mbmi).edf                 1.371e+00 1.004e+00 1.101e+00 2.995e+00      0.968</span></span>
+<span><span class="co">## s(agechild).tau21           1.781e+00 3.113e-01 1.137e+00 7.115e+00      5.961</span></span>
+<span><span class="co">## s(agechild).alpha           1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span></span>
+<span><span class="co">## s(agechild).edf             6.351e+00 4.844e+00 6.292e+00 8.056e+00      7.956</span></span>
+<span><span class="co">## s(district,id='mrf1').tau21 3.519e-03 9.780e-04 3.370e-03 6.699e-03      0.006</span></span>
+<span><span class="co">## s(district,id='mrf1').alpha 1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span></span>
+<span><span class="co">## s(district,id='mrf1').edf   3.008e+01 1.814e+01 3.066e+01 3.737e+01     35.955</span></span>
+<span><span class="co">## s(district,id='re2').tau21  4.176e-03 6.933e-05 1.175e-03 2.426e-02      0.000</span></span>
+<span><span class="co">## s(district,id='re2').alpha  1.000e+00 1.000e+00 1.000e+00 1.000e+00         NA</span></span>
+<span><span class="co">## s(district,id='re2').edf    1.104e+01 4.409e-01 6.224e+00 3.601e+01      0.000</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Formula sigma:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## sigma ~ memployment + urban + gender + meducation + s(mbmi) + </span></span>
+<span><span class="co">##     s(agechild) + s(district, bs = "mrf", xt = list(penalty = K)) + </span></span>
+<span><span class="co">##     s(district, bs = "re")</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                        Mean      2.5%       50%     97.5% parameters</span></span>
+<span><span class="co">## (Intercept)       -0.136367 -0.177225 -0.136755 -0.092489     -0.165</span></span>
+<span><span class="co">## memploymentno     -0.015910 -0.038422 -0.015772  0.004915     -0.017</span></span>
+<span><span class="co">## urbanno            0.036322 -0.002975  0.035881  0.071793      0.022</span></span>
+<span><span class="co">## genderfemale       0.026088  0.006519  0.025961  0.047295      0.026</span></span>
+<span><span class="co">## meducationno       0.031518 -0.017891  0.031465  0.075792      0.032</span></span>
+<span><span class="co">## meducationprimary -0.030673 -0.073803 -0.029815  0.009465     -0.029</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##         Mean   2.5%    50% 97.5%</span></span>
+<span><span class="co">## alpha 0.9278 0.6580 0.9852     1</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Smooth terms:</span></span>
+<span><span class="co">##                                  Mean      2.5%       50%     97.5% parameters</span></span>
+<span><span class="co">## s(mbmi).tau21               1.850e-01 8.480e-05 9.515e-03 1.154e+00     10.289</span></span>
+<span><span class="co">## s(mbmi).alpha               9.611e-01 7.032e-01 9.979e-01 1.000e+00         NA</span></span>
+<span><span class="co">## s(mbmi).edf                 2.111e+00 1.007e+00 1.551e+00 5.379e+00      7.754</span></span>
+<span><span class="co">## s(agechild).tau21           9.199e-02 3.791e-03 3.750e-02 5.667e-01      0.018</span></span>
+<span><span class="co">## s(agechild).alpha           9.666e-01 8.027e-01 9.965e-01 1.000e+00         NA</span></span>
+<span><span class="co">## s(agechild).edf             3.394e+00 1.836e+00 3.218e+00 5.938e+00      2.691</span></span>
+<span><span class="co">## s(district,id='mrf1').tau21 1.548e-03 5.780e-04 1.437e-03 3.226e-03      0.000</span></span>
+<span><span class="co">## s(district,id='mrf1').alpha 7.536e-01 1.863e-01 8.365e-01 1.000e+00         NA</span></span>
+<span><span class="co">## s(district,id='mrf1').edf   2.588e+01 1.697e+01 2.607e+01 3.447e+01      0.001</span></span>
+<span><span class="co">## s(district,id='re2').tau21  4.062e-03 9.555e-05 3.259e-03 1.379e-02      0.017</span></span>
+<span><span class="co">## s(district,id='re2').alpha  8.480e-01 3.013e-01 9.636e-01 1.000e+00         NA</span></span>
+<span><span class="co">## s(district,id='re2').edf    1.737e+01 8.979e-01 1.755e+01 3.454e+01     36.606</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Sampler summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## DIC = 12616.75 logLik = -6262.522 pd = 91.7017</span></span>
+<span><span class="co">## runtime = 150.96</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Optimizer summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## AICc = 12617.72 edf = 103.9308 logLik = -6202.629</span></span>
+<span><span class="co">## logPost = -35164.45 nobs = 4847 runtime = 19.623</span></span></code></pre>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Now, to predict the spatial effects we set up new data.</span>
-<span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"district"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">## Predict for the structured spatial effects.</span>
-<span class="va">p_str</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"s(district,id='mrf1')"</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co">## And the unstructured spatial effect.</span>
-<span class="va">p_unstr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"s(district,id='re2')"</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p>Now, to visualize the effects we plot all maps using the same range
-for the color legends</p>
+<code class="sourceCode R"><span><span class="co">## Now, to predict the spatial effects we set up new data.</span></span>
+<span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"district"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">ZambiaNutrition</span><span class="op">$</span><span class="va">district</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Predict for the structured spatial effects.</span></span>
+<span><span class="va">p_str</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"s(district,id='mrf1')"</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## And the unstructured spatial effect.</span></span>
+<span><span class="va">p_unstr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"s(district,id='re2')"</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>Now, to visualize the effects we plot all maps using the same range for the color legends</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">r_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p_str</span><span class="op">$</span><span class="va">mu</span>, <span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span>
-<span class="va">r_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_mu</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_mu</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">r_sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p_str</span><span class="op">$</span><span class="va">sigma</span>, <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">)</span><span class="op">)</span>
-<span class="va">r_sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_sigma</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_sigma</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">r_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p_str</span><span class="op">$</span><span class="va">mu</span>, <span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">r_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_mu</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_mu</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">r_sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p_str</span><span class="op">$</span><span class="va">sigma</span>, <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">r_sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_sigma</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">r_sigma</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>and plot the effects using a diverging color legend.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## MRF smooth effect.</span>
-<span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_str</span><span class="op">$</span><span class="va">mu</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_mu</span>,
-  main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span>, shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"MRF"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>
-<span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_str</span><span class="op">$</span><span class="va">sigma</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_sigma</span>,
-  main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span>, shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"MRF"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>
-
-<span class="co">## Random effects.</span>
-<span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_mu</span>,
-  shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"Random effect"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>
-<span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_sigma</span>,
-  shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"Random effect"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></code></pre></div>
-<p><img src="zn_files/figure-html/unnamed-chunk-11-1.png" width="60%" style="display: block; margin: auto;">
-The maps clearly show that the unstructured spatial effect seems to very
-small, if existent at all when looking the 95% credible intervals:</p>
+<code class="sourceCode R"><span><span class="co">## MRF smooth effect.</span></span>
+<span><span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_str</span><span class="op">$</span><span class="va">mu</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_mu</span>,</span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span>, shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"MRF"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_str</span><span class="op">$</span><span class="va">sigma</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_sigma</span>,</span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span>, shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"MRF"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Random effects.</span></span>
+<span><span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_mu</span>,</span>
+<span>  shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"Random effect"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plotmap.html">plotmap</a></span><span class="op">(</span><span class="va">ZambiaBnd</span>, x <span class="op">=</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span>, id <span class="op">=</span> <span class="va">nd</span><span class="op">$</span><span class="va">district</span>, color <span class="op">=</span> <span class="va">diverge_hcl</span>, range <span class="op">=</span> <span class="va">r_sigma</span>,</span>
+<span>  shift <span class="op">=</span> <span class="fl">0.1</span>, title <span class="op">=</span> <span class="st">"Random effect"</span>, mdensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
+<p><img src="zn_files/figure-html/unnamed-chunk-11-1.png" width="60%" style="display: block; margin: auto;"> The maps clearly show that the unstructured spatial effect seems to very small, if existent at all when looking the 95% credible intervals:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Again predict, but now additionally compute 95% credible intervals</span>
-<span class="co">## using function c95().</span>
-<span class="va">p_unstr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"s(district,id='re2')"</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span>
-
-<span class="co">## Test if all effects contain zero, i.e., are not significant</span>
-<span class="co">## according the 95% credible intervals.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span><span class="op">[[</span><span class="st">"2.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span><span class="op">[[</span><span class="st">"97.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## [1] TRUE</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## Again predict, but now additionally compute 95% credible intervals</span></span>
+<span><span class="co">## using function c95().</span></span>
+<span><span class="va">p_unstr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"s(district,id='re2')"</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Test if all effects contain zero, i.e., are not significant</span></span>
+<span><span class="co">## according the 95% credible intervals.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span><span class="op">[[</span><span class="st">"2.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">mu</span><span class="op">[[</span><span class="st">"97.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">[[</span><span class="st">"2.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">[[</span><span class="st">"97.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## [1] TRUE</span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">[[</span><span class="st">"2.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">p_unstr</span><span class="op">$</span><span class="va">sigma</span><span class="op">[[</span><span class="st">"97.5%"</span><span class="op">]</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-bamlss:Umlauf+Adler+Kneib+Lang+Zeileis:2014" class="csl-entry">
-Umlauf, Nikolaus, Daniel Adler, Thomas Kneib, Stefan Lang, and Achim
-Zeileis. 2015. <span>“Structured Additive Regression Models: An r
-Interface to <span>BayesX</span>.”</span> <em>Journal of Statistical
-Software</em> 63 (1): 1–46. <a href="https://doi.org/10.18637/jss.v063.i21" class="external-link">https://doi.org/10.18637/jss.v063.i21</a>.
+<div id="refs" class="references hanging-indent">
+<div id="ref-bamlss:Umlauf+Adler+Kneib+Lang+Zeileis:2014">
+<p>Umlauf, Nikolaus, Daniel Adler, Thomas Kneib, Stefan Lang, and Achim Zeileis. 2015. “Structured Additive Regression Models: An R Interface to BayesX.” <em>Journal of Statistical Software</em> 63 (1): 1–46. <a href="https://doi.org/10.18637/jss.v063.i21" class="external-link">https://doi.org/10.18637/jss.v063.i21</a>.</p>
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
-Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
-<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
-Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
+<div id="ref-bamlss:Umlauf+bamlss:2018">
+<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.</p>
 </div>
 </div>
 </div>
@@ -402,7 +377,7 @@ Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-p
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -120,8 +120,8 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">continue</span><span class="op">(</span><span class="va">object</span>, cores <span class="op">=</span> <span class="cn">NULL</span>, combine <span class="op">=</span> <span class="cn">TRUE</span>,
-  sleep <span class="op">=</span> <span class="cn">NULL</span>, results <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">continue</span><span class="op">(</span><span class="va">object</span>, cores <span class="op">=</span> <span class="cn">NULL</span>, combine <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  sleep <span class="op">=</span> <span class="cn">NULL</span>, results <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -164,10 +164,10 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate and run model with MCMC.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate and run model with MCMC.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc -133.365 logPost  70.7124 logLik 100.6751 edf 31.765 eps 0.9003 iteration   1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc -265.806 logPost 149.9555 logLik 167.5114 edf 32.303 eps 0.2972 iteration   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc -288.417 logPost 159.9160 logLik 182.8770 edf 35.820 eps 0.0825 iteration   3</span>
@@ -177,60 +177,60 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc -289.793 logPost 159.2033 logLik 186.1218 edf 38.008 eps 0.0001 iteration   7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc -289.794 logPost 159.2022 logLik 186.1229 edf 38.009 eps 0.0000 iteration   8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc -289.794 logPost 159.2022 logLik 186.1229 edf 38.009 eps 0.0000 iteration   8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  1.26sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.21sec</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Starting the sampler...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                    |   0% 26.78sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*                   |   5% 23.73sec  1.25sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**                  |  10% 22.63sec  2.51sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***                 |  15% 21.32sec  3.76sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |****                |  20% 20.36sec  5.09sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*****               |  25% 19.23sec  6.41sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******              |  30% 18.28sec  7.83sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*******             |  35% 17.28sec  9.31sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |********            |  40% 16.23sec 10.82sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*********           |  45% 15.07sec 12.33sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**********          |  50% 13.98sec 13.98sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***********         |  55% 12.68sec 15.50sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |************        |  60% 11.29sec 16.94sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*************       |  65%  9.91sec 18.40sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**************      |  70%  8.52sec 19.87sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***************     |  75%  7.12sec 21.35sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |****************    |  80%  5.72sec 22.89sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*****************   |  85%  4.31sec 24.41sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******************  |  90%  2.88sec 25.91sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******************* |  95%  1.47sec 27.95sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |********************| 100%  0.00sec 29.90sec</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Continue sampling.</span></span>
-<span class="r-in"><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">continue</span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |                    |   0%  4.52sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*                   |   5%  4.37sec  0.23sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**                  |  10%  4.13sec  0.46sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***                 |  15%  3.89sec  0.69sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |****                |  20%  4.19sec  1.05sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*****               |  25%  3.85sec  1.28sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******              |  30%  3.56sec  1.53sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*******             |  35%  3.28sec  1.77sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |********            |  40%  3.01sec  2.01sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*********           |  45%  2.75sec  2.25sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**********          |  50%  2.49sec  2.49sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***********         |  55%  2.26sec  2.76sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |************        |  60%  2.01sec  3.01sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*************       |  65%  1.75sec  3.26sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**************      |  70%  1.50sec  3.50sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***************     |  75%  1.25sec  3.74sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |****************    |  80%  0.99sec  3.98sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*****************   |  85%  0.74sec  4.22sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******************  |  90%  0.50sec  4.46sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******************* |  95%  0.25sec  4.70sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |********************| 100%  0.00sec  4.95sec</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Continue sampling.</span></span></span>
+<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">continue</span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Starting the sampler...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                    |   0% 23.32sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*                   |   5% 24.02sec  1.26sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**                  |  10% 24.75sec  2.75sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***                 |  15% 23.94sec  4.22sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |****                |  20% 23.11sec  5.78sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*****               |  25% 21.65sec  7.22sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******              |  30% 20.96sec  8.98sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*******             |  35% 19.82sec 10.67sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |********            |  40% 18.59sec 12.40sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*********           |  45% 17.11sec 14.00sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**********          |  50% 15.56sec 15.56sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***********         |  55% 14.09sec 17.22sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |************        |  60% 12.55sec 18.82sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*************       |  65% 10.99sec 20.42sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**************      |  70%  9.55sec 22.29sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***************     |  75%  7.96sec 23.87sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |****************    |  80%  6.43sec 25.72sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*****************   |  85%  4.82sec 27.32sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******************  |  90%  3.21sec 28.93sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******************* |  95%  1.60sec 30.39sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |********************| 100%  0.00sec 31.80sec</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot all samples.</span></span>
-<span class="r-in"><span class="co">## plot(a, which = "samples")</span></span>
-<span class="r-in"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |                    |   0%  4.28sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*                   |   5%  4.24sec  0.22sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**                  |  10%  4.11sec  0.46sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***                 |  15%  3.90sec  0.69sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |****                |  20%  3.72sec  0.93sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*****               |  25%  3.50sec  1.17sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******              |  30%  3.29sec  1.41sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*******             |  35%  3.07sec  1.65sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |********            |  40%  2.84sec  1.90sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*********           |  45%  2.61sec  2.13sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**********          |  50%  2.37sec  2.37sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***********         |  55%  2.14sec  2.61sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |************        |  60%  1.90sec  2.85sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*************       |  65%  1.67sec  3.09sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**************      |  70%  1.43sec  3.33sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***************     |  75%  1.19sec  3.58sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |****************    |  80%  0.96sec  3.82sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*****************   |  85%  0.72sec  4.06sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******************  |  90%  0.48sec  4.31sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******************* |  95%  0.24sec  4.55sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |********************| 100%  0.00sec  4.79sec</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot all samples.</span></span></span>
+<span class="r-in"><span><span class="co">## plot(a, which = "samples")</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -245,7 +245,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

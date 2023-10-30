@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">c95</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">c95</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -136,19 +136,19 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">c95</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">c95</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        2.5%        Mean       97.5% </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -2.03558585 -0.08520532  1.96359896 </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Example computing predictions.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"x"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>, length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">30</span>, sd <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Estimate model and compute predictions.</span></span>
-<span class="r-in"><span class="co">## with c95().</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Example computing predictions.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"x"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>, length <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span><span class="op">$</span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">30</span>, sd <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Estimate model and compute predictions.</span></span></span>
+<span class="r-in"><span><span class="co">## with c95().</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc  32.4494 logPost -45.4219 logLik  -9.3006 edf 5.4381 eps 0.5421 iteration   1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc  20.6556 logPost -37.4143 logLik  -3.1010 edf 5.6297 eps 0.1766 iteration   2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc  15.6084 logPost -34.5604 logLik   0.1807 edf 6.0962 eps 0.1383 iteration   3</span>
@@ -159,55 +159,55 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc  14.5352 logPost -33.9653 logLik   1.7127 edf 6.6810 eps 0.0001 iteration   8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc  14.5352 logPost -33.9653 logLik   1.7129 edf 6.6811 eps 0.0000 iteration   9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AICc  14.5352 logPost -33.9653 logLik   1.7129 edf 6.6811 eps 0.0000 iteration   9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.18sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.05sec</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Starting the sampler...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |                    |   0%  2.62sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*                   |   5%  2.66sec  0.14sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**                  |  10%  2.48sec  0.28sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***                 |  15%  2.29sec  0.40sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |****                |  20%  2.13sec  0.53sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*****               |  25%  2.02sec  0.67sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******              |  30%  1.86sec  0.80sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*******             |  35%  1.71sec  0.92sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |********            |  40%  1.57sec  1.05sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*********           |  45%  1.44sec  1.18sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**********          |  50%  1.29sec  1.29sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***********         |  55%  1.15sec  1.41sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |************        |  60%  1.02sec  1.52sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*************       |  65%  0.88sec  1.64sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |**************      |  70%  0.76sec  1.77sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |***************     |  75%  0.63sec  1.88sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |****************    |  80%  0.50sec  2.00sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |*****************   |  85%  0.37sec  2.11sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******************  |  90%  0.25sec  2.24sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |******************* |  95%  0.13sec  2.38sec</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |********************| 100%  0.00sec  2.50sec</span>
-<span class="r-in"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span>, <span class="va">p</span>, type <span class="op">=</span> <span class="st">"l"</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
-<span class="r-in">  col <span class="op">=</span> <span class="st">"black"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |                    |   0%  0.95sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*                   |   5%  0.91sec  0.05sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**                  |  10%  0.90sec  0.10sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***                 |  15%  0.83sec  0.15sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |****                |  20%  0.78sec  0.19sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*****               |  25%  0.76sec  0.25sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******              |  30%  0.70sec  0.30sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*******             |  35%  0.65sec  0.35sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |********            |  40%  0.61sec  0.41sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*********           |  45%  0.56sec  0.46sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**********          |  50%  0.51sec  0.51sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***********         |  55%  0.46sec  0.57sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |************        |  60%  0.41sec  0.62sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*************       |  65%  0.36sec  0.67sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |**************      |  70%  0.31sec  0.73sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |***************     |  75%  0.26sec  0.79sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |****************    |  80%  0.21sec  0.84sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |*****************   |  85%  0.16sec  0.91sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******************  |  90%  0.11sec  0.96sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |******************* |  95%  0.05sec  1.02sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |********************| 100%  0.00sec  1.08sec</span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x</span>, <span class="va">p</span>, type <span class="op">=</span> <span class="st">"l"</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  col <span class="op">=</span> <span class="st">"black"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="c95-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Example extracting coefficients.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                           2.5%         Mean       97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b1        -2.7847260 -2.129696981 -1.45752699</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b2        -1.9563014  0.010141033  1.96605632</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b3        -0.8101710 -0.236356785  0.30852990</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b4        -0.9077545  0.464176813  1.92575246</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b5        -0.3655203  0.117796726  0.64467827</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b6        -1.9976302 -0.487629037  0.76329326</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b7        -0.5288563  0.007556141  0.52179682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b8        -3.6759480 -0.437777267  2.53618629</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b9        -2.6312908 -1.547709389 -0.42249094</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).tau21      2.9196076 13.599263786 49.00307483</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).alpha      1.0000000  1.000000000  1.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.p.(Intercept)    -0.1190762 -0.019865381  0.06886159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mu.p.alpha           1.0000000  0.999999999  1.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma.p.(Intercept) -1.6796657 -1.390218055 -1.09563720</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma.p.alpha        0.5354809  0.942938714  1.00000000</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Example extracting coefficients.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                           2.5%        Mean       97.5%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b1        -2.7128249 -2.07000703 -1.44983517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b2        -1.4800066  0.31732825  2.23923359</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b3        -0.6976676 -0.17336785  0.35867711</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b4        -1.2198943  0.15481990  1.54778071</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b5        -0.4754548  0.05119379  0.52651786</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b6        -1.5442848 -0.17577973  1.04634256</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b7        -0.6296562 -0.05705302  0.40215896</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b8        -2.9576602 -0.04595215  2.79233488</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).b9        -2.5895736 -1.51987111 -0.34548875</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).tau21      2.8397411 13.59739370 48.98173816</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.s.s(x).alpha      1.0000000  1.00000000  1.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.p.(Intercept)    -0.1202318 -0.01986826  0.06927125</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mu.p.alpha           1.0000000  1.00000000  1.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma.p.(Intercept) -1.6712943 -1.39173221 -1.09268439</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma.p.alpha        0.5042547  0.93969229  1.00000000</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -222,7 +222,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

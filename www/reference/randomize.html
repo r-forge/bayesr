@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -124,8 +124,8 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">trans_random</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-<span class="fu">randomize</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">trans_random</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu">randomize</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -166,15 +166,15 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Simulate data.</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Create a "bamlss.frame".</span></span>
-<span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Structure of the "s(x1)" smooth.construct.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 27</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Simulate data.</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Create a "bamlss.frame".</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Structure of the "s(x1)" smooth.construct.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 28</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ term          : chr "x1"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ bs.dim        : num 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ fixed         : logi FALSE</span>
@@ -190,8 +190,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ drop.null     : num 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ X             : num [1:500, 1:9] -0.8941 -1.1407 -0.1109 -1.1451 -0.0447 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ S             :List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num [1:9, 1:9] 7.73 -1.23 -3.914 -0.833 -5.113 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ UZ            : num [1:502, 1:10] -1.052 -0.958 -0.931 -0.928 -0.92 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num [1:9, 1:9] 7.73 -1.23 3.914 -0.833 -5.113 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ UZ            : num [1:502, 1:10] 1.052 0.958 0.931 0.928 0.92 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Xu            : num [1:500, 1] -0.505 -0.494 -0.49 -0.49 -0.489 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ df            : num 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ shift         : num [1(1d)] 0.508</span>
@@ -199,6 +199,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ null.space.dim: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ plot.me       : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ side.constrain: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ repara        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ S.scale       : num 22.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ X.dim         : int 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ fit.fun       :function (X, b, expand = TRUE, no.sparse.setup = FALSE)  </span>
@@ -209,20 +210,20 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ hess          :function (score = NULL, parameters, full = FALSE)  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "class")= chr [1:2] "tprs.smooth" "mgcv.smooth"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "qrc")=List of 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ qr   : num [1:10, 1] 1.96 0.135 -0.376 0.162 0.389 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ qr   : num [1:10, 1] -1.96 -0.135 0.376 0.162 -0.389 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rank : int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ qraux: num 1.48</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ pivot: int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "class")= chr "qr"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "nCons")= int 1</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Transform.</span></span>
-<span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu">randomize</span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## New structure adding fixed</span></span>
-<span class="r-in"><span class="co">## and random effect matrices.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 31</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Transform.</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu">randomize</span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## New structure adding fixed</span></span></span>
+<span class="r-in"><span><span class="co">## and random effect matrices.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 32</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ term          : chr "x1"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ bs.dim        : num 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ fixed         : logi FALSE</span>
@@ -238,8 +239,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ drop.null     : num 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ X             : num [1:500, 1:9] -0.8941 -1.1407 -0.1109 -1.1451 -0.0447 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ S             :List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num [1:9, 1:9] 7.73 -1.23 -3.914 -0.833 -5.113 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ UZ            : num [1:502, 1:10] -1.052 -0.958 -0.931 -0.928 -0.92 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ : num [1:9, 1:9] 7.73 -1.23 3.914 -0.833 -5.113 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ UZ            : num [1:502, 1:10] 1.052 0.958 0.931 0.928 0.92 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Xu            : num [1:500, 1] -0.505 -0.494 -0.49 -0.49 -0.489 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ df            : num 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ shift         : num [1(1d)] 0.508</span>
@@ -247,6 +248,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ null.space.dim: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ plot.me       : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ side.constrain: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ repara        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ S.scale       : num 22.3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ X.dim         : int 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ fit.fun       :function (X, b, expand = TRUE, no.sparse.setup = FALSE)  </span>
@@ -257,13 +259,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ hess          :function (score = NULL, parameters, full = FALSE)  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ Xf            : num [1:500, 1] -0.6793 -1.2461 -0.0775 -1.7152 -0.0343 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ rand          :List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Xr: num [1:500, 1:8] -0.03749 -0.05814 -0.00187 -0.08334 -0.003 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Xr: num [1:500, 1:8] 0.03749 0.05814 0.00187 0.08334 0.003 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..- attr(*, "s.label")= chr "s(x1)"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ trans.D       : num [1:9] 0.0563 0.0782 0.0812 0.1263 0.1379 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ trans.U       : num [1:9, 1:9] -0.0173 0.0115 -0.0219 -0.0166 -0.0362 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ trans.U       : num [1:9, 1:9] 0.0173 -0.0115 -0.0219 0.0166 0.0362 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "class")= chr [1:2] "tprs.smooth" "mgcv.smooth"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "qrc")=List of 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ qr   : num [1:10, 1] 1.96 0.135 -0.376 0.162 0.389 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ qr   : num [1:10, 1] -1.96 -0.135 0.376 0.162 -0.389 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ rank : int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ qraux: num 1.48</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ pivot: int 1</span>
@@ -283,7 +285,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

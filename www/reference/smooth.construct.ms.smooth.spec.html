@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -120,8 +120,8 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for ms.smooth.spec</span>
-<span class="fu"><a href="smooth.construct.html">smooth.construct</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for ms.smooth.spec</span></span>
+<span><span class="fu"><a href="smooth.construct.html">smooth.construct</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -155,26 +155,36 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Generate some data.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
-<span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Increasing: constr = 1.</span></span>
-<span class="r-in"><span class="co">## Decreasing: constr = 2.</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="s2.html">s2</a></span><span class="op">(</span><span class="va">x</span>,bs<span class="op">=</span><span class="st">"ms"</span>,xt<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>constr<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">  data <span class="op">=</span> <span class="va">d</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span>, optimizer <span class="op">=</span> <span class="va">opt_bfit</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts):</span> object 'd' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Predict and plot.</span></span>
-<span class="r-in"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in predict(b, model = "mu"):</span> object 'b' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Generate some data.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"y"</span> <span class="op">=</span> <span class="va">y</span>, <span class="st">"x"</span> <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Increasing: constr = 1.</span></span></span>
+<span class="r-in"><span><span class="co">## Decreasing: constr = 2.</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="s2.html">s2</a></span><span class="op">(</span><span class="va">x</span>,bs<span class="op">=</span><span class="st">"ms"</span>,xt<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>constr<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="va">opt_bfit</span>, sampler <span class="op">=</span> <span class="va">sam_MVNORM</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 160.7101 logPost -94.9489 logLik -75.1264 edf 5.1219 eps 0.8913 iteration   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc  -6.5555 logPost -11.0618 logLik   8.8436 edf 5.4463 eps 0.1834 iteration   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc -75.1945 logPost  23.4106 logLik  43.4027 edf 5.6763 eps 0.1043 iteration   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc -84.3641 logPost  28.0615 logLik  48.1083 edf 5.7921 eps 0.0406 iteration   4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc -84.4774 logPost  28.1376 logLik  48.2034 edf 5.8289 eps 0.0061 iteration   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc -84.4729 logPost  28.1377 logLik  48.2058 edf 5.8334 eps 0.0002 iteration   6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc -84.4728 logPost  28.1377 logLik  48.2059 edf 5.8335 eps 0.0000 iteration   7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc -84.4728 logPost  28.1377 logLik  48.2059 edf 5.8335 eps 0.0000 iteration   7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.02sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>sigma is numerically not positive semidefinite</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Predict and plot.</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p</span> <span class="op">~</span> <span class="va">x</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col.lines <span class="op">=</span> <span class="fl">4</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="smooth.construct.ms.smooth.spec-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu"><a href="plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p</span> <span class="op">~</span> <span class="va">x</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col.lines <span class="op">=</span> <span class="fl">4</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in as.matrix(p):</span> object 'p' not found</span>
 </code></pre></div>
     </div>
   </div>
@@ -189,7 +199,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -19,7 +19,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -122,23 +122,23 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## Sampler functions:</span>
-<span class="fu">sam_GMCMC</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,
-  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  step <span class="op">=</span> <span class="fl">20</span>, propose <span class="op">=</span> <span class="st">"iwlsC_gp"</span>, chains <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">GMCMC</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,
-  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  step <span class="op">=</span> <span class="fl">20</span>, propose <span class="op">=</span> <span class="st">"iwlsC_gp"</span>, chains <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Propose functions:</span>
-<span class="fu">GMCMC_iwls</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>,
-  weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-<span class="fu">GMCMC_iwlsC</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>,
-  weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">zworking</span>, <span class="va">resids</span>, <span class="va">rho</span>, <span class="va">...</span><span class="op">)</span>
-<span class="fu">GMCMC_iwlsC_gp</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>,
-  weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">zworking</span>, <span class="va">resids</span>, <span class="va">rho</span>, <span class="va">...</span><span class="op">)</span>
-<span class="fu">GMCMC_slice</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## Sampler functions:</span></span>
+<span><span class="fu">sam_GMCMC</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  step <span class="op">=</span> <span class="fl">20</span>, propose <span class="op">=</span> <span class="st">"iwlsC_gp"</span>, chains <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">GMCMC</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  step <span class="op">=</span> <span class="fl">20</span>, propose <span class="op">=</span> <span class="st">"iwlsC_gp"</span>, chains <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Propose functions:</span></span>
+<span><span class="fu">GMCMC_iwls</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">GMCMC_iwlsC</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">zworking</span>, <span class="va">resids</span>, <span class="va">rho</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">GMCMC_iwlsC_gp</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">zworking</span>, <span class="va">resids</span>, <span class="va">rho</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">GMCMC_slice</span><span class="op">(</span><span class="va">family</span>, <span class="va">theta</span>, <span class="va">id</span>, <span class="va">eta</span>, <span class="va">y</span>, <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -272,25 +272,25 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulated data example illustrating</span></span>
-<span class="r-in"><span class="co">## how to call the sampler function.</span></span>
-<span class="r-in"><span class="co">## This is done internally within</span></span>
-<span class="r-in"><span class="co">## the setup of function bamlss().</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts):</span> object 'd' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## First, find starting values with optimizer.</span></span>
-<span class="r-in"><span class="va">opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu"><a href="bfit.html">bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulated data example illustrating</span></span></span>
+<span class="r-in"><span><span class="co">## how to call the sampler function.</span></span></span>
+<span class="r-in"><span><span class="co">## This is done internally within</span></span></span>
+<span class="r-in"><span><span class="co">## the setup of function bamlss().</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts, nthres = list(...)$nthres):</span> object 'd' not found</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## First, find starting values with optimizer.</span></span></span>
+<span class="r-in"><span><span class="va">opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu"><a href="bfit.html">bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in with(bf, bfit(x, y, family)):</span> object 'bf' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Sample.</span></span>
-<span class="r-in"><span class="va">samps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu">sam_GMCMC</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="va">opt</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Sample.</span></span></span>
+<span class="r-in"><span><span class="va">samps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu">sam_GMCMC</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="va">opt</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in with(bf, sam_GMCMC(x, y, family, start = opt$parameters)):</span> object 'bf' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">samps</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">samps</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'samps' not found</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -305,7 +305,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

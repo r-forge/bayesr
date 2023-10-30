@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -124,51 +124,51 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## JM family object.</span>
-<span class="fu">jm_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="co">## "bamlss.frame" transformer function</span>
-<span class="co">## to set up joint models.</span>
-<span class="fu">jm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">data</span>, <span class="va">terms</span>, <span class="va">knots</span>, <span class="va">formula</span>, <span class="va">family</span>, subdivisions <span class="op">=</span> <span class="fl">25</span>,
-  timedependent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda"</span>, <span class="st">"mu"</span>, <span class="st">"alpha"</span>, <span class="st">"dalpha"</span><span class="op">)</span>, timevar <span class="op">=</span> <span class="cn">NULL</span>, 
-  idvar <span class="op">=</span> <span class="cn">NULL</span>, alpha <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span>, mu <span class="op">=</span> <span class="cn">NULL</span>, sigma <span class="op">=</span> <span class="cn">NULL</span>, 
-  sparse <span class="op">=</span> <span class="cn">TRUE</span>, nonlinear <span class="op">=</span> <span class="cn">FALSE</span>, edf_alt <span class="op">=</span> <span class="cn">FALSE</span>, start_mu <span class="op">=</span> <span class="cn">NULL</span>, 
-  k_mu <span class="op">=</span> <span class="fl">6</span>, <span class="va">...</span><span class="op">)</span>
-                    
-<span class="co">## Posterior mode optimizing engine.     </span>
-<span class="fu">opt_JM</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, 
-  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>, maxit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span>, 
-  nu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"gamma"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"mu"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"sigma"</span> <span class="op">=</span> <span class="fl">0.1</span>, 
-  <span class="st">"alpha"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"dalpha"</span> <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>,
-  update.nu <span class="op">=</span> <span class="cn">FALSE</span>, eps <span class="op">=</span> <span class="fl">0.0001</span>, alpha.eps <span class="op">=</span> <span class="fl">0.001</span>, ic.eps <span class="op">=</span> <span class="fl">1e-08</span>, 
-  nback <span class="op">=</span> <span class="fl">40</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">jm_mode</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, 
-  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>, maxit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span>, 
-  nu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"gamma"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"mu"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"sigma"</span> <span class="op">=</span> <span class="fl">0.1</span>, 
-  <span class="st">"alpha"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"dalpha"</span> <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>,
-  update.nu <span class="op">=</span> <span class="cn">FALSE</span>, eps <span class="op">=</span> <span class="fl">0.0001</span>, alpha.eps <span class="op">=</span> <span class="fl">0.001</span>, ic.eps <span class="op">=</span> <span class="fl">1e-08</span>, 
-  nback <span class="op">=</span> <span class="fl">40</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Sampler function.</span>
-<span class="fu">sam_JM</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, 
-  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, 
-  step <span class="op">=</span> <span class="fl">20</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">jm_mcmc</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, 
-  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, 
-  step <span class="op">=</span> <span class="fl">20</span>, <span class="va">...</span><span class="op">)</span>
-  
-<span class="co">## Predict function, set to default in jm_bamlss().</span>
-<span class="fu">jm_predict</span><span class="op">(</span><span class="va">object</span>, <span class="va">newdata</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"link"</span>, <span class="st">"parameter"</span>, <span class="st">"probabilities"</span>, <span class="st">"cumhaz"</span>, <span class="st">"loglik"</span><span class="op">)</span>,
-  <span class="va">dt</span>, <span class="va">steps</span>, <span class="va">id</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">}</span>, 
-  subdivisions <span class="op">=</span> <span class="fl">100</span>, cores <span class="op">=</span> <span class="cn">NULL</span>, chunks <span class="op">=</span> <span class="fl">1</span>,
-  verbose <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="va">...</span><span class="op">)</span>
-  
-<span class="co">## Survival plot.</span>
-<span class="fu">jm_survplot</span><span class="op">(</span><span class="va">object</span>, id <span class="op">=</span> <span class="fl">1</span>, dt <span class="op">=</span> <span class="cn">NULL</span>, steps <span class="op">=</span> <span class="fl">10</span>, 
-  points <span class="op">=</span> <span class="cn">TRUE</span>, rug <span class="op">=</span> <span class="op">!</span><span class="va">points</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## JM family object.</span></span>
+<span><span class="fu">jm_bamlss</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## "bamlss.frame" transformer function</span></span>
+<span><span class="co">## to set up joint models.</span></span>
+<span><span class="fu">jm_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">data</span>, <span class="va">terms</span>, <span class="va">knots</span>, <span class="va">formula</span>, <span class="va">family</span>, subdivisions <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  timedependent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda"</span>, <span class="st">"mu"</span>, <span class="st">"alpha"</span>, <span class="st">"dalpha"</span><span class="op">)</span>, timevar <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  idvar <span class="op">=</span> <span class="cn">NULL</span>, alpha <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span>, mu <span class="op">=</span> <span class="cn">NULL</span>, sigma <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  sparse <span class="op">=</span> <span class="cn">TRUE</span>, nonlinear <span class="op">=</span> <span class="cn">FALSE</span>, edf_alt <span class="op">=</span> <span class="cn">FALSE</span>, start_mu <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  k_mu <span class="op">=</span> <span class="fl">6</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>                    </span>
+<span><span class="co">## Posterior mode optimizing engine.     </span></span>
+<span><span class="fu">opt_JM</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>, maxit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span>, </span>
+<span>  nu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"gamma"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"mu"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"sigma"</span> <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    <span class="st">"alpha"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"dalpha"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  update.nu <span class="op">=</span> <span class="cn">FALSE</span>, eps <span class="op">=</span> <span class="fl">0.0001</span>, alpha.eps <span class="op">=</span> <span class="fl">0.001</span>, ic.eps <span class="op">=</span> <span class="fl">1e-08</span>, </span>
+<span>  nback <span class="op">=</span> <span class="fl">40</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">jm_mode</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>, maxit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span>, </span>
+<span>  nu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"gamma"</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="st">"mu"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"sigma"</span> <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    <span class="st">"alpha"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"dalpha"</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  update.nu <span class="op">=</span> <span class="cn">FALSE</span>, eps <span class="op">=</span> <span class="fl">0.0001</span>, alpha.eps <span class="op">=</span> <span class="fl">0.001</span>, ic.eps <span class="op">=</span> <span class="fl">1e-08</span>, </span>
+<span>  nback <span class="op">=</span> <span class="fl">40</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Sampler function.</span></span>
+<span><span class="fu">sam_JM</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, </span>
+<span>  step <span class="op">=</span> <span class="fl">20</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">jm_mcmc</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  n.iter <span class="op">=</span> <span class="fl">1200</span>, burnin <span class="op">=</span> <span class="fl">200</span>, thin <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, </span>
+<span>  step <span class="op">=</span> <span class="fl">20</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="co">## Predict function, set to default in jm_bamlss().</span></span>
+<span><span class="fu">jm_predict</span><span class="op">(</span><span class="va">object</span>, <span class="va">newdata</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"link"</span>, <span class="st">"parameter"</span>, <span class="st">"probabilities"</span>, <span class="st">"cumhaz"</span>, <span class="st">"loglik"</span><span class="op">)</span>,</span>
+<span>  <span class="va">dt</span>, <span class="va">steps</span>, <span class="va">id</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">}</span>, </span>
+<span>  subdivisions <span class="op">=</span> <span class="fl">100</span>, cores <span class="op">=</span> <span class="cn">NULL</span>, chunks <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="va">...</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="co">## Survival plot.</span></span>
+<span><span class="fu">jm_survplot</span><span class="op">(</span><span class="va">object</span>, id <span class="op">=</span> <span class="fl">1</span>, dt <span class="op">=</span> <span class="cn">NULL</span>, steps <span class="op">=</span> <span class="fl">10</span>, </span>
+<span>  points <span class="op">=</span> <span class="cn">TRUE</span>, rug <span class="op">=</span> <span class="op">!</span><span class="va">points</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -398,10 +398,10 @@ important distinction between associations which are nonlinear in \(\eta_{\mu}\)
     <h2>References</h2>
     <p>Koehler M, Umlauf N, Beyerlein, A., Winkler, C. Ziegler, A.-G., Greven S (2017). Flexible
   Bayesian Additive Joint Models with an Application to Type 1 Diabetes Research.
-  <em>Biometrical Journal</em>. <a href="https://doi.org/10.1002/bimj.201600224" class="external-link">doi:10.1002/bimj.201600224</a></p>  
+  <em>Biometrical Journal</em>. doi: <a href="https://doi.org/10.1002/bimj.201600224" class="external-link">10.1002/bimj.201600224</a></p>  
 <p>Meike Koehler, Nikolaus Umlauf, and Sonja Greven (2018). Nonlinear association structures in
   flexible Bayesian additive joint models. <em>Statistics in Medicine</em>.
-  <a href="https://doi.org/10.1002/sim.7967" class="external-link">doi:10.1002/sim.7967</a></p>
+  doi: <a href="https://doi.org/10.1002/sim.7967" class="external-link">10.1002/sim.7967</a></p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -410,121 +410,121 @@ important distinction between associations which are nonlinear in \(\eta_{\mu}\)
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"><span class="co">## Simulate survival data</span></span>
-<span class="r-in"><span class="co">## with random intercepts/slopes and a linear effect of time,</span></span>
-<span class="r-in"><span class="co">## constant association alpha and no effect of the derivative</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="simJM.html">simJM</a></span><span class="op">(</span>nsub <span class="op">=</span> <span class="fl">200</span>, long_setting <span class="op">=</span> <span class="st">"linear"</span>, </span>
-<span class="r-in">  alpha_setting <span class="op">=</span> <span class="st">"constant"</span>,</span>
-<span class="r-in">  dalpha_setting <span class="op">=</span> <span class="st">"zero"</span>, full <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Formula of the according joint model</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="fu"><a href="Surv2.html">Surv2</a></span><span class="op">(</span><span class="va">survtime</span>, <span class="va">event</span>, obs <span class="op">=</span> <span class="va">y</span><span class="op">)</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">gamma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">mu</span> <span class="op">~</span> <span class="va">obstime</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">    <span class="fu">s</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">sigma</span> <span class="op">~</span> <span class="fl">1</span>,</span>
-<span class="r-in">  <span class="va">alpha</span> <span class="op">~</span> <span class="fl">1</span>,</span>
-<span class="r-in">  <span class="va">dalpha</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Joint model estimation</span></span>
-<span class="r-in"><span class="co">## jm_bamlss() sets the default optimizer and sampler function.</span></span>
-<span class="r-in"><span class="co">## First, posterior mode estimates are computed using function</span></span>
-<span class="r-in"><span class="co">## opt_JM(), afterwards the sampler sam_JM() is started.</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>,</span>
-<span class="r-in">           timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot estimated effects.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Predict event probabilities for two individuals</span></span>
-<span class="r-in"><span class="co">## at 12 time units after their last longitudinal measurement.</span></span>
-<span class="r-in"><span class="co">## The event probability is conditional on their survival</span></span>
-<span class="r-in"><span class="co">## up to their last observed measurement.</span></span>
-<span class="r-in"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, type <span class="op">=</span> <span class="st">"probabilities"</span>, id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, dt <span class="op">=</span> <span class="fl">12</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot of survival probabilities and</span></span>
-<span class="r-in"><span class="co">## corresponding longitudinal effects</span></span>
-<span class="r-in"><span class="co">## for individual id.</span></span>
-<span class="r-in"><span class="fu">jm_survplot</span><span class="op">(</span><span class="va">b</span>, id <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">jm_survplot</span><span class="op">(</span><span class="va">b</span>, id <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Simulate survival data</span></span>
-<span class="r-in"><span class="co">## with functional random intercepts and a nonlinear effect </span></span>
-<span class="r-in"><span class="co">## of time, time-varying association alpha and no effect </span></span>
-<span class="r-in"><span class="co">## of the derivative.</span></span>
-<span class="r-in"><span class="co">## Note: This specification is the simJM default.</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="simJM.html">simJM</a></span><span class="op">(</span>nsub <span class="op">=</span> <span class="fl">200</span>, full <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Formula of the according joint model</span></span>
-<span class="r-in"><span class="co">## number of knots for the smooth nonlinear effect of time</span></span>
-<span class="r-in"><span class="va">klong</span> <span class="op">&lt;-</span> <span class="fl">8</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="fu"><a href="Surv2.html">Surv2</a></span><span class="op">(</span><span class="va">survtime</span>, <span class="va">event</span>, obs <span class="op">=</span> <span class="va">y</span><span class="op">)</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">gamma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">mu</span> <span class="op">~</span> <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">    <span class="fu">ti</span><span class="op">(</span><span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="va">klong</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">    <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"re"</span>, <span class="st">"ps"</span><span class="op">)</span>, </span>
-<span class="r-in">      k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html" class="external-link">nlevels</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, <span class="va">klong</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">    <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">sigma</span> <span class="op">~</span> <span class="fl">1</span>,</span>
-<span class="r-in">  <span class="va">alpha</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">dalpha</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Estimating posterior mode only using opt_JM()</span></span>
-<span class="r-in"><span class="va">b_mode</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>,</span>
-<span class="r-in">                 timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span>, </span>
-<span class="r-in">                 sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Estimating posterior means using sam_JM() </span></span>
-<span class="r-in"><span class="co">##  with starting values generated from posterior mode </span></span>
-<span class="r-in"><span class="va">b_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>,</span>
-<span class="r-in">                 timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span class="r-in">                 start <span class="op">=</span> <span class="fu"><a href="parameters.html">parameters</a></span><span class="op">(</span><span class="va">b_mode</span><span class="op">)</span>, results <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot effects.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b_mean</span>, model <span class="op">=</span> <span class="st">"alpha"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Simulate survival data</span></span>
-<span class="r-in"><span class="co">## with functional random intercepts and an association nonlinear in mu</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">234</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="simJM.html">simJM</a></span><span class="op">(</span>nsub <span class="op">=</span> <span class="fl">300</span>, long_setting <span class="op">=</span> <span class="st">"functional"</span>, alpha_setting <span class="op">=</span> <span class="st">"nonlinear"</span>, </span>
-<span class="r-in">           nonlinear <span class="op">=</span> <span class="cn">TRUE</span>, full <span class="op">=</span> <span class="cn">FALSE</span>, probmiss <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Calculate longitudinal model to obtain starting values for mu</span></span>
-<span class="r-in"><span class="va">long_df</span> <span class="op">&lt;-</span> <span class="fl">7</span></span>
-<span class="r-in"><span class="va">f_start</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">~</span> <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ti</span><span class="op">(</span><span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="va">long_df</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">               <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"re"</span>, <span class="st">"ps"</span><span class="op">)</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html" class="external-link">nlevels</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, <span class="va">long_df</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">               <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b_start</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f_start</span>, data <span class="op">=</span> <span class="va">d</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b_start</span><span class="op">)</span><span class="op">$</span><span class="va">mu</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Fit joint model with nonlinear association (nonlinear = TRUE)</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="fu"><a href="Surv2.html">Surv2</a></span><span class="op">(</span><span class="va">survtime</span>, <span class="va">event</span>, obs <span class="op">=</span> <span class="va">y</span><span class="op">)</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">gamma</span> <span class="op">~</span> <span class="va">x1</span>,</span>
-<span class="r-in">  <span class="va">mu</span> <span class="op">~</span> <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ti</span><span class="op">(</span><span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="va">long_df</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">       <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"re"</span>, <span class="st">"ps"</span><span class="op">)</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html" class="external-link">nlevels</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, <span class="va">long_df</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">       <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">sigma</span> <span class="op">~</span> <span class="fl">1</span>,</span>
-<span class="r-in">  <span class="va">alpha</span> <span class="op">~</span> <span class="fl">1</span>,</span>
-<span class="r-in">  <span class="va">dalpha</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>, timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span>, </span>
-<span class="r-in">            nonlinear <span class="op">=</span> <span class="cn">TRUE</span>, start_mu <span class="op">=</span> <span class="va">mu</span>, </span>
-<span class="r-in">            n.iter <span class="op">=</span> <span class="fl">6000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="samplestats.html">samplestats</a></span><span class="op">(</span><span class="va">b</span><span class="op">$</span><span class="va">samples</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">## Simulate survival data</span></span></span>
+<span class="r-in"><span><span class="co">## with random intercepts/slopes and a linear effect of time,</span></span></span>
+<span class="r-in"><span><span class="co">## constant association alpha and no effect of the derivative</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="simJM.html">simJM</a></span><span class="op">(</span>nsub <span class="op">=</span> <span class="fl">200</span>, long_setting <span class="op">=</span> <span class="st">"linear"</span>, </span></span>
+<span class="r-in"><span>  alpha_setting <span class="op">=</span> <span class="st">"constant"</span>,</span></span>
+<span class="r-in"><span>  dalpha_setting <span class="op">=</span> <span class="st">"zero"</span>, full <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Formula of the according joint model</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="Surv2.html">Surv2</a></span><span class="op">(</span><span class="va">survtime</span>, <span class="va">event</span>, obs <span class="op">=</span> <span class="va">y</span><span class="op">)</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">gamma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">mu</span> <span class="op">~</span> <span class="va">obstime</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>    <span class="fu">s</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">sigma</span> <span class="op">~</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  <span class="va">alpha</span> <span class="op">~</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  <span class="va">dalpha</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Joint model estimation</span></span></span>
+<span class="r-in"><span><span class="co">## jm_bamlss() sets the default optimizer and sampler function.</span></span></span>
+<span class="r-in"><span><span class="co">## First, posterior mode estimates are computed using function</span></span></span>
+<span class="r-in"><span><span class="co">## opt_JM(), afterwards the sampler sam_JM() is started.</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>,</span></span>
+<span class="r-in"><span>           timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot estimated effects.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Predict event probabilities for two individuals</span></span></span>
+<span class="r-in"><span><span class="co">## at 12 time units after their last longitudinal measurement.</span></span></span>
+<span class="r-in"><span><span class="co">## The event probability is conditional on their survival</span></span></span>
+<span class="r-in"><span><span class="co">## up to their last observed measurement.</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, type <span class="op">=</span> <span class="st">"probabilities"</span>, id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, dt <span class="op">=</span> <span class="fl">12</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot of survival probabilities and</span></span></span>
+<span class="r-in"><span><span class="co">## corresponding longitudinal effects</span></span></span>
+<span class="r-in"><span><span class="co">## for individual id.</span></span></span>
+<span class="r-in"><span><span class="fu">jm_survplot</span><span class="op">(</span><span class="va">b</span>, id <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">jm_survplot</span><span class="op">(</span><span class="va">b</span>, id <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Simulate survival data</span></span></span>
+<span class="r-in"><span><span class="co">## with functional random intercepts and a nonlinear effect </span></span></span>
+<span class="r-in"><span><span class="co">## of time, time-varying association alpha and no effect </span></span></span>
+<span class="r-in"><span><span class="co">## of the derivative.</span></span></span>
+<span class="r-in"><span><span class="co">## Note: This specification is the simJM default.</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="simJM.html">simJM</a></span><span class="op">(</span>nsub <span class="op">=</span> <span class="fl">200</span>, full <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Formula of the according joint model</span></span></span>
+<span class="r-in"><span><span class="co">## number of knots for the smooth nonlinear effect of time</span></span></span>
+<span class="r-in"><span><span class="va">klong</span> <span class="op">&lt;-</span> <span class="fl">8</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="Surv2.html">Surv2</a></span><span class="op">(</span><span class="va">survtime</span>, <span class="va">event</span>, obs <span class="op">=</span> <span class="va">y</span><span class="op">)</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">gamma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">mu</span> <span class="op">~</span> <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>    <span class="fu">ti</span><span class="op">(</span><span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="va">klong</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>    <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"re"</span>, <span class="st">"ps"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>      k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html" class="external-link">nlevels</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, <span class="va">klong</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>    <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">sigma</span> <span class="op">~</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  <span class="va">alpha</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">dalpha</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Estimating posterior mode only using opt_JM()</span></span></span>
+<span class="r-in"><span><span class="va">b_mode</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>,</span></span>
+<span class="r-in"><span>                 timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span>, </span></span>
+<span class="r-in"><span>                 sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Estimating posterior means using sam_JM() </span></span></span>
+<span class="r-in"><span><span class="co">##  with starting values generated from posterior mode </span></span></span>
+<span class="r-in"><span><span class="va">b_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>,</span></span>
+<span class="r-in"><span>                 timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                 start <span class="op">=</span> <span class="fu"><a href="parameters.html">parameters</a></span><span class="op">(</span><span class="va">b_mode</span><span class="op">)</span>, results <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot effects.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b_mean</span>, model <span class="op">=</span> <span class="st">"alpha"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Simulate survival data</span></span></span>
+<span class="r-in"><span><span class="co">## with functional random intercepts and an association nonlinear in mu</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">234</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="simJM.html">simJM</a></span><span class="op">(</span>nsub <span class="op">=</span> <span class="fl">300</span>, long_setting <span class="op">=</span> <span class="st">"functional"</span>, alpha_setting <span class="op">=</span> <span class="st">"nonlinear"</span>, </span></span>
+<span class="r-in"><span>           nonlinear <span class="op">=</span> <span class="cn">TRUE</span>, full <span class="op">=</span> <span class="cn">FALSE</span>, probmiss <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Calculate longitudinal model to obtain starting values for mu</span></span></span>
+<span class="r-in"><span><span class="va">long_df</span> <span class="op">&lt;-</span> <span class="fl">7</span></span></span>
+<span class="r-in"><span><span class="va">f_start</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">~</span> <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ti</span><span class="op">(</span><span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="va">long_df</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>               <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"re"</span>, <span class="st">"ps"</span><span class="op">)</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html" class="external-link">nlevels</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, <span class="va">long_df</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>               <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">b_start</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f_start</span>, data <span class="op">=</span> <span class="va">d</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b_start</span><span class="op">)</span><span class="op">$</span><span class="va">mu</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Fit joint model with nonlinear association (nonlinear = TRUE)</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="Surv2.html">Surv2</a></span><span class="op">(</span><span class="va">survtime</span>, <span class="va">event</span>, obs <span class="op">=</span> <span class="va">y</span><span class="op">)</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">survtime</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">gamma</span> <span class="op">~</span> <span class="va">x1</span>,</span></span>
+<span class="r-in"><span>  <span class="va">mu</span> <span class="op">~</span> <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, bs <span class="op">=</span> <span class="st">"re"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ti</span><span class="op">(</span><span class="va">obstime</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="va">long_df</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>       <span class="fu">ti</span><span class="op">(</span><span class="va">id</span>, <span class="va">obstime</span>, bs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"re"</span>, <span class="st">"ps"</span><span class="op">)</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html" class="external-link">nlevels</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, <span class="va">long_df</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>       <span class="fu">s</span><span class="op">(</span><span class="va">x2</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">sigma</span> <span class="op">~</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  <span class="va">alpha</span> <span class="op">~</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  <span class="va">dalpha</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"jm"</span>, timevar <span class="op">=</span> <span class="st">"obstime"</span>, idvar <span class="op">=</span> <span class="st">"id"</span>, </span></span>
+<span class="r-in"><span>            nonlinear <span class="op">=</span> <span class="cn">TRUE</span>, start_mu <span class="op">=</span> <span class="va">mu</span>, </span></span>
+<span class="r-in"><span>            n.iter <span class="op">=</span> <span class="fl">6000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="samplestats.html">samplestats</a></span><span class="op">(</span><span class="va">b</span><span class="op">$</span><span class="va">samples</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -539,7 +539,7 @@ important distinction between associations which are nonlinear in \(\eta_{\mu}\)
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

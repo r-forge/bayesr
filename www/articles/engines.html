@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="engines_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Estimation Engines</h1>
@@ -147,468 +147,373 @@
 <div class="section level2">
 <h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
 </h2>
-<p>For the estimation of model parameters the <em>bamlss</em> package
-provides a flexible infrastructure that allows the user to exchange
-both, optimization functions for posterior mode estimation (penalized
-likelihood) and sampling functions for full Bayesian Inference. This
-goes beyond the common modeling infrastructures that usually allow to
-create new family objects, only, and can be too restrictive for a couple
-of applications. Within the unified modeling approach in <em>bamlss</em>
-it is relatively straightforward to develop new estimation functions
-(algorithms), e.g., for implementing new models or for efficiency
-reasons. Such estimation functions could also interface to other
-software (see, e.g., the <code><a href="../reference/JAGS.html">sam_JAGS()</a></code> sampling function). In
-the following, the basic requirements for optimizer and sampling
-functions are described in detail.</p>
+<p>For the estimation of model parameters the <em>bamlss</em> package provides a flexible infrastructure that allows the user to exchange both, optimization functions for posterior mode estimation (penalized likelihood) and sampling functions for full Bayesian Inference. This goes beyond the common modeling infrastructures that usually allow to create new family objects, only, and can be too restrictive for a couple of applications. Within the unified modeling approach in <em>bamlss</em> it is relatively straightforward to develop new estimation functions (algorithms), e.g., for implementing new models or for efficiency reasons. Such estimation functions could also interface to other software (see, e.g., the <code><a href="../reference/JAGS.html">sam_JAGS()</a></code> sampling function). In the following, the basic requirements for optimizer and sampling functions are described in detail.</p>
 </div>
 <div class="section level2">
 <h2 id="the-basic-setup">The basic setup<a class="anchor" aria-label="anchor" href="#the-basic-setup"></a>
 </h2>
-<p>Estimation engines in <em>bamlss</em> are usually based on the model
-frame setup function <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>, i.e., the functions
-all have a <code>x</code> argument, which contains all the necessary
-model and penalty matrices, and a <code>y</code> argument, which is the
-response (univariate or multivariate). In addition, an estimation engine
-usually has a <code>family</code> argument, which specifies the model to
-be estimated. However, this is not a mandatory argument, i.e., one could
-write an estimation function that is designed for one specific problem,
-only.</p>
-<p>The modeling setup is best explained by looking at the main
-estimation engines provided by <em>bamlss</em>. The default optimizer
-using the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function is
-<code><a href="../reference/bfit.html">opt_bfit()</a></code>, which is a backfitting routine. The most
-important arguments are</p>
+<p>Estimation engines in <em>bamlss</em> are usually based on the model frame setup function <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>, i.e., the functions all have a <code>x</code> argument, which contains all the necessary model and penalty matrices, and a <code>y</code> argument, which is the response (univariate or multivariate). In addition, an estimation engine usually has a <code>family</code> argument, which specifies the model to be estimated. However, this is not a mandatory argument, i.e., one could write an estimation function that is designed for one specific problem, only.</p>
+<p>The modeling setup is best explained by looking at the main estimation engines provided by <em>bamlss</em>. The default optimizer using the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function is <code><a href="../reference/bfit.html">opt_bfit()</a></code>, which is a backfitting routine. The most important arguments are</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/bfit.html">opt_bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
-<p>The default sampling engine in <em>bamlss</em> is
-<code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>, again the most important arguments are</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bfit.html">opt_bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<p>The default sampling engine in <em>bamlss</em> is <code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>, again the most important arguments are</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/GMCMC.html">sam_GMCMC</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
-<p>So basically, the arguments of the optimizer and the sampling
-function are the same, the main difference is the return value. In
-<em>bamlss</em> optimizer functions usually return a vector of estimated
-regression coefficients (parameters), while sampling functions return a
-matrix of parameter samples of class <code>"mcmc"</code> or
-<code>"mcmc.list"</code> (for details see the documentation of the
-<em>coda</em> package). Also note that there is naming convention,
-optimizer functions start with prefix <code>opt_*</code> and sampler
-functions with <code>sam_*</code>.</p>
-<p>Internally, what the optimizer or sampling function is actually
-processing is not important for the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper
-function as long as a vector or matrix of parameters is returned. For
-optimizer functions the return value needs to be named list with an
-element <code>"parameters"</code>, the vector (also a matrix, e.g., for
-<code><a href="../reference/lasso.html">opt_lasso()</a></code> and <code><a href="../reference/boost.html">opt_boost()</a></code> optimizers) of
-estimated parameters. The most important requirement to make use of all
-extractor functions like <code><a href="../reference/summary.bamlss.html">summary.bamlss()</a></code>,
-<code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code>, <code><a href="../reference/plot.bamlss.html">plot.bamlss()</a></code>,
-<code><a href="../reference/residuals.bamlss.html">residuals.bamlss()</a></code>, etc., is to follow the naming
-convention of the returned estimates. The parameter names are based on
-the names of the distribution parameters as specified in the family
-object. For example, the family object <code><a href="../reference/family.bamlss.html">gaussian_bamlss()</a></code>
-has parameter names <code>"mu"</code> and <code>"sigma"</code></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/GMCMC.html">sam_GMCMC</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<p>So basically, the arguments of the optimizer and the sampling function are the same, the main difference is the return value. In <em>bamlss</em> optimizer functions usually return a vector of estimated regression coefficients (parameters), while sampling functions return a matrix of parameter samples of class <code>"mcmc"</code> or <code>"mcmc.list"</code> (for details see the documentation of the <em>coda</em> package). Also note that there is naming convention, optimizer functions start with prefix <code>opt_*</code> and sampler functions with <code>sam_*</code>.</p>
+<p>Internally, what the optimizer or sampling function is actually processing is not important for the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function as long as a vector or matrix of parameters is returned. For optimizer functions the return value needs to be named list with an element <code>"parameters"</code>, the vector (also a matrix, e.g., for <code><a href="../reference/lasso.html">opt_lasso()</a></code> and <code><a href="../reference/boost.html">opt_boost()</a></code> optimizers) of estimated parameters. The most important requirement to make use of all extractor functions like <code><a href="../reference/summary.bamlss.html">summary.bamlss()</a></code>, <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code>, <code><a href="../reference/plot.bamlss.html">plot.bamlss()</a></code>, <code><a href="../reference/residuals.bamlss.html">residuals.bamlss()</a></code>, etc., is to follow the naming convention of the returned estimates. The parameter names are based on the names of the distribution parameters as specified in the family object. For example, the family object <code><a href="../reference/family.bamlss.html">gaussian_bamlss()</a></code> has parameter names <code>"mu"</code> and <code>"sigma"</code></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/family.bamlss.html">gaussian_bamlss</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">names</span></code></pre></div>
-<pre><code><span class="co">## [1] "mu"    "sigma"</span></code></pre>
-<p>Then, each distributional parameter can be modeled by parametric
-(linear) and nonlinear smooth effect terms. The parametric part is
-indicated with <code>"p"</code> and the smooth part with
-<code>"s"</code>. The names of the parametric coefficients are the names
-of the corresponding model matrices as returned from
-<code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>. E.g., if two linear effects,
-“<code>x1</code>” and <code>"x2"</code>, enter the model for
-distributional parameter <code>"mu"</code>, then the final names are
-<code>"mu.p.x1"</code> and <code>"mu.p.x2"</code>. Similarly for the
-smooth parts, if we model a variable <code>"x3"</code> using a
-regression spline as provided by the <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> function of the
-<em>mgcv</em> package, the name is based on the names that are used by
-<code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code> for the <code><a href="../reference/smooth.construct.html">smooth.construct()</a></code>
-object. In this case the parameter names start with
-<code>"mu.s.s(x3)"</code>. If this smooth term has 10 regression
-coefficients, then the final name must be</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/family.bamlss.html">gaussian_bamlss</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">names</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "mu"    "sigma"</span></span></code></pre>
+<p>Then, each distributional parameter can be modeled by parametric (linear) and nonlinear smooth effect terms. The parametric part is indicated with <code>"p"</code> and the smooth part with <code>"s"</code>. The names of the parametric coefficients are the names of the corresponding model matrices as returned from <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code>. E.g., if two linear effects, “<code>x1</code>” and <code>"x2"</code>, enter the model for distributional parameter <code>"mu"</code>, then the final names are <code>"mu.p.x1"</code> and <code>"mu.p.x2"</code>. Similarly for the smooth parts, if we model a variable <code>"x3"</code> using a regression spline as provided by the <code><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s()</a></code> function of the <em>mgcv</em> package, the name is based on the names that are used by <code><a href="../reference/bamlss.frame.html">bamlss.frame()</a></code> for the <code><a href="../reference/smooth.construct.html">smooth.construct()</a></code> object. In this case the parameter names start with <code>"mu.s.s(x3)"</code>. If this smooth term has 10 regression coefficients, then the final name must be</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"mu.s.s(x3)"</span>, <span class="st">".b"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##  [1] "mu.s.s(x3).b1"  "mu.s.s(x3).b2"  "mu.s.s(x3).b3"  "mu.s.s(x3).b4" </span>
-<span class="co">##  [5] "mu.s.s(x3).b5"  "mu.s.s(x3).b6"  "mu.s.s(x3).b7"  "mu.s.s(x3).b8" </span>
-<span class="co">##  [9] "mu.s.s(x3).b9"  "mu.s.s(x3).b10"</span></code></pre>
-<p>i.e., all smooth term parameters are named with “b” and a
-numerated.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"mu.s.s(x3)"</span>, <span class="st">".b"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##  [1] "mu.s.s(x3).b1"  "mu.s.s(x3).b2"  "mu.s.s(x3).b3"  "mu.s.s(x3).b4" </span></span>
+<span><span class="co">##  [5] "mu.s.s(x3).b5"  "mu.s.s(x3).b6"  "mu.s.s(x3).b7"  "mu.s.s(x3).b8" </span></span>
+<span><span class="co">##  [9] "mu.s.s(x3).b9"  "mu.s.s(x3).b10"</span></span></code></pre>
+<p>i.e., all smooth term parameters are named with “b” and a numerated.</p>
 </div>
 <div class="section level2">
 <h2 id="model-fitting-engines-for-linear-regression">Model fitting engines for linear regression<a class="anchor" aria-label="anchor" href="#model-fitting-engines-for-linear-regression"></a>
 </h2>
-<p>In the following, to explain the setup and the naming convention of
-estimation engines in more detail, we implement</p>
+<p>In the following, to explain the setup and the naming convention of estimation engines in more detail, we implement</p>
 <ul>
-<li>a new family object for simple linear models <span class="math inline">\(y = x^{\top}\boldsymbol{\beta} +
-\varepsilon\)</span> with <span class="math inline">\(\varepsilon \sim
-N(0, \sigma^2)\)</span>,</li>
-<li>and set up an optimizer function based on the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>
-function,</li>
+<li>a new family object for simple linear models <span class="math inline">\(y = x^{\top}\boldsymbol{\beta} + \varepsilon\)</span> with <span class="math inline">\(\varepsilon \sim N(0, \sigma^2)\)</span>,</li>
+<li>and set up an optimizer function based on the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> function,</li>
 <li>and additionally a MCMC sampling function.</li>
 </ul>
-<p>For illustration, the family object is kept very simple, we only
-model the mean function in terms of covariates.</p>
+<p>For illustration, the family object is kept very simple, we only model the mean function in terms of covariates.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">lm_bamlss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-    <span class="st">"family"</span> <span class="op">=</span> <span class="st">"LM"</span>,
-    <span class="st">"names"</span> <span class="op">=</span> <span class="st">"mu"</span>,
-    <span class="st">"links"</span> <span class="op">=</span> <span class="st">"identity"</span>,
-    <span class="st">"d"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">log</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="va">.lm_bamlss.p</span><span class="op">)</span><span class="op">)</span>
-      <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">y</span>, mean <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span>, sd <span class="op">=</span> <span class="va">sigma</span>, log <span class="op">=</span> <span class="va">log</span><span class="op">)</span>
-    <span class="op">}</span>,
-    <span class="st">"p"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="va">.lm_bamlss.p</span><span class="op">)</span><span class="op">)</span>
-      <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="va">y</span>, mean <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span>, sd <span class="op">=</span> <span class="va">sigma</span>, <span class="va">...</span><span class="op">)</span>
-    <span class="op">}</span>
-  <span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"family.bamlss"</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<p>Now, for setting up the estimation functions we first simulate some
-data using the <code><a href="../reference/GAMart.html">GAMart()</a></code> function, afterwards the necessary
-<code>"bamlss.frame"</code> can be created with</p>
+<code class="sourceCode R"><span><span class="va">lm_bamlss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"family"</span> <span class="op">=</span> <span class="st">"LM"</span>,</span>
+<span>    <span class="st">"names"</span> <span class="op">=</span> <span class="st">"mu"</span>,</span>
+<span>    <span class="st">"links"</span> <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>    <span class="st">"d"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">log</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="va">.lm_bamlss.p</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">y</span>, mean <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span>, sd <span class="op">=</span> <span class="va">sigma</span>, log <span class="op">=</span> <span class="va">log</span><span class="op">)</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    <span class="st">"p"</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">par</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="va">.lm_bamlss.p</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="va">y</span>, mean <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">mu</span>, sd <span class="op">=</span> <span class="va">sigma</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"family.bamlss"</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Now, for setting up the estimation functions we first simulate some data using the <code><a href="../reference/GAMart.html">GAMart()</a></code> function, afterwards the necessary <code>"bamlss.frame"</code> can be created with</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Simulate some data.</span>
-<span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="co">## Setup a "bamlss.frame" object, that is used for</span>
-<span class="co">## developing the estimation functions for the linear model.</span>
-<span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span>
-
-<span class="co">## Print the structure of the "bamlss.frame".</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## 'bamlss.frame' structure: </span>
-<span class="co">##   ..$ call </span>
-<span class="co">##   ..$ model.frame </span>
-<span class="co">##   ..$ formula </span>
-<span class="co">##   ..$ family </span>
-<span class="co">##   ..$ terms </span>
-<span class="co">##   ..$ x </span>
-<span class="co">##   .. ..$ mu </span>
-<span class="co">##   .. .. ..$ formula </span>
-<span class="co">##   .. .. ..$ fake.formula </span>
-<span class="co">##   .. .. ..$ terms </span>
-<span class="co">##   .. .. ..$ model.matrix </span>
-<span class="co">##   ..$ y </span>
-<span class="co">##   .. ..$ num </span>
-<span class="co">##   ..$ delete</span></code></pre>
-<p>As noted above, the object is a named list with elements
-<code>"x"</code> and <code>"y"</code>, which will be passed to the
-estimation functions. For the moment, since we only implement a linear
-model, we need to work with the linear model matrix that is part of the
-<code>bf</code> object.</p>
+<code class="sourceCode R"><span><span class="co">## Simulate some data.</span></span>
+<span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Setup a "bamlss.frame" object, that is used for</span></span>
+<span><span class="co">## developing the estimation functions for the linear model.</span></span>
+<span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Print the structure of the "bamlss.frame".</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## 'bamlss.frame' structure: </span></span>
+<span><span class="co">##   ..$ call </span></span>
+<span><span class="co">##   ..$ model.frame </span></span>
+<span><span class="co">##   ..$ formula </span></span>
+<span><span class="co">##   ..$ family </span></span>
+<span><span class="co">##   ..$ terms </span></span>
+<span><span class="co">##   ..$ x </span></span>
+<span><span class="co">##   .. ..$ mu </span></span>
+<span><span class="co">##   .. .. ..$ formula </span></span>
+<span><span class="co">##   .. .. ..$ fake.formula </span></span>
+<span><span class="co">##   .. .. ..$ terms </span></span>
+<span><span class="co">##   .. .. ..$ model.matrix </span></span>
+<span><span class="co">##   ..$ y </span></span>
+<span><span class="co">##   .. ..$ num </span></span>
+<span><span class="co">##   ..$ delete</span></span></code></pre>
+<p>As noted above, the object is a named list with elements <code>"x"</code> and <code>"y"</code>, which will be passed to the estimation functions. For the moment, since we only implement a linear model, we need to work with the linear model matrix that is part of the <code>bf</code> object.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">model.matrix</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##   (Intercept)        x1         x2</span>
-<span class="co">## 1           1 0.2875775 0.35360608</span>
-<span class="co">## 2           1 0.7883051 0.36644144</span>
-<span class="co">## 3           1 0.4089769 0.28710013</span>
-<span class="co">## 4           1 0.8830174 0.07997291</span>
-<span class="co">## 5           1 0.9404673 0.36545427</span>
-<span class="co">## 6           1 0.0455565 0.17801381</span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">model.matrix</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   (Intercept)        x1         x2</span></span>
+<span><span class="co">## 1           1 0.2875775 0.35360608</span></span>
+<span><span class="co">## 2           1 0.7883051 0.36644144</span></span>
+<span><span class="co">## 3           1 0.4089769 0.28710013</span></span>
+<span><span class="co">## 4           1 0.8830174 0.07997291</span></span>
+<span><span class="co">## 5           1 0.9404673 0.36545427</span></span>
+<span><span class="co">## 6           1 0.0455565 0.17801381</span></span></code></pre>
 <p>and the response <code>"y"</code></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##            num</span>
-<span class="co">## 1  0.341704542</span>
-<span class="co">## 2 -0.373302161</span>
-<span class="co">## 3  0.007432787</span>
-<span class="co">## 4  0.163871126</span>
-<span class="co">## 5 -0.096522673</span>
-<span class="co">## 6  0.505487688</span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##            num</span></span>
+<span><span class="co">## 1  0.341704542</span></span>
+<span><span class="co">## 2 -0.373302161</span></span>
+<span><span class="co">## 3  0.007432787</span></span>
+<span><span class="co">## 4  0.163871126</span></span>
+<span><span class="co">## 5 -0.096522673</span></span>
+<span><span class="co">## 6  0.505487688</span></span></code></pre>
 <p>to setup the optimizer function with:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Linear model optimizer function.</span>
-<span class="va">opt_LM</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span><span class="op">)</span>
-<span class="op">{</span>
-  <span class="co">## Only univariate response.</span>
-  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
-
-  <span class="co">## For illustration this is easier to read.</span>
-  <span class="va">X</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">model.matrix</span>
-
-  <span class="co">## Estimate model parameters.</span>
-  <span class="va">par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chol2inv.html" class="external-link">chol2inv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>
-
-  <span class="co">## Set parameter names.</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"mu.p."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>
-
-  <span class="co">## Return estimated parameters and fitted values.</span>
-  <span class="va">rval</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-    <span class="st">"parameters"</span> <span class="op">=</span> <span class="va">par</span>,
-    <span class="st">"fitted.values"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">par</span><span class="op">)</span>,
-    <span class="st">"edf"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span>,
-    <span class="st">"sigma"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">par</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-  <span class="op">)</span>
-
-  <span class="co">## Set edf within .GlobalEnv for the</span>
-  <span class="co">## loglik() function in the lm_bamlss() family.</span>
-  <span class="va">.lm_bamlss.p</span> <span class="op">&lt;&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span>
-
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">rval</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<p>This optimizer function can already be used with the
-<code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function and all extractor functions are
-readily available.</p>
+<code class="sourceCode R"><span><span class="co">## Linear model optimizer function.</span></span>
+<span><span class="va">opt_LM</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="op">{</span></span>
+<span>  <span class="co">## Only univariate response.</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span>  <span class="co">## For illustration this is easier to read.</span></span>
+<span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">model.matrix</span></span>
+<span></span>
+<span>  <span class="co">## Estimate model parameters.</span></span>
+<span>  <span class="va">par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chol2inv.html" class="external-link">chol2inv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Set parameter names.</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"mu.p."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Return estimated parameters and fitted values.</span></span>
+<span>  <span class="va">rval</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"parameters"</span> <span class="op">=</span> <span class="va">par</span>,</span>
+<span>    <span class="st">"fitted.values"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">par</span><span class="op">)</span>,</span>
+<span>    <span class="st">"edf"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span>,</span>
+<span>    <span class="st">"sigma"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">par</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Set edf within .GlobalEnv for the</span></span>
+<span>  <span class="co">## loglik() function in the lm_bamlss() family.</span></span>
+<span>  <span class="va">.lm_bamlss.p</span> <span class="op">&lt;&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">rval</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>This optimizer function can already be used with the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper function and all extractor functions are readily available.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Model formula with polynomial model terms.</span>
-<span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">x2</span>, <span class="fl">5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">x3</span>, <span class="fl">5</span><span class="op">)</span>
-
-<span class="co">## Estimate model with new optimizer function.</span>
-<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"lm"</span>, optimizer <span class="op">=</span> <span class="va">opt_LM</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co">## Summary output.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = "lm", data = d, optimizer = opt_LM, </span>
-<span class="co">##     sampler = FALSE)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: LM </span>
-<span class="co">## Link function: mu = identity</span>
-<span class="co">## *---</span>
-<span class="co">## Formula mu:</span>
-<span class="co">## ---</span>
-<span class="co">## num ~ x1 + poly(x2, 5) + poly(x3, 5)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##              parameters</span>
-<span class="co">## (Intercept)       0.344</span>
-<span class="co">## x1               -0.677</span>
-<span class="co">## poly(x2, 5)1     -1.138</span>
-<span class="co">## poly(x2, 5)2      2.575</span>
-<span class="co">## poly(x2, 5)3      0.966</span>
-<span class="co">## poly(x2, 5)4     -1.504</span>
-<span class="co">## poly(x2, 5)5      1.201</span>
-<span class="co">## poly(x3, 5)1     -0.214</span>
-<span class="co">## poly(x3, 5)2      4.446</span>
-<span class="co">## poly(x3, 5)3      0.200</span>
-<span class="co">## poly(x3, 5)4     -0.052</span>
-<span class="co">## poly(x3, 5)5     -0.627</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## edf = 12 sigma = 0.2469</span>
-<span class="co">## ---</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## Model formula with polynomial model terms.</span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">x2</span>, <span class="fl">5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">x3</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Estimate model with new optimizer function.</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"lm"</span>, optimizer <span class="op">=</span> <span class="va">opt_LM</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Summary output.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## bamlss(formula = f, family = "lm", data = d, optimizer = opt_LM, </span></span>
+<span><span class="co">##     sampler = FALSE)</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Family: LM </span></span>
+<span><span class="co">## Link function: mu = identity</span></span>
+<span><span class="co">## *---</span></span>
+<span><span class="co">## Formula mu:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## num ~ x1 + poly(x2, 5) + poly(x3, 5)</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##              parameters</span></span>
+<span><span class="co">## (Intercept)       0.344</span></span>
+<span><span class="co">## x1               -0.677</span></span>
+<span><span class="co">## poly(x2, 5)1     -1.138</span></span>
+<span><span class="co">## poly(x2, 5)2      2.575</span></span>
+<span><span class="co">## poly(x2, 5)3      0.966</span></span>
+<span><span class="co">## poly(x2, 5)4     -1.504</span></span>
+<span><span class="co">## poly(x2, 5)5      1.201</span></span>
+<span><span class="co">## poly(x3, 5)1     -0.214</span></span>
+<span><span class="co">## poly(x3, 5)2      4.446</span></span>
+<span><span class="co">## poly(x3, 5)3      0.200</span></span>
+<span><span class="co">## poly(x3, 5)4     -0.052</span></span>
+<span><span class="co">## poly(x3, 5)5     -0.627</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Optimizer summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## edf = 12 sigma = 0.2469</span></span>
+<span><span class="co">## ---</span></span></code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Predict for term x2.</span>
-<span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"x2"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
-<span class="va">nd</span><span class="op">$</span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"x2"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## Predict for term x2.</span></span>
+<span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"x2"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">nd</span><span class="op">$</span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="st">"x2"</span><span class="op">)</span></span></code></pre></div>
 <p>Plot the estimated effect of <code>x2</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p</span> <span class="op">~</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p</span> <span class="op">~</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></span></code></pre></div>
 <p><img src="engines_files/figure-html/unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;"></p>
-<p>The next step is to setup a full Bayesian MCMC sampling function.
-Fortunately, if we assume multivariate normal priors for the regression
-coefficients and an inverse Gamma prior for the variance, a Gibbs
-sampler with multivariate normal and inverse Gamma full conditionals can
-be created. The MCMC algorithm consecutively samples for <span class="math inline">\(t = 1, \ldots, T\)</span> from the full
-conditionals <span class="math display">\[
-\boldsymbol{\beta}^{(t)} | \cdot \sim
-N\left(\boldsymbol{\mu}_{\boldsymbol{\beta}}^{(t - 1)},
+<p>The next step is to setup a full Bayesian MCMC sampling function. Fortunately, if we assume multivariate normal priors for the regression coefficients and an inverse Gamma prior for the variance, a Gibbs sampler with multivariate normal and inverse Gamma full conditionals can be created. The MCMC algorithm consecutively samples for <span class="math inline">\(t = 1, \ldots, T\)</span> from the full conditionals <span class="math display">\[
+\boldsymbol{\beta}^{(t)} | \cdot \sim N\left(\boldsymbol{\mu}_{\boldsymbol{\beta}}^{(t - 1)}, 
   \boldsymbol{\Sigma}_{\boldsymbol{\beta}}^{(t - 1)}\right)
-\]</span> and <span class="math display">\[
-{\sigma^2}^{(t)} | \cdot \sim IG\left({a^{\prime}}^{(t - 1)},
-{b^{\prime}}^{(t - 1)}\right),
-\]</span> where <span class="math inline">\(IG( \cdot )\)</span> is the
-inverse Gamma distribution for sampling the variance parameter. The
-covariance matrix for <span class="math inline">\(\boldsymbol{\beta}\)</span> is given by <span class="math display">\[
-\boldsymbol{\Sigma}_{\boldsymbol{\beta}} =
-\left(\frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{X} +
+\]</span> and <span class="math display">\[ 
+{\sigma^2}^{(t)} | \cdot \sim IG\left({a^{\prime}}^{(t - 1)}, {b^{\prime}}^{(t - 1)}\right),
+\]</span> where <span class="math inline">\(IG( \cdot )\)</span> is the inverse Gamma distribution for sampling the variance parameter. The covariance matrix for <span class="math inline">\(\boldsymbol{\beta}\)</span> is given by <span class="math display">\[
+\boldsymbol{\Sigma}_{\boldsymbol{\beta}} = \left(\frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{X} +
   \frac{1}{\sigma^2}\mathbf{M}^{-1}\right)^{-1}
 \]</span> and the mean <span class="math display">\[
-\boldsymbol{\mu}_{\boldsymbol{\beta}} =
-\boldsymbol{\Sigma}_{\boldsymbol{\beta}}
+\boldsymbol{\mu}_{\boldsymbol{\beta}} = \boldsymbol{\Sigma}_{\boldsymbol{\beta}}
   \left(\frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{y} +
   \frac{1}{\sigma^2}\mathbf{M}^{-1}\mathbf{m}\right),
-\]</span> where <span class="math inline">\(\mathbf{m}\)</span> is the
-prior mean and <span class="math inline">\(\mathbf{M}\)</span> the prior
-covariance matrix. Similarly, for <span class="math inline">\(\sigma^2\)</span> paramaters <span class="math inline">\(a^{\prime}\)</span> and <span class="math inline">\(b^{\prime}\)</span> are computed by <span class="math display">\[
+\]</span> where <span class="math inline">\(\mathbf{m}\)</span> is the prior mean and <span class="math inline">\(\mathbf{M}\)</span> the prior covariance matrix. Similarly, for <span class="math inline">\(\sigma^2\)</span> paramaters <span class="math inline">\(a^{\prime}\)</span> and <span class="math inline">\(b^{\prime}\)</span> are computed by <span class="math display">\[
 a^{\prime} = a + \frac{n}{2} + \frac{p}{2}
 \]</span> and <span class="math display">\[
 b^{\prime} = b + \frac{1}{2}(\mathbf{y} -
-  \mathbf{X}\boldsymbol{\beta})^\top(\mathbf{y} -
-\mathbf{X}\boldsymbol{\beta}) +
-  \frac{1}{2} (\boldsymbol{\beta} - \mathbf{m})^\top
-\mathbf{M}^{-1}(\boldsymbol{\beta}
+  \mathbf{X}\boldsymbol{\beta})^\top(\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) +
+  \frac{1}{2} (\boldsymbol{\beta} - \mathbf{m})^\top \mathbf{M}^{-1}(\boldsymbol{\beta}
   - \mathbf{m}),
-\]</span> where <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are usually set small, e.g., with <span class="math inline">\(a = 1\)</span> and <span class="math inline">\(b =
-0.0001\)</span>, such that the prior is flat and uninformative.</p>
-<p>We can implement the MCMC algorithm in the following sampling
-function</p>
+\]</span> where <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are usually set small, e.g., with <span class="math inline">\(a = 1\)</span> and <span class="math inline">\(b = 0.0001\)</span>, such that the prior is flat and uninformative.</p>
+<p>We can implement the MCMC algorithm in the following sampling function</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sam_LM</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">start</span> <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">n.iter</span> <span class="op">=</span> <span class="fl">12000</span>, <span class="va">burnin</span> <span class="op">=</span> <span class="fl">2000</span>, <span class="va">thin</span> <span class="op">=</span> <span class="fl">10</span>,
-  <span class="va">m</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">M</span> <span class="op">=</span> <span class="fl">1e+05</span>,
-  <span class="va">a</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">b</span> <span class="op">=</span> <span class="fl">1e-05</span>,
-  <span class="va">verbose</span> <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
-<span class="op">{</span>
-  <span class="co">## How many samples are saved?</span>
-  <span class="va">itrthin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq.int</a></span><span class="op">(</span><span class="va">burnin</span>, <span class="va">n.iter</span>, by <span class="op">=</span> <span class="va">thin</span><span class="op">)</span>
-  <span class="va">nsaves</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">itrthin</span><span class="op">)</span>
-
-  <span class="co">## Only univariate response.</span>
-  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span>
-
-  <span class="co">## For illustration this is easier to read.</span>
-  <span class="va">X</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">model.matrix</span>
-
-  <span class="co">## Again, set edf within .GlobalEnv for the</span>
-  <span class="co">## loglik() function in the lm_bamlss() family.</span>
-  <span class="va">.lm_bamlss.p</span> <span class="op">&lt;&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>
-
-  <span class="co">## Number of observations and parameters.</span>
-  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>
-  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>
-
-  <span class="co">## Matrix saving the samples.</span>
-  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">nsaves</span>, <span class="va">p</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">)</span>
-
-  <span class="co">## Stick to the naming convention.</span>
-  <span class="va">pn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"mu.p."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>
-    <span class="va">pn</span>,      <span class="co">## Regression coefficients and</span>
-    <span class="st">"sigma"</span>  <span class="co">## variance samples.</span>
-  <span class="op">)</span>
-
-  <span class="co">## Setup coefficient vector,</span>
-  <span class="co">## again, use correct names.</span>
-  <span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">beta</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">pn</span>
-  <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>
-
-  <span class="co">## Check for starting values obtained,</span>
-  <span class="co">## e.g., from lm.opt() from above.</span>
-  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">sn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span>
-    <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">beta</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span><span class="op">(</span><span class="va">j</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">sn</span><span class="op">)</span>
-        <span class="va">beta</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">start</span><span class="op">[</span><span class="va">j</span><span class="op">]</span>
-    <span class="op">}</span>
-  <span class="op">}</span>
-
-  <span class="co">## Process prior information.</span>
-  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">m</span>, length.out <span class="op">=</span> <span class="va">p</span><span class="op">)</span>
-  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">2</span><span class="op">)</span>
-    <span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">M</span>, length.out <span class="op">=</span> <span class="va">p</span><span class="op">)</span>
-  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">is.matrix</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span><span class="op">)</span>
-    <span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span>
-  <span class="va">Mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span>
-
-  <span class="co">## Precompute cross products.</span>
-  <span class="va">XX</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>
-  <span class="va">Xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span><span class="op">)</span>
-
-  <span class="co">## Inverse gamma parameter.</span>
-  <span class="va">a</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">n</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">+</span> <span class="va">p</span> <span class="op">/</span> <span class="fl">2</span>
-
-  <span class="co">## Start sampling.</span>
-  <span class="va">ii</span> <span class="op">&lt;-</span> <span class="fl">1</span>
-  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n.iter</span><span class="op">)</span> <span class="op">{</span>
-    <span class="co">## Sampling sigma</span>
-    <span class="va">b2</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fl">1</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">beta</span> <span class="op">-</span> <span class="va">m</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">Mi</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">beta</span> <span class="op">-</span> <span class="va">m</span><span class="op">)</span>
-    <span class="va">sigma2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">a</span>, <span class="va">b2</span><span class="op">)</span><span class="op">)</span>
-
-    <span class="co">## Sampling beta.</span>
-    <span class="va">sigma2i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="va">sigma2</span>
-    <span class="va">Sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/chol2inv.html" class="external-link">chol2inv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol</a></span><span class="op">(</span><span class="va">sigma2i</span> <span class="op">*</span> <span class="va">XX</span> <span class="op">+</span> <span class="va">sigma2i</span> <span class="op">*</span> <span class="va">Mi</span><span class="op">)</span><span class="op">)</span>
-    <span class="va">mu</span> <span class="op">&lt;-</span> <span class="va">Sigma</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">sigma2i</span> <span class="op">*</span> <span class="va">Xy</span> <span class="op">+</span> <span class="va">sigma2i</span> <span class="op">*</span> <span class="va">Mi</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">m</span><span class="op">)</span>
-    <span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">mu</span>, <span class="va">Sigma</span><span class="op">)</span>
-      
-    <span class="kw">if</span><span class="op">(</span><span class="va">i</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">itrthin</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">samples</span><span class="op">[</span><span class="va">ii</span>, <span class="va">pn</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">beta</span>
-      <span class="va">samples</span><span class="op">[</span><span class="va">ii</span>, <span class="st">"sigma"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">sigma2</span><span class="op">)</span>
-      <span class="va">ii</span> <span class="op">&lt;-</span> <span class="va">ii</span> <span class="op">+</span> <span class="fl">1</span>
-    <span class="op">}</span>
-    <span class="kw">if</span><span class="op">(</span><span class="va">verbose</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span><span class="op">(</span><span class="va">i</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">1000</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>
-        <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"iteration:"</span>, <span class="va">i</span>, <span class="st">"\n"</span><span class="op">)</span>
-    <span class="op">}</span>
-  <span class="op">}</span>
-
-  <span class="co">## Convert to "mcmc" object.</span>
-  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/coda/man/mcmc.html" class="external-link">as.mcmc</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span>
-
-  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<p>The new estimation function can be directly used with the
-<code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper.</p>
+<code class="sourceCode R"><span><span class="va">sam_LM</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">start</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">n.iter</span> <span class="op">=</span> <span class="fl">12000</span>, <span class="va">burnin</span> <span class="op">=</span> <span class="fl">2000</span>, <span class="va">thin</span> <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  <span class="va">m</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">M</span> <span class="op">=</span> <span class="fl">1e+05</span>,</span>
+<span>  <span class="va">a</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">b</span> <span class="op">=</span> <span class="fl">1e-05</span>,</span>
+<span>  <span class="va">verbose</span> <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="op">{</span></span>
+<span>  <span class="co">## How many samples are saved?</span></span>
+<span>  <span class="va">itrthin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq.int</a></span><span class="op">(</span><span class="va">burnin</span>, <span class="va">n.iter</span>, by <span class="op">=</span> <span class="va">thin</span><span class="op">)</span></span>
+<span>  <span class="va">nsaves</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">itrthin</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Only univariate response.</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span>  <span class="co">## For illustration this is easier to read.</span></span>
+<span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">model.matrix</span></span>
+<span></span>
+<span>  <span class="co">## Again, set edf within .GlobalEnv for the</span></span>
+<span>  <span class="co">## loglik() function in the lm_bamlss() family.</span></span>
+<span>  <span class="va">.lm_bamlss.p</span> <span class="op">&lt;&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Number of observations and parameters.</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Matrix saving the samples.</span></span>
+<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">nsaves</span>, <span class="va">p</span> <span class="op">+</span> <span class="fl">1L</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Stick to the naming convention.</span></span>
+<span>  <span class="va">pn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"mu.p."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="va">pn</span>,      <span class="co">## Regression coefficients and</span></span>
+<span>    <span class="st">"sigma"</span>  <span class="co">## variance samples.</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Setup coefficient vector,</span></span>
+<span>  <span class="co">## again, use correct names.</span></span>
+<span>  <span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">beta</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">pn</span></span>
+<span>  <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Check for starting values obtained,</span></span>
+<span>  <span class="co">## e.g., from lm.opt() from above.</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">sn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span></span>
+<span>    <span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">beta</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span><span class="op">(</span><span class="va">j</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">sn</span><span class="op">)</span></span>
+<span>        <span class="va">beta</span><span class="op">[</span><span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">start</span><span class="op">[</span><span class="va">j</span><span class="op">]</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co">## Process prior information.</span></span>
+<span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">m</span>, length.out <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>    <span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">M</span>, length.out <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">is.matrix</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span></span>
+<span>  <span class="va">Mi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Precompute cross products.</span></span>
+<span>  <span class="va">XX</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span>
+<span>  <span class="va">Xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## Inverse gamma parameter.</span></span>
+<span>  <span class="va">a</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">n</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">+</span> <span class="va">p</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span></span>
+<span>  <span class="co">## Start sampling.</span></span>
+<span>  <span class="va">ii</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n.iter</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co">## Sampling sigma</span></span>
+<span>    <span class="va">b2</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">X</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fl">1</span> <span class="op">/</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">beta</span> <span class="op">-</span> <span class="va">m</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">Mi</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">beta</span> <span class="op">-</span> <span class="va">m</span><span class="op">)</span></span>
+<span>    <span class="va">sigma2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">a</span>, <span class="va">b2</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co">## Sampling beta.</span></span>
+<span>    <span class="va">sigma2i</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="va">sigma2</span></span>
+<span>    <span class="va">Sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/chol2inv.html" class="external-link">chol2inv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol</a></span><span class="op">(</span><span class="va">sigma2i</span> <span class="op">*</span> <span class="va">XX</span> <span class="op">+</span> <span class="va">sigma2i</span> <span class="op">*</span> <span class="va">Mi</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">mu</span> <span class="op">&lt;-</span> <span class="va">Sigma</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="op">(</span><span class="va">sigma2i</span> <span class="op">*</span> <span class="va">Xy</span> <span class="op">+</span> <span class="va">sigma2i</span> <span class="op">*</span> <span class="va">Mi</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">m</span><span class="op">)</span></span>
+<span>    <span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">mu</span>, <span class="va">Sigma</span><span class="op">)</span></span>
+<span>      </span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="va">i</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">itrthin</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">samples</span><span class="op">[</span><span class="va">ii</span>, <span class="va">pn</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">beta</span></span>
+<span>      <span class="va">samples</span><span class="op">[</span><span class="va">ii</span>, <span class="st">"sigma"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">sigma2</span><span class="op">)</span></span>
+<span>      <span class="va">ii</span> <span class="op">&lt;-</span> <span class="va">ii</span> <span class="op">+</span> <span class="fl">1</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="va">verbose</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span><span class="op">(</span><span class="va">i</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">1000</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"iteration:"</span>, <span class="va">i</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co">## Convert to "mcmc" object.</span></span>
+<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/coda/man/mcmc.html" class="external-link">as.mcmc</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The new estimation function can be directly used with the <code><a href="../reference/bamlss.html">bamlss()</a></code> wrapper.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"lm"</span>, optimizer <span class="op">=</span> <span class="va">opt_LM</span>, sampler <span class="op">=</span> <span class="va">sam_LM</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## iteration: 1000 </span>
-<span class="co">## iteration: 2000 </span>
-<span class="co">## iteration: 3000 </span>
-<span class="co">## iteration: 4000 </span>
-<span class="co">## iteration: 5000 </span>
-<span class="co">## iteration: 6000 </span>
-<span class="co">## iteration: 7000 </span>
-<span class="co">## iteration: 8000 </span>
-<span class="co">## iteration: 9000 </span>
-<span class="co">## iteration: 10000 </span>
-<span class="co">## iteration: 11000 </span>
-<span class="co">## iteration: 12000</span></code></pre>
+<code class="sourceCode R"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"lm"</span>, optimizer <span class="op">=</span> <span class="va">opt_LM</span>, sampler <span class="op">=</span> <span class="va">sam_LM</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## iteration: 1000 </span></span>
+<span><span class="co">## iteration: 2000 </span></span>
+<span><span class="co">## iteration: 3000 </span></span>
+<span><span class="co">## iteration: 4000 </span></span>
+<span><span class="co">## iteration: 5000 </span></span>
+<span><span class="co">## iteration: 6000 </span></span>
+<span><span class="co">## iteration: 7000 </span></span>
+<span><span class="co">## iteration: 8000 </span></span>
+<span><span class="co">## iteration: 9000 </span></span>
+<span><span class="co">## iteration: 10000 </span></span>
+<span><span class="co">## iteration: 11000 </span></span>
+<span><span class="co">## iteration: 12000</span></span></code></pre>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = "lm", data = d, optimizer = opt_LM, </span>
-<span class="co">##     sampler = sam_LM)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: LM </span>
-<span class="co">## Link function: mu = identity</span>
-<span class="co">## *---</span>
-<span class="co">## Formula mu:</span>
-<span class="co">## ---</span>
-<span class="co">## num ~ x1 + poly(x2, 5) + poly(x3, 5)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                  Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## (Intercept)   0.34252  0.25527  0.34282  0.43611      0.344</span>
-<span class="co">## x1           -0.67672 -0.83802 -0.67751 -0.51890     -0.677</span>
-<span class="co">## poly(x2, 5)1 -1.14643 -2.11933 -1.14154 -0.19307     -1.138</span>
-<span class="co">## poly(x2, 5)2  2.57407  1.63995  2.57167  3.60904      2.575</span>
-<span class="co">## poly(x2, 5)3  0.95966  0.01826  0.93844  1.95831      0.966</span>
-<span class="co">## poly(x2, 5)4 -1.51688 -2.49769 -1.51497 -0.53558     -1.504</span>
-<span class="co">## poly(x2, 5)5  1.20293  0.14707  1.22189  2.21376      1.201</span>
-<span class="co">## poly(x3, 5)1 -0.23606 -1.25027 -0.23667  0.70896     -0.214</span>
-<span class="co">## poly(x3, 5)2  4.46278  3.45564  4.46599  5.44358      4.446</span>
-<span class="co">## poly(x3, 5)3  0.18477 -0.90909  0.18850  1.21970      0.200</span>
-<span class="co">## poly(x3, 5)4 -0.06372 -1.09129 -0.06167  0.91668     -0.052</span>
-<span class="co">## poly(x3, 5)5 -0.62116 -1.64493 -0.61147  0.32856     -0.627</span>
-<span class="co">## ---</span>
-<span class="co">## Sampler summary:</span>
-<span class="co">## -</span>
-<span class="co">## DIC = 105.5625 pd = 48.6553 runtime = 2.71</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## edf = 12 sigma = 0.2469</span>
-<span class="co">## ---</span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## bamlss(formula = f, family = "lm", data = d, optimizer = opt_LM, </span></span>
+<span><span class="co">##     sampler = sam_LM)</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Family: LM </span></span>
+<span><span class="co">## Link function: mu = identity</span></span>
+<span><span class="co">## *---</span></span>
+<span><span class="co">## Formula mu:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## num ~ x1 + poly(x2, 5) + poly(x3, 5)</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                  Mean     2.5%      50%    97.5% parameters</span></span>
+<span><span class="co">## (Intercept)   0.34304  0.25043  0.34403  0.43245      0.344</span></span>
+<span><span class="co">## x1           -0.67655 -0.83572 -0.67860 -0.51514     -0.677</span></span>
+<span><span class="co">## poly(x2, 5)1 -1.16615 -2.17394 -1.15335 -0.19779     -1.138</span></span>
+<span><span class="co">## poly(x2, 5)2  2.58290  1.66255  2.55044  3.61085      2.575</span></span>
+<span><span class="co">## poly(x2, 5)3  0.97392 -0.01130  0.98422  1.95831      0.966</span></span>
+<span><span class="co">## poly(x2, 5)4 -1.53216 -2.52141 -1.51632 -0.55921     -1.504</span></span>
+<span><span class="co">## poly(x2, 5)5  1.22474  0.24891  1.26158  2.16017      1.201</span></span>
+<span><span class="co">## poly(x3, 5)1 -0.21728 -1.25040 -0.19911  0.70896     -0.214</span></span>
+<span><span class="co">## poly(x3, 5)2  4.41589  3.42650  4.42969  5.41749      4.446</span></span>
+<span><span class="co">## poly(x3, 5)3  0.20214 -0.79325  0.19012  1.23571      0.200</span></span>
+<span><span class="co">## poly(x3, 5)4 -0.04284 -1.04544 -0.04309  0.93298     -0.052</span></span>
+<span><span class="co">## poly(x3, 5)5 -0.62871 -1.59483 -0.62916  0.41074     -0.627</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Sampler summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## DIC = 105.537 pd = 48.6297 runtime = 0.995</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Optimizer summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## edf = 12 sigma = 0.2469</span></span>
+<span><span class="co">## ---</span></span></code></pre>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Predict for all terms including 95% credible intervals</span>
-<span class="va">nd</span><span class="op">$</span><span class="va">x1</span> <span class="op">&lt;-</span> <span class="va">nd</span><span class="op">$</span><span class="va">x3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
-<span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span><span class="op">)</span><span class="op">)</span>
-  <span class="va">nd</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"p"</span>, <span class="va">j</span><span class="op">)</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="va">j</span>, FUN <span class="op">=</span> <span class="va">c95</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## Predict for all terms including 95% credible intervals</span></span>
+<span><span class="va">nd</span><span class="op">$</span><span class="va">x1</span> <span class="op">&lt;-</span> <span class="va">nd</span><span class="op">$</span><span class="va">x3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span>, <span class="st">"x3"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">nd</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"p"</span>, <span class="va">j</span><span class="op">)</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, term <span class="op">=</span> <span class="va">j</span>, FUN <span class="op">=</span> <span class="va">c95</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>The estimated effects can be plotted with.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">px1</span> <span class="op">~</span> <span class="va">x1</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span>
-<span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">px2</span> <span class="op">~</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span>
-<span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">px3</span> <span class="op">~</span> <span class="va">x3</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">px1</span> <span class="op">~</span> <span class="va">x1</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">px2</span> <span class="op">~</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">px3</span> <span class="op">~</span> <span class="va">x3</span>, data <span class="op">=</span> <span class="va">nd</span><span class="op">)</span></span></code></pre></div>
 <p><img src="engines_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
-Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
-<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
-Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
+<div id="refs" class="references hanging-indent">
+<div id="ref-bamlss:Umlauf+bamlss:2018">
+<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.</p>
 </div>
 </div>
 </div>
@@ -631,7 +536,7 @@ Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-p
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

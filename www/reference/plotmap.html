@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -120,8 +120,8 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotmap</span><span class="op">(</span><span class="va">map</span>, x <span class="op">=</span> <span class="cn">NA</span>, id <span class="op">=</span> <span class="cn">NULL</span>, select <span class="op">=</span> <span class="cn">NULL</span>,
-  legend <span class="op">=</span> <span class="cn">TRUE</span>, names <span class="op">=</span> <span class="cn">FALSE</span>, values <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">map</span>, x <span class="op">=</span> <span class="cn">NA</span>, id <span class="op">=</span> <span class="cn">NULL</span>, select <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  legend <span class="op">=</span> <span class="cn">TRUE</span>, names <span class="op">=</span> <span class="cn">FALSE</span>, values <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -173,40 +173,40 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Example from mgcv ?mrf.</span></span>
-<span class="r-in"><span class="co">## Load Columbus Ohio crime data (see ?columbus for details and credits).</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"columb"</span>, package <span class="op">=</span> <span class="st">"mgcv"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"columb.polys"</span>, package <span class="op">=</span> <span class="st">"mgcv"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot the map.</span></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Example from mgcv ?mrf.</span></span></span>
+<span class="r-in"><span><span class="co">## Load Columbus Ohio crime data (see ?columbus for details and credits).</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"columb"</span>, package <span class="op">=</span> <span class="st">"mgcv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"columb.polys"</span>, package <span class="op">=</span> <span class="st">"mgcv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot the map.</span></span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotmap-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot aggregated data.</span></span>
-<span class="r-in"><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">columb</span>, <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">crime</span>,</span>
-<span class="r-in">  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"district"</span> <span class="op">=</span> <span class="va">district</span><span class="op">)</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot aggregated data.</span></span></span>
+<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">columb</span>, <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">crime</span>,</span></span>
+<span class="r-in"><span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"district"</span> <span class="op">=</span> <span class="va">district</span><span class="op">)</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotmap-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span>
-<span class="r-in">  pos <span class="op">=</span> <span class="st">"topleft"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span>
-<span class="r-in">  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span></span>
+<span class="r-in"><span>  pos <span class="op">=</span> <span class="st">"topleft"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span></span>
+<span class="r-in"><span>  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotmap-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span>
-<span class="r-in">  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span></span>
+<span class="r-in"><span>  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotmap-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span>
-<span class="r-in">  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span>,</span>
-<span class="r-in">  col <span class="op">=</span> <span class="va">heat_hcl</span>, swap <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span>
-<span class="r-in">  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span>,</span>
-<span class="r-in">  col <span class="op">=</span> <span class="va">heat_hcl</span>, swap <span class="op">=</span> <span class="cn">TRUE</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span></span>
+<span class="r-in"><span>  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>  col <span class="op">=</span> <span class="va">heat_hcl</span>, swap <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span></span>
+<span class="r-in"><span>  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>  col <span class="op">=</span> <span class="va">heat_hcl</span>, swap <span class="op">=</span> <span class="cn">TRUE</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotmap-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span>
-<span class="r-in">  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span>,</span>
-<span class="r-in">  col <span class="op">=</span> <span class="fu">heat_hcl</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>, swap <span class="op">=</span> <span class="cn">TRUE</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>,</span>
-<span class="r-in">  lrange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">plotmap</span><span class="op">(</span><span class="va">columb.polys</span>, x <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">x</span>, id <span class="op">=</span> <span class="va">a</span><span class="op">$</span><span class="va">district</span>,</span></span>
+<span class="r-in"><span>  pos <span class="op">=</span> <span class="st">"topleft"</span>, side.legend <span class="op">=</span> <span class="fl">2</span>, side.ticks <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>  col <span class="op">=</span> <span class="fu">heat_hcl</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>, swap <span class="op">=</span> <span class="cn">TRUE</span>, range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  lrange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotmap-6.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
@@ -222,7 +222,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -120,36 +120,36 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## Smooth constructor function.</span>
-<span class="fu">la</span><span class="op">(</span><span class="va">formula</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"single"</span>, <span class="st">"multiple"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Single Lasso smoothing parameter optimizer.</span>
-<span class="fu">opt_lasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, adaptive <span class="op">=</span> <span class="cn">TRUE</span>, lower <span class="op">=</span> <span class="fl">0.001</span>, upper <span class="op">=</span> <span class="fl">1000</span>,
-  nlambda <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>,  multiple <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="cn">NULL</span>, stop.nu <span class="op">=</span> <span class="cn">NULL</span>,
-  ridge <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span>, zeromodel <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">lasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, adaptive <span class="op">=</span> <span class="cn">TRUE</span>, lower <span class="op">=</span> <span class="fl">0.001</span>, upper <span class="op">=</span> <span class="fl">1000</span>,
-  nlambda <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>,  multiple <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="cn">NULL</span>, stop.nu <span class="op">=</span> <span class="cn">NULL</span>,
-  ridge <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span>, zeromodel <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Lasso transformation function to set</span>
-<span class="co">## adaptive weights from an unpenalized model.</span>
-<span class="fu">lasso_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">zeromodel</span>, nobs <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Plotting function for opt_lasso() optimizer.</span>
-<span class="fu">lasso_plot</span><span class="op">(</span><span class="va">x</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"criterion"</span>, <span class="st">"parameters"</span><span class="op">)</span>,
-  spar <span class="op">=</span> <span class="cn">TRUE</span>, model <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="cn">NULL</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,
-  retrans <span class="op">=</span> <span class="cn">FALSE</span>, color <span class="op">=</span> <span class="cn">NULL</span>, show.lambda <span class="op">=</span> <span class="cn">TRUE</span>,
-  labels <span class="op">=</span> <span class="cn">NULL</span>, digits <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Extract optimum stopping iteration for opt_lasso() optimizer.</span>
-<span class="co">## Based on the minimum of the information criterion.</span>
-<span class="fu">lasso_stop</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-
-<span class="co">## Extract retransformed Lasso coefficients.</span>
-<span class="fu">lasso_coef</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## Smooth constructor function.</span></span>
+<span><span class="fu">la</span><span class="op">(</span><span class="va">formula</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"single"</span>, <span class="st">"multiple"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Single Lasso smoothing parameter optimizer.</span></span>
+<span><span class="fu">opt_lasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, adaptive <span class="op">=</span> <span class="cn">TRUE</span>, lower <span class="op">=</span> <span class="fl">0.001</span>, upper <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  nlambda <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>,  multiple <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="cn">NULL</span>, stop.nu <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ridge <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span>, zeromodel <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">lasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, start <span class="op">=</span> <span class="cn">NULL</span>, adaptive <span class="op">=</span> <span class="cn">TRUE</span>, lower <span class="op">=</span> <span class="fl">0.001</span>, upper <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  nlambda <span class="op">=</span> <span class="fl">100</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>,  multiple <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="cn">NULL</span>, stop.nu <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ridge <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.5</span>, zeromodel <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Lasso transformation function to set</span></span>
+<span><span class="co">## adaptive weights from an unpenalized model.</span></span>
+<span><span class="fu">lasso_transform</span><span class="op">(</span><span class="va">x</span>, <span class="va">zeromodel</span>, nobs <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Plotting function for opt_lasso() optimizer.</span></span>
+<span><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">x</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"criterion"</span>, <span class="st">"parameters"</span><span class="op">)</span>,</span>
+<span>  spar <span class="op">=</span> <span class="cn">TRUE</span>, model <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="cn">NULL</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  retrans <span class="op">=</span> <span class="cn">FALSE</span>, color <span class="op">=</span> <span class="cn">NULL</span>, show.lambda <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NULL</span>, digits <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Extract optimum stopping iteration for opt_lasso() optimizer.</span></span>
+<span><span class="co">## Based on the minimum of the information criterion.</span></span>
+<span><span class="fu">lasso_stop</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Extract retransformed Lasso coefficients.</span></span>
+<span><span class="fu">lasso_coef</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -294,10 +294,10 @@
     <p>Andreas Groll, Julien Hambuckers, Thomas Kneib, and Nikolaus Umlauf (2019). Lasso-type penalization in
   the framework of generalized additive models for location, scale and shape.
   <em>Computational Statistics &amp; Data Analysis</em>.
-  <a href="https://doi.org/10.1016/j.csda.2019.06.005" class="external-link">doi:10.1016/j.csda.2019.06.005</a></p>
+  doi: <a href="https://doi.org/10.1016/j.csda.2019.06.005" class="external-link">10.1016/j.csda.2019.06.005</a></p>
 <p>Oelker Margreth-Ruth and Tutz Gerhard (2015). A uniform framework for combination of
   penalties in generalized structured models. <em>Adv Data Anal Classif</em>.
-  <a href="https://doi.org/10.1007/s11634-015-0205-y" class="external-link">doi:10.1007/s11634-015-0205-y</a></p>
+  doi: <a href="https://doi.org/10.1007/s11634-015-0205-y" class="external-link">10.1007/s11634-015-0205-y</a></p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -306,70 +306,70 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulated fusion Lasso example.</span></span>
-<span class="r-in"><span class="va">bmu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">bsigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="op">-</span><span class="fl">2</span>,<span class="op">-</span><span class="fl">2</span>,<span class="op">-</span><span class="fl">2</span>,<span class="op">-</span><span class="fl">1</span>,<span class="op">-</span><span class="fl">1</span>,<span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bmu</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">300</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulated fusion Lasso example.</span></span></span>
+<span class="r-in"><span><span class="va">bmu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bsigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0</span>,<span class="op">-</span><span class="fl">2</span>,<span class="op">-</span><span class="fl">2</span>,<span class="op">-</span><span class="fl">2</span>,<span class="op">-</span><span class="fl">1</span>,<span class="op">-</span><span class="fl">1</span>,<span class="op">-</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bmu</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">300</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sort(rep(1:length(bmu), length.out = 300)):</span> object 'bmu' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Response.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">bmu</span><span class="op">[</span><span class="va">id</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">bsigma</span><span class="op">[</span><span class="va">id</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Response.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">bmu</span><span class="op">[</span><span class="va">id</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">id</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">bsigma</span><span class="op">[</span><span class="va">id</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'bmu' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Estimate model:</span></span>
-<span class="r-in"><span class="co">## fuse=1 -&gt; nominal fusion,</span></span>
-<span class="r-in"><span class="co">## fuse=2 -&gt; ordinal fusion,</span></span>
-<span class="r-in"><span class="co">## first, unpenalized model to be used for adaptive fusion weights.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">2</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, <span class="va">sigma</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">1</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b0</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Estimate model:</span></span></span>
+<span class="r-in"><span><span class="co">## fuse=1 -&gt; nominal fusion,</span></span></span>
+<span class="r-in"><span><span class="co">## fuse=2 -&gt; ordinal fusion,</span></span></span>
+<span class="r-in"><span><span class="co">## first, unpenalized model to be used for adaptive fusion weights.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">2</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>, <span class="va">sigma</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">1</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">b0</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(predvars, data, env):</span> object 'y' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Model with single lambda parameter.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">2</span><span class="op">)</span>, <span class="va">sigma</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span>, optimizer <span class="op">=</span> <span class="va">opt_lasso</span>,</span>
-<span class="r-in">  criterion <span class="op">=</span> <span class="st">"BIC"</span>, zeromodel <span class="op">=</span> <span class="va">b0</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(predvars, data, env):</span> object 'y' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot information criterion and coefficient paths.</span></span>
-<span class="r-in"><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Model with single lambda parameter.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">2</span><span class="op">)</span>, <span class="va">sigma</span> <span class="op">~</span> <span class="fu">la</span><span class="op">(</span><span class="va">id</span>,fuse<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span>, optimizer <span class="op">=</span> <span class="va">opt_lasso</span>,</span></span>
+<span class="r-in"><span>  criterion <span class="op">=</span> <span class="st">"BIC"</span>, zeromodel <span class="op">=</span> <span class="va">b0</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts, nthres = list(...)$nthres):</span> object 'b0' not found</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot information criterion and coefficient paths.</span></span></span>
+<span class="r-in"><span><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in lasso_plot(b1, which = 1):</span> object 'b1' not found</span>
-<span class="r-in"><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in lasso_plot(b1, which = 2):</span> object 'b1' not found</span>
-<span class="r-in"><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"mu"</span>, name <span class="op">=</span> <span class="st">"mu.s.la(id).id"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"mu"</span>, name <span class="op">=</span> <span class="st">"mu.s.la(id).id"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in lasso_plot(b1, which = 2, model = "mu", name = "mu.s.la(id).id"):</span> object 'b1' not found</span>
-<span class="r-in"><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"sigma"</span>, name <span class="op">=</span> <span class="st">"sigma.s.la(id).id"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"sigma"</span>, name <span class="op">=</span> <span class="st">"sigma.s.la(id).id"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in lasso_plot(b1, which = 2, model = "sigma", name = "sigma.s.la(id).id"):</span> object 'b1' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Extract coefficients for optimum Lasso parameter.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b1</span>, mstop <span class="op">=</span> <span class="fu">lasso_stop</span><span class="op">(</span><span class="va">b1</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Extract coefficients for optimum Lasso parameter.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b1</span>, mstop <span class="op">=</span> <span class="fu">lasso_stop</span><span class="op">(</span><span class="va">b1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b1, mstop = lasso_stop(b1)):</span> object 'b1' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Predict with optimum Lasso parameter.</span></span>
-<span class="r-in"><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b1</span>, mstop <span class="op">=</span> <span class="fu">lasso_stop</span><span class="op">(</span><span class="va">b1</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Predict with optimum Lasso parameter.</span></span></span>
+<span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b1</span>, mstop <span class="op">=</span> <span class="fu">lasso_stop</span><span class="op">(</span><span class="va">b1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in predict(b1, mstop = lasso_stop(b1)):</span> object 'b1' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Full MCMC, needs lasso_transform() to assign the</span></span>
-<span class="r-in"><span class="co">## adaptive weights from unpenalized model b0.</span></span>
-<span class="r-in"><span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, transform <span class="op">=</span> <span class="va">lasso_transform</span>,</span>
-<span class="r-in">  zeromodel <span class="op">=</span> <span class="va">b0</span>, nobs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b1</span>, mstop <span class="op">=</span> <span class="fu">lasso_stop</span><span class="op">(</span><span class="va">b1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">  n.iter <span class="op">=</span> <span class="fl">4000</span>, burnin <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(predvars, data, env):</span> object 'y' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Full MCMC, needs lasso_transform() to assign the</span></span></span>
+<span class="r-in"><span><span class="co">## adaptive weights from unpenalized model b0.</span></span></span>
+<span class="r-in"><span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, transform <span class="op">=</span> <span class="va">lasso_transform</span>,</span></span>
+<span class="r-in"><span>  zeromodel <span class="op">=</span> <span class="va">b0</span>, nobs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b1</span>, mstop <span class="op">=</span> <span class="fu">lasso_stop</span><span class="op">(</span><span class="va">b1</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  n.iter <span class="op">=</span> <span class="fl">4000</span>, burnin <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b1, mstop = lasso_stop(b1)):</span> object 'b1' not found</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(b2):</span> object 'b2' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b2' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">b2</span>, model <span class="op">=</span> <span class="st">"mu"</span>, pterms <span class="op">=</span> <span class="cn">FALSE</span>, sterms <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">b2</span>, model <span class="op">=</span> <span class="st">"mu"</span>, pterms <span class="op">=</span> <span class="cn">FALSE</span>, sterms <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in confint(b2, model = "mu", pterms = FALSE, sterms = TRUE):</span> object 'b2' not found</span>
-<span class="r-in"><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"mu"</span>, name <span class="op">=</span> <span class="st">"mu.s.la(id).id"</span>, spar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">lasso_plot</span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fl">2</span>, model <span class="op">=</span> <span class="st">"mu"</span>, name <span class="op">=</span> <span class="st">"mu.s.la(id).id"</span>, spar <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in lasso_plot(b1, which = 2, model = "mu", name = "mu.s.la(id).id",     spar = FALSE):</span> object 'b1' not found</span>
-<span class="r-in"><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">ci</span><span class="op">[</span><span class="va">i</span>, <span class="fl">1</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">ci</span><span class="op">[</span><span class="va">i</span>, <span class="fl">2</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+<span class="r-in"><span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">ci</span><span class="op">[</span><span class="va">i</span>, <span class="fl">1</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">ci</span><span class="op">[</span><span class="va">i</span>, <span class="fl">2</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in int_abline(a = a, b = b, h = h, v = v, untf = untf, ...):</span> object 'ci' not found</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -384,7 +384,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

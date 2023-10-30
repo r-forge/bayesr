@@ -31,7 +31,7 @@ Finally, the estimated parameters and/or samples are used to create model output
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -146,14 +146,14 @@ Finally, the estimated parameters and/or samples are used to create model output
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bamlss</span><span class="op">(</span><span class="va">formula</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="cn">NULL</span>,
-  start <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>,
-  subset <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, na.action <span class="op">=</span> <span class="va">na.omit</span>,
-  contrasts <span class="op">=</span> <span class="cn">NULL</span>, reference <span class="op">=</span> <span class="cn">NULL</span>, transform <span class="op">=</span> <span class="cn">NULL</span>,
-  optimizer <span class="op">=</span> <span class="cn">NULL</span>, sampler <span class="op">=</span> <span class="cn">NULL</span>, samplestats <span class="op">=</span> <span class="cn">NULL</span>,
-  results <span class="op">=</span> <span class="cn">NULL</span>, cores <span class="op">=</span> <span class="cn">NULL</span>, sleep <span class="op">=</span> <span class="cn">NULL</span>,
-  combine <span class="op">=</span> <span class="cn">TRUE</span>, model <span class="op">=</span> <span class="cn">TRUE</span>, x <span class="op">=</span> <span class="cn">TRUE</span>,
-  light <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bamlss</span><span class="op">(</span><span class="va">formula</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  start <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subset <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>, na.action <span class="op">=</span> <span class="va">na.omit</span>,</span>
+<span>  contrasts <span class="op">=</span> <span class="cn">NULL</span>, reference <span class="op">=</span> <span class="cn">NULL</span>, transform <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  optimizer <span class="op">=</span> <span class="cn">NULL</span>, sampler <span class="op">=</span> <span class="cn">NULL</span>, samplestats <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  results <span class="op">=</span> <span class="cn">NULL</span>, cores <span class="op">=</span> <span class="cn">NULL</span>, sleep <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  combine <span class="op">=</span> <span class="cn">TRUE</span>, model <span class="op">=</span> <span class="cn">TRUE</span>, x <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  light <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -355,11 +355,11 @@ Finally, the estimated parameters and/or samples are used to create model output
     <h2>References</h2>
     <p>Umlauf N, Klein N, Zeileis A (2019). BAMLSS: Bayesian Additive Models for Location,
   Scale and Shape (and Beyond). <em>Journal of Computational and Graphical Statistics</em>, <b>27</b>(3), 612--627.
-  <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link">doi:10.1080/10618600.2017.1407325</a></p>
+  doi: <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link">10.1080/10618600.2017.1407325</a></p>
 <p>Umlauf N, Klein N, Simon T, Zeileis A (2021).
   bamlss: A Lego Toolbox for Flexible Bayesian Regression (and Beyond).
   <em>Journal of Statistical Software</em>,
-  <b>100</b>(4), 1--53. <a href="https://doi.org/10.18637/jss.v100.i04" class="external-link">doi:10.18637/jss.v100.i04</a></p>
+  <b>100</b>(4), 1--53. doi: <a href="https://doi.org/10.18637/jss.v100.i04" class="external-link">10.18637/jss.v100.i04</a></p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -376,47 +376,47 @@ Finally, the estimated parameters and/or samples are used to create model output
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulated data example.</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>, <span class="va">lat</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">bamlss</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts):</span> object 'd' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulated data example.</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>, <span class="va">lat</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">bamlss</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(f, data = d):</span> object 'd' not found</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(b):</span> object 'b' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Use of optimizer and sampler functions:</span></span>
-<span class="r-in"><span class="co">## * first run optimizer,</span></span>
-<span class="r-in"><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu">bamlss</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="va">opt_bfit</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts):</span> object 'd' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Use of optimizer and sampler functions:</span></span></span>
+<span class="r-in"><span><span class="co">## * first run optimizer,</span></span></span>
+<span class="r-in"><span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu">bamlss</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="va">opt_bfit</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(f, data = d, optimizer = opt_bfit, sampler = FALSE):</span> object 'd' not found</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in print(b1):</span> object 'b1' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(b1):</span> object 'b1' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## * afterwards, start sampler with staring values,</span></span>
-<span class="r-in"><span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu">bamlss</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_GMCMC</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts):</span> object 'd' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## * afterwards, start sampler with staring values,</span></span></span>
+<span class="r-in"><span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu">bamlss</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_GMCMC</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(f, data = d, start = coef(b1), optimizer = FALSE, sampler = sam_GMCMC):</span> object 'd' not found</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in print(b2):</span> object 'b2' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(b2):</span> object 'b2' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Continue sampling.</span></span>
-<span class="r-in"><span class="va">b3</span> <span class="op">&lt;-</span> <span class="fu"><a href="continue.html">continue</a></span><span class="op">(</span><span class="va">b2</span>, n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">0</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Continue sampling.</span></span></span>
+<span class="r-in"><span><span class="va">b3</span> <span class="op">&lt;-</span> <span class="fu"><a href="continue.html">continue</a></span><span class="op">(</span><span class="va">b2</span>, n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">0</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in continue(b2, n.iter = 12000, burnin = 0, thin = 10):</span> object 'b2' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b3</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b3</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b3' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b3</span>, which <span class="op">=</span> <span class="st">"max-acf"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b3</span>, which <span class="op">=</span> <span class="st">"max-acf"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b3' not found</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b3</span>, which <span class="op">=</span> <span class="st">"max-acf"</span>, burnin <span class="op">=</span> <span class="fl">500</span>, thin <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b3</span>, which <span class="op">=</span> <span class="st">"max-acf"</span>, burnin <span class="op">=</span> <span class="fl">500</span>, thin <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b3' not found</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -431,7 +431,7 @@ Finally, the estimated parameters and/or samples are used to create model output
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

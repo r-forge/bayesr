@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -118,14 +118,14 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## BayesX.</span>
-<span class="fu">bayesx2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Gradient boosting.</span>
-<span class="fu">boost2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Lasso.</span>
-<span class="fu">lasso2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## BayesX.</span></span>
+<span><span class="fu">bayesx2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Gradient boosting.</span></span>
+<span><span class="fu">boost2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Lasso.</span></span>
+<span><span class="fu">lasso2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -147,15 +147,15 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate data.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Estimate model.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Boosted model.</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">boost2</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate data.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Estimate model.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Boosted model.</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">boost2</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik -229.885 eps 1.3708 iteration   2 qsel 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik -220.195 eps 0.8915 iteration   3 qsel 2</span>
@@ -500,70 +500,70 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.0136 eps 0.0046 iteration 342 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.0276 eps 0.0026 iteration 343 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.0843 eps 0.0029 iteration 344 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.1261 eps 0.0814 iteration 345 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.1261 eps 0.0795 iteration 345 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.1784 eps 0.0036 iteration 346 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2118 eps 0.0036 iteration 347 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2325 eps 0.0025 iteration 348 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2465 eps 0.0003 iteration 349 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2579 eps 0.0003 iteration 350 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2691 eps 0.0021 iteration 351 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2578 eps 0.0003 iteration 350 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2690 eps 0.0021 iteration 351 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.2969 eps 0.0034 iteration 352 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.3454 eps 0.0019 iteration 353 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.3790 eps 0.0036 iteration 354 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.4241 eps 0.0020 iteration 355 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.4510 eps 0.0032 iteration 356 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.3789 eps 0.0036 iteration 354 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.4240 eps 0.0020 iteration 355 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.4509 eps 0.0032 iteration 356 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.4609 eps 0.0002 iteration 357 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.4703 eps 0.0020 iteration 358 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.4702 eps 0.0020 iteration 358 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.5123 eps 0.0020 iteration 359 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.5353 eps 0.0024 iteration 360 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.5544 eps 0.0018 iteration 361 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.5728 eps 0.0029 iteration 362 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6109 eps 0.0019 iteration 363 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6354 eps 0.0043 iteration 364 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6441 eps 0.0002 iteration 365 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6525 eps 0.0677 iteration 366 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6679 eps 0.0036 iteration 367 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6918 eps 0.0036 iteration 368 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7269 eps 0.0020 iteration 369 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7403 eps 0.0015 iteration 370 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7576 eps 0.0021 iteration 371 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7651 eps 0.0002 iteration 372 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7723 eps 0.0023 iteration 373 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8045 eps 0.0021 iteration 374 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8182 eps 0.0016 iteration 375 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8344 eps 0.0122 iteration 376 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8569 eps 0.0030 iteration 377 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8862 eps 0.0020 iteration 378 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8951 eps 0.0013 iteration 379 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9015 eps 0.0002 iteration 380 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9078 eps 0.0019 iteration 381 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9252 eps 0.0079 iteration 382 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9409 eps 0.0456 iteration 383 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9685 eps 0.0024 iteration 384 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9941 eps 0.0027 iteration 385 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0072 eps 0.0034 iteration 386 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0127 eps 0.0002 iteration 387 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0180 eps 0.0050 iteration 388 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0337 eps 0.0036 iteration 389 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0579 eps 0.0031 iteration 390 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0640 eps 0.0014 iteration 391 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0781 eps 0.0036 iteration 392 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1007 eps 0.0023 iteration 393 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1132 eps 0.0023 iteration 394 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1180 eps 0.0001 iteration 395 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1225 eps 0.0035 iteration 396 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1437 eps 0.0037 iteration 397 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1496 eps 0.0015 iteration 398 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1605 eps 0.0044 iteration 399 qsel 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1732 eps 0.0063 iteration 400 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.5352 eps 0.0024 iteration 360 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.5554 eps 0.0018 iteration 361 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.5736 eps 0.0029 iteration 362 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6115 eps 0.0020 iteration 363 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6362 eps 0.0044 iteration 364 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6493 eps 0.0015 iteration 365 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6580 eps 0.0002 iteration 366 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6659 eps 0.0060 iteration 367 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.6888 eps 0.0035 iteration 368 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7242 eps 0.0016 iteration 369 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7426 eps 0.0022 iteration 370 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7756 eps 0.0019 iteration 371 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7831 eps 0.0002 iteration 372 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.7902 eps 0.0020 iteration 373 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8052 eps 0.0021 iteration 374 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8221 eps 0.0091 iteration 375 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8414 eps 0.0032 iteration 376 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8611 eps 0.0037 iteration 377 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.8741 eps 0.0016 iteration 378 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9020 eps 0.0026 iteration 379 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9085 eps 0.0002 iteration 380 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9148 eps 0.0020 iteration 381 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9355 eps 0.0063 iteration 382 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9446 eps 0.0017 iteration 383 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9624 eps 0.0034 iteration 384 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9887 eps 0.0037 iteration 385 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 182.9945 eps 0.0032 iteration 386 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0106 eps 0.0067 iteration 387 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0353 eps 0.0027 iteration 388 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0502 eps 0.0046 iteration 389 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0647 eps 0.0028 iteration 390 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0755 eps 0.0025 iteration 391 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.0941 eps 0.0025 iteration 392 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1001 eps 0.0016 iteration 393 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1133 eps 0.0026 iteration 394 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1297 eps 0.0021 iteration 395 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1356 eps 0.0002 iteration 396 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1403 eps 0.0002 iteration 397 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1445 eps 0.3172 iteration 398 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1652 eps 0.0021 iteration 399 qsel 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> logLik 183.1759 eps 0.0055 iteration 400 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time:  5.64sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time:  0.99sec</span>
 <span class="r-plt img"><img src="shortcuts-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot estimated effects.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot estimated effects.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="shortcuts-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -578,7 +578,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

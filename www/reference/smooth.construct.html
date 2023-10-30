@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -124,22 +124,22 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## Function as in package mgcv</span>
-<span class="co">## but with additional dots argument.</span>
-<span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## For 'bamlss.frame's.</span>
-<span class="co"># S3 method for bamlss.frame</span>
-<span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, data <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>,
-  model <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for bamlss.formula</span>
-<span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, data <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>,
-  model <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for bamlss.terms</span>
-<span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, data <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>,
-  model <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## Function as in package mgcv</span></span>
+<span><span class="co">## but with additional dots argument.</span></span>
+<span><span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## For 'bamlss.frame's.</span></span>
+<span><span class="co"># S3 method for bamlss.frame</span></span>
+<span><span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, data <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bamlss.formula</span></span>
+<span><span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, data <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bamlss.terms</span></span>
+<span><span class="fu">smooth.construct</span><span class="op">(</span><span class="va">object</span>, data <span class="op">=</span> <span class="cn">NULL</span>, knots <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -182,19 +182,19 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Generate some data.</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Create a "bamlss.frame".</span></span>
-<span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Extract the smooth construct.</span></span>
-<span class="r-in"><span class="va">sc</span> <span class="op">&lt;-</span> <span class="fu">smooth.construct</span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sc</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Generate some data.</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Create a "bamlss.frame".</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Extract the smooth construct.</span></span></span>
+<span class="r-in"><span><span class="va">sc</span> <span class="op">&lt;-</span> <span class="fu">smooth.construct</span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ mu   :List of 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ smooth.construct:List of 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x1):List of 23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x1):List of 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ term          : chr "x1"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ bs.dim        : num 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ fixed         : logi FALSE</span>
@@ -210,8 +210,8 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ drop.null     : num 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X             : num [1:500, 1:9] 1.123 1.121 1.101 -0.303 -0.923 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S             :List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 8.001 1.07 -4.043 0.675 -4.856 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] -0.822 -0.803 -0.775 -0.763 -0.76 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 8.001 1.07 -4.043 -0.675 -4.856 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] 0.822 0.803 0.775 0.763 0.76 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ Xu            : num [1:500, 1] -0.499 -0.496 -0.492 -0.49 -0.49 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ df            : num 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ shift         : num [1(1d)] 0.5</span>
@@ -219,17 +219,18 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ null.space.dim: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ plot.me       : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ side.constrain: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ repara        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S.scale       : num 20.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X.dim         : int 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "tprs.smooth" "mgcv.smooth"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "qrc")=List of 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] 1.982 -0.125 -0.385 -0.132 0.396 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] -1.982 0.125 0.385 0.132 0.396 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ rank : int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qraux: num 1.47</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ pivot: int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..- attr(*, "class")= chr "qr"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "nCons")= int 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x2):List of 23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x2):List of 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ term          : chr "x2"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ bs.dim        : num 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ fixed         : logi FALSE</span>
@@ -245,8 +246,8 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ drop.null     : num 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X             : num [1:500, 1:9] -1.058 -0.672 1.21 -1.089 -1.106 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S             :List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 9.85 1.25 -4.96 0.81 -5.89 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] -0.813 -0.791 -0.791 -0.785 -0.759 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 9.85 1.25 4.96 0.81 -5.89 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] 0.813 0.791 0.791 0.785 0.759 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ Xu            : num [1:500, 1] -0.476 -0.472 -0.472 -0.471 -0.467 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ df            : num 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ shift         : num [1(1d)] 0.48</span>
@@ -254,30 +255,31 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ null.space.dim: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ plot.me       : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ side.constrain: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ repara        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S.scale       : num 17.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X.dim         : int 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "tprs.smooth" "mgcv.smooth"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "qrc")=List of 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] 1.964 -0.106 -0.378 -0.137 0.391 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] -1.964 0.106 0.378 -0.137 -0.391 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ rank : int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qraux: num 1.48</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ pivot: int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..- attr(*, "class")= chr "qr"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "nCons")= int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ sigma: Named list()</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Also possible with formulas.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.formula.html">bamlss.formula</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">sigma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">sc</span> <span class="op">&lt;-</span> <span class="fu">smooth.construct</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sc</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Also possible with formulas.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.formula.html">bamlss.formula</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">sigma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">sc</span> <span class="op">&lt;-</span> <span class="fu">smooth.construct</span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ mu   :List of 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ smooth.construct:List of 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x1)      :List of 23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x1)      :List of 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ term          : chr "x1"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ bs.dim        : num 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ fixed         : logi FALSE</span>
@@ -293,8 +295,8 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ drop.null     : num 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X             : num [1:500, 1:9] 1.123 1.121 1.101 -0.303 -0.923 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S             :List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 8.001 1.07 -4.043 0.675 -4.856 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] -0.822 -0.803 -0.775 -0.763 -0.76 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 8.001 1.07 -4.043 -0.675 -4.856 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] 0.822 0.803 0.775 0.763 0.76 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ Xu            : num [1:500, 1] -0.499 -0.496 -0.492 -0.49 -0.49 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ df            : num 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ shift         : num [1(1d)] 0.5</span>
@@ -302,17 +304,18 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ null.space.dim: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ plot.me       : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ side.constrain: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ repara        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S.scale       : num 20.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X.dim         : int 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "tprs.smooth" "mgcv.smooth"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "qrc")=List of 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] 1.982 -0.125 -0.385 -0.132 0.396 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] -1.982 0.125 0.385 0.132 0.396 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ rank : int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qraux: num 1.47</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ pivot: int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..- attr(*, "class")= chr "qr"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "nCons")= int 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ te(lon,lat):List of 22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ te(lon,lat):List of 23</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ margin        :List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ :List of 18</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. .. ..$ term          : chr "lon"</span>
@@ -381,6 +384,7 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ rank          : num [1:2(1d)] 15 15</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ XP            : list()</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ side.constrain: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ repara        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S.scale       : num [1:2] 0.368 0.368</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X.dim         : int 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "tensor.smooth" "mgcv.smooth"</span>
@@ -393,7 +397,7 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "nCons")= int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ sigma:List of 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ smooth.construct:List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x2):List of 23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ s(x2):List of 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ term          : chr "x2"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ bs.dim        : num 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ fixed         : logi FALSE</span>
@@ -409,8 +413,8 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ drop.null     : num 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X             : num [1:500, 1:9] -1.058 -0.672 1.21 -1.089 -1.106 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S             :List of 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 9.85 1.25 -4.96 0.81 -5.89 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] -0.813 -0.791 -0.791 -0.785 -0.759 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ : num [1:9, 1:9] 9.85 1.25 4.96 0.81 -5.89 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ UZ            : num [1:502, 1:10] 0.813 0.791 0.791 0.785 0.759 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ Xu            : num [1:500, 1] -0.476 -0.472 -0.472 -0.471 -0.467 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ df            : num 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ shift         : num [1(1d)] 0.48</span>
@@ -418,11 +422,12 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ null.space.dim: num 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ plot.me       : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ side.constrain: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ repara        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ S.scale       : num 17.4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ X.dim         : int 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "class")= chr [1:2] "tprs.smooth" "mgcv.smooth"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..- attr(*, "qrc")=List of 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] 1.964 -0.106 -0.378 -0.137 0.391 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qr   : num [1:10, 1] -1.964 0.106 0.378 -0.137 -0.391 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ rank : int 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ qraux: num 1.48</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. .. ..$ pivot: int 1</span>
@@ -442,7 +447,7 @@ see function <code><a href="bamlss.frame.html">bamlss.frame</a></code> for more 
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

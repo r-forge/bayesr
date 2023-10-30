@@ -21,7 +21,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -126,8 +126,8 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">bamlss.engine.setup</span><span class="op">(</span><span class="va">x</span>, update <span class="op">=</span> <span class="st">"iwls"</span>, propose <span class="op">=</span> <span class="st">"iwlsC_gp"</span>,
-  do.optim <span class="op">=</span> <span class="cn">NULL</span>, df <span class="op">=</span> <span class="cn">NULL</span>, parametric2smooth <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bamlss.engine.setup</span><span class="op">(</span><span class="va">x</span>, update <span class="op">=</span> <span class="st">"iwls"</span>, propose <span class="op">=</span> <span class="st">"iwlsC_gp"</span>,</span>
+<span>  do.optim <span class="op">=</span> <span class="cn">NULL</span>, df <span class="op">=</span> <span class="cn">NULL</span>, parametric2smooth <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -196,37 +196,38 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "s(x1)" "s(x2)"</span>
-<span class="r-in"><span class="va">bf</span><span class="op">$</span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">bamlss.engine.setup</span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span>, df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x1)"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"s(x2)"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="va">bf</span><span class="op">$</span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">bamlss.engine.setup</span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span>, df <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s(x1)"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"s(x2)"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "s(x1)"        "s(x2)"        "model.matrix"</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "term"           "bs.dim"         "fixed"          "dim"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "p.order"        "by"             "label"          "xt"            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "id"             "sp"             "drop.null"      "X"             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [13] "S"              "UZ"             "Xu"             "df"            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [17] "shift"          "rank"           "null.space.dim" "plot.me"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [21] "side.constrain" "S.scale"        "X.dim"          "fit.fun"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "prior"          "grad"           "hess"           "binning"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [29] "nobs"           "weights"        "rres"           "fit.reduced"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [33] "fxsp"           "a"              "b"              "edf"           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [37] "lower"          "upper"          "state"          "sparse.setup"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [41] "added"          "pid"            "update"         "propose"       </span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">state</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21] "side.constrain" "repara"         "S.scale"        "X.dim"         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "fit.fun"        "prior"          "grad"           "hess"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [29] "binning"        "nobs"           "weights"        "rres"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [33] "fit.reduced"    "fxsp"           "a"              "b"             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [37] "edf"            "lower"          "upper"          "state"         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41] "sparse.setup"   "added"          "pid"            "update"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [45] "propose"       </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span><span class="op">[[</span><span class="st">"s(x1)"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">state</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "parameters"    "fitted.values" "edf"           "do.optim"     </span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">state</span><span class="op">$</span><span class="va">edf</span>, <span class="fu"><a href="bamlss.engine.helpers.html">get.state</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"tau2"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">bf</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">mu</span><span class="op">$</span><span class="va">smooth.construct</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">state</span><span class="op">$</span><span class="va">edf</span>, <span class="fu"><a href="bamlss.engine.helpers.html">get.state</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"tau2"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`s(x1)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     tau21 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1.000000e+00 2.912639e-05 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.000000e+00 2.956634e-05 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`s(x2)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               tau21 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3.0000000 0.8196163 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3.0000000 0.6222542 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $model.matrix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   </span>
@@ -246,7 +247,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

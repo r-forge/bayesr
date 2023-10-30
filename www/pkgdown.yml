@@ -1,5 +1,5 @@
-pandoc: 2.19.2
-pkgdown: 2.0.6
+pandoc: 2.9.2.1
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   bamlss: bamlss.html
@@ -19,5 +19,5 @@ articles:
   rent: rent.html
   terms: terms.html
   zn: zn.html
-last_built: 2023-02-01T12:56Z
+last_built: 2023-10-30T06:05Z
 

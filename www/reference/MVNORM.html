@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -124,11 +124,11 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sam_MVNORM</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, family <span class="op">=</span> <span class="cn">NULL</span>, start <span class="op">=</span> <span class="cn">NULL</span>,
-  n.samples <span class="op">=</span> <span class="fl">500</span>, hessian <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">MVNORM</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, family <span class="op">=</span> <span class="cn">NULL</span>, start <span class="op">=</span> <span class="cn">NULL</span>,
-  n.samples <span class="op">=</span> <span class="fl">500</span>, hessian <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sam_MVNORM</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, family <span class="op">=</span> <span class="cn">NULL</span>, start <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n.samples <span class="op">=</span> <span class="fl">500</span>, hessian <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">MVNORM</span><span class="op">(</span><span class="va">x</span>, y <span class="op">=</span> <span class="cn">NULL</span>, family <span class="op">=</span> <span class="cn">NULL</span>, start <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n.samples <span class="op">=</span> <span class="fl">500</span>, hessian <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -178,26 +178,26 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Simulated data example illustrating</span></span>
-<span class="r-in"><span class="co">## how to call the sampler function.</span></span>
-<span class="r-in"><span class="co">## This is done internally within</span></span>
-<span class="r-in"><span class="co">## the setup of function bamlss().</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## First, find starting values with optimizer.</span></span>
-<span class="r-in"><span class="va">o</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu"><a href="bfit.html">opt_bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.2256 logPost -164.909 logLik -167.291 edf 6.7157 eps 1.9793 iteration   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.1098 logPost -164.851 logLik -167.233 edf 6.7157 eps 0.0049 iteration   2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.1097 logPost -164.851 logLik -167.233 edf 6.7157 eps 0.0000 iteration   3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 348.1097 logPost -164.851 logLik -167.233 edf 6.7157 eps 0.0000 iteration   3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.11sec</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Sample.</span></span>
-<span class="r-in"><span class="va">samps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu">sam_MVNORM</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="va">o</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Simulated data example illustrating</span></span></span>
+<span class="r-in"><span><span class="co">## how to call the sampler function.</span></span></span>
+<span class="r-in"><span><span class="co">## This is done internally within</span></span></span>
+<span class="r-in"><span><span class="co">## the setup of function bamlss().</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span>, bs <span class="op">=</span> <span class="st">"ps"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## First, find starting values with optimizer.</span></span></span>
+<span class="r-in"><span><span class="va">o</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu"><a href="bfit.html">opt_bfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 325.6348 logPost -153.671 logLik -155.980 edf 6.7313 eps 1.2399 iteration   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 325.4626 logPost -153.585 logLik -155.894 edf 6.7313 eps 0.0058 iteration   2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 325.4626 logPost -153.585 logLik -155.894 edf 6.7313 eps 0.0000 iteration   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AICc 325.4626 logPost -153.585 logLik -155.894 edf 6.7313 eps 0.0000 iteration   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed time:  0.03sec</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Sample.</span></span></span>
+<span class="r-in"><span><span class="va">samps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu">sam_MVNORM</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="va">o</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">samps</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">samps</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="MVNORM-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="MVNORM-2.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="MVNORM-3.png" alt="" width="700" height="433"></span>
@@ -216,7 +216,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="glm_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Generalized Linear Models (+)</h1>
@@ -147,11 +147,7 @@
 <div class="section level2">
 <h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
 </h2>
-<p>The <em>bamlss</em> package is perfectly suitable for estimating
-(Bayesian) generalized linear models (GLM) and provides infrastructures
-for the estimation using very large data sets, too. Within the main
-model fitting function <code><a href="../reference/bamlss.html">bamlss()</a></code>, the possible
-<code>family</code> specifications for fitting GLMs are:</p>
+<p>The <em>bamlss</em> package is perfectly suitable for estimating (Bayesian) generalized linear models (GLM) and provides infrastructures for the estimation using very large data sets, too. Within the main model fitting function <code><a href="../reference/bamlss.html">bamlss()</a></code>, the possible <code>family</code> specifications for fitting GLMs are:</p>
 <ul>
 <li>
 <code>"gaussian"</code> or <code><a href="../reference/family.bamlss.html">gaussian_bamlss()</a></code>,</li>
@@ -164,549 +160,440 @@ model fitting function <code><a href="../reference/bamlss.html">bamlss()</a></co
 <li>
 <code>"poisson"</code> or <code><a href="../reference/family.bamlss.html">poisson_bamlss()</a></code>.</li>
 </ul>
-<p>In addition, there is a wrapper function for the family objects
-provided by the <em>gamlss</em> package <span class="citation">(<strong>bamlss:Stasinopoulos+Rigby:2018?</strong>)</span>,
-so in principle all <em>gamlss</em> families can be used by just passing
-them to the <code>family</code> argument in the <code><a href="../reference/bamlss.html">bamlss()</a></code>
-function (see also the <a href="#countreg">count data regression
-example</a>).</p>
-<p>First, we illustrate how to fit standard GLMs and how to do inference
-using the <em>bamlss</em> framework. Aftwards, we show how to estimate
-GLMs using very large data set.</p>
+<p>In addition, there is a wrapper function for the family objects provided by the <em>gamlss</em> package <span class="citation">(<span class="citeproc-not-found" data-reference-id="bamlss:Stasinopoulos+Rigby:2018"><strong>???</strong></span>)</span>, so in principle all <em>gamlss</em> families can be used by just passing them to the <code>family</code> argument in the <code><a href="../reference/bamlss.html">bamlss()</a></code> function (see also the <a href="#countreg">count data regression example</a>).</p>
+<p>First, we illustrate how to fit standard GLMs and how to do inference using the <em>bamlss</em> framework. Aftwards, we show how to estimate GLMs using very large data set.</p>
 </div>
 <div class="section level2">
 <h2 id="logit-model">Logit model<a class="anchor" aria-label="anchor" href="#logit-model"></a>
 </h2>
-<p>This example is taken from the <em>AER</em> package <span class="citation">(Kleiber and Zeileis 2018, 2008)</span> and is about
-labor force participation (yes/no) of women in Switzerland 1981. The
-data can be loaded with</p>
+<p>This example is taken from the <em>AER</em> package <span class="citation">(Kleiber and Zeileis 2018, 2008)</span> and is about labor force participation (yes/no) of women in Switzerland 1981. The data can be loaded with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"SwissLabor"</span>, package <span class="op">=</span> <span class="st">"AER"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SwissLabor</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##   participation   income age education youngkids oldkids foreign</span>
-<span class="co">## 1            no 10.78750 3.0         8         1       1      no</span>
-<span class="co">## 2           yes 10.52425 4.5         8         0       1      no</span>
-<span class="co">## 3            no 10.96858 4.6         9         0       0      no</span>
-<span class="co">## 4            no 11.10500 3.1        11         2       0      no</span>
-<span class="co">## 5            no 11.10847 4.4        12         0       2      no</span>
-<span class="co">## 6           yes 11.02825 4.2        12         0       1      no</span></code></pre>
-<p>The data frame contains of 872 observations on 7 variables, where
-some of them might have a nonlinear influence on the response labor
-<code>participation</code>. Now, a standard Bayesian binomial logit
-model can be fitted with</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"SwissLabor"</span>, package <span class="op">=</span> <span class="st">"AER"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SwissLabor</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   participation   income age education youngkids oldkids foreign</span></span>
+<span><span class="co">## 1            no 10.78750 3.0         8         1       1      no</span></span>
+<span><span class="co">## 2           yes 10.52425 4.5         8         0       1      no</span></span>
+<span><span class="co">## 3            no 10.96858 4.6         9         0       0      no</span></span>
+<span><span class="co">## 4            no 11.10500 3.1        11         2       0      no</span></span>
+<span><span class="co">## 5            no 11.10847 4.4        12         0       2      no</span></span>
+<span><span class="co">## 6           yes 11.02825 4.2        12         0       1      no</span></span></code></pre>
+<p>The data frame contains of 872 observations on 7 variables, where some of them might have a nonlinear influence on the response labor <code>participation</code>. Now, a standard Bayesian binomial logit model can be fitted with</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.bamlss.org/" class="external-link">"bamlss"</a></span><span class="op">)</span>
-
-<span class="co">## First, set the seed for reproducibly.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
-
-<span class="co">## Model formula.</span>
-<span class="va">f</span> <span class="op">&lt;-</span> <span class="va">participation</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">youngkids</span> <span class="op">+</span> <span class="va">oldkids</span> <span class="op">+</span> <span class="va">foreign</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
-
-<span class="co">## Estimate model.</span>
-<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">SwissLabor</span>,
-  n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
-<p>Note, to capture nonlinearities, a quadratic term for variable
-<code>age</code> is added to the model. The model summary gives</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.bamlss.org/" class="external-link">"bamlss"</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## First, set the seed for reproducibly.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Model formula.</span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">participation</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">youngkids</span> <span class="op">+</span> <span class="va">oldkids</span> <span class="op">+</span> <span class="va">foreign</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">age</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Estimate model.</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, data <span class="op">=</span> <span class="va">SwissLabor</span>,</span>
+<span>  n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<p>Note, to capture nonlinearities, a quadratic term for variable <code>age</code> is added to the model. The model summary gives</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = "binomial", data = SwissLabor, n.iter = 12000, </span>
-<span class="co">##     burnin = 2000, thin = 10)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: binomial </span>
-<span class="co">## Link function: pi = logit</span>
-<span class="co">## *---</span>
-<span class="co">## Formula pi:</span>
-<span class="co">## ---</span>
-<span class="co">## participation ~ income + age + education + youngkids + oldkids + </span>
-<span class="co">##     foreign + I(age^2)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                 Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## (Intercept)  6.29460  1.61320  6.35800 10.86894      6.196</span>
-<span class="co">## income      -1.11826 -1.53526 -1.11857 -0.66780     -1.104</span>
-<span class="co">## age          3.45820  2.14132  3.45310  4.72934      3.437</span>
-<span class="co">## education    0.03269 -0.02513  0.03389  0.08447      0.033</span>
-<span class="co">## youngkids   -1.17482 -1.50360 -1.17595 -0.83496     -1.186</span>
-<span class="co">## oldkids     -0.24017 -0.39322 -0.24097 -0.07412     -0.241</span>
-<span class="co">## foreignyes   1.16362  0.77613  1.16502  1.53449      1.168</span>
-<span class="co">## I(age^2)    -0.48985 -0.64783 -0.48968 -0.32830     -0.488</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.8684 0.2947 0.9857     1</span>
-<span class="co">## ---</span>
-<span class="co">## Sampler summary:</span>
-<span class="co">## -</span>
-<span class="co">## DIC = 1032.965 logLik = -512.6361 pd = 7.693</span>
-<span class="co">## runtime = 12.1</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## AICc = 1033.737 edf = 8 logLik = -508.7851</span>
-<span class="co">## logPost = -571.3986 nobs = 872 runtime = 0.171</span></code></pre>
-<p>which suggests “significant” effects for all covariates, since there
-are no zeros within the 95% credible intervals. Before we proceed, we
-usually do some convergence checks of the MCMC chains using
-traceplots.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## bamlss(formula = f, family = "binomial", data = SwissLabor, n.iter = 12000, </span></span>
+<span><span class="co">##     burnin = 2000, thin = 10)</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Family: binomial </span></span>
+<span><span class="co">## Link function: pi = logit</span></span>
+<span><span class="co">## *---</span></span>
+<span><span class="co">## Formula pi:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## participation ~ income + age + education + youngkids + oldkids + </span></span>
+<span><span class="co">##     foreign + I(age^2)</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                 Mean     2.5%      50%    97.5% parameters</span></span>
+<span><span class="co">## (Intercept)  6.29460  1.61320  6.35800 10.86894      6.196</span></span>
+<span><span class="co">## income      -1.11826 -1.53526 -1.11857 -0.66780     -1.104</span></span>
+<span><span class="co">## age          3.45820  2.14132  3.45310  4.72934      3.437</span></span>
+<span><span class="co">## education    0.03269 -0.02513  0.03389  0.08447      0.033</span></span>
+<span><span class="co">## youngkids   -1.17482 -1.50360 -1.17595 -0.83496     -1.186</span></span>
+<span><span class="co">## oldkids     -0.24017 -0.39322 -0.24097 -0.07412     -0.241</span></span>
+<span><span class="co">## foreignyes   1.16362  0.77613  1.16502  1.53449      1.168</span></span>
+<span><span class="co">## I(age^2)    -0.48985 -0.64783 -0.48968 -0.32830     -0.488</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##         Mean   2.5%    50% 97.5%</span></span>
+<span><span class="co">## alpha 0.8684 0.2947 0.9857     1</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Sampler summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## DIC = 1032.965 logLik = -512.6361 pd = 7.693</span></span>
+<span><span class="co">## runtime = 12.1</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Optimizer summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## AICc = 1033.737 edf = 8 logLik = -508.7851</span></span>
+<span><span class="co">## logPost = -571.3986 nobs = 872 runtime = 0.171</span></span></code></pre>
+<p>which suggests “significant” effects for all covariates, since there are no zeros within the 95% credible intervals. Before we proceed, we usually do some convergence checks of the MCMC chains using traceplots.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></code></pre></div>
-<p><img src="glm_files/figure-html/unnamed-chunk-6-1.png" width="864" style="display: block; margin: auto;">
-The plots indicate convergence of the MCMC chains, i.e., there is no
-visible trend in the MCMC chains and very low autocorrelation suggest
-i.i.d. sampling from the posterior distribution. Note that the function
-call would show all traceplots, however, for convenience we only show
-the plots for the intercept and variable <code>income</code>.</p>
-<p>The estimated regression coefficients can also be extracted using the
-<code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code> method</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, which <span class="op">=</span> <span class="st">"samples"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="glm_files/figure-html/unnamed-chunk-6-1.png" width="864" style="display: block; margin: auto;"> The plots indicate convergence of the MCMC chains, i.e., there is no visible trend in the MCMC chains and very low autocorrelation suggest i.i.d. sampling from the posterior distribution. Note that the function call would show all traceplots, however, for convenience we only show the plots for the intercept and variable <code>income</code>.</p>
+<p>The estimated regression coefficients can also be extracted using the <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code> method</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Extract posterior mean.</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## pi.p.(Intercept)      pi.p.income         pi.p.age   pi.p.education </span>
-<span class="co">##       6.29459725      -1.11826351       3.45820448       0.03268852 </span>
-<span class="co">##   pi.p.youngkids     pi.p.oldkids  pi.p.foreignyes    pi.p.I(age^2) </span>
-<span class="co">##      -1.17481773      -0.24017030       1.16362217      -0.48984985 </span>
-<span class="co">##       pi.p.alpha </span>
-<span class="co">##       0.86841423</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## Extract posterior mean.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## pi.p.(Intercept)      pi.p.income         pi.p.age   pi.p.education </span></span>
+<span><span class="co">##       6.29459725      -1.11826351       3.45820448       0.03268852 </span></span>
+<span><span class="co">##   pi.p.youngkids     pi.p.oldkids  pi.p.foreignyes    pi.p.I(age^2) </span></span>
+<span><span class="co">##      -1.17481773      -0.24017030       1.16362217      -0.48984985 </span></span>
+<span><span class="co">##       pi.p.alpha </span></span>
+<span><span class="co">##       0.86841423</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Or use any other function on the samples.</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">x</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##                         2.5%       97.5%</span>
-<span class="co">## pi.p.(Intercept)  1.61320356 10.86894390</span>
-<span class="co">## pi.p.income      -1.53525827 -0.66779610</span>
-<span class="co">## pi.p.age          2.14132459  4.72934336</span>
-<span class="co">## pi.p.education   -0.02513391  0.08446961</span>
-<span class="co">## pi.p.youngkids   -1.50359765 -0.83496378</span>
-<span class="co">## pi.p.oldkids     -0.39321512 -0.07412275</span>
-<span class="co">## pi.p.foreignyes   0.77612963  1.53449289</span>
-<span class="co">## pi.p.I(age^2)    -0.64783455 -0.32830179</span>
-<span class="co">## pi.p.alpha        0.29466484  1.00000000</span></code></pre>
-<p>(there is also a <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> method). The naming
-convention of the regression coefficients might first seem a bit
-atypical, it is based on the idea that a <em>bamlss</em> family/response
-distribution can have more than just one distributional parameter, as
-well as linear and/or nonlinear model terms. To explain, <code>pi</code>
-is the name of the distributional parameter in the
-<code><a href="../reference/family.bamlss.html">binomial_bamlss()</a></code> family and <code>p</code> stands for
-parametric terms, i.e., there would also be a <code>s</code> for smooth
-terms if they are part of the model.</p>
-<p>Model predictions on the probability scale can be obtained by the
-predict method (see also function <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code>).</p>
+<code class="sourceCode R"><span><span class="co">## Or use any other function on the samples.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">x</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##                         2.5%       97.5%</span></span>
+<span><span class="co">## pi.p.(Intercept)  1.61320356 10.86894390</span></span>
+<span><span class="co">## pi.p.income      -1.53525827 -0.66779610</span></span>
+<span><span class="co">## pi.p.age          2.14132459  4.72934336</span></span>
+<span><span class="co">## pi.p.education   -0.02513391  0.08446961</span></span>
+<span><span class="co">## pi.p.youngkids   -1.50359765 -0.83496378</span></span>
+<span><span class="co">## pi.p.oldkids     -0.39321512 -0.07412275</span></span>
+<span><span class="co">## pi.p.foreignyes   0.77612963  1.53449289</span></span>
+<span><span class="co">## pi.p.I(age^2)    -0.64783455 -0.32830179</span></span>
+<span><span class="co">## pi.p.alpha        0.29466484  1.00000000</span></span></code></pre>
+<p>(there is also a <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> method). The naming convention of the regression coefficients might first seem a bit atypical, it is based on the idea that a <em>bamlss</em> family/response distribution can have more than just one distributional parameter, as well as linear and/or nonlinear model terms. To explain, <code>pi</code> is the name of the distributional parameter in the <code><a href="../reference/family.bamlss.html">binomial_bamlss()</a></code> family and <code>p</code> stands for parametric terms, i.e., there would also be a <code>s</code> for smooth terms if they are part of the model.</p>
+<p>Model predictions on the probability scale can be obtained by the predict method (see also function <code><a href="../reference/predict.bamlss.html">predict.bamlss()</a></code>).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Create some newdata for prediction, note that</span>
-<span class="co">## factors need to be fully specified (this will be changed soon).</span>
-<span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>income <span class="op">=</span> <span class="fl">11</span>, age <span class="op">=</span> <span class="fl">3.3</span>,
-  education <span class="op">=</span> <span class="fl">12</span>, youngkids <span class="op">=</span> <span class="fl">1</span>, oldkids <span class="op">=</span> <span class="fl">1</span>,
-  foreign <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fl">1</span>, levels <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"yes"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">## Predicted probabilities.</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## [1] 0.279716</span></code></pre>
+<code class="sourceCode R"><span><span class="co">## Create some newdata for prediction, note that</span></span>
+<span><span class="co">## factors need to be fully specified (this will be changed soon).</span></span>
+<span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>income <span class="op">=</span> <span class="fl">11</span>, age <span class="op">=</span> <span class="fl">3.3</span>,</span>
+<span>  education <span class="op">=</span> <span class="fl">12</span>, youngkids <span class="op">=</span> <span class="fl">1</span>, oldkids <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  foreign <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fl">1</span>, levels <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"yes"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Predicted probabilities.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 0.279716</span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">nd</span><span class="op">$</span><span class="va">foreign</span> <span class="op">&lt;-</span> <span class="st">"yes"</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## [1] 0.552208</span></code></pre>
-<p>To visualize the effect of age on the probability we can do the
-following:</p>
+<code class="sourceCode R"><span><span class="va">nd</span><span class="op">$</span><span class="va">foreign</span> <span class="op">&lt;-</span> <span class="st">"yes"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 0.552208</span></span></code></pre>
+<p>To visualize the effect of age on the probability we can do the following:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Predict effect of age including 95% credible intervals and plot.</span>
-<span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>income <span class="op">=</span> <span class="fl">11</span>, age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">6.2</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,
-  education <span class="op">=</span> <span class="fl">12</span>, youngkids <span class="op">=</span> <span class="fl">1</span>, oldkids <span class="op">=</span> <span class="fl">1</span>,
-  foreign <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fl">1</span>, levels <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"yes"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">nd</span><span class="op">$</span><span class="va">pSwiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span>
-<span class="va">nd</span><span class="op">$</span><span class="va">foreign</span> <span class="op">&lt;-</span> <span class="st">"yes"</span>
-<span class="va">nd</span><span class="op">$</span><span class="va">pForeign</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span>
-
-<span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p.no</span> <span class="op">~</span> <span class="va">age</span>, data <span class="op">=</span> <span class="va">nd</span>, ylab <span class="op">=</span> <span class="st">"participation"</span>,
-  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">nd</span><span class="op">$</span><span class="va">p.no</span>, <span class="va">nd</span><span class="op">$</span><span class="va">pForeign</span><span class="op">)</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">pForeign</span> <span class="op">~</span> <span class="va">age</span>, data <span class="op">=</span> <span class="va">nd</span>, col.lines <span class="op">=</span> <span class="st">"blue"</span>, add <span class="op">=</span> <span class="cn">TRUE</span>,
-  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign yes"</span>, <span class="st">"foreign no"</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">1</span>,
-  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="glm_files/figure-html/unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;">
-The plot nicely depicts the nonlinear effect of variable
-<code>age</code> for the two levels of <code>foreign</code>.</p>
+<code class="sourceCode R"><span><span class="co">## Predict effect of age including 95% credible intervals and plot.</span></span>
+<span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>income <span class="op">=</span> <span class="fl">11</span>, age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">6.2</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>  education <span class="op">=</span> <span class="fl">12</span>, youngkids <span class="op">=</span> <span class="fl">1</span>, oldkids <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  foreign <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fl">1</span>, levels <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"yes"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">nd</span><span class="op">$</span><span class="va">pSwiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span>
+<span><span class="va">nd</span><span class="op">$</span><span class="va">foreign</span> <span class="op">&lt;-</span> <span class="st">"yes"</span></span>
+<span><span class="va">nd</span><span class="op">$</span><span class="va">pForeign</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, type <span class="op">=</span> <span class="st">"parameter"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p.no</span> <span class="op">~</span> <span class="va">age</span>, data <span class="op">=</span> <span class="va">nd</span>, ylab <span class="op">=</span> <span class="st">"participation"</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">nd</span><span class="op">$</span><span class="va">p.no</span>, <span class="va">nd</span><span class="op">$</span><span class="va">pForeign</span><span class="op">)</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">pForeign</span> <span class="op">~</span> <span class="va">age</span>, data <span class="op">=</span> <span class="va">nd</span>, col.lines <span class="op">=</span> <span class="st">"blue"</span>, add <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign yes"</span>, <span class="st">"foreign no"</span><span class="op">)</span>, lwd <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>, <span class="st">"black"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="glm_files/figure-html/unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;"> The plot nicely depicts the nonlinear effect of variable <code>age</code> for the two levels of <code>foreign</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="countreg">Models for count data<a class="anchor" aria-label="anchor" href="#countreg"></a>
 </h2>
-<p>This example is taken from <span class="citation">Zeileis, Kleiber,
-and Jackman (2008)</span>. The application is about modeling the demand
-for medical care by elderly and was first analyzed by <span class="citation">Deb and Trivedi (1997)</span>. The data can be
-downloaded on loaded into R with</p>
+<p>This example is taken from <span class="citation">Zeileis, Kleiber, and Jackman (2008)</span>. The application is about modeling the demand for medical care by elderly and was first analyzed by <span class="citation">Deb and Trivedi (1997)</span>. The data can be downloaded on loaded into R with</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span>
-  <span class="st">"https://www.jstatsoft.org/index.php/jss/article/downloadSuppFile/v027i08/DebTrivedi.rda.zip"</span>,
-  <span class="st">"DebTrivedi.rda.zip"</span>
-<span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/unzip.html" class="external-link">unzip</a></span><span class="op">(</span><span class="st">"DebTrivedi.rda.zip"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"DebTrivedi.rda"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">DebTrivedi</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##   ofp ofnp opp opnp emer hosp  health numchron adldiff region age black gender</span>
-<span class="co">## 1   5    0   0    0    0    1 average        2      no  other 6.9   yes   male</span>
-<span class="co">## 2   1    0   2    0    2    0 average        2      no  other 7.4    no female</span>
-<span class="co">## 3  13    0   0    0    3    3    poor        4     yes  other 6.6   yes female</span>
-<span class="co">## 4  16    0   5    0    1    1    poor        2     yes  other 7.6    no   male</span>
-<span class="co">## 5   3    0   0    0    0    0 average        2     yes  other 7.9    no female</span>
-<span class="co">## 6  17    0   0    0    0    0    poor        5     yes  other 6.6    no female</span>
-<span class="co">##   married school faminc employed privins medicaid</span>
-<span class="co">## 1     yes      6 2.8810      yes     yes       no</span>
-<span class="co">## 2     yes     10 2.7478       no     yes       no</span>
-<span class="co">## 3      no     10 0.6532       no      no      yes</span>
-<span class="co">## 4     yes      3 0.6588       no     yes       no</span>
-<span class="co">## 5     yes      6 0.6588       no     yes       no</span>
-<span class="co">## 6      no      7 0.3301       no      no      yes</span></code></pre>
-<p>The response variable in this data is the number of physician office
-visits, variable <code>ofp</code>. A histogram of the count data
-response can be plotted with</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://www.jstatsoft.org/index.php/jss/article/downloadSuppFile/v027i08/DebTrivedi.rda.zip"</span>,</span>
+<span>  <span class="st">"DebTrivedi.rda.zip"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/unzip.html" class="external-link">unzip</a></span><span class="op">(</span><span class="st">"DebTrivedi.rda.zip"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"DebTrivedi.rda"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">DebTrivedi</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   ofp ofnp opp opnp emer hosp  health numchron adldiff region age black gender</span></span>
+<span><span class="co">## 1   5    0   0    0    0    1 average        2      no  other 6.9   yes   male</span></span>
+<span><span class="co">## 2   1    0   2    0    2    0 average        2      no  other 7.4    no female</span></span>
+<span><span class="co">## 3  13    0   0    0    3    3    poor        4     yes  other 6.6   yes female</span></span>
+<span><span class="co">## 4  16    0   5    0    1    1    poor        2     yes  other 7.6    no   male</span></span>
+<span><span class="co">## 5   3    0   0    0    0    0 average        2     yes  other 7.9    no female</span></span>
+<span><span class="co">## 6  17    0   0    0    0    0    poor        5     yes  other 6.6    no female</span></span>
+<span><span class="co">##   married school faminc employed privins medicaid</span></span>
+<span><span class="co">## 1     yes      6 2.8810      yes     yes       no</span></span>
+<span><span class="co">## 2     yes     10 2.7478       no     yes       no</span></span>
+<span><span class="co">## 3      no     10 0.6532       no      no      yes</span></span>
+<span><span class="co">## 4     yes      3 0.6588       no     yes       no</span></span>
+<span><span class="co">## 5     yes      6 0.6588       no     yes       no</span></span>
+<span><span class="co">## 6      no      7 0.3301       no      no      yes</span></span></code></pre>
+<p>The response variable in this data is the number of physician office visits, variable <code>ofp</code>. A histogram of the count data response can be plotted with</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">DebTrivedi</span><span class="op">$</span><span class="va">ofp</span><span class="op">)</span>,
-  xlab <span class="op">=</span> <span class="st">"Number of physician office visits"</span>,
-  ylab <span class="op">=</span> <span class="st">"Frequency"</span><span class="op">)</span></code></pre></div>
-<p><img src="glm_files/figure-html/unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;">
-which shows very large counts and also a large number of zero counts.
-Our first model is a Poisson regression, which can be estimated with</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">DebTrivedi</span><span class="op">$</span><span class="va">ofp</span><span class="op">)</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Number of physician office visits"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Frequency"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="glm_files/figure-html/unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;"> which shows very large counts and also a large number of zero counts. Our first model is a Poisson regression, which can be estimated with</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Set the seed for reproducibly.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
-
-<span class="co">## Model formula.</span>
-<span class="va">f</span> <span class="op">&lt;-</span> <span class="va">ofp</span> <span class="op">~</span> <span class="va">hosp</span> <span class="op">+</span> <span class="va">health</span> <span class="op">+</span> <span class="va">numchron</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">school</span> <span class="op">+</span> <span class="va">privins</span>
-
-<span class="co">## Estimate model.</span>
-<span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="st">"poisson"</span>, data <span class="op">=</span> <span class="va">DebTrivedi</span>,
-  n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## Set the seed for reproducibly.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Model formula.</span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">ofp</span> <span class="op">~</span> <span class="va">hosp</span> <span class="op">+</span> <span class="va">health</span> <span class="op">+</span> <span class="va">numchron</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">school</span> <span class="op">+</span> <span class="va">privins</span></span>
+<span></span>
+<span><span class="co">## Estimate model.</span></span>
+<span><span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="st">"poisson"</span>, data <span class="op">=</span> <span class="va">DebTrivedi</span>,</span>
+<span>  n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <p>The model summary is shown by</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = "poisson", data = DebTrivedi, n.iter = 12000, </span>
-<span class="co">##     burnin = 2000, thin = 10)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: poisson </span>
-<span class="co">## Link function: lambda = log</span>
-<span class="co">## *---</span>
-<span class="co">## Formula lambda:</span>
-<span class="co">## ---</span>
-<span class="co">## ofp ~ hosp + health + numchron + gender + school + privins</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                     Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## (Intercept)      1.03049  0.98540  1.03074  1.07790      1.029</span>
-<span class="co">## hosp             0.16452  0.15322  0.16440  0.17678      0.165</span>
-<span class="co">## healthpoor       0.24810  0.21558  0.24791  0.27968      0.248</span>
-<span class="co">## healthexcellent -0.36253 -0.42490 -0.36207 -0.30116     -0.362</span>
-<span class="co">## numchron         0.14669  0.13829  0.14641  0.15585      0.147</span>
-<span class="co">## gendermale      -0.11279 -0.13677 -0.11268 -0.08745     -0.112</span>
-<span class="co">## school           0.02606  0.02223  0.02611  0.02960      0.026</span>
-<span class="co">## privinsyes       0.20102  0.16795  0.20116  0.23446      0.202</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.9644 0.8023 0.9986     1</span>
-<span class="co">## ---</span>
-<span class="co">## Sampler summary:</span>
-<span class="co">## -</span>
-<span class="co">## DIC = 35958.86 logLik = -17975.52 pd = 7.813</span>
-<span class="co">## runtime = 34.156</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## AICc = 35959.26 edf = 8 logLik = -17971.61</span>
-<span class="co">## logPost = -18034.23 nobs = 4406 runtime = 0.241</span></code></pre>
-<p>which shows “significant” effects for all covariates, since there are
-no zeros within the 95% credible intervals. We can use randomized
-quantile residuals <span class="citation">(Dunn and Smyth 1996)</span>
-to evaluate how good the models fits to the data.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## bamlss(formula = f, family = "poisson", data = DebTrivedi, n.iter = 12000, </span></span>
+<span><span class="co">##     burnin = 2000, thin = 10)</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Family: poisson </span></span>
+<span><span class="co">## Link function: lambda = log</span></span>
+<span><span class="co">## *---</span></span>
+<span><span class="co">## Formula lambda:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## ofp ~ hosp + health + numchron + gender + school + privins</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                     Mean     2.5%      50%    97.5% parameters</span></span>
+<span><span class="co">## (Intercept)      1.03049  0.98540  1.03074  1.07790      1.029</span></span>
+<span><span class="co">## hosp             0.16452  0.15322  0.16440  0.17678      0.165</span></span>
+<span><span class="co">## healthpoor       0.24810  0.21558  0.24791  0.27968      0.248</span></span>
+<span><span class="co">## healthexcellent -0.36253 -0.42490 -0.36207 -0.30116     -0.362</span></span>
+<span><span class="co">## numchron         0.14669  0.13829  0.14641  0.15585      0.147</span></span>
+<span><span class="co">## gendermale      -0.11279 -0.13677 -0.11268 -0.08745     -0.112</span></span>
+<span><span class="co">## school           0.02606  0.02223  0.02611  0.02960      0.026</span></span>
+<span><span class="co">## privinsyes       0.20102  0.16795  0.20116  0.23446      0.202</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##         Mean   2.5%    50% 97.5%</span></span>
+<span><span class="co">## alpha 0.9644 0.8023 0.9986     1</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Sampler summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## DIC = 35958.86 logLik = -17975.52 pd = 7.813</span></span>
+<span><span class="co">## runtime = 34.156</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Optimizer summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## AICc = 35959.26 edf = 8 logLik = -17971.61</span></span>
+<span><span class="co">## logPost = -18034.23 nobs = 4406 runtime = 0.241</span></span></code></pre>
+<p>which shows “significant” effects for all covariates, since there are no zeros within the 95% credible intervals. We can use randomized quantile residuals <span class="citation">(Dunn and Smyth 1996)</span> to evaluate how good the models fits to the data.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hist-resid"</span>, <span class="st">"qq-resid"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Warning in residuals.bamlss(x, FUN = FUN, ...): non finite quantiles from</span>
-<span class="co">## probabilities, set to NA!</span></code></pre>
-<p><img src="glm_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;">
-Clearly, the plots shows that the model performance is not very good at
-the tails of the data, this might be caused by the large amount of zero
-counts in the data, which is not accounted for using the Poisson
-distribution.</p>
-<p>Therefore, another possible candidate for the response distribution
-is the zero-inflated negative binomial distribution, which is
-implemented in the <em>gamlss</em> package <span class="citation">(<strong>bamlss:Stasinopoulos+Rigby:2018?</strong>)</span>
-in the function <code>ZINBI</code>. The family has 3 parameters
-<code>mu</code>, <code>sigma</code> and <code>nu</code>. In this example
-we model distributional parameters <code>mu</code> and
-<code>sigma</code> in terms of covariates by setting up the model
-formula with</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b1</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hist-resid"</span>, <span class="st">"qq-resid"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in residuals.bamlss(x, FUN = FUN, ...): non finite quantiles from</span></span>
+<span><span class="co">## probabilities, set to NA!</span></span></code></pre>
+<p><img src="glm_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;"> Clearly, the plots shows that the model performance is not very good at the tails of the data, this might be caused by the large amount of zero counts in the data, which is not accounted for using the Poisson distribution.</p>
+<p>Therefore, another possible candidate for the response distribution is the zero-inflated negative binomial distribution, which is implemented in the <em>gamlss</em> package <span class="citation">(<span class="citeproc-not-found" data-reference-id="bamlss:Stasinopoulos+Rigby:2018"><strong>???</strong></span>)</span> in the function <code>ZINBI</code>. The family has 3 parameters <code>mu</code>, <code>sigma</code> and <code>nu</code>. In this example we model distributional parameters <code>mu</code> and <code>sigma</code> in terms of covariates by setting up the model formula with</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-  <span class="va">ofp</span> <span class="op">~</span> <span class="va">hosp</span> <span class="op">+</span> <span class="va">health</span> <span class="op">+</span> <span class="va">numchron</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">school</span> <span class="op">+</span> <span class="va">privins</span>,
-  <span class="va">sigma</span> <span class="op">~</span> <span class="va">hosp</span> <span class="op">+</span> <span class="va">health</span> <span class="op">+</span> <span class="va">numchron</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">school</span> <span class="op">+</span> <span class="va">privins</span>,
-  <span class="va">nu</span> <span class="op">~</span> <span class="fl">1</span>
-<span class="op">)</span></code></pre></div>
-<p>Note, for parameter <code>nu</code> an intercept only model would
-also be the default if the specification is omitted in the model
-formula. The model is estimated with (note, this can take some time)</p>
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="va">ofp</span> <span class="op">~</span> <span class="va">hosp</span> <span class="op">+</span> <span class="va">health</span> <span class="op">+</span> <span class="va">numchron</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">school</span> <span class="op">+</span> <span class="va">privins</span>,</span>
+<span>  <span class="va">sigma</span> <span class="op">~</span> <span class="va">hosp</span> <span class="op">+</span> <span class="va">health</span> <span class="op">+</span> <span class="va">numchron</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">school</span> <span class="op">+</span> <span class="va">privins</span>,</span>
+<span>  <span class="va">nu</span> <span class="op">~</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Note, for parameter <code>nu</code> an intercept only model would also be the default if the specification is omitted in the model formula. The model is estimated with (note, this can take some time)</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Get the gamlss families.</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://www.gamlss.com/" class="external-link">"gamlss"</a></span><span class="op">)</span>
-
-<span class="co">## Set the seed for reproducibly.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
-
-<span class="co">## Estimate model.</span>
-<span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="va">ZINBI</span>, data <span class="op">=</span> <span class="va">DebTrivedi</span>,
-  n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## Get the gamlss families.</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://www.gamlss.com/" class="external-link">"gamlss"</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Set the seed for reproducibly.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Estimate model.</span></span>
+<span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, family <span class="op">=</span> <span class="va">ZINBI</span>, data <span class="op">=</span> <span class="va">DebTrivedi</span>,</span>
+<span>  n.iter <span class="op">=</span> <span class="fl">12000</span>, burnin <span class="op">=</span> <span class="fl">2000</span>, thin <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <p>The model summary gives</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = ZINBI, data = DebTrivedi, n.iter = 12000, </span>
-<span class="co">##     burnin = 2000, thin = 10)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: ZINBI </span>
-<span class="co">## Link function: mu = log, sigma = log, nu = logit</span>
-<span class="co">## *---</span>
-<span class="co">## Formula mu:</span>
-<span class="co">## ---</span>
-<span class="co">## ofp ~ hosp + health + numchron + gender + school + privins</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                     Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## (Intercept)      1.01470  0.88866  1.01485  1.13262      1.016</span>
-<span class="co">## hosp             0.20735  0.16496  0.20773  0.24950      0.210</span>
-<span class="co">## healthpoor       0.21927  0.12495  0.22063  0.31016      0.221</span>
-<span class="co">## healthexcellent -0.35063 -0.47696 -0.34898 -0.23186     -0.341</span>
-<span class="co">## numchron         0.15875  0.13652  0.15845  0.18334      0.159</span>
-<span class="co">## gendermale      -0.11469 -0.17365 -0.11470 -0.05689     -0.115</span>
-<span class="co">## school           0.02641  0.01720  0.02630  0.03495      0.027</span>
-<span class="co">## privinsyes       0.18738  0.09794  0.18607  0.27407      0.184</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##          Mean    2.5%     50% 97.5%</span>
-<span class="co">## alpha 0.67619 0.08023 0.71540     1</span>
-<span class="co">## ---</span>
-<span class="co">## Formula sigma:</span>
-<span class="co">## ---</span>
-<span class="co">## sigma ~ hosp + health + numchron + gender + school + privins</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                      Mean      2.5%       50%     97.5% parameters</span>
-<span class="co">## (Intercept)      0.510961  0.316771  0.508389  0.706571      0.520</span>
-<span class="co">## hosp            -0.028914 -0.095758 -0.028909  0.038187     -0.023</span>
-<span class="co">## healthpoor       0.227347  0.063571  0.231602  0.396216      0.227</span>
-<span class="co">## healthexcellent -0.002851 -0.228342 -0.007384  0.234369      0.003</span>
-<span class="co">## numchron        -0.236836 -0.278745 -0.236980 -0.194826     -0.236</span>
-<span class="co">## gendermale       0.222175  0.105449  0.223875  0.332764      0.225</span>
-<span class="co">## school          -0.012696 -0.028136 -0.012729  0.003863     -0.013</span>
-<span class="co">## privinsyes      -0.449505 -0.587264 -0.452838 -0.308850     -0.452</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##          Mean    2.5%     50% 97.5%</span>
-<span class="co">## alpha 0.61640 0.05323 0.63030     1</span>
-<span class="co">## ---</span>
-<span class="co">## Formula nu:</span>
-<span class="co">## ---</span>
-<span class="co">## nu ~ 1</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##               Mean   2.5%    50%  97.5% parameters</span>
-<span class="co">## (Intercept) -4.210 -5.071 -4.177 -3.607     -4.268</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.9091 0.4316 0.9868     1</span>
-<span class="co">## ---</span>
-<span class="co">## Sampler summary:</span>
-<span class="co">## -</span>
-<span class="co">## DIC = 24206.2 logLik = -12094.4 pd = 17.3959</span>
-<span class="co">## runtime = 987.661</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## AICc = 24205.35 edf = 17 logLik = -12085.61</span>
-<span class="co">## logPost = -12218.66 nobs = 4406 runtime = 2.508</span></code></pre>
-<p>and the corresponding randomized quantile residuals plots are created
-with</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## bamlss(formula = f, family = ZINBI, data = DebTrivedi, n.iter = 12000, </span></span>
+<span><span class="co">##     burnin = 2000, thin = 10)</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Family: ZINBI </span></span>
+<span><span class="co">## Link function: mu = log, sigma = log, nu = logit</span></span>
+<span><span class="co">## *---</span></span>
+<span><span class="co">## Formula mu:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## ofp ~ hosp + health + numchron + gender + school + privins</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                     Mean     2.5%      50%    97.5% parameters</span></span>
+<span><span class="co">## (Intercept)      1.01470  0.88866  1.01485  1.13262      1.016</span></span>
+<span><span class="co">## hosp             0.20735  0.16496  0.20773  0.24950      0.210</span></span>
+<span><span class="co">## healthpoor       0.21927  0.12495  0.22063  0.31016      0.221</span></span>
+<span><span class="co">## healthexcellent -0.35063 -0.47696 -0.34898 -0.23186     -0.341</span></span>
+<span><span class="co">## numchron         0.15875  0.13652  0.15845  0.18334      0.159</span></span>
+<span><span class="co">## gendermale      -0.11469 -0.17365 -0.11470 -0.05689     -0.115</span></span>
+<span><span class="co">## school           0.02641  0.01720  0.02630  0.03495      0.027</span></span>
+<span><span class="co">## privinsyes       0.18738  0.09794  0.18607  0.27407      0.184</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##          Mean    2.5%     50% 97.5%</span></span>
+<span><span class="co">## alpha 0.67619 0.08023 0.71540     1</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Formula sigma:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## sigma ~ hosp + health + numchron + gender + school + privins</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                      Mean      2.5%       50%     97.5% parameters</span></span>
+<span><span class="co">## (Intercept)      0.510961  0.316771  0.508389  0.706571      0.520</span></span>
+<span><span class="co">## hosp            -0.028914 -0.095758 -0.028909  0.038187     -0.023</span></span>
+<span><span class="co">## healthpoor       0.227347  0.063571  0.231602  0.396216      0.227</span></span>
+<span><span class="co">## healthexcellent -0.002851 -0.228342 -0.007384  0.234369      0.003</span></span>
+<span><span class="co">## numchron        -0.236836 -0.278745 -0.236980 -0.194826     -0.236</span></span>
+<span><span class="co">## gendermale       0.222175  0.105449  0.223875  0.332764      0.225</span></span>
+<span><span class="co">## school          -0.012696 -0.028136 -0.012729  0.003863     -0.013</span></span>
+<span><span class="co">## privinsyes      -0.449505 -0.587264 -0.452838 -0.308850     -0.452</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##          Mean    2.5%     50% 97.5%</span></span>
+<span><span class="co">## alpha 0.61640 0.05323 0.63030     1</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Formula nu:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## nu ~ 1</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##               Mean   2.5%    50%  97.5% parameters</span></span>
+<span><span class="co">## (Intercept) -4.210 -5.071 -4.177 -3.607     -4.268</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##         Mean   2.5%    50% 97.5%</span></span>
+<span><span class="co">## alpha 0.9091 0.4316 0.9868     1</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Sampler summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## DIC = 24206.2 logLik = -12094.4 pd = 17.3959</span></span>
+<span><span class="co">## runtime = 987.661</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Optimizer summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## AICc = 24205.35 edf = 17 logLik = -12085.61</span></span>
+<span><span class="co">## logPost = -12218.66 nobs = 4406 runtime = 2.508</span></span></code></pre>
+<p>and the corresponding randomized quantile residuals plots are created with</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hist-resid"</span>, <span class="st">"qq-resid"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="glm_files/figure-html/unnamed-chunk-24-1.png" width="80%" style="display: block; margin: auto;">
-The plots indicate a better model fit compared to the Poisson model,
-however, for very large counts the model performance could probably be
-improved further. The corresponding DIC values are</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hist-resid"</span>, <span class="st">"qq-resid"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="glm_files/figure-html/unnamed-chunk-24-1.png" width="80%" style="display: block; margin: auto;"> The plots indicate a better model fit compared to the Poisson model, however, for very large counts the model performance could probably be improved further. The corresponding DIC values are</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/DIC.html">DIC</a></span><span class="op">(</span><span class="va">b1</span>, <span class="va">b2</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##         DIC        pd</span>
-<span class="co">## b1 35958.86  7.813035</span>
-<span class="co">## b2 24206.20 17.395871</span></code></pre>
-<p>which also state that the zero-inflated negative binomial model is
-better than the Poisson model.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/DIC.html">DIC</a></span><span class="op">(</span><span class="va">b1</span>, <span class="va">b2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##         DIC        pd</span></span>
+<span><span class="co">## b1 35958.86  7.813035</span></span>
+<span><span class="co">## b2 24206.20 17.395871</span></span></code></pre>
+<p>which also state that the zero-inflated negative binomial model is better than the Poisson model.</p>
 </div>
 <div class="section level2">
 <h2 id="large-data-sets">Large data sets<a class="anchor" aria-label="anchor" href="#large-data-sets"></a>
 </h2>
-<p>The R package <em>bamlss</em> provides infrastructures to estimate
-models using large data sets. The default algorithms for posterior mode
-estimation (see function <code><a href="../reference/bfit.html">opt_bfit()</a></code>) and MCMC simulation
-(function <code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>) can be utilized in these situations.
-More precisely, the algorithms make advantage of the fact that usually
-the number of unique observations is much smaller than the number of
-total observations in the data (for a detailed description of the
-algorithms see <span class="citation">Lang et al. (2014)</span>). For
-illustration, we load the precipitation data of the HOMSTART-project
-which was first analyzed in <span class="citation">Umlauf et al.
-(2012)</span> (note, an internet connection is required).</p>
+<p>The R package <em>bamlss</em> provides infrastructures to estimate models using large data sets. The default algorithms for posterior mode estimation (see function <code><a href="../reference/bfit.html">opt_bfit()</a></code>) and MCMC simulation (function <code><a href="../reference/GMCMC.html">sam_GMCMC()</a></code>) can be utilized in these situations. More precisely, the algorithms make advantage of the fact that usually the number of unique observations is much smaller than the number of total observations in the data (for a detailed description of the algorithms see <span class="citation">Lang et al. (2014)</span>). For illustration, we load the precipitation data of the HOMSTART-project which was first analyzed in <span class="citation">Umlauf et al. (2012)</span> (note, an internet connection is required).</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/homstart_data.html">homstart_data</a></span><span class="op">(</span>load <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/homstart_data.html">homstart_data</a></span><span class="op">(</span>load <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">homstart</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##    raw cens  bin    cat     trend month year day   lon  lat id      cos1</span>
-<span class="co">## 1   NA   NA &lt;NA&gt;   &lt;NA&gt; -22.00000   Jan 1948   1 14.75 47.6  1 0.9998518</span>
-<span class="co">## 2 37.0 37.0  yes   high -21.99726   Jan 1948   2 14.75 47.6  1 0.9994074</span>
-<span class="co">## 3  3.0  3.0  yes medium -21.99452   Jan 1948   3 14.75 47.6  1 0.9986668</span>
-<span class="co">## 4  0.0  0.0   no   none -21.99178   Jan 1948   4 14.75 47.6  1 0.9976303</span>
-<span class="co">## 5  5.2  5.2  yes   high -21.98904   Jan 1948   5 14.75 47.6  1 0.9962982</span>
-<span class="co">## 6  0.0  0.0   no   none -21.98630   Jan 1948   6 14.75 47.6  1 0.9946708</span>
-<span class="co">##        cos2       sin1       sin2 weekend elevation</span>
-<span class="co">## 1 0.9994074 0.01721336 0.03442161      no       779</span>
-<span class="co">## 2 0.9976303 0.03442161 0.06880243      no       779</span>
-<span class="co">## 3 0.9946708 0.05161967 0.10310170     yes       779</span>
-<span class="co">## 4 0.9905325 0.06880243 0.13727877     yes       779</span>
-<span class="co">## 5 0.9852201 0.08596480 0.17129314      no       779</span>
-<span class="co">## 6 0.9787401 0.10310170 0.20510450      no       779</span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">homstart</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##    raw cens  bin    cat     trend month year day   lon  lat id      cos1</span></span>
+<span><span class="co">## 1   NA   NA &lt;NA&gt;   &lt;NA&gt; -22.00000   Jan 1948   1 14.75 47.6  1 0.9998518</span></span>
+<span><span class="co">## 2 37.0 37.0  yes   high -21.99726   Jan 1948   2 14.75 47.6  1 0.9994074</span></span>
+<span><span class="co">## 3  3.0  3.0  yes medium -21.99452   Jan 1948   3 14.75 47.6  1 0.9986668</span></span>
+<span><span class="co">## 4  0.0  0.0   no   none -21.99178   Jan 1948   4 14.75 47.6  1 0.9976303</span></span>
+<span><span class="co">## 5  5.2  5.2  yes   high -21.98904   Jan 1948   5 14.75 47.6  1 0.9962982</span></span>
+<span><span class="co">## 6  0.0  0.0   no   none -21.98630   Jan 1948   6 14.75 47.6  1 0.9946708</span></span>
+<span><span class="co">##        cos2       sin1       sin2 weekend elevation</span></span>
+<span><span class="co">## 1 0.9994074 0.01721336 0.03442161      no       779</span></span>
+<span><span class="co">## 2 0.9976303 0.03442161 0.06880243      no       779</span></span>
+<span><span class="co">## 3 0.9946708 0.05161967 0.10310170     yes       779</span></span>
+<span><span class="co">## 4 0.9905325 0.06880243 0.13727877     yes       779</span></span>
+<span><span class="co">## 5 0.9852201 0.08596480 0.17129314      no       779</span></span>
+<span><span class="co">## 6 0.9787401 0.10310170 0.20510450      no       779</span></span></code></pre>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">homstart</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## [1] 1063610      17</span></code></pre>
-<p>The data consists of 1063610 observations. To illustrate how large
-models can be fitted using <em>bamlss</em>, we estimate a logit model
-using the binary response variable <code>bin</code>, which indicates if
-it rained or not.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">homstart</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 1063610      17</span></span></code></pre>
+<p>The data consists of 1063610 observations. To illustrate how large models can be fitted using <em>bamlss</em>, we estimate a logit model using the binary response variable <code>bin</code>, which indicates if it rained or not.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Set the seed for reproducibly.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
-
-<span class="co">## Model formula including a seasonal effect of the day</span>
-<span class="co">## of the year using harmonic regression.</span>
-<span class="va">f</span> <span class="op">&lt;-</span> <span class="va">bin</span> <span class="op">~</span> <span class="va">weekend</span> <span class="op">+</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">cos1</span> <span class="op">+</span> <span class="va">cos2</span> <span class="op">+</span> <span class="va">sin1</span> <span class="op">+</span> <span class="va">sin2</span>
-
-<span class="co">## Estimate model using only unique observations by setting</span>
-<span class="co">## argument binning = TRUE in the bamlss() call. Moreover,</span>
-<span class="co">## only use minimum storage for the returned object by</span>
-<span class="co">## setting light = TRUE.</span>
-<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">homstart</span>, family <span class="op">=</span> <span class="st">"binomial"</span>,
-  binning <span class="op">=</span> <span class="cn">TRUE</span>, light <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p>By setting <code>binning = TRUE</code>, the algorithms only use 33580
-unique observations for model fitting. This could in principle even be
-further utilized if each covariate represents one model term, e.g.:</p>
+<code class="sourceCode R"><span><span class="co">## Set the seed for reproducibly.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Model formula including a seasonal effect of the day</span></span>
+<span><span class="co">## of the year using harmonic regression.</span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">bin</span> <span class="op">~</span> <span class="va">weekend</span> <span class="op">+</span> <span class="va">elevation</span> <span class="op">+</span> <span class="va">cos1</span> <span class="op">+</span> <span class="va">cos2</span> <span class="op">+</span> <span class="va">sin1</span> <span class="op">+</span> <span class="va">sin2</span></span>
+<span></span>
+<span><span class="co">## Estimate model using only unique observations by setting</span></span>
+<span><span class="co">## argument binning = TRUE in the bamlss() call. Moreover,</span></span>
+<span><span class="co">## only use minimum storage for the returned object by</span></span>
+<span><span class="co">## setting light = TRUE.</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">homstart</span>, family <span class="op">=</span> <span class="st">"binomial"</span>,</span>
+<span>  binning <span class="op">=</span> <span class="cn">TRUE</span>, light <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>By setting <code>binning = TRUE</code>, the algorithms only use 33580 unique observations for model fitting. This could in principle even be further utilized if each covariate represents one model term, e.g.:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">bin</span> <span class="op">~</span> <span class="va">weekend</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">elevation</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">cos1</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">cos2</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sin1</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sin2</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p>Which is a bit of a hack using the random effects smooth constructor
-and setting <code>fx = TRUE</code>, forcing the smoother to use fixed
-effects (linear effects) estimation. However, by doing so, the resulting
-number of unique observations for the harmonic part is only 365 and for
-elevation only 46, which saves quite a lot of memory storage.</p>
-<p>In this example, we are interested if it is more likely to rain on
-weekends than during the week (see also <span class="citation">Umlauf et
-al. (2012)</span> and <span class="citation">Umlauf, Klein, and Zeileis
-(2018)</span> for a more detailed analysis). The model summary
-suggests</p>
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">bin</span> <span class="op">~</span> <span class="va">weekend</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">elevation</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">cos1</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">cos2</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sin1</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">sin2</span>,bs<span class="op">=</span><span class="st">"re"</span>,fx<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Which is a bit of a hack using the random effects smooth constructor and setting <code>fx = TRUE</code>, forcing the smoother to use fixed effects (linear effects) estimation. However, by doing so, the resulting number of unique observations for the harmonic part is only 365 and for elevation only 46, which saves quite a lot of memory storage.</p>
+<p>In this example, we are interested if it is more likely to rain on weekends than during the week (see also <span class="citation">Umlauf et al. (2012)</span> and <span class="citation">Umlauf, Klein, and Zeileis (2018)</span> for a more detailed analysis). The model summary suggests</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = "binomial", data = homstart, light = TRUE, </span>
-<span class="co">##     binning = TRUE)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: binomial </span>
-<span class="co">## Link function: pi = logit</span>
-<span class="co">## *---</span>
-<span class="co">## Formula pi:</span>
-<span class="co">## ---</span>
-<span class="co">## bin ~ weekend + elevation + cos1 + cos2 + sin1 + sin2</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                   Mean       2.5%        50%      97.5% parameters</span>
-<span class="co">## (Intercept) -3.118e-01 -3.209e-01 -3.118e-01 -3.028e-01     -0.312</span>
-<span class="co">## weekendyes   1.241e-02  4.298e-03  1.244e-02  2.083e-02      0.012</span>
-<span class="co">## elevation    6.440e-05  5.241e-05  6.433e-05  7.664e-05      0.000</span>
-<span class="co">## cos1        -2.652e-01 -2.707e-01 -2.652e-01 -2.596e-01     -0.265</span>
-<span class="co">## cos2         1.462e-01  1.405e-01  1.461e-01  1.520e-01      0.146</span>
-<span class="co">## sin1         7.021e-02  6.494e-02  7.025e-02  7.590e-02      0.070</span>
-<span class="co">## sin2        -2.897e-02 -3.462e-02 -2.900e-02 -2.359e-02     -0.029</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.9988 0.9918 1.0000     1</span>
-<span class="co">## ---</span>
-<span class="co">## Sampler summary:</span>
-<span class="co">## -</span>
-<span class="co">## runtime = 532.388</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## AICc = 1330320 edf = 7 logLik = -665152.9</span>
-<span class="co">## logPost = -665207.7 nobs = 980633 runtime = 2.349</span></code></pre>
-<p>that the weekend effect is very little and since we did not account
-for any spatial correlations in this example, the effect is most
-probably not existing (at least in Austria). Note, because we set
-<code>light = TRUE</code> in the <code><a href="../reference/bamlss.html">bamlss()</a></code> call, there will
-be no real sampler summary except of the presented runtime of the
-sampler. The reason is, that computing the DIC from the posterior
-samples can take quite long and can lead to memory storage problems,
-too.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## bamlss(formula = f, family = "binomial", data = homstart, light = TRUE, </span></span>
+<span><span class="co">##     binning = TRUE)</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Family: binomial </span></span>
+<span><span class="co">## Link function: pi = logit</span></span>
+<span><span class="co">## *---</span></span>
+<span><span class="co">## Formula pi:</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## bin ~ weekend + elevation + cos1 + cos2 + sin1 + sin2</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Parametric coefficients:</span></span>
+<span><span class="co">##                   Mean       2.5%        50%      97.5% parameters</span></span>
+<span><span class="co">## (Intercept) -3.118e-01 -3.209e-01 -3.118e-01 -3.028e-01     -0.312</span></span>
+<span><span class="co">## weekendyes   1.241e-02  4.298e-03  1.244e-02  2.083e-02      0.012</span></span>
+<span><span class="co">## elevation    6.440e-05  5.241e-05  6.433e-05  7.664e-05      0.000</span></span>
+<span><span class="co">## cos1        -2.652e-01 -2.707e-01 -2.652e-01 -2.596e-01     -0.265</span></span>
+<span><span class="co">## cos2         1.462e-01  1.405e-01  1.461e-01  1.520e-01      0.146</span></span>
+<span><span class="co">## sin1         7.021e-02  6.494e-02  7.025e-02  7.590e-02      0.070</span></span>
+<span><span class="co">## sin2        -2.897e-02 -3.462e-02 -2.900e-02 -2.359e-02     -0.029</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## Acceptance probability:</span></span>
+<span><span class="co">##         Mean   2.5%    50% 97.5%</span></span>
+<span><span class="co">## alpha 0.9988 0.9918 1.0000     1</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Sampler summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## runtime = 260.858</span></span>
+<span><span class="co">## ---</span></span>
+<span><span class="co">## Optimizer summary:</span></span>
+<span><span class="co">## -</span></span>
+<span><span class="co">## AICc = 1330320 edf = 7 logLik = -665152.9</span></span>
+<span><span class="co">## logPost = -665207.7 nobs = 980633 runtime = 1.483</span></span></code></pre>
+<p>that the weekend effect is very little and since we did not account for any spatial correlations in this example, the effect is most probably not existing (at least in Austria). Note, because we set <code>light = TRUE</code> in the <code><a href="../reference/bamlss.html">bamlss()</a></code> call, there will be no real sampler summary except of the presented runtime of the sampler. The reason is, that computing the DIC from the posterior samples can take quite long and can lead to memory storage problems, too.</p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-bamlss:Deb+Trivedi:1997" class="csl-entry">
-Deb, Partha, and P. K. Trivedi. 1997. <span>“Demand for Medical Care by
-the Elderly: A Finite Mixture Approach.”</span> <em>Journal of Applied
-Econometrics</em> 12 (3): 313–36. <a href="https://doi.org/10.1002/(SICI)1099-1255(199705)12:3&lt;313::AID-JAE440&gt;3.0.CO;2-G" class="external-link">https://doi.org/10.1002/(SICI)1099-1255(199705)12:3&lt;313::AID-JAE440&gt;3.0.CO;2-G</a>.
+<div id="refs" class="references hanging-indent">
+<div id="ref-bamlss:Deb+Trivedi:1997">
+<p>Deb, Partha, and P. K. Trivedi. 1997. “Demand for Medical Care by the Elderly: A Finite Mixture Approach.” <em>Journal of Applied Econometrics</em> 12 (3): 313–36. <a href="https://doi.org/10.1002/(SICI)1099-1255(199705)12:3%3C313::AID-JAE440%3E3.0.CO;2-G" class="external-link">https://doi.org/10.1002/(SICI)1099-1255(199705)12:3&lt;313::AID-JAE440&gt;3.0.CO;2-G</a>.</p>
 </div>
-<div id="ref-bamlss:Dunn+Gordon:1996" class="csl-entry">
-Dunn, Peter K., and Gordon K. Smyth. 1996. <span>“Randomized Quantile
-Residuals.”</span> <em>Journal of Computational and Graphical
-Statistics</em> 5 (3): 236–44.
+<div id="ref-bamlss:Dunn+Gordon:1996">
+<p>Dunn, Peter K., and Gordon K. Smyth. 1996. “Randomized Quantile Residuals.” <em>Journal of Computational and Graphical Statistics</em> 5 (3): 236–44.</p>
 </div>
-<div id="ref-bamlss:Kleiber+Zeileis:2008" class="csl-entry">
-Kleiber, Christian, and Achim Zeileis. 2008. <em>Applied Econometrics
-with <span>R</span></em>. New York: Springer-Verlag. <a href="https://doi.org/10.1007/978-0-387-77318-6" class="external-link">https://doi.org/10.1007/978-0-387-77318-6</a>.
+<div id="ref-bamlss:Kleiber+Zeileis:2008">
+<p>Kleiber, Christian, and Achim Zeileis. 2008. <em>Applied Econometrics with R</em>. New York: Springer-Verlag. <a href="https://doi.org/10.1007/978-0-387-77318-6" class="external-link">https://doi.org/10.1007/978-0-387-77318-6</a>.</p>
 </div>
-<div id="ref-bamlss:Kleiber+Zeileis:2018" class="csl-entry">
-———. 2018. <em>AER: Applied Econometrics with r</em>. <a href="https://CRAN.R-project.org/package=AER" class="external-link">https://CRAN.R-project.org/package=AER</a>.
+<div id="ref-bamlss:Kleiber+Zeileis:2018">
+<p>———. 2018. <em>AER: Applied Econometrics with R</em>. <a href="https://CRAN.R-project.org/package=AER" class="external-link">https://CRAN.R-project.org/package=AER</a>.</p>
 </div>
-<div id="ref-bamlss:Lang+Umlauf+Wechselberger+Harttgen+Kneib:2014" class="csl-entry">
-Lang, Stefan, Nikolaus Umlauf, Peter Wechselberger, Kenneth Harttgen,
-and Thomas Kneib. 2014. <span>“Multilevel Structured Additive
-Regression.”</span> <em>Statistics and Computing</em> 24 (2): 223–38. <a href="https://doi.org/10.1007/s11222-012-9366-0" class="external-link">https://doi.org/10.1007/s11222-012-9366-0</a>.
+<div id="ref-bamlss:Lang+Umlauf+Wechselberger+Harttgen+Kneib:2014">
+<p>Lang, Stefan, Nikolaus Umlauf, Peter Wechselberger, Kenneth Harttgen, and Thomas Kneib. 2014. “Multilevel Structured Additive Regression.” <em>Statistics and Computing</em> 24 (2): 223–38. <a href="https://doi.org/10.1007/s11222-012-9366-0" class="external-link">https://doi.org/10.1007/s11222-012-9366-0</a>.</p>
 </div>
-<div id="ref-bamlss:Umlauf+Klein+Zeileis:2017" class="csl-entry">
-Umlauf, Nikolaus, Nadja Klein, and Achim Zeileis. 2018.
-<span>“<span>BAMLSS</span>: <span>B</span>ayesian Additive Models for
-Location, Scale and Shape (and Beyond).”</span> <em>Journal of
-Computational and Graphical Statistics</em> 27 (3): 612–27. <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link">https://doi.org/10.1080/10618600.2017.1407325</a>.
+<div id="ref-bamlss:Umlauf+Klein+Zeileis:2017">
+<p>Umlauf, Nikolaus, Nadja Klein, and Achim Zeileis. 2018. “BAMLSS: Bayesian Additive Models for Location, Scale and Shape (and Beyond).” <em>Journal of Computational and Graphical Statistics</em> 27 (3): 612–27. <a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link">https://doi.org/10.1080/10618600.2017.1407325</a>.</p>
 </div>
-<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
-Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
-<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
-Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
+<div id="ref-bamlss:Umlauf+bamlss:2018">
+<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.</p>
 </div>
-<div id="ref-bamlss:Umlauf+Mayr+Messner:2012" class="csl-entry">
-Umlauf, Nikolaus, Georg Mayr, Jakob Messner, and Achim Zeileis. 2012.
-<span>“Why Does It Always Rain on Me? <span>A</span> Spatio-Temporal
-Analysis of Precipitation in <span>A</span>ustria.”</span> <em>Austrian
-Journal of Statistics</em> 41 (1): 81–92. <a href="https://doi.org/10.1002/joc.4913" class="external-link">https://doi.org/10.1002/joc.4913</a>.
+<div id="ref-bamlss:Umlauf+Mayr+Messner:2012">
+<p>Umlauf, Nikolaus, Georg Mayr, Jakob Messner, and Achim Zeileis. 2012. “Why Does It Always Rain on Me? A Spatio-Temporal Analysis of Precipitation in Austria.” <em>Austrian Journal of Statistics</em> 41 (1): 81–92. <a href="https://doi.org/10.1002/joc.4913" class="external-link">https://doi.org/10.1002/joc.4913</a>.</p>
 </div>
-<div id="ref-bamlss:Zeileis+Kleiber+Jackman:2008" class="csl-entry">
-Zeileis, Achim, Christian Kleiber, and Simon Jackman. 2008.
-<span>“Regression Models for Count Data in r.”</span> <em>Journal of
-Statistical Software, Articles</em> 27 (8): 1–25. <a href="https://doi.org/10.18637/jss.v027.i08" class="external-link">https://doi.org/10.18637/jss.v027.i08</a>.
+<div id="ref-bamlss:Zeileis+Kleiber+Jackman:2008">
+<p>Zeileis, Achim, Christian Kleiber, and Simon Jackman. 2008. “Regression Models for Count Data in R.” <em>Journal of Statistical Software, Articles</em> 27 (8): 1–25. <a href="https://doi.org/10.18637/jss.v027.i08" class="external-link">https://doi.org/10.18637/jss.v027.i08</a>.</p>
 </div>
 </div>
 </div>
@@ -729,7 +616,7 @@ Statistical Software, Articles</em> 27 (8): 1–25. <a href="https://doi.org/10.
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

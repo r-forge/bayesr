@@ -19,7 +19,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -122,64 +122,64 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## Gradient boosting optimizer.</span>
-<span class="fu">opt_boost</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, weights <span class="op">=</span> <span class="cn">NULL</span>,
-  offset <span class="op">=</span> <span class="cn">NULL</span>, nu <span class="op">=</span> <span class="fl">0.1</span>, nu.adapt <span class="op">=</span> <span class="cn">TRUE</span>, df <span class="op">=</span> <span class="fl">4</span>, maxit <span class="op">=</span> <span class="fl">400</span>,
-  mstop <span class="op">=</span> <span class="cn">NULL</span>, maxq <span class="op">=</span> <span class="cn">NULL</span>, qsel.splitfactor <span class="op">=</span> <span class="cn">FALSE</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,
-  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>,
-  nback <span class="op">=</span> <span class="cn">NULL</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>, initialize <span class="op">=</span> <span class="cn">TRUE</span>,
-  stop.criterion <span class="op">=</span> <span class="cn">NULL</span>, select.type <span class="op">=</span> <span class="fl">1</span>,
-  force.stop <span class="op">=</span> <span class="cn">TRUE</span>, hatmatrix <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,
-  reverse.edf <span class="op">=</span> <span class="cn">FALSE</span>, approx.edf <span class="op">=</span> <span class="cn">FALSE</span>,
-  always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">boost</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, weights <span class="op">=</span> <span class="cn">NULL</span>,
-  offset <span class="op">=</span> <span class="cn">NULL</span>, nu <span class="op">=</span> <span class="fl">0.1</span>, nu.adapt <span class="op">=</span> <span class="cn">TRUE</span>, df <span class="op">=</span> <span class="fl">4</span>, maxit <span class="op">=</span> <span class="fl">400</span>,
-  mstop <span class="op">=</span> <span class="cn">NULL</span>, maxq <span class="op">=</span> <span class="cn">NULL</span>, qsel.splitfactor <span class="op">=</span> <span class="cn">FALSE</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,
-  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>,
-  nback <span class="op">=</span> <span class="cn">NULL</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>, initialize <span class="op">=</span> <span class="cn">TRUE</span>,
-  stop.criterion <span class="op">=</span> <span class="cn">NULL</span>, select.type <span class="op">=</span> <span class="fl">1</span>,
-  force.stop <span class="op">=</span> <span class="cn">TRUE</span>, hatmatrix <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,
-  reverse.edf <span class="op">=</span> <span class="cn">FALSE</span>, approx.edf <span class="op">=</span> <span class="cn">FALSE</span>,
-  always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Modified likelihood based boosting.</span>
-<span class="fu">opt_boostm</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,
-  nu <span class="op">=</span> <span class="fl">0.1</span>, df <span class="op">=</span> <span class="fl">3</span>, maxit <span class="op">=</span> <span class="fl">400</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,
-  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>,
-  initialize <span class="op">=</span> <span class="cn">TRUE</span>, stop.criterion <span class="op">=</span> <span class="st">"BIC"</span>,
-  force.stop <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,
-  do.optim <span class="op">=</span> <span class="cn">TRUE</span>, always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">boostm</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,
-  nu <span class="op">=</span> <span class="fl">0.1</span>, df <span class="op">=</span> <span class="fl">3</span>, maxit <span class="op">=</span> <span class="fl">400</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,
-  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>,
-  initialize <span class="op">=</span> <span class="cn">TRUE</span>, stop.criterion <span class="op">=</span> <span class="st">"BIC"</span>,
-  force.stop <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,
-  do.optim <span class="op">=</span> <span class="cn">TRUE</span>, always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Boosting summary extractor.</span>
-<span class="fu">boost_summary</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Plot all boosting paths.</span>
-<span class="fu">boost_plot</span><span class="op">(</span><span class="va">x</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"loglik"</span>, <span class="st">"loglik.contrib"</span>, <span class="st">"parameters"</span>,
-  <span class="st">"aic"</span>, <span class="st">"bic"</span>, <span class="st">"user"</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="cn">TRUE</span>, spar <span class="op">=</span> <span class="cn">TRUE</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,
-  name <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">NULL</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, color <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Boosting summary printing and plotting.</span>
-<span class="co"># S3 method for boost_summary</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, summary <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>,
-  which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"loglik"</span>, <span class="st">"loglik.contrib"</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="cn">TRUE</span>,
-  spar <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
-<span class="co"># S3 method for boost_summary</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Model frame for out-of-sample selection.</span>
-<span class="fu">boost_frame</span><span class="op">(</span><span class="va">formula</span>, <span class="va">train</span>, <span class="va">test</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## Gradient boosting optimizer.</span></span>
+<span><span class="fu">opt_boost</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  offset <span class="op">=</span> <span class="cn">NULL</span>, nu <span class="op">=</span> <span class="fl">0.1</span>, nu.adapt <span class="op">=</span> <span class="cn">TRUE</span>, df <span class="op">=</span> <span class="fl">4</span>, maxit <span class="op">=</span> <span class="fl">400</span>,</span>
+<span>  mstop <span class="op">=</span> <span class="cn">NULL</span>, maxq <span class="op">=</span> <span class="cn">NULL</span>, qsel.splitfactor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>,</span>
+<span>  nback <span class="op">=</span> <span class="cn">NULL</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>, initialize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  stop.criterion <span class="op">=</span> <span class="cn">NULL</span>, select.type <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  force.stop <span class="op">=</span> <span class="cn">TRUE</span>, hatmatrix <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,</span>
+<span>  reverse.edf <span class="op">=</span> <span class="cn">FALSE</span>, approx.edf <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">boost</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  offset <span class="op">=</span> <span class="cn">NULL</span>, nu <span class="op">=</span> <span class="fl">0.1</span>, nu.adapt <span class="op">=</span> <span class="cn">TRUE</span>, df <span class="op">=</span> <span class="fl">4</span>, maxit <span class="op">=</span> <span class="fl">400</span>,</span>
+<span>  mstop <span class="op">=</span> <span class="cn">NULL</span>, maxq <span class="op">=</span> <span class="cn">NULL</span>, qsel.splitfactor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>,</span>
+<span>  nback <span class="op">=</span> <span class="cn">NULL</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>, initialize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  stop.criterion <span class="op">=</span> <span class="cn">NULL</span>, select.type <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  force.stop <span class="op">=</span> <span class="cn">TRUE</span>, hatmatrix <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,</span>
+<span>  reverse.edf <span class="op">=</span> <span class="cn">FALSE</span>, approx.edf <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Modified likelihood based boosting.</span></span>
+<span><span class="fu">opt_boostm</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nu <span class="op">=</span> <span class="fl">0.1</span>, df <span class="op">=</span> <span class="fl">3</span>, maxit <span class="op">=</span> <span class="fl">400</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  initialize <span class="op">=</span> <span class="cn">TRUE</span>, stop.criterion <span class="op">=</span> <span class="st">"BIC"</span>,</span>
+<span>  force.stop <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,</span>
+<span>  do.optim <span class="op">=</span> <span class="cn">TRUE</span>, always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">boostm</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nu <span class="op">=</span> <span class="fl">0.1</span>, df <span class="op">=</span> <span class="fl">3</span>, maxit <span class="op">=</span> <span class="fl">400</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, flush <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  initialize <span class="op">=</span> <span class="cn">TRUE</span>, stop.criterion <span class="op">=</span> <span class="st">"BIC"</span>,</span>
+<span>  force.stop <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">stop.criterion</span><span class="op">)</span>,</span>
+<span>  do.optim <span class="op">=</span> <span class="cn">TRUE</span>, always <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Boosting summary extractor.</span></span>
+<span><span class="fu">boost_summary</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Plot all boosting paths.</span></span>
+<span><span class="fu">boost_plot</span><span class="op">(</span><span class="va">x</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"loglik"</span>, <span class="st">"loglik.contrib"</span>, <span class="st">"parameters"</span>,</span>
+<span>  <span class="st">"aic"</span>, <span class="st">"bic"</span>, <span class="st">"user"</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="cn">TRUE</span>, spar <span class="op">=</span> <span class="cn">TRUE</span>, mstop <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>, drop <span class="op">=</span> <span class="cn">NULL</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, color <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Boosting summary printing and plotting.</span></span>
+<span><span class="co"># S3 method for boost_summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, summary <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"loglik"</span>, <span class="st">"loglik.contrib"</span><span class="op">)</span>, intercept <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  spar <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S3 method for boost_summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Model frame for out-of-sample selection.</span></span>
+<span><span class="fu">boost_frame</span><span class="op">(</span><span class="va">formula</span>, <span class="va">train</span>, <span class="va">test</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -359,17 +359,17 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate data.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Estimate model.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">+</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">lat</span> <span class="op">+</span></span>
-<span class="r-in">  <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lat</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="va">opt_boost</span>,</span>
-<span class="r-in">  sampler <span class="op">=</span> <span class="cn">FALSE</span>, scale.d <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span class="r-in">  maxit <span class="op">=</span> <span class="fl">1000</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate data.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Estimate model.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">+</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">lat</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lat</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="va">opt_boost</span>,</span></span>
+<span class="r-in"><span>  sampler <span class="op">=</span> <span class="cn">FALSE</span>, scale.d <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="fl">0.01</span>,</span></span>
+<span class="r-in"><span>  maxit <span class="op">=</span> <span class="fl">1000</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik -181.739 eps 0.0123 iteration    2 qsel 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik -180.556 eps 0.0122 iteration    3 qsel 1</span>
@@ -1371,13 +1371,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik  89.3439 eps 0.0023 iteration  999 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik  89.6935 eps 0.0076 iteration 1000 qsel 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time: 13.86sec</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot estimated effects.</span></span>
-<span class="r-in"><span class="co">## plot(b)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Print and plot the boosting summary.</span></span>
-<span class="r-in"><span class="fu">boost_summary</span><span class="op">(</span><span class="va">b</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time:  2.54sec</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot estimated effects.</span></span></span>
+<span class="r-in"><span><span class="co">## plot(b)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Print and plot the boosting summary.</span></span></span>
+<span class="r-in"><span><span class="fu">boost_summary</span><span class="op">(</span><span class="va">b</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> logLik. = 89.6935 -&gt; at mstop = 1000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
@@ -1398,13 +1398,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>             sigma % selected LogLik contrib.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)             34.7           58.18</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="co">## boost_plot(b, which = 1)</span></span>
-<span class="r-in"><span class="co">## boost_plot(b, which = 2)</span></span>
-<span class="r-in"><span class="co">## boost_plot(b, which = 3, name = "mu.s.te(lon,lat).")</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Extract estimated parameters for certain</span></span>
-<span class="r-in"><span class="co">## boosting iterations.</span></span>
-<span class="r-in"><span class="fu"><a href="parameters.html">parameters</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="co">## boost_plot(b, which = 1)</span></span></span>
+<span class="r-in"><span><span class="co">## boost_plot(b, which = 2)</span></span></span>
+<span class="r-in"><span><span class="co">## boost_plot(b, which = 3, name = "mu.s.te(lon,lat).")</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Extract estimated parameters for certain</span></span></span>
+<span class="r-in"><span><span class="co">## boosting iterations.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="parameters.html">parameters</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mu.p.(Intercept)              mu.p.x1              mu.p.x2 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          -0.05841161           0.00000000           0.00000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              mu.p.x3             mu.p.lon             mu.p.lat </span>
@@ -1457,25 +1457,25 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>           0.00000000           0.00000000           0.00000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  sigma.p.(Intercept) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          -1.05304572 </span>
-<span class="r-in"><span class="fu"><a href="parameters.html">parameters</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="parameters.html">parameters</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     mu.p.(Intercept)              mu.p.x1              mu.p.x2 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         -0.058411614          0.000000000          0.000000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              mu.p.x3             mu.p.lon             mu.p.lat </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          0.000000000          0.000000000          0.000000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x1).b1        mu.s.s(x1).b2        mu.s.s(x1).b3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.039268945          0.001350402          0.015219138 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.039268945         -0.001350402          0.015219138 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x1).b4        mu.s.s(x1).b5        mu.s.s(x1).b6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.009161954          0.007104356         -0.005601264 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.009161954          0.007104356          0.005601264 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x1).b7        mu.s.s(x1).b8        mu.s.s(x1).b9 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          0.001180029          0.001274986         -0.126444256 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x2).b1        mu.s.s(x2).b2        mu.s.s(x2).b3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         -0.001271167          0.069043611         -0.001003697 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         -0.001271167          0.069043611          0.001003697 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x2).b4        mu.s.s(x2).b5        mu.s.s(x2).b6 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         -0.024173043          0.004058185         -0.021312378 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x2).b7        mu.s.s(x2).b8        mu.s.s(x2).b9 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         -0.007109845          0.055989599          0.007363287 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x3).b1        mu.s.s(x3).b2        mu.s.s(x3).b3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          0.024911838         -0.029259307          0.012201572 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.024911838         -0.029259307         -0.012201572 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x3).b4        mu.s.s(x3).b5        mu.s.s(x3).b6 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          0.022586312          0.016285732          0.035045844 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        mu.s.s(x3).b7        mu.s.s(x3).b8        mu.s.s(x3).b9 </span>
@@ -1510,9 +1510,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>          0.000000000          0.000000000          0.000000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  sigma.p.(Intercept) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         -1.053045720 </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Also works with predict().</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"cbind"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Also works with predict().</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"cbind"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mu     sigma</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -0.05841161 -1.053046</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -0.05841161 -1.053046</span>
@@ -1520,7 +1520,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.05841161 -1.053046</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -0.05841161 -1.053046</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6,] -0.05841161 -1.053046</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"cbind"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"cbind"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, mstop <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               mu     sigma</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  0.01910224 -1.053046</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.02862474 -1.053046</span>
@@ -1528,19 +1528,19 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.02623836 -1.053046</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -0.15807300 -1.053046</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6,] -0.01981386 -1.053046</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Another example using the modified likelihood</span></span>
-<span class="r-in"><span class="co">## boosting algorithm.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">+</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">lat</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lat</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">sigma</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">+</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">lat</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lat</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="va">opt_boostm</span>,</span>
-<span class="r-in">  sampler <span class="op">=</span> <span class="cn">FALSE</span>, scale.d <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span class="r-in">  maxit <span class="op">=</span> <span class="fl">400</span>, stop.criterion <span class="op">=</span> <span class="st">"AIC"</span>, force.stop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Another example using the modified likelihood</span></span></span>
+<span class="r-in"><span><span class="co">## boosting algorithm.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">num</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">+</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">lat</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lat</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">sigma</span> <span class="op">~</span> <span class="va">x1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op">+</span> <span class="va">x3</span> <span class="op">+</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">lat</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lat</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="va">opt_boostm</span>,</span></span>
+<span class="r-in"><span>  sampler <span class="op">=</span> <span class="cn">FALSE</span>, scale.d <span class="op">=</span> <span class="cn">TRUE</span>, nu <span class="op">=</span> <span class="fl">0.05</span>,</span></span>
+<span class="r-in"><span>  maxit <span class="op">=</span> <span class="fl">400</span>, stop.criterion <span class="op">=</span> <span class="st">"AIC"</span>, force.stop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AIC 342.6370 logLik -165.617 edf 5.70  eps 0.2729 iteration   2 qsel 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AIC 317.4701 logLik -153.617 edf 5.11  eps 0.8732 iteration   3 qsel 1</span>
@@ -1942,45 +1942,45 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> AIC 114.3807 logLik -46.4399 edf 10.7  eps 0.0000 iteration 399 qsel 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> AIC 114.3807 logLik -46.4399 edf 10.7  eps 0.0000 iteration 400 qsel 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time:  3.31min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time: 34.35sec</span>
 <span class="r-plt img"><img src="boost-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot estimated effects.</span></span>
-<span class="r-in"><span class="co">## plot(b)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot AIC and log-lik contributions.</span></span>
-<span class="r-in"><span class="co">## boost_plot(b, "AIC")</span></span>
-<span class="r-in"><span class="co">## boost_plot(b, "loglik.contrib")</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Out-of-sample selection of model terms.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Split data into training and testing</span></span>
-<span class="r-in"><span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">dtest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">d</span>, <span class="va">i</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">dtrain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">d</span>, <span class="va">i</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Model formula</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">sigma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Create model frame for out-of-sample selection.</span></span>
-<span class="r-in"><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu">boost_frame</span><span class="op">(</span><span class="va">f</span>, train <span class="op">=</span> <span class="va">dtrain</span>, test <span class="op">=</span> <span class="va">dtest</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Out-of-sample selection function.</span></span>
-<span class="r-in"><span class="va">sfun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="va">sm</span><span class="op">$</span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">parameters</span></span>
-<span class="r-in">  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">sm</span>, type <span class="op">=</span> <span class="st">"parameter"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">sm</span><span class="op">$</span><span class="va">family</span><span class="op">$</span><span class="fu">d</span><span class="op">(</span><span class="va">dtest</span><span class="op">$</span><span class="va">num</span>, <span class="va">p</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Start boosting with out-of-sample negative</span></span>
-<span class="r-in"><span class="co">## log-likelihood selection of model terms.</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">dtrain</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span>, optimizer <span class="op">=</span> <span class="va">opt_boost</span>,</span>
-<span class="r-in">  selectfun <span class="op">=</span> <span class="va">sfun</span>, always <span class="op">=</span> <span class="st">"best"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot estimated effects.</span></span></span>
+<span class="r-in"><span><span class="co">## plot(b)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot AIC and log-lik contributions.</span></span></span>
+<span class="r-in"><span><span class="co">## boost_plot(b, "AIC")</span></span></span>
+<span class="r-in"><span><span class="co">## boost_plot(b, "loglik.contrib")</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Out-of-sample selection of model terms.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Split data into training and testing</span></span></span>
+<span class="r-in"><span><span class="va">i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">d</span>, <span class="va">i</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtrain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">d</span>, <span class="va">i</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Model formula</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">sigma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Create model frame for out-of-sample selection.</span></span></span>
+<span class="r-in"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu">boost_frame</span><span class="op">(</span><span class="va">f</span>, train <span class="op">=</span> <span class="va">dtrain</span>, test <span class="op">=</span> <span class="va">dtest</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Out-of-sample selection function.</span></span></span>
+<span class="r-in"><span><span class="va">sfun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">sm</span><span class="op">$</span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">parameters</span></span></span>
+<span class="r-in"><span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">sm</span>, type <span class="op">=</span> <span class="st">"parameter"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">-</span><span class="fl">1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">sm</span><span class="op">$</span><span class="va">family</span><span class="op">$</span><span class="fu">d</span><span class="op">(</span><span class="va">dtest</span><span class="op">$</span><span class="va">num</span>, <span class="va">p</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Start boosting with out-of-sample negative</span></span></span>
+<span class="r-in"><span><span class="co">## log-likelihood selection of model terms.</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">dtrain</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span>, optimizer <span class="op">=</span> <span class="va">opt_boost</span>,</span></span>
+<span class="r-in"><span>  selectfun <span class="op">=</span> <span class="va">sfun</span>, always <span class="op">=</span> <span class="st">"best"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> userIC 2413.338 logLik -598.545 eps 0.0531 iteration   2 qsel 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> userIC 2409.204 logLik -546.484 eps 0.0509 iteration   3 qsel 2</span>
@@ -2119,12 +2119,12 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> userIC 2365.390 logLik 497.9755 eps 0.0106 iteration 136 qsel 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> userIC 2365.380 logLik 498.0168 eps 0.0233 iteration 137 qsel 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time:  5.43sec</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  elapsed time:  2.89sec</span>
 <span class="r-plt img"><img src="boost-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Plot curve of negative out-of-sample log-likelihood.</span></span>
-<span class="r-in"><span class="co">## boost_plot(b, which = "user")</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Plot curve of negative out-of-sample log-likelihood.</span></span></span>
+<span class="r-in"><span><span class="co">## boost_plot(b, which = "user")</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -2139,7 +2139,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -124,17 +124,17 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">opt_Cox</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">start</span>, <span class="va">weights</span>, <span class="va">offset</span>,
-  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>,
-  nu <span class="op">=</span> <span class="fl">0.1</span>, update.nu <span class="op">=</span> <span class="cn">TRUE</span>,
-  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, maxit <span class="op">=</span> <span class="fl">400</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">cox_mode</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">start</span>, <span class="va">weights</span>, <span class="va">offset</span>,
-  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>,
-  nu <span class="op">=</span> <span class="fl">0.1</span>, update.nu <span class="op">=</span> <span class="cn">TRUE</span>,
-  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, maxit <span class="op">=</span> <span class="fl">400</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">opt_Cox</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">start</span>, <span class="va">weights</span>, <span class="va">offset</span>,</span>
+<span>  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>,</span>
+<span>  nu <span class="op">=</span> <span class="fl">0.1</span>, update.nu <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, maxit <span class="op">=</span> <span class="fl">400</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cox_mode</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">start</span>, <span class="va">weights</span>, <span class="va">offset</span>,</span>
+<span>  criterion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span><span class="op">)</span>,</span>
+<span>  nu <span class="op">=</span> <span class="fl">0.1</span>, update.nu <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eps <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">^</span><span class="fl">0.25</span>, maxit <span class="op">=</span> <span class="fl">400</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">4</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -231,7 +231,7 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Please see the examples of function sam_Cox()!</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Please see the examples of function sam_Cox()!</span></span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>
@@ -247,7 +247,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

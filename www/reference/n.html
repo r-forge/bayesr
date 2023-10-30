@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -118,20 +118,20 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## The neural network smooth constructor.</span>
-<span class="fu">n</span><span class="op">(</span><span class="va">...</span>, k <span class="op">=</span> <span class="fl">10</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-
-<span class="co">## Initialize weights.</span>
-<span class="fu">n.weights</span><span class="op">(</span><span class="va">nodes</span>, <span class="va">k</span>, r <span class="op">=</span> <span class="cn">NULL</span>, s <span class="op">=</span> <span class="cn">NULL</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigmoid"</span>, <span class="st">"gauss"</span>, <span class="st">"softplus"</span>, <span class="st">"cos"</span>, <span class="st">"sin"</span><span class="op">)</span>,
-  x <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Second weights initializer, internally calls n.weights.</span>
-<span class="fu">make_weights</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, dropout <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
-
-<span class="co">## Boosted neural net predictions.</span>
-<span class="fu">predictn</span><span class="op">(</span><span class="va">object</span>, <span class="va">newdata</span>, model <span class="op">=</span> <span class="cn">NULL</span>,
-  mstop <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"link"</span>, <span class="st">"parameter"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## The neural network smooth constructor.</span></span>
+<span><span class="fu">n</span><span class="op">(</span><span class="va">...</span>, k <span class="op">=</span> <span class="fl">10</span>, type <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Initialize weights.</span></span>
+<span><span class="fu">n.weights</span><span class="op">(</span><span class="va">nodes</span>, <span class="va">k</span>, r <span class="op">=</span> <span class="cn">NULL</span>, s <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigmoid"</span>, <span class="st">"gauss"</span>, <span class="st">"softplus"</span>, <span class="st">"cos"</span>, <span class="st">"sin"</span><span class="op">)</span>,</span>
+<span>  x <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Second weights initializer, internally calls n.weights.</span></span>
+<span><span class="fu">make_weights</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, dropout <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Boosted neural net predictions.</span></span>
+<span><span class="fu">predictn</span><span class="op">(</span><span class="va">object</span>, <span class="va">newdata</span>, model <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mstop <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"link"</span>, <span class="st">"parameter"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -195,7 +195,7 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## ... coming soon ...!</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## ... coming soon ...!</span></span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>
@@ -211,7 +211,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

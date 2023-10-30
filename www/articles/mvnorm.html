@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="mvnorm_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Multivariate Normal Model</h1>
@@ -144,277 +144,26 @@
 
     
     
-<p>The family <code>mvnorm_bamlss</code> implements the multivariate
-normal distribution that can be used for estimation with
-<code>bamlss</code>. To illustrate the usage we simulate data from a
-trivariate normal.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.bamlss.org/" class="external-link">"bamlss"</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://mvtnorm.R-forge.R-project.org" class="external-link">"mvtnorm"</a></span><span class="op">)</span>
-
-<span class="co">## Set the seed for reproducability.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
-
-<span class="co">## Simulate data.</span>
-<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000</span>
-
-<span class="co">## True functions.</span>
-<span class="va">f0</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">pi</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span>
-<span class="va">f1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span>
-<span class="va">f2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="va">x</span><span class="op">^</span><span class="fl">11</span> <span class="op">*</span> <span class="op">(</span><span class="fl">10</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">6</span> <span class="op">+</span> <span class="fl">10</span> <span class="op">*</span> <span class="op">(</span><span class="fl">10</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span><span class="op">^</span><span class="fl">3</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">x</span><span class="op">)</span><span class="op">^</span><span class="fl">10</span>
-<span class="va">f3</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">3</span><span class="op">)</span> <span class="op">-</span> <span class="fl">3</span>
-<span class="va">f4</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">6</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span>
-<span class="va">f5</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">eta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="../reference/scale2.html">scale2</a></span><span class="op">(</span><span class="va">x</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fl">3</span>
-  <span class="va">eta</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">eta</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
-<span class="op">}</span>
-<span class="va">f6</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">eta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="fu"><a href="../reference/scale2.html">scale2</a></span><span class="op">(</span><span class="va">x</span>, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span>
-  <span class="va">eta</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="va">eta</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="co">## Covariate data.</span>
-<span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>
-  <span class="st">"x0"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,
-  <span class="st">"x1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,
-  <span class="st">"x2"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,
-  <span class="st">"x3"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu">f3</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x1</span><span class="op">)</span><span class="op">)</span>
-<span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu">f4</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">s3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="va">n</span><span class="op">)</span><span class="op">)</span>
-<span class="va">rho12</span> <span class="op">&lt;-</span> <span class="fu">f5</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x3</span><span class="op">)</span>
-<span class="va">rho13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="va">n</span><span class="op">)</span>
-<span class="va">rho23</span> <span class="op">&lt;-</span> <span class="fu">f6</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x3</span><span class="op">)</span>
-
-<span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span>, <span class="fl">3</span><span class="op">)</span>
-
-<span class="co">## Generate response observations.</span>
-<span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">s1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="va">s2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="va">s3</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>
-  <span class="va">V</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rho12</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="va">s1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="va">s2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
-  <span class="va">V</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rho13</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="va">s1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="va">s3</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
-  <span class="va">V</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">rho23</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="va">s2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">*</span> <span class="va">s3</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
-  <span class="va">V</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">V</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span>
-  <span class="va">V</span><span class="op">[</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">V</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">]</span>
-  <span class="va">V</span><span class="op">[</span><span class="fl">3</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">V</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">]</span>
-  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">f0</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x0</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fu">f1</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, <span class="fu">f2</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, <span class="fu">f3</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">x3</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
-  <span class="va">y</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/rmvn.html" class="external-link">rmvn</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">mu</span>, <span class="va">V</span><span class="op">)</span>
-<span class="op">}</span>
-
-<span class="co">## Specify response names and add to data frame.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"y"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>
-<span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">d</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>Now we can setup the model formula with</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
-  <span class="va">y1</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>,
-  <span class="va">y2</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span>,
-  <span class="va">y3</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,
-  <span class="va">sigma1</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span>,
-  <span class="va">sigma2</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x2</span><span class="op">)</span>,
-  <span class="va">sigma3</span> <span class="op">~</span> <span class="fl">1</span>,
-  <span class="va">rho12</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,
-  <span class="va">rho13</span> <span class="op">~</span> <span class="fl">1</span>,
-  <span class="va">rho23</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
-<p>Note that the numbering of the correlation parameters is somewhat
-untrivial, but it corresponds to the position of the correlation matrix.
-The model can be estimated using the usual specifications, but the
-dimension of the multivariate normal distribution must be specified
-directly in the family.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
-<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="fu"><a href="../reference/family.bamlss.html">mvnorm_bamlss</a></span><span class="op">(</span>k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>After the MCMC algorithm is completed, all summary and extraction
-functions can be used as usual.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## </span>
-<span class="co">## Call:</span>
-<span class="co">## bamlss(formula = f, family = mvnorm_bamlss(k = 3), data = d)</span>
-<span class="co">## ---</span>
-<span class="co">## Family: mvnorm </span>
-<span class="co">## Link function: mu1 = identity, mu2 = identity, mu3 = identity, sigma1 = log, sigma2 = log, sigma3 = log, rho12 = rhogit, rho13 = rhogit, rho23 = rhogit</span>
-<span class="co">## *---</span>
-<span class="co">## Formula mu1:</span>
-<span class="co">## ---</span>
-<span class="co">## y1 ~ s(x0) + s(x1)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##              Mean  2.5%   50% 97.5% parameters</span>
-<span class="co">## (Intercept) 4.463 4.456 4.463 4.471      4.464</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##       Mean 2.5% 50% 97.5%</span>
-<span class="co">## alpha    1    1   1     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##               Mean   2.5%    50%  97.5% parameters</span>
-<span class="co">## s(x0).tau21 1.4957 0.4989 1.2566 3.8044      0.031</span>
-<span class="co">## s(x0).alpha 1.0000 1.0000 1.0000 1.0000         NA</span>
-<span class="co">## s(x0).edf   8.8549 8.6823 8.8675 8.9566      6.663</span>
-<span class="co">## s(x1).tau21 1.5608 0.5454 1.2539 4.7034      0.195</span>
-<span class="co">## s(x1).alpha 1.0000 1.0000 1.0000 1.0000         NA</span>
-<span class="co">## s(x1).edf   8.8365 8.6602 8.8473 8.9575      8.206</span>
-<span class="co">## ---</span>
-<span class="co">## Formula mu2:</span>
-<span class="co">## ---</span>
-<span class="co">## y2 ~ s(x2)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##              Mean  2.5%   50% 97.5% parameters</span>
-<span class="co">## (Intercept) 3.276 3.260 3.276 3.295      3.272</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##       Mean 2.5% 50% 97.5%</span>
-<span class="co">## alpha    1    1   1     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##                 Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## s(x2).tau21  581.594  196.200  472.467 1570.624    138.045</span>
-<span class="co">## s(x2).alpha    1.000    1.000    1.000    1.000         NA</span>
-<span class="co">## s(x2).edf      8.999    8.999    8.999    9.000      8.998</span>
-<span class="co">## ---</span>
-<span class="co">## Formula mu3:</span>
-<span class="co">## ---</span>
-<span class="co">## y3 ~ s(x3)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##               Mean   2.5%    50%  97.5% parameters</span>
-<span class="co">## (Intercept) -2.325 -2.347 -2.325 -2.304      -2.32</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##       Mean 2.5% 50% 97.5%</span>
-<span class="co">## alpha    1    1   1     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##               Mean   2.5%    50%  97.5% parameters</span>
-<span class="co">## s(x3).tau21 0.7537 0.2247 0.5956 2.3505      0.104</span>
-<span class="co">## s(x3).alpha 1.0000 1.0000 1.0000 1.0000         NA</span>
-<span class="co">## s(x3).edf   7.0921 6.0282 7.0858 8.2334      5.160</span>
-<span class="co">## ---</span>
-<span class="co">## Formula sigma1:</span>
-<span class="co">## ---</span>
-<span class="co">## sigma1 ~ s(x1)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##               Mean   2.5%    50%  97.5% parameters</span>
-<span class="co">## (Intercept) -2.086 -2.128 -2.087 -2.044     -2.085</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.9757 0.8250 0.9999     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##               Mean   2.5%    50%  97.5% parameters</span>
-<span class="co">## s(x1).tau21 1.3533 0.1459 0.8480 5.0489      2.804</span>
-<span class="co">## s(x1).alpha 0.8541 0.3320 0.9356 1.0000         NA</span>
-<span class="co">## s(x1).edf   5.6462 3.7602 5.6178 7.5910      6.999</span>
-<span class="co">## ---</span>
-<span class="co">## Formula sigma2:</span>
-<span class="co">## ---</span>
-<span class="co">## sigma2 ~ s(x2)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##               Mean   2.5%    50%  97.5% parameters</span>
-<span class="co">## (Intercept) -1.777 -1.815 -1.776 -1.742     -1.774</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.9865 0.8944 1.0000     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##                 Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## s(x2).tau21  73.8518  22.2223  55.4773 219.8731     85.182</span>
-<span class="co">## s(x2).alpha   0.8510   0.3495   0.9390   1.0000         NA</span>
-<span class="co">## s(x2).edf     8.8633   8.6955   8.8754   8.9686      8.916</span>
-<span class="co">## ---</span>
-<span class="co">## Formula sigma3:</span>
-<span class="co">## ---</span>
-<span class="co">## sigma3 ~ 1</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                Mean    2.5%     50%   97.5% parameters</span>
-<span class="co">## (Intercept) -1.0301 -1.0693 -1.0298 -0.9938     -1.022</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##         Mean   2.5%    50% 97.5%</span>
-<span class="co">## alpha 0.9621 0.7437 0.9991     1</span>
-<span class="co">## ---</span>
-<span class="co">## Formula rho12:</span>
-<span class="co">## ---</span>
-<span class="co">## rho12 ~ s(x3)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                Mean    2.5%     50%   97.5% parameters</span>
-<span class="co">## (Intercept) -0.8469 -0.8874 -0.8501 -0.7702     -0.866</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##            Mean      2.5%       50% 97.5%</span>
-<span class="co">## alpha 6.278e-01 1.070e-61 8.759e-01     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##                  Mean      2.5%       50%     97.5% parameters</span>
-<span class="co">## s(x3).tau21 1.284e+01 3.322e+00 9.790e+00 4.524e+01     24.314</span>
-<span class="co">## s(x3).alpha 2.554e-01 4.625e-67 7.836e-02 1.000e+00         NA</span>
-<span class="co">## s(x3).edf   7.995e+00 6.998e+00 8.001e+00 8.726e+00      8.569</span>
-<span class="co">## ---</span>
-<span class="co">## Formula rho13:</span>
-<span class="co">## ---</span>
-<span class="co">## rho13 ~ 1</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                 Mean     2.5%      50%    97.5% parameters</span>
-<span class="co">## (Intercept)  0.03327 -0.02900  0.03953  0.05855      0.037</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##            Mean      2.5%       50% 97.5%</span>
-<span class="co">## alpha 6.586e-01 5.487e-60 9.194e-01     1</span>
-<span class="co">## ---</span>
-<span class="co">## Formula rho23:</span>
-<span class="co">## ---</span>
-<span class="co">## rho23 ~ s(x3)</span>
-<span class="co">## -</span>
-<span class="co">## Parametric coefficients:</span>
-<span class="co">##                Mean    2.5%     50%   97.5% parameters</span>
-<span class="co">## (Intercept) -0.8673 -0.9094 -0.8686 -0.8193     -0.869</span>
-<span class="co">## -</span>
-<span class="co">## Acceptance probability:</span>
-<span class="co">##            Mean      2.5%       50% 97.5%</span>
-<span class="co">## alpha 6.547e-01 2.169e-64 9.121e-01     1</span>
-<span class="co">## -</span>
-<span class="co">## Smooth terms:</span>
-<span class="co">##                   Mean       2.5%        50%      97.5% parameters</span>
-<span class="co">## s(x3).tau21  1.067e+00  8.240e-02  5.090e-01  7.421e+00      0.035</span>
-<span class="co">## s(x3).alpha  2.871e-01 4.360e-186  7.989e-02  1.000e+00         NA</span>
-<span class="co">## s(x3).edf    5.174e+00  3.581e+00  5.058e+00  7.802e+00      3.008</span>
-<span class="co">## ---</span>
-<span class="co">## Sampler summary:</span>
-<span class="co">## -</span>
-<span class="co">## DIC = -2986.723 logLik = 1526.518 pd = 66.3138</span>
-<span class="co">## runtime = 147.739</span>
-<span class="co">## ---</span>
-<span class="co">## Optimizer summary:</span>
-<span class="co">## -</span>
-<span class="co">## AICc = -2971.752 edf = 65.5196 logLik = 1556.064</span>
-<span class="co">## logPost = 1193.908 nobs = 1000 runtime = 110.476</span></code></pre>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, ask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p><img src="mvnorm_files/figure-html/unnamed-chunk-7-1.png" width="90%" style="display: block; margin: auto;"></p>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-bamlss:Umlauf+bamlss:2018" class="csl-entry">
-Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021.
-<em><span class="nocase">bamlss</span>: <span>B</span>ayesian Additive
-Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.
+<div class="section level2">
+<h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
+</h2>
+<p>Coming soon, for details see <span class="citation">(Muschinski et al. 2022)</span>.</p>
+<div id="refs" class="references hanging-indent">
+<div id="ref-bamlss:Muschinski+Mayr+Simon+Umlauf+Zeileis:2022">
+<p>Muschinski, Thomas, Georg J. Mayr, Thorsten Simon, Nikolaus Umlauf, and Achim Zeileis. 2022. “Cholesky-Based Multivariate Gaussian Regression.” <em>Econometrics and Statistics</em>. <a href="https://doi.org/10.1016/j.ecosta.2022.03.001" class="external-link">https://doi.org/10.1016/j.ecosta.2022.03.001</a>.</p>
+</div>
+<div id="ref-bamlss:Umlauf+bamlss:2018">
+<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.</p>
+</div>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
@@ -427,7 +176,7 @@ Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-p
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

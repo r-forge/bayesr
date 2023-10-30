@@ -20,7 +20,7 @@ Method confint.bamlss() produces credible intervals or parameter samples
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -124,17 +124,17 @@ Method confint.bamlss() produces credible intervals or parameter samples
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for bamlss</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, model <span class="op">=</span> <span class="cn">NULL</span>, term <span class="op">=</span> <span class="cn">NULL</span>,
-  FUN <span class="op">=</span> <span class="cn">NULL</span>, parameters <span class="op">=</span> <span class="cn">NULL</span>,
-  pterms <span class="op">=</span> <span class="cn">TRUE</span>, sterms <span class="op">=</span> <span class="cn">TRUE</span>,
-  hyper.parameters <span class="op">=</span> <span class="cn">TRUE</span>, list <span class="op">=</span> <span class="cn">FALSE</span>,
-  full.names <span class="op">=</span> <span class="cn">TRUE</span>, rescale <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for bamlss</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">parm</span>, level <span class="op">=</span> <span class="fl">0.95</span>,
-  model <span class="op">=</span> <span class="cn">NULL</span>, pterms <span class="op">=</span> <span class="cn">TRUE</span>, sterms <span class="op">=</span> <span class="cn">FALSE</span>,
-  full.names <span class="op">=</span> <span class="cn">FALSE</span>, hyper.parameters <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for bamlss</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, model <span class="op">=</span> <span class="cn">NULL</span>, term <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  FUN <span class="op">=</span> <span class="cn">NULL</span>, parameters <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pterms <span class="op">=</span> <span class="cn">TRUE</span>, sterms <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  hyper.parameters <span class="op">=</span> <span class="cn">TRUE</span>, list <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  full.names <span class="op">=</span> <span class="cn">TRUE</span>, rescale <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for bamlss</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">parm</span>, level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  model <span class="op">=</span> <span class="cn">NULL</span>, pterms <span class="op">=</span> <span class="cn">TRUE</span>, sterms <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  full.names <span class="op">=</span> <span class="cn">FALSE</span>, hyper.parameters <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -202,56 +202,56 @@ Method confint.bamlss() produces credible intervals or parameter samples
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate data.</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Model formula.</span></span>
-<span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="va">sigma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Estimate model.</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts):</span> object 'd' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Extract coefficients based on MCMC samples.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Simulate data.</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Model formula.</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">sigma</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Estimate model.</span></span></span>
+<span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(f, data = d):</span> object 'd' not found</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Extract coefficients based on MCMC samples.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Now only the mean.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Now only the mean.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b, FUN = mean):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## As list without the full names.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">mean</span>, list <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## As list without the full names.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, FUN <span class="op">=</span> <span class="va">mean</span>, list <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b, FUN = mean, list = TRUE, full.names = FALSE):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Coefficients only for "mu".</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Coefficients only for "mu".</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b, model = "mu"):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## And "s(x2)".</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## And "s(x2)".</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b, model = "mu", term = "s(x2)"):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## With optimizer parameters.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span>, parameters <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## With optimizer parameters.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span>, parameters <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b, model = "mu", term = "s(x2)", parameters = TRUE):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Only parameteric part.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, sterms <span class="op">=</span> <span class="cn">FALSE</span>, hyper.parameters <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Only parameteric part.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, sterms <span class="op">=</span> <span class="cn">FALSE</span>, hyper.parameters <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b, sterms = FALSE, hyper.parameters = FALSE):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## For sigma.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"sigma"</span>, sterms <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span class="r-in">  hyper.parameters <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## For sigma.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"sigma"</span>, sterms <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  hyper.parameters <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in coef(b, model = "sigma", sterms = FALSE, hyper.parameters = FALSE):</span> object 'b' not found</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## 95 perc. credible interval based on samples.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## 95 perc. credible interval based on samples.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in confint(b):</span> object 'b' not found</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -266,7 +266,7 @@ Method confint.bamlss() produces credible intervals or parameter samples
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

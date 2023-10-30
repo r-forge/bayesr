@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">Volcano</span><span class="op">(</span>sd <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">Volcano</span><span class="op">(</span>sd <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -142,20 +142,20 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu">Volcano</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         lon      lat           y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -36.87764 174.7647  0.07800973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -36.87764 174.7647  0.07406653</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -36.87763 174.7647  0.52956121</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -36.87763 174.7647  0.22811148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -36.87762 174.7647 -0.03536768</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -36.87762 174.7647  0.33804461</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span>,k<span class="op">=</span><span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, theta <span class="op">=</span> <span class="op">-</span><span class="fl">130</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu">Volcano</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         lon      lat          y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -36.87764 174.7647 -0.2367639</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -36.87764 174.7647 -0.2388586</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -36.87763 174.7647 -0.5366136</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -36.87763 174.7647  0.4691255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -36.87762 174.7647  0.4415208</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -36.87762 174.7647 -0.2585384</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span>,k<span class="op">=</span><span class="fl">10</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span>, theta <span class="op">=</span> <span class="op">-</span><span class="fl">130</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -170,7 +170,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

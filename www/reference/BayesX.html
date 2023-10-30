@@ -21,7 +21,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1-9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
       </span>
     </div>
 
@@ -126,48 +126,48 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co">## Sampler functions:</span>
-<span class="fu">sam_BayesX</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>, control <span class="op">=</span> <span class="fu">BayesX.control</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">BayesX</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>, control <span class="op">=</span> <span class="fu">BayesX.control</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Sampler control:</span>
-<span class="fu">BayesX.control</span><span class="op">(</span>n.iter <span class="op">=</span> <span class="fl">1200</span>, thin <span class="op">=</span> <span class="fl">1</span>, burnin <span class="op">=</span> <span class="fl">200</span>,
-  seed <span class="op">=</span> <span class="cn">NULL</span>, predict <span class="op">=</span> <span class="st">"light"</span>, model.name <span class="op">=</span> <span class="st">"bamlss"</span>,
-  data.name <span class="op">=</span> <span class="st">"d"</span>, prg.name <span class="op">=</span> <span class="cn">NULL</span>, dir <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">FALSE</span>, show.prg <span class="op">=</span> <span class="cn">TRUE</span>, modeonly <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Special BayesX smooth term constructor.</span>
-<span class="fu">sx</span><span class="op">(</span><span class="va">x</span>, z <span class="op">=</span> <span class="cn">NULL</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, by <span class="op">=</span> <span class="cn">NA</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co">## Special BayesX tensor product smooth term constructor.</span>
-<span class="fu">tx</span><span class="op">(</span><span class="va">...</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,
-  ctr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="st">"main"</span>, <span class="st">"both"</span>, <span class="st">"both1"</span>, <span class="st">"both2"</span>,
-    <span class="st">"none"</span>, <span class="st">"meanf"</span>, <span class="st">"meanfd"</span>, <span class="st">"meansimple"</span>, <span class="st">"nullspace"</span><span class="op">)</span>,
-  xt <span class="op">=</span> <span class="cn">NULL</span>, special <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu">tx2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>
-<span class="fu">tx3</span><span class="op">(</span><span class="va">...</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">5</span><span class="op">)</span>,
-  ctr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"main"</span>, <span class="st">"center"</span><span class="op">)</span>,
-  xt <span class="op">=</span> <span class="cn">NULL</span>, special <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu">tx4</span><span class="op">(</span><span class="va">...</span>, ctr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="st">"main"</span>, <span class="st">"both"</span>, <span class="st">"both1"</span>, <span class="st">"both2"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co">## Smooth constructors and predict matrix.</span>
-<span class="co"># S3 method for tensorX.smooth.spec</span>
-<span class="fu"><a href="smooth.construct.html">smooth.construct</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span>
-<span class="co"># S3 method for tensorX.smooth</span>
-<span class="fu">Predict.matrix</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span><span class="op">)</span> 
-<span class="co"># S3 method for tensorX3.smooth.spec</span>
-<span class="fu"><a href="smooth.construct.html">smooth.construct</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span>
-<span class="co"># S3 method for tensorX3.smooth</span>
-<span class="fu">Predict.matrix</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span><span class="op">)</span> 
-
-<span class="co">## Family object for quantile regression with BayesX.</span>
-<span class="fu">quant_bamlss</span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
-
-<span class="co">## Download the newest version of BayesXsrc.</span>
-<span class="fu">get_BayesXsrc</span><span class="op">(</span>dir <span class="op">=</span> <span class="cn">NULL</span>, install <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">## Sampler functions:</span></span>
+<span><span class="fu">sam_BayesX</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>, control <span class="op">=</span> <span class="fu">BayesX.control</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">BayesX</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span>, start <span class="op">=</span> <span class="cn">NULL</span>, weights <span class="op">=</span> <span class="cn">NULL</span>, offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>, control <span class="op">=</span> <span class="fu">BayesX.control</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Sampler control:</span></span>
+<span><span class="fu">BayesX.control</span><span class="op">(</span>n.iter <span class="op">=</span> <span class="fl">1200</span>, thin <span class="op">=</span> <span class="fl">1</span>, burnin <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>, predict <span class="op">=</span> <span class="st">"light"</span>, model.name <span class="op">=</span> <span class="st">"bamlss"</span>,</span>
+<span>  data.name <span class="op">=</span> <span class="st">"d"</span>, prg.name <span class="op">=</span> <span class="cn">NULL</span>, dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>, show.prg <span class="op">=</span> <span class="cn">TRUE</span>, modeonly <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Special BayesX smooth term constructor.</span></span>
+<span><span class="fu">sx</span><span class="op">(</span><span class="va">x</span>, z <span class="op">=</span> <span class="cn">NULL</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, by <span class="op">=</span> <span class="cn">NA</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Special BayesX tensor product smooth term constructor.</span></span>
+<span><span class="fu">tx</span><span class="op">(</span><span class="va">...</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
+<span>  ctr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="st">"main"</span>, <span class="st">"both"</span>, <span class="st">"both1"</span>, <span class="st">"both2"</span>,</span>
+<span>    <span class="st">"none"</span>, <span class="st">"meanf"</span>, <span class="st">"meanfd"</span>, <span class="st">"meansimple"</span>, <span class="st">"nullspace"</span><span class="op">)</span>,</span>
+<span>  xt <span class="op">=</span> <span class="cn">NULL</span>, special <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">tx2</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">tx3</span><span class="op">(</span><span class="va">...</span>, bs <span class="op">=</span> <span class="st">"ps"</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  ctr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"main"</span>, <span class="st">"center"</span><span class="op">)</span>,</span>
+<span>  xt <span class="op">=</span> <span class="cn">NULL</span>, special <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">tx4</span><span class="op">(</span><span class="va">...</span>, ctr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"center"</span>, <span class="st">"main"</span>, <span class="st">"both"</span>, <span class="st">"both1"</span>, <span class="st">"both2"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Smooth constructors and predict matrix.</span></span>
+<span><span class="co"># S3 method for tensorX.smooth.spec</span></span>
+<span><span class="fu"><a href="smooth.construct.html">smooth.construct</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S3 method for tensorX.smooth</span></span>
+<span><span class="fu">Predict.matrix</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span><span class="op">)</span> </span>
+<span><span class="co"># S3 method for tensorX3.smooth.spec</span></span>
+<span><span class="fu"><a href="smooth.construct.html">smooth.construct</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span>, <span class="va">knots</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S3 method for tensorX3.smooth</span></span>
+<span><span class="fu">Predict.matrix</span><span class="op">(</span><span class="va">object</span>, <span class="va">data</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="co">## Family object for quantile regression with BayesX.</span></span>
+<span><span class="fu">quant_bamlss</span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Download the newest version of BayesXsrc.</span></span>
+<span><span class="fu">get_BayesXsrc</span><span class="op">(</span>dir <span class="op">=</span> <span class="cn">NULL</span>, install <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -336,8 +336,8 @@
 <p>For function <code>sx()</code> the following basis types are currently supported:</p><ul><li><p><code>"ps"</code>: P-spline with second order difference penalty.</p></li>
 <li><p><code>"mrf"</code>: Markov random fields: Defines a Markov random field prior for a
                spatial covariate, where geographical information is provided by a map object in
-               boundary or graph file format (see function <code><a href="https://rdrr.io/pkg/BayesX/man/read.bnd.html" class="external-link">read.bnd</a></code>,
-               <code><a href="https://rdrr.io/pkg/BayesX/man/read.gra.html" class="external-link">read.gra</a></code> and <code><a href="https://rdrr.io/pkg/BayesX/man/shp2bnd.html" class="external-link">shp2bnd</a></code>), as an additional
+               boundary or graph file format (see function <code>read.bnd</code>,
+               <code>read.gra</code> and <code>shp2bnd</code>), as an additional
                argument named <code>map</code>.</p></li>
 <li><p><code>"re"</code>: Gaussian i.i.d. Random effects of a unit or cluster identification covariate.</p></li>
 </ul><p>Function <code>tx()</code> currently supports smooth terms with two variables.</p>
@@ -349,46 +349,46 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Get newest version of BayesXsrc.</span></span>
-<span class="r-in"><span class="co">## Note: needs sh, svn and R build tools!</span></span>
-<span class="r-in"><span class="co">## get_BayesXsrc()</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="kw">if</span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://www.uni-goettingen.de/de/bayesx/550513.html" class="external-link">"BayesXsrc"</a></span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="co">## Simulate some data</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co">## Estimate model with BayesX. Note</span></span>
-<span class="r-in">  <span class="co">## that BayesX computes starting values, so</span></span>
-<span class="r-in">  <span class="co">## these are not required by some optimizer function</span></span>
-<span class="r-in">  <span class="co">## in bamlss()</span></span>
-<span class="r-in">  <span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span>
-<span class="r-in">    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co">## Same model with anisotropic penalty.</span></span>
-<span class="r-in">  <span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tx</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span>
-<span class="r-in">    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co">## Quantile regression.</span></span>
-<span class="r-in">  <span class="va">b3_0.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tx</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span>
-<span class="r-in">    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span>,</span>
-<span class="r-in">    family <span class="op">=</span> <span class="fu"><a href="gF.html">gF</a></span><span class="op">(</span><span class="st">"quant"</span>, prob <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="va">b3_0.9</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tx</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span>
-<span class="r-in">    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span>,</span>
-<span class="r-in">    family <span class="op">=</span> <span class="fu"><a href="gF.html">gF</a></span><span class="op">(</span><span class="st">"quant"</span>, prob <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co">## Predict quantiles.</span></span>
-<span class="r-in">  <span class="va">p_0.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b3_0.1</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">p_0.9</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b3_0.9</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">  <span class="co">## Plot.</span></span>
-<span class="r-in">  <span class="fu"><a href="plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p_0.1</span> <span class="op">+</span> <span class="va">p_0.9</span> <span class="op">~</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span>  </span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Get newest version of BayesXsrc.</span></span></span>
+<span class="r-in"><span><span class="co">## Note: needs sh, svn and R build tools!</span></span></span>
+<span class="r-in"><span><span class="co">## get_BayesXsrc()</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="kw">if</span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://www.uni-goettingen.de/de/bayesx/550513.html" class="external-link">"BayesXsrc"</a></span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="co">## Simulate some data</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co">## Estimate model with BayesX. Note</span></span></span>
+<span class="r-in"><span>  <span class="co">## that BayesX computes starting values, so</span></span></span>
+<span class="r-in"><span>  <span class="co">## these are not required by some optimizer function</span></span></span>
+<span class="r-in"><span>  <span class="co">## in bamlss()</span></span></span>
+<span class="r-in"><span>  <span class="va">b1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co">## Same model with anisotropic penalty.</span></span></span>
+<span class="r-in"><span>  <span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tx</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co">## Quantile regression.</span></span></span>
+<span class="r-in"><span>  <span class="va">b3_0.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tx</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span>,</span></span>
+<span class="r-in"><span>    family <span class="op">=</span> <span class="fu"><a href="gF.html">gF</a></span><span class="op">(</span><span class="st">"quant"</span>, prob <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">b3_0.9</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tx</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">d</span>, optimizer <span class="op">=</span> <span class="cn">FALSE</span>, sampler <span class="op">=</span> <span class="va">sam_BayesX</span>,</span></span>
+<span class="r-in"><span>    family <span class="op">=</span> <span class="fu"><a href="gF.html">gF</a></span><span class="op">(</span><span class="st">"quant"</span>, prob <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co">## Predict quantiles.</span></span></span>
+<span class="r-in"><span>  <span class="va">p_0.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b3_0.1</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">p_0.9</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b3_0.9</span>, term <span class="op">=</span> <span class="st">"s(x2)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co">## Plot.</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="plot2d.html">plot2d</a></span><span class="op">(</span><span class="va">p_0.1</span> <span class="op">+</span> <span class="va">p_0.9</span> <span class="op">~</span> <span class="va">x2</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span>  </span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -403,7 +403,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
