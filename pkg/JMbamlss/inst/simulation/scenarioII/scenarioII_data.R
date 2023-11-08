@@ -8,7 +8,7 @@
 
 
 # Specify location
-location <- "server_linux"
+location <- "workstation"
 if(location %in% c("server_linux", "server_windows")){
   .libPaths(if (location == "server_linux") {
     c("~/H:/volkmana.hub/R4_linux_b", "~/H:/volkmana.hub/R4_linux")
@@ -84,8 +84,39 @@ m2 <- funData(argvals = argvals,
               X = matrix(c(m2sp1(argvals), m2sp2(argvals), m2sp3(argvals)), 
                          nrow = 3, byrow = TRUE))
 
+# Plot in Appendix
+# fundat1 <- funData2DataFrame(m1) # From package multifammPaper
+# p1 <- ggplot(fundat1, aes(x = t, y = y, col = factor(obs))) +
+#   geom_path() +
+#   theme_bw() +
+#   ggtitle("Longitudinal Outcome 1") +
+#   theme(legend.position = "none") +
+#   labs(x = "t", y = "Basisfunctions")
+# 
+# fundat2 <- funData2DataFrame(m2)
+# p2 <- ggplot(fundat2, aes(x = t, y = y, col = factor(obs))) +
+#   geom_path() +
+#   theme_bw() +
+#   ggtitle("Longitudinal Outcome 2") +
+#   theme(legend.position = "none") +
+#   labs(x = "t", y = "Basisfunctions")
+# library(gridExtra)
+# grid.arrange(p1, p2, nrow = 1)
+# Save as 4x8 inch
+
 # True multivariate covariance structure
 m <- JMbamlss:::MFPCA_cov(cov = cov, basis_funs = list(m1, m2))
+
+# # Plot in appendix
+# dat <- funData2DataFrame(m$functions)
+# ggplot(dat, aes(x = t, y = y, col = factor(obs))) +
+#   geom_path() +
+#   facet_grid(~ factor(dim, labels = c("Longitudinal Outcome 1",
+#                                       "Longitudinal Outcome 2"))) +
+#   theme_bw() +
+#   theme(legend.position = "none") +
+#   labs(x = "t", y = "Multivariate Eigenfunctions")
+  
 
 
 # Simulation function -----------------------------------------------------

@@ -69,7 +69,7 @@ sim_results <- function(result_list, dat_list, name) {
       predictor = "lambga",
       marker = "all",
       t = "all",
-      value = c(mean(-(est$lambga$Mean - sim$lambga)),
+      value = c(mean(est$lambga$Mean - sim$lambga),
                 sqrt(mean((est$lambga$Mean - sim$lambga)^2)),
                 mean(est$lambga[, 1] < sim$lambga & 
                        est$lambga[, 3] > sim$lambga)))
@@ -80,7 +80,7 @@ sim_results <- function(result_list, dat_list, name) {
       predictor = "alpha",
       marker = paste0("m", seq_len(n_dim)),
       t = "all",
-      value = c(-(est$alpha$Mean - sim$alpha),
+      value = c(est$alpha$Mean - sim$alpha,
                 sqrt((est$alpha$Mean - sim$alpha)^2),
                 as.numeric(est$alpha[, 1] < sim$alpha & 
                              est$alpha[, 3] > sim$alpha)))
@@ -91,7 +91,7 @@ sim_results <- function(result_list, dat_list, name) {
       predictor = "sigma",
       marker = paste0("m", seq_len(n_dim)),
       t = "all",
-      value = c(-(est$sigma$Mean - sim$sigma),
+      value = c(est$sigma$Mean - sim$sigma,
                 sqrt((est$sigma$Mean - sim$sigma)^2),
                 as.numeric(est$sigma[, 1] < sim$sigma & 
                              est$sigma[, 3] > sim$sigma)))
@@ -103,7 +103,7 @@ sim_results <- function(result_list, dat_list, name) {
       marker = paste0("m", seq_len(n_dim)),
       t = "all",
       value = c(mapply(function (e, s) {
-                  mean(s - e)
+                  mean(e - s)
                 }, e = split(est$mu$Mean, est$mu$marker), 
                 s = split(sim$mu$mu, sim$mu$marker)),
                 mapply(function (e, s) {
@@ -126,7 +126,7 @@ sim_results <- function(result_list, dat_list, name) {
       value = c(c(sapply(seq(0, 1, by = 0.01), function (t) {
                   mapply(function(e, s) {
                     same_t <- e$obstime == t
-                    mean(-(e$Mean[same_t] - s[same_t]))
+                    mean(e$Mean[same_t] - s[same_t])
                   }, e = split(est$mu_long, est$mu_long$marker), s = sim_marker)
                 })),
                 c(sapply(seq(0, 1, by = 0.01), function (t) {
@@ -154,7 +154,7 @@ sim_results <- function(result_list, dat_list, name) {
         e$obstime <- split(est$mu_long, est$mu_long$marker)[[1]]$obstime
         s <- sim_marker[[1]]
         same_t <- e$obstime == t
-        mean(-(e$Mean[same_t] - s[same_t]))
+        mean(e$Mean[same_t] - s[same_t])
       })),
       c(sapply(seq(0, 1, by = 0.01), function (t) {
         e <- split(est$lambga_long, est$mu_long$marker)[[1]]
@@ -179,7 +179,7 @@ sim_results <- function(result_list, dat_list, name) {
       predictor = "lambga_event",
       marker = "all",
       t = "all",
-      value = c(mean(-(est$lambga_event$Mean - sim$lambga_event)),
+      value = c(mean(est$lambga_event$Mean - sim$lambga_event),
                 sqrt(mean((est$lambga_event$Mean - sim$lambga_event)^2)),
                 mean(est$lambga_event[, 1] < sim$lambga_event & 
                        est$lambga_event[, 3] > sim$lambga_event)))
