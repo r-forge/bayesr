@@ -309,6 +309,8 @@ ggplot(mean_dat %>% filter(id %in% ids) %>%
   scale_color_manual(values = c("black", scales::hue_pal()(4))) +
   labs(y = expression(mu(t)~","~hat(mu)(t)), linetype = NULL, color = NULL,
        x = "Time")
+ggsave(filename = "Volkmann_fig1.eps", device = "eps", dpi = 800, width = 8,
+       height = 4, units = "in")
 # save 4x8
 
 

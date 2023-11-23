@@ -334,7 +334,8 @@ MJM_opt <- function(x, y, start = NULL, eps = 0.0001, maxit = 1500,
                                  eta_timegrid_lambda = eta_timegrid_lambda,
                                  eta_timegrid_mu_unst = eta_timegrid_mu_unst,
                                  eta_timegrid_alpha = eta_timegrid_alpha,
-                                 eta_T_mu = eta_T_mu, survtime = survtime,
+                                 eta_T_mu_unst = eta_T_mu_unst,
+                                 survtime = survtime,
                                  get_LogLik = get_LogLik, update_nu = update_nu,
                                  update_tau = update_tau, edf = edf, ...)
           etaUP$mu <- eta$mu -

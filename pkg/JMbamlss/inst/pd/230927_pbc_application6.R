@@ -365,8 +365,10 @@ ggplot(preds_plot %>%
                filter(id %in% ids) %>%
                droplevels() %>%
                mutate(id = factor(id, labels = paste("Subject", levels(id)))),
-             aes(y = logy), alpha = 0.5) +
+             aes(y = logy), col = "grey44") +
   labs(y = NULL, x = "Time")
+ggsave(filename = "Volkmann_fig2.eps", device = "eps", dpi = 800, width = 8,
+       height = 4, units = "in")
 # save as 4x8
 
 library(manipulate)
