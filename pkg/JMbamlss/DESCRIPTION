@@ -18,7 +18,10 @@ Imports:
     Rcpp,
     sparseFLMM,
     refund,
-    MFPCA
+    MFPCA,
+    gamm4,
+    Matrix,
+    mgcv
 Suggests: 
     testthat (>= 3.0.0),
     splines

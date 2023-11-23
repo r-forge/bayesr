@@ -13,11 +13,10 @@ fpca(
   argvals_pred = seq(0, 1, by = 0.01),
   random.int = FALSE,
   nbasis = 10,
+  nbasis_cov = nbasis,
+  bs_cov = "symm",
   pve = 0.99,
   npc = NULL,
-  var = FALSE,
-  simul = FALSE,
-  sim.alpha = 0.95,
   useSymm = FALSE,
   makePD = FALSE,
   center = TRUE,
@@ -46,21 +45,20 @@ default), the mean is estimated by \code{\link[mgcv]{gam}} treating all the
 data as independent.}
 
 \item{nbasis}{number of B-spline basis functions used for estimation of the
-mean function and bivariate smoothing of the covariance surface.}
+mean function.}
+
+\item{nbasis_cov}{number of basis functions used for the bivariate
+smoothing of the covariance surface.}
+
+\item{bs_cov}{type of spline for the bivariate smoothing of the covariance
+surface. Default is symmetric fast covariance smoothing proposed by 
+Cederbaum.}
 
 \item{pve}{proportion of variance explained: used to choose the number of
 principal components.}
 
 \item{npc}{prespecified value for the number of principal components (if
 given, this overrides \code{pve}).}
-
-\item{var}{\code{TRUE} or \code{FALSE} indicating whether model-based
-estimates for the variance of FPCA expansions should be computed.}
-
-\item{simul}{logical: should critical values be estimated for simultaneous
-confidence intervals?}
-
-\item{sim.alpha}{1 - coverage probability of the simultaneous intervals.}
 
 \item{useSymm}{logical, indicating whether to smooth only the upper
 triangular part of the naive covariance (when \code{cov.est.method==2}).
@@ -76,8 +74,7 @@ your favorite mean function estimate.}
 
 \item{cov.est.method}{covariance estimation method. If set to \code{1} 
 (the default), a one-step method that applies a bivariate smooth to the 
-\eqn{y(s_1)y(s_2)} values. This can be very slow but the fast covariance
-estimation method from Cederbaum is used. If set to \code{2}, a two-step
+\eqn{y(s_1)y(s_2)} values. This can be very slow. If set to \code{2}, a two-step
 method that obtains a naive covariance estimate which is then smoothed.}
 
 \item{integration}{quadrature method for numerical integration; only

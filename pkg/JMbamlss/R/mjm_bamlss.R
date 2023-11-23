@@ -1,3 +1,11 @@
+#' Family for Flexible Multivariate Joint Model
+#'
+#' This function specifies the different predictors and link functions as well
+#' as the corresponding transform/updating/sampling functions as well as the
+#' predict function.
+#' @param ... All arguments are actually hard coded as needed by the
+#'   implementation.
+#'@export
 mjm_bamlss <- function(...)
 {
   links = c(

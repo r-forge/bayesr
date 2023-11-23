@@ -4,7 +4,7 @@
 \alias{sim_bamlss_predict}
 \title{Simulation Helper Function - Predict the Results for bamlss-Models}
 \usage{
-sim_bamlss_predict(m, wd, model_wd, data_wd)
+sim_bamlss_predict(m, wd, model_wd, data_wd, rds = TRUE, old = FALSE)
 }
 \arguments{
 \item{m}{Vector containing all the file names of the models.}
@@ -14,6 +14,12 @@ sim_bamlss_predict(m, wd, model_wd, data_wd)
 \item{model_wd}{Simulation setting folder where the models are saved.}
 
 \item{data_wd}{Simulation data folder.}
+
+\item{rds}{Objects are saved as .rds files (for backwards compatibility when
+.Rdata files were used). Defaults to TRUE.}
+
+\item{old}{Simulated data sets before Version 0.0.3 (samples need to be adapted
+for standardized survival matrices). Defaults to FALSE.}
 }
 \description{
 This function takes all the models listed in a folder and predicts the fit.

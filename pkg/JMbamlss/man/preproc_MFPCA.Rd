@@ -11,12 +11,17 @@ preproc_MFPCA(
   id = "id",
   marker = "marker",
   M = NULL,
+  weights = FALSE,
   remove_obs = NULL,
   method = c("fpca", "fpca.sc", "FPCA", "PACE"),
   nbasis = 10,
+  nbasis_cov = nbasis,
+  bs_cov = "symm",
   npc = NULL,
   fve_uni = 0.99,
   pve_uni = 0.99,
+  fit = FALSE,
+  max_time = NULL,
   save_uniFPCA = FALSE,
   save_uniGAM = FALSE
 )
@@ -35,6 +40,9 @@ preproc_MFPCA(
 \item{M}{Number of mFPCs to compute in the MFPCA. If not supplied, it
 defaults to the maximum number of computable mFPCs.}
 
+\item{weights}{TRUE if inverse sum of univariate eigenvals should be used as
+weights in the scalar product of the MFPCA. Defaults to FALSE (weights 1).}
+
 \item{remove_obs}{Minimal number of observations per individual and marker to
 be included in the FPC estimation. Defaults to NULL (all observations). Not
 removing observations can lead to problems if the univariate variance 
@@ -45,15 +53,29 @@ few observations cannot be estimated.}
 adapted function 'fpca', 'FPCA' from package \code{fdapace}, 'fpca.sc' from
 package \code{refund}, or function 'PACE' from package \code{MFPCA}.}
 
-\item{nbasis}{Number of B-spline basis functions for mean estimate and
-bivariate smoothing of covariance surface for methods fpca.sc, PACE.}
+\item{nbasis}{Number of B-spline basis functions for mean estimate for 
+methods fpca, fpca.sc, PACE. For fpca.sc, PACE also bivariate smoothing of
+covariance estimate.}
+
+\item{nbasis_cov}{Number of basis functions used for the bivariate
+smoothing of the covariance surface for method fpca.}
+
+\item{bs_cov}{Type of spline for the bivariate smoothing of the covariance
+surface for method fpca. Default is symmetric fast covariance smoothing 
+proposed by Cederbaum.}
 
 \item{npc}{Number of univariate principal components to use in fpca.sc, PACE.}
 
 \item{fve_uni}{Fraction of univariate variance explained for method FPCA.}
 
-\item{pve_uni}{Proportion of univariate variance explained for method 
-fpca.sc,PACE.}
+\item{pve_uni}{Proportion of univariate variance explained for methods 
+fpca, fpca.sc, PACE.}
+
+\item{fit}{MFPCA argument to return a truncated KL fit to the data. Defaults
+to FALSE.}
+
+\item{max_time}{If supplied, forces the evaluation of the MFPCs up to maxtime.
+Only implemented for method = 'fpca'.}
 
 \item{save_uniFPCA}{TRUE to attach list of univariate FPCAs as attribute to
 output. Defaults to FALSE.}

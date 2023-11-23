@@ -4,7 +4,7 @@
 \alias{sim_jmbamlss_eval}
 \title{Simulation Helper Function - Evaluate the Simulation for JMbamlss Setting}
 \usage{
-sim_jmbamlss_eval(wd, model_wd, data_wd, name)
+sim_jmbamlss_eval(wd, model_wd, data_wd, name, rds = TRUE)
 }
 \arguments{
 \item{wd}{Path to simulations folder.}
@@ -14,6 +14,9 @@ sim_jmbamlss_eval(wd, model_wd, data_wd, name)
 \item{data_wd}{Simulation data folder.}
 
 \item{name}{Name for description of the simulation setting.}
+
+\item{rds}{Objects are saved as .rds files (for backwards compatibility when
+.Rdata files were used). Defaults to TRUE.}
 }
 \description{
 This function evaluates the results for a given folder of JMbamlss model 
