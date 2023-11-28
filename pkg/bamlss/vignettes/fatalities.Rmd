@@ -55,6 +55,7 @@ zero in the thousands, i.e., a model for count data will most probable not impro
 
 ```{r, echo=FALSE, fig.width = 5, fig.height = 4.5, fig.align = "center", dev = "png", results='hide', message=FALSE, echo=FALSE, out.width="60%", fig.cap = "Fatalities data in Austria (2000--2019), histogram and fitted distributions."}
 library("bamlss")
+library("gamlss.dist")
 
 if(!file.exists("figures/fatalities_models.rda")) {
   source("figures/fatalities_models.R")

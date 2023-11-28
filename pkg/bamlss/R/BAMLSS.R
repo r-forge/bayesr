@@ -4540,6 +4540,7 @@ predict.bamlss <- function(object, newdata, model = NULL, term = NULL, match.nam
               any(sapply(x[[jj]]$margin, function(z) { inherits(z, "random.effect") }))
             } else inherits(x[[jj]], "random.effect")
           }
+          print(jj)
           if(any(sn %in% colnames(samps))) {
             if(random) {
               if(ncol(X) == ncol(samps[, sn, drop = FALSE]))
@@ -10418,6 +10419,7 @@ term.labels2 <- function(x, model = NULL, pterms = TRUE, sterms = TRUE,
       rval[[j]] <- c(rval[[j]], "(Intercept)")
     if(is.bamlss)
       rval[[j]] <- c(rval[[j]], stl[[j]])
+## check rval[[j]] <- rval[[j]][rval[[j]] != ""]
   }
   names(rval) <- nx
   if(rm.by) {

@@ -3,6 +3,10 @@ library("bamlss")
 if(!file.exists("../../www/misc")) {
   dir.create("../../www/misc")
 }
+
+if(!file.exists("vignettes/figures/bivnorm_data.rds")) {
+  download.file("http://bayesr.r-forge.r-project.org/misc/bivnorm_data.rds", "vignettes/figures/bivnorm_data.rds")
+}
 figs <- dir("vignettes/figures", full.names = TRUE)
 file.copy(figs, file.path("../../www/misc/", basename(figs)), overwrite = TRUE)
 
