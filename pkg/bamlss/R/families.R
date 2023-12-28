@@ -4550,6 +4550,20 @@ tF <- function(x, ...)
     rval$variance <- function(par, ...) { par[[2L]] }
   }
 
+  if(!is.null(x$rqres)) {
+    rqres <- utils::getFromNamespace("rqres", "gamlss")
+    rqres_fun <- x$rqres
+    nenv <- new.env()
+    assign("rqres", utils::getFromNamespace("rqres", "gamlss"), envir = nenv)
+
+    rval$residuals <- function(y, par) {
+      assign("y", y, envir = nenv)
+      for(i in nx)
+        assign(i, par[[i]], envir = nenv)
+      eval(x$rqres, envir = nenv)
+    }
+  }
+
   class(rval) <- "family.bamlss"
   rval
 }
