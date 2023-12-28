@@ -4556,7 +4556,7 @@ tF <- function(x, ...)
     nenv <- new.env()
     assign("rqres", utils::getFromNamespace("rqres", "gamlss"), envir = nenv)
 
-    rval$residuals <- function(y, par) {
+    rval$rqres <- function(y, par, ...) {
       assign("y", y, envir = nenv)
       for(i in nx)
         assign(i, par[[i]], envir = nenv)
