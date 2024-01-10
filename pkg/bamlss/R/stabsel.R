@@ -105,11 +105,10 @@ StabStep <- function(formula, data, family = "gaussian", q, maxit, seed = NULL,
     if(!is.null(seed)) {
         set.seed(seed)
     }
-    d <- data[sample(nrow(data), size = round(nrow(data) * fraction)), ]
+    d <- data[sample(nrow(data), size = round(nrow(data) * fraction)), , drop = FALSE]
     b <- bamlss(formula, data = d, family = family,
                 optimizer = opt_boost, maxit = maxit, maxq = q,
-                sampler = FALSE, binning = TRUE,
-                plot = FALSE, verbose = TRUE, ...)
+                sampler = FALSE, plot = FALSE, verbose = TRUE, ...)
 
     rval <- NULL
 
