@@ -81,7 +81,7 @@ stabsel <- function(formula, data, family = "gaussian",
     tabsel <- sort(table(stabselection), decreasing = FALSE)
     f <- StabFormula(tabsel, formula, family, thr, B)
 
-    ## --- Comupte per-family-error-rate ---
+    ## --- Compute per-family-error-rate ---
     p <- 0
     for (i in seq_along(formula)) {
         p <- p + length(attr(terms(formula[[i]]$formula), "term.labels"))
@@ -103,9 +103,11 @@ stabsel <- function(formula, data, family = "gaussian",
 StabStep <- function(formula, data, family = "gaussian", q, maxit, seed = NULL,
                      fraction = fraction, ...) {
     if(!is.null(seed)) {
-        set.seed(seed)
+      set.seed(seed)
     }
+
     d <- data[sample(nrow(data), size = round(nrow(data) * fraction)), , drop = FALSE]
+
     b <- bamlss(formula, data = d, family = family,
                 optimizer = opt_boost, maxit = maxit, maxq = q,
                 sampler = FALSE, plot = FALSE, verbose = TRUE, ...)
