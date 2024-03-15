@@ -3510,7 +3510,7 @@ formula_hcheck <- function(formula)
         if(j != i) {
           fi <- if(!is.list(formula[[i]])) list(formula[[i]]) else formula[[i]]
           rnj <- response.name(formula[[j]], keep.functions = TRUE)
-          if(!is.na(rnj)) {
+          if(!all(is.na(rnj))) {
             if(rnj == ".")
               next
           }
