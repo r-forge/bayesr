@@ -245,7 +245,14 @@ export(
   "smooth_check",
   "engines",
   "gamlss_distributions",
-  "CRPS"
+  "CRPS",
+
+  ## mvnchol
+  "dist_mvnchol",
+  "make_formula",
+  "mvn_chol",
+  "mvn_modchol",
+  "mvnchol_bamlss"
 )
 
 S3method("plot", "bamlss")
