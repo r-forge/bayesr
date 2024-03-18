@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-3</span>
       </span>
     </div>
 
@@ -241,7 +241,7 @@
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## Estimate model.</span></span></span>
 <span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(b):</span> object 'b' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'b' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Plot estimated effect.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
@@ -251,20 +251,20 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Extract fitted values.</span></span></span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">b</span>, model <span class="op">=</span> <span class="st">"mu"</span>, term <span class="op">=</span> <span class="st">"s(x)"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in fitted(b, model = "mu", term = "s(x)"):</span> object 'b' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'b' not found</span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="st">"x"</span><span class="op">]</span>, <span class="va">f</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data.frame(..., check.names = FALSE):</span> object 'f' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'f' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Now use plot2d.</span></span></span>
 <span class="r-in"><span><span class="fu">plot2d</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot2d(f):</span> object 'f' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'f' not found</span>
 <span class="r-in"><span><span class="fu">plot2d</span><span class="op">(</span><span class="va">f</span>, fill.select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot2d(f, fill.select = c(0, 1, 0, 1)):</span> object 'f' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'f' not found</span>
 <span class="r-in"><span><span class="fu">plot2d</span><span class="op">(</span><span class="va">f</span>, fill.select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot2d(f, fill.select = c(0, 1, 0, 1), lty = c(2, 1, 2)):</span> object 'f' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'f' not found</span>
 <span class="r-in"><span><span class="fu">plot2d</span><span class="op">(</span><span class="va">f</span>, fill.select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  scheme <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot2d(f, fill.select = c(0, 1, 0, 1), lty = c(2, 1, 2), scheme = 2):</span> object 'f' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'f' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Variations.</span></span></span>
 <span class="r-in"><span><span class="fu">plot2d</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>

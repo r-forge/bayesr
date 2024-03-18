@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-3</span>
       </span>
     </div>
 
@@ -189,12 +189,12 @@
 </h2>
 <p>When modeling wage, we need to take into account its special characteristics as a random variable: It is positive (or non-negative, but our dataset does not contain any zeros) and its distribution is right-skewed. These characteristics make distributional regression an appropriate tool for the task at hand.</p>
 <p>Based on the characteristics of wage, we choose the <a href="https://en.wikipedia.org/wiki/Log-normal_distribution" class="external-link">log-normal distribution</a> for our model. The log-normal distribution has positive support, it is right-skewed, and it has a location parameter <span class="math inline">\(\mu\)</span> and a scale parameter <span class="math inline">\(\sigma\)</span>. The idea of distributional regression is to link all parameters of the response distribution to explanatory variables. In our case, these will be education, age, race, and year.</p>
-<p>The following R code specifies and estimates our model using the <code>LOGNO</code> family of the <em>gamlss</em> package <span class="citation">(<span class="citeproc-not-found" data-reference-id="bamlss:Stasinopoulos+Rigby:2018"><strong>???</strong></span>)</span>:</p>
+<p>The following R code specifies and estimates our model using the <code>LOGNO</code> family of the <em>gamlss.dist</em> package <span class="citation">(<span class="citeproc-not-found" data-reference-id="bamlss:Stasinopoulos+Rigby:2018"><strong>???</strong></span>)</span>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.bamlss.org/" class="external-link">"bamlss"</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Get the gamlss families.</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://www.gamlss.com/" class="external-link">"gamlss"</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://www.gamlss.com/" class="external-link">"gamlss.dist"</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Model formula.</span></span>
 <span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -297,7 +297,7 @@
 <p>Stadlmann, Stanislaus. 2019. <em>Distreg.vis: Framework for the Visualization of Distributional Regression Models</em>. <a href="https://CRAN.R-project.org/package=distreg.vis" class="external-link">https://CRAN.R-project.org/package=distreg.vis</a>.</p>
 </div>
 <div id="ref-bamlss:Umlauf+bamlss:2018">
-<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2021. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.</p>
+<p>Umlauf, Nikolaus, Nadja Klein, Achim Zeileis, and Thorsten Simon. 2024. <em>bamlss: Bayesian Additive Models for Location Scale and Shape (and Beyond)</em>. <a href="https://CRAN.R-project.org/package=bamlss" class="external-link">https://CRAN.R-project.org/package=bamlss</a>.</p>
 </div>
 </div>
 </div>

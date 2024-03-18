@@ -138,12 +138,56 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-Infrastructure for estimating probabilistic distributional regression models in a Bayesian framework.
-  The distribution parameters may capture location, scale, shape, etc. and every parameter may depend
-  on complex additive terms (fixed, random, smooth, spatial, etc.) similar to a generalized additive model.
-  The conceptual and computational framework is introduced in Umlauf, Klein, Zeileis (2019)
-  &lt;<a href="https://doi.org/10.1080/10618600.2017.1407325" class="external-link">doi:10.1080/10618600.2017.1407325</a>&gt; and the R package in Umlauf, Klein, Simon, Zeileis (2021)
-  &lt;<a href="https://doi.org/10.18637/jss.v100.i04" class="external-link">doi:10.18637/jss.v100.i04</a>&gt;.
+<div class="section level1">
+<div class="page-header"><h1 id="a-lego-toolbox-for-flexible-bayesian-regression-and-beyond">A Lego Toolbox for Flexible Bayesian Regression (and Beyond)<a class="anchor" aria-label="anchor" href="#a-lego-toolbox-for-flexible-bayesian-regression-and-beyond"></a>
+</h1></div>
+<p>The <em>bamlss</em> package provides a modular computational framework for flexible Bayesian regression models (and beyond). Users can specify complex models using the familiar formula syntax of R. The package supports commonly used extractor functions like <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, etc. Moreover, users can specify their own model term constructors or even model fitting engines, Bayesian or frequentist.</p>
+<div class="section level2">
+<h2 id="flexible-model-terms">Flexible model terms<a class="anchor" aria-label="anchor" href="#flexible-model-terms"></a>
+</h2>
+<hr>
+<p><img src="misc/mcycle1.png" style="width:98.0%"></p>
+</div>
+<div class="section level2">
+<h2 id="spatial-effects">Spatial effects<a class="anchor" aria-label="anchor" href="#spatial-effects"></a>
+</h2>
+<hr>
+<p><img src="misc/firemodel-effects-spatial-tc.png" style="width:49.0%"><img src="misc/firemodel-effects-spatial-td.png" style="width:49.0%"></p>
+<p><img src="misc/firemodel-effects-baseline.png" style="width:49.0%"><img src="misc/firemodel-effects-daytime-curves.png" style="width:49.0%"></p>
+</div>
+<div class="section level2">
+<h2 id="prediction">Prediction<a class="anchor" aria-label="anchor" href="#prediction"></a>
+</h2>
+<hr>
+<p><img src="misc/rainmodel-effects-predict.png" style="width:98.0%"></p>
+</div>
+<div class="section level2">
+<h2 id="model-diagnostics">Model diagnostics<a class="anchor" aria-label="anchor" href="#model-diagnostics"></a>
+</h2>
+<hr>
+<p><img src="misc/mcycle2.png" style="width:98.0%"></p>
+<p><img src="misc/traceplot-03.png" style="width:98.0%"></p>
+</div>
+<div class="section level2">
+<h2 id="extensible-model-terms-and-model-fitting-engines">Extensible model terms and model fitting engines<a class="anchor" aria-label="anchor" href="#extensible-model-terms-and-model-fitting-engines"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">## Posterior mode optimization.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>opt_bfit &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, family, <span class="dt">start =</span> <span class="ot">NULL</span>, <span class="dt">weights =</span> <span class="ot">NULL</span>, <span class="dt">offset =</span> <span class="ot">NULL</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="dt">update =</span> <span class="st">"iwls"</span>, <span class="dt">criterion =</span> <span class="kw">c</span>(<span class="st">"AICc"</span>, <span class="st">"BIC"</span>, <span class="st">"AIC"</span>), ..) { }</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co">## MCMC Sampler.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>sam_GMCMC &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, family, <span class="dt">start =</span> <span class="ot">NULL</span>, <span class="dt">weights =</span> <span class="ot">NULL</span>, <span class="dt">offset =</span> <span class="ot">NULL</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="dt">n.iter =</span> <span class="dv">1200</span>, <span class="dt">burnin =</span> <span class="dv">200</span>, <span class="dt">thin =</span> <span class="dv">1</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>, <span class="dt">step =</span> <span class="dv">20</span>, ...) { }</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">## Gradient boosting.</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>opt_boost &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, family, <span class="dt">weights =</span> <span class="ot">NULL</span>, <span class="dt">offset =</span> <span class="ot">NULL</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  <span class="dt">nu =</span> <span class="fl">0.1</span>, <span class="dt">nu.adapt =</span> <span class="ot">TRUE</span>, <span class="dt">df =</span> <span class="dv">4</span>, <span class="dt">maxit =</span> <span class="dv">400</span>, ...) { }</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co">## Lasso.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>opt_lasso &lt;-<span class="st"> </span><span class="cf">function</span>(x, y, <span class="dt">start =</span> <span class="ot">NULL</span>, <span class="dt">adaptive =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  <span class="dt">lower =</span> <span class="fl">0.001</span>, <span class="dt">upper =</span> <span class="dv">1000</span>,  <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">lambda =</span> <span class="ot">NULL</span>, ...) { }</span></code></pre></div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -109,6 +109,9 @@
     <loc>/reference/Surv2.html</loc>
   </url>
   <url>
+    <loc>/reference/TempIbk.html</loc>
+  </url>
+  <url>
     <loc>/reference/Volcano.html</loc>
   </url>
   <url>
@@ -169,7 +172,7 @@
     <loc>/reference/ddnn.html</loc>
   </url>
   <url>
-    <loc>/reference/dl.bamlss.html</loc>
+    <loc>/reference/dist_mvnchol.html</loc>
   </url>
   <url>
     <loc>/reference/engines.html</loc>
@@ -211,10 +214,22 @@
     <loc>/reference/lin.html</loc>
   </url>
   <url>
+    <loc>/reference/make_formula.html</loc>
+  </url>
+  <url>
     <loc>/reference/model.frame.bamlss.html</loc>
   </url>
   <url>
     <loc>/reference/model.matrix.bamlss.frame.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mvn_chol.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mvn_modchol.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mvnchol_bamlss.html</loc>
   </url>
   <url>
     <loc>/reference/n.html</loc>
@@ -284,6 +299,9 @@
   </url>
   <url>
     <loc>/reference/simSurv.html</loc>
+  </url>
+  <url>
+    <loc>/reference/simdata.html</loc>
   </url>
   <url>
     <loc>/reference/sliceplot.html</loc>

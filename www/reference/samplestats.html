@@ -19,7 +19,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-3</span>
       </span>
     </div>
 
@@ -188,15 +188,15 @@
 <span class="r-in"><span><span class="co">## Estimate model without sampling statistics</span></span></span>
 <span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">d</span>, samplestats <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(num ~ s(x1) + s(x2) + s(x3) + te(lon, lat), data = d,     samplestats = FALSE):</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'd' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Note: needs the $d() or $loglik() function in the family!</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in family(b):</span> object 'b' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'b' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Compute sampling statistics.</span></span></span>
 <span class="r-in"><span><span class="fu">samplestats</span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in samplestats(b):</span> object 'b' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'b' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-3</span>
       </span>
     </div>
 
@@ -144,20 +144,20 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu">GAMart</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          num     pnum      bnum cnum bin    cat     cens         eta         x1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.4497811 1.691436 0.3033638   30  no   none 0.000000 -0.37799392 0.99224239</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.3343110 1.806906 0.3523558   35  no   none 0.000000 -0.47455213 0.22782415</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.5756694 2.716886 0.7384443   74 yes   high 0.000000  0.56631234 0.13231028</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.2666320 1.874585 0.3810708   38  no    low 1.286787 -0.26486410 0.62844445</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.0572494 2.083967 0.4699081   47 yes medium 0.000000  0.06743703 0.53186759</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.5981314 2.739348 0.7479745   75 yes   high 0.000000  0.50664908 0.01437493</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          x2         x3    fac id        lon        lat          err</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9590275 0.71230048 medium  1 0.09090909 0.72727273 -0.071787217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.6543157 0.59238197    low  2 0.54545455 0.09090909  0.140241109</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.9033687 0.00958522   high  3 0.18181818 0.18181818  0.009357073</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.9828262 0.63567766   high  4 0.72727273 0.86363636 -0.001767906</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.7719231 0.75022459   high  5 0.63636364 0.50000000 -0.124686426</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.7259872 0.85406946 medium  6 0.81818182 0.50000000  0.091482333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          num     pnum      bnum cnum bin  cat      cens        eta         x1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1.0169690 3.092265 0.9900000  100 yes high 1.9653517  1.0000000 0.16630246</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.1229567 1.952339 0.4560680   46  no  low 1.1407196 -0.2363394 0.53903533</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.2380406 1.837255 0.4021636   40  no none 1.7760826 -0.2276778 0.09199109</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.2999583 2.375254 0.6541580   66 yes high 0.0000000  0.3903429 0.42139066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.4510741 1.624222 0.3023804   30  no none 0.0000000 -0.3925761 0.91944974</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -0.4631957 1.612100 0.2967028   29  no none 0.6829801 -0.3386446 0.41674452</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          x2        x3  fac id        lon        lat         err</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.1114923 0.9311871 high  1 0.86363636 0.36363636  0.01696899</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.1690732 0.7248583  low  2 0.09090909 0.54545455  0.11338276</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.5384616 0.3959943  low  3 0.31818182 0.77272727 -0.01036283</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.5836437 0.9025054 high  4 0.13636364 0.09090909 -0.09038457</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.7918226 0.9482536  low  5 0.13636364 0.59090909 -0.05849799</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.5891254 0.5708711 high  6 0.90909091 0.95454545 -0.12455111</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span> <span class="op">+</span> <span class="fu">te</span><span class="op">(</span><span class="va">lon</span>,<span class="va">lat</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>

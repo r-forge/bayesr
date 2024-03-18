@@ -21,7 +21,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-3</span>
       </span>
     </div>
 
@@ -395,31 +395,31 @@
 <span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="GAMart.html">GAMart</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">num</span> <span class="op">~</span> <span class="fu">s</span><span class="op">(</span><span class="va">x1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">s</span><span class="op">(</span><span class="va">x3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bf</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.frame.html">bamlss.frame</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss.model.frame(formula, data, family, weights, subset, offset,     na.action, specials, contrasts, nthres = list(...)$nthres):</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'd' not found</span>
 <span class="r-in"><span><span class="va">opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">bf</span>, <span class="fu">opt_bfit</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">family</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in with(bf, opt_bfit(x, y, family)):</span> object 'bf' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'bf' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">opt</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in str(opt):</span> object 'opt' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'opt' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Same with bamlss().</span></span></span>
 <span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, sampler <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(f, data = d, family = "gaussian", sampler = FALSE):</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'd' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(b):</span> object 'b' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'b' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Use of different updating function.</span></span></span>
 <span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
 <span class="r-in"><span>  sampler <span class="op">=</span> <span class="cn">FALSE</span>, update <span class="op">=</span> <span class="va">bfit_lm</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(f, data = d, family = "gaussian", sampler = FALSE, update = bfit_lm):</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'd' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Use mgcv gam() function for updating.</span></span></span>
 <span class="r-in"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="bamlss.html">bamlss</a></span><span class="op">(</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">d</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>,</span></span>
 <span class="r-in"><span>  sampler <span class="op">=</span> <span class="cn">FALSE</span>, mgcv <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bamlss(f, data = d, family = "gaussian", sampler = FALSE, mgcv = TRUE):</span> object 'd' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'd' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'b' not found</span>
 <span class="r-in"><span></span></span>
@@ -487,12 +487,12 @@
 <span class="r-in"><span><span class="co">## Predict with special model term.</span></span></span>
 <span class="r-in"><span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"time"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">30</span>, length <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">b</span>, newdata <span class="op">=</span> <span class="va">nd</span>, model <span class="op">=</span> <span class="st">"mu"</span>, FUN <span class="op">=</span> <span class="va">c95</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in predict(b, newdata = nd, model = "mu", FUN = c95):</span> object 'b' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'b' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">d</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">y</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot.default(x[[1L]], x[[2L]], xlab = xlab, ylab = ylab, ...):</span> object 'p' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'p' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">nd</span><span class="op">$</span><span class="va">time</span>, <span class="va">p</span>, type <span class="op">=</span> <span class="st">"l"</span>,</span></span>
 <span class="r-in"><span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"black"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in matplot(nd$time, p, type = "l", lty = c(2, 1, 2), col = "black",     add = TRUE):</span> object 'p' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'p' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
