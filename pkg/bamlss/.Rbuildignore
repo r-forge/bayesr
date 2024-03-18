@@ -3,6 +3,7 @@ index.md
 
 inst/tscript.R
 inst/fatalities.R
+inst/minify.R
 
 R/devtools.R
 R/STAN.R
@@ -13,6 +14,10 @@ R/JM2.R
 
 data/MunichBnd.rda
 data/rent99.rda
+data/Austria.rda
+man/Austria.Rd
+data/GEFCom2014.rda
+man/GEFCom2014.Rd
 
 tests
 paper
