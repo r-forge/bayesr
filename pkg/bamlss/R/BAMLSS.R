@@ -5750,6 +5750,9 @@ smooth.construct.linear.smooth.spec <- function(object, data, knots, ...)
     else
       object$S <- list(crossprod(diff(diag(ncol(object$X)))))
     object$xt$df <- if(is.null(object$xt$df)) min(c(floor(length(object$scale$center) / 2), 2)) else object$xt$df
+    object[["a"]] <- 0.0001
+    object[["b"]] <- 0.0001
+    object[["rank"]] <- ncol(object$S[[1]])
   } else {
     object$fixed <- TRUE
     object$fxsp <- TRUE

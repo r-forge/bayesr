@@ -1,5 +1,5 @@
 ---
-title: "Spatial location-scale model"
+title: "Spatial Location-Scale Model"
 output:
   html_document:
     toc: true

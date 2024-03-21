@@ -75,10 +75,10 @@ parameters of the response distribution to explanatory variables. In our case, t
 education, age, race, and year.
 
 The following R code specifies and estimates our model using the `LOGNO` family of the 
-_gamlss_ package [@bamlss:Stasinopoulos+Rigby:2018]:
+_gamlss.dist_ package [@bamlss:Stasinopoulos+Rigby:2018]:
 
 ```{r, echo=FALSE, message=FALSE, results='hide'}
-library("gamlss")
+library("gamlss.dist")
 
 f <- list(
   wage ~ s(age) + race + year + education,
@@ -97,7 +97,7 @@ if(!file.exists("figures/distregvis.rda")) {
 library("bamlss")
 
 ## Get the gamlss families.
-library("gamlss")
+library("gamlss.dist")
 
 ## Model formula.
 f <- list(

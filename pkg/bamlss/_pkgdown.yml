@@ -115,6 +115,15 @@ reference:
     - '`Volcano`'
     - '`homstart_data`'
     - '`Golf`'
+    - '`simdata`'
+    - '`TempIbk`'
+  - title: Multivariate Normal Family
+    contents:
+    - '`mvnchol_bamlss`'
+    - '`mvn_chol`'
+    - '`mvn_modchol`'
+    - '`dist_mvnchol`'
+    - '`make_formula`'
   - title: Misc
     contents:
     - '`BAMLSS`'
