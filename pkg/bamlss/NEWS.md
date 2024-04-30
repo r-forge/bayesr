@@ -1,3 +1,7 @@
+# bamlss 1.2-4
+
+* Fixed opt_boost()
+
 # bamlss 1.2-3
 
 * Added the modified Cholesky family.
