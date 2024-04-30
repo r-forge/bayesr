@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bamlss</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2-4</span>
       </span>
     </div>
 
@@ -185,24 +185,24 @@
 <span class="r-in"><span><span class="co">## Get the model matrices.</span></span></span>
 <span class="r-in"><span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">bf</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">X</span><span class="op">$</span><span class="va">sigma</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)        x3 facmedium fachigh       lon       lat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1 0.3367601         0       0 0.6818182 0.8636364</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           1 0.7738954         0       0 0.9090909 0.5000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3           1 0.9562896         0       0 0.6818182 0.9090909</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4           1 0.9281883         0       1 0.7727273 0.5454545</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5           1 0.8467788         0       1 0.8181818 0.2727273</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6           1 0.4282276         0       0 0.7272727 0.1363636</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)        x3 facmedium fachigh       lon        lat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1 0.1897572         0       0 0.8636364 0.95454545</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           1 0.1045232         0       1 0.5909091 0.86363636</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           1 0.4983402         1       0 0.9090909 0.09090909</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           1 0.1659821         0       0 0.6818182 0.04545455</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           1 0.5665869         0       1 0.5454545 0.81818182</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6           1 0.5376464         1       0 0.7727273 0.36363636</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Same with "bamlss.formula".</span></span></span>
 <span class="r-in"><span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="fu"><a href="bamlss.formula.html">bamlss.formula</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">X</span><span class="op">$</span><span class="va">sigma</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)        x3 facmedium fachigh       lon       lat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1 0.3367601         0       0 0.6818182 0.8636364</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           1 0.7738954         0       0 0.9090909 0.5000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3           1 0.9562896         0       0 0.6818182 0.9090909</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4           1 0.9281883         0       1 0.7727273 0.5454545</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5           1 0.8467788         0       1 0.8181818 0.2727273</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6           1 0.4282276         0       0 0.7272727 0.1363636</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)        x3 facmedium fachigh       lon        lat</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1 0.1897572         0       0 0.8636364 0.95454545</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           1 0.1045232         0       1 0.5909091 0.86363636</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           1 0.4983402         1       0 0.9090909 0.09090909</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           1 0.1659821         0       0 0.6818182 0.04545455</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           1 0.5665869         0       1 0.5454545 0.81818182</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6           1 0.5376464         1       0 0.7727273 0.36363636</span>
 </code></pre></div>
     </div>
   </div>
