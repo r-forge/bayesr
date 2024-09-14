@@ -12238,6 +12238,8 @@ CRPS <- function(object, newdata = NULL, interval = c(-Inf, Inf), FUN = mean, te
 }
 
 .CRPS <- function(y, par, family, interval = c(-Inf, Inf)) {
+  if(is.list(par))
+    par <- as.data.frame(par)
   if(is.function(family))
     family <- family()
   if(inherits(family, "gamlss.family"))
