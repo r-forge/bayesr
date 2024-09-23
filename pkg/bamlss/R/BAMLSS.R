@@ -1465,7 +1465,6 @@ make.fit.fun <- function(x, type = 1)
   return(ff)
 }
 
-
 ## The prior function.
 make.prior <- function(x, sigma = 0.1)
 {
