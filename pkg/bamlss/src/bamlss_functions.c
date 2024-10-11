@@ -191,7 +191,7 @@ SEXP eval_dmvnorm_log(SEXP fun, SEXP x, SEXP mu, SEXP sigma, SEXP rho)
 }
 
 
-/*/* logPost evaluation */*/
+/* logPost evaluation */
 /*double lp_eval(SEXP fun, SEXP g, SEXP x,*/
 /*  SEXP family, SEXP response, SEXP eta,*/
 /*  SEXP id, SEXP rho)*/
@@ -216,7 +216,7 @@ SEXP eval_dmvnorm_log(SEXP fun, SEXP x, SEXP mu, SEXP sigma, SEXP rho)
 /*}*/
 
 
-/*/* Univariate slice sampling */*/
+/* Univariate slice sampling */
 /*SEXP uni_slice(SEXP g, SEXP x, SEXP family, SEXP response, SEXP eta, SEXP id, SEXP j,*/
 /*  SEXP W, SEXP M, SEXP LOWER, SEXP UPPER, SEXP logPost, SEXP rho)*/
 /*{*/
