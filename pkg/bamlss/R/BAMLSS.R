@@ -2746,14 +2746,13 @@ bamlss.family <- function(family, type = "bamlss", ...)
   if(inherits(family, "gamlss.family"))
     family <- tF(family, ...)
   if(!inherits(family, "family.bamlss")) {
-    if(!is.character(family)) {
-      if(is.null(family$family)) stop("family is specified wrong, no family name available!")
-      family <- family$family
+    if(is.character(family)) {
+      txt <- paste(tolower(family), type, sep = if(!is.null(type)) "_" else "")
+      txt <- gsub("bamlss.bamlss", "bamlss", txt, fixed = TRUE)
+      family <- eval(parse(text = txt[1]))
     }
-    txt <- paste(tolower(family), type, sep = if(!is.null(type)) "_" else "")
-    txt <- gsub("bamlss.bamlss", "bamlss", txt, fixed = TRUE)
-    family <- eval(parse(text = txt[1]))
-    family <- family()
+    if(is.function(family))
+      family <- family()
   }
   if(is.null(family)) family <- list()
 
