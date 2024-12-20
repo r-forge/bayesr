@@ -2985,7 +2985,6 @@ bamlss.formula <- function(formula, family = NULL, specials = NULL, env = NULL, 
   formula <- formula_at(formula)
   formula <- complete_formula(formula_hierarchical(formula))
   formula <- formula_extend(formula, family, specials)
-
   environment(formula) <- env
   class(formula) <- c("bamlss.formula", "list")
 
@@ -10185,8 +10184,15 @@ coef.bamlss <- function(object, model = NULL, term = NULL,
   if(!is.null(object$samples)) {
     rval$samples <- samples(object, model = model, term = term, ...)
     tdrop <- grep2(drop, colnames(rval$samples), fixed = TRUE)
-    if(length(tdrop))
-      rval$samples <- rval$samples[, -tdrop, drop = FALSE]
+    if(length(tdrop)) {
+      tt <- colnames(rval$samples)
+      if(("pd" %in% drop) && !any("pd" %in% tt)) {
+        drop <- drop[drop != "pd"]
+        tdrop <- grep2(drop, colnames(rval$samples), fixed = TRUE)
+      }
+      if(length(tdrop))
+        rval$samples <- rval$samples[, -tdrop, drop = FALSE]
+    }
     if(hyper.parameters & summary) {
       ttake <- grep2(c(".tau2", ".lambda", ".edf", ".alpha"), colnames(rval$samples), fixed = TRUE)
       if(length(ttake)) {
