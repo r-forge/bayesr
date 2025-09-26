@@ -19,6 +19,13 @@ The \code{fatalities} data contains the following variables:
 }
 }
 
+\details{
+Previous versions of the package employed a slightly smaller version of the data
+set. Since version 1.2-6 of the package the data also includes the last seven weeks
+from 2020 (2020-47 to 2020-53) plus small corrections for the earlier weeks in
+2020 and the addition of two previously missing weeks (2004-42 and 2014-20).
+}
+
 \references{
   Eurostat Database (2020). \emph{Population and social conditions, demography and migration,
     mortality, weekly deaths, deaths by week and NUTS 3 region, Austria}
