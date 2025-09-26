@@ -4,7 +4,7 @@
 \title{Weekly Number of Fatalities in Austria}
 
 \description{
-  This data set includes weekly fatalities in Austria from 2000 to 46 weeks in 2020. The data
+  This data set includes weekly fatalities in Austria from 2000 to 2020. The data
   is taken from the Eurostat data base.
 }
 
@@ -15,7 +15,7 @@ The \code{fatalities} data contains the following variables:
 \describe{
   \item{num:}{Integer, the number of fatalities.}
   \item{year:}{Integer, the corresponding year fatalities are recorded.}
-  \item{week:}{Integer, the corresponding week fatalities are recorded..}
+  \item{week:}{Integer, the corresponding week fatalities are recorded.}
 }
 }
 

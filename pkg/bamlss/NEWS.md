@@ -1,3 +1,10 @@
+# bamlss 1.2-6
+
+* Updated fatalities data to also include the last seven weeks
+  from 2020 (2020-47 to 2020-53) plus small corrections for the
+  earlier weeks in 2020 and the addition of two previously missing
+  weeks (2004-42 and 2014-20).
+
 # bamlss 1.2-5
 
 * Improved family parsing and code touch ups.

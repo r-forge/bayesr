@@ -18,7 +18,7 @@ vignette: >
 In this example we estimate a distributional regression
 model using data on fatalities in Austria. The data is taken from the Eurostat data base
 ([https://ec.europa.eu/eurostat/](https://ec.europa.eu/eurostat/)) and includes weekly fatalities
-in Austria from the beginning of 2000 up to week~46 in 2020. The data is provided in the
+in Austria from the beginning of 2000 to the end of 2020. The data is provided in the
 _bamlss_ package and can be loaded with
 ```{r}
 data("fatalities", package = "bamlss")
@@ -51,7 +51,7 @@ without covariates, to get a first idea which distribution fits well. We compare
 as well as by the deviance information criterion (DIC, the complete code is available
 [here](http://bamlss.org/misc/fatalities_models.R)). Note that we do not
 use discrete distributions in this example because the number of fatalities is far away from
-zero in the thousands, i.e., a model for count data will most probable not improve the overall fit.
+zero in the thousands, i.e., a model for count data will most probably not improve the overall fit.
 
 ```{r, echo=FALSE, fig.width = 5, fig.height = 4.5, fig.align = "center", dev = "png", results='hide', message=FALSE, echo=FALSE, out.width="60%", fig.cap = "Fatalities data in Austria (2000--2019), histogram and fitted distributions."}
 library("bamlss")
@@ -295,8 +295,16 @@ with a higher number of fatalities in winter. The skewness of the distribution
 is also very dominant in winter.  However, also in the summer months there is a
 visible increase in the upper quantile, which is probably due to particular
 heat waves leading to greater cardiovascular stress [@bamlss:fouillet2008]. The
-mortality rate from beginning of 2020 to week 46 is plotted in red and clearly
+mortality rate from 2020 is plotted in red and clearly
 indicates that this is much higher than the long-term median in the spring and
 from about week 40 onward, and also well above the estimated 95% quantile,
 respectively.
 
+**Note:** Previous versions of the package, in particular the one used in
+@bamlss:Umlauf+bamlss:2021, employed a slightly smaller version of the data
+set. Since version 1.2-6 of the package the data also includes the last seven weeks
+from 2020 (2020-47 to 2020-53) plus small corrections for the earlier weeks in
+2020 and the addition of two previously missing weeks (2004-42 and 2014-20).
+
+
+## References
