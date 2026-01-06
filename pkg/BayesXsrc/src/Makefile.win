@@ -6,10 +6,8 @@
 # usual include statement sicne ${R_HOME} may contain spaces.
 #
 
-CXX14 = `"${R_HOME}/bin/R" CMD config CXX14`
-CXX14STD = `"${R_HOME}/bin/R" CMD config CXX14STD`
-CXX = ${CXX14} ${CXX14STD}
-CXXFLAGS = `"${R_HOME}/bin/R" CMD config CXX14FLAGS`
+CXX = `"${R_HOME}/bin/R" CMD config CXX`
+CXXFLAGS = `"${R_HOME}/bin/R" CMD config CXXFLAGS`
 
 INNERMAKEFILE=dev-Makefile.inner.win
 
