@@ -5,7 +5,7 @@ Title: Distribution of the 'BayesX' C++ Sources
 Authors@R: c(person(given = "Nikolaus", family = "Umlauf", role = c("aut", "cre"), email = "Nikolaus.Umlauf@uibk.ac.at",
                comment = c(ORCID = "0000-0003-2160-9803")),
         person(given = "Daniel", family = "Adler", role = "aut", email = "dadler@dyncall.org"),
-        person(given = "Thomas", family = "Kneib", role = "aut", email = "tkneib@uni-goettingen.de"),
+        person(given = "Thomas", family = "Kneib", role = "aut", email = "tkneib@uni-goettingen.de", comment = c(ORCID = "0000-0003-3390-0972")),
         person(given = "Stefan", family = "Lang", role = "aut", email = "Stefan.Lang@uibk.ac.at"),
         person(given = "Achim", family = "Zeileis", role = "aut", email = "Achim.Zeileis@R-project.org",
                comment = c(ORCID = "0000-0003-0918-3766")))
@@ -14,6 +14,6 @@ Description: 'BayesX' performs Bayesian inference in structured additive regress
 	A convenient R interface is provided in package R2BayesX.
 Depends: R (>= 2.8.0)
 Suggests: R2BayesX
-SystemRequirements: GNU make, C++
+SystemRequirements: GNU make
 License: GPL-2 | GPL-3
 URL: https://www.uni-goettingen.de/de/bayesx/550513.html
